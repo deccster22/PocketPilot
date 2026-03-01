@@ -1,0 +1,11 @@
+{
+  "name": "pocketpilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PocketPilot scaffold",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check:structure": "node tests/structure.test.mjs"
+  }
+}
