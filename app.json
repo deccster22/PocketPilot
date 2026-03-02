@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "PocketPilot",
+    "slug": "pocketpilot",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"]
+  }
+}
