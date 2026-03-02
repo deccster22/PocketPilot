@@ -1,5 +1,5 @@
 \# PocketPilot (Phase 0 Foundation Lock)
-
+.
 
 
 PocketPilot is scaffolded as an Expo + TypeScript React Native app with architecture guardrails for deterministic core logic.
