@@ -1,11 +1,10 @@
 import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
 
 describe('resolveActiveStrategies', () => {
-  it('resolves beginner profile to at least noop strategy', () => {
+  it('resolves beginner profile to implemented data_quality and noop strategies', () => {
     const result = resolveActiveStrategies({ profile: 'BEGINNER' });
 
-    expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result.map((strategy) => strategy.id)).toContain('noop');
+    expect(result.map((strategy) => strategy.id)).toEqual(['data_quality', 'noop']);
   });
 
   it('returns noop when defaults are only unimplemented strategies', () => {

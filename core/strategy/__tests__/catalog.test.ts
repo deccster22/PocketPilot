@@ -6,6 +6,7 @@ describe('strategy catalog', () => {
 
     expect(result.map((entry) => entry.id)).toEqual([
       'noop',
+      'data_quality',
       'momentum_basics',
       'dip_buying',
       'trend_following',
@@ -18,6 +19,6 @@ describe('strategy catalog', () => {
     const result = listCatalog({ archetype: 'BEGINNER' });
 
     expect(result.every((entry) => entry.archetype === 'BEGINNER')).toBe(true);
-    expect(result.map((entry) => entry.id)).toEqual(['momentum_basics', 'dip_buying']);
+    expect(result.map((entry) => entry.id)).toEqual(['data_quality', 'momentum_basics', 'dip_buying']);
   });
 });
