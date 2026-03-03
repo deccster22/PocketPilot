@@ -10,6 +10,7 @@ describe('strategy catalog', () => {
       'momentum_basics',
       'dip_buying',
       'trend_following',
+      'snapshot_change',
       'mean_reversion',
       'fib_levels',
     ]);

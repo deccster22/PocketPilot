@@ -3,7 +3,7 @@ import type { StrategyId } from '@/core/strategy/types';
 
 const PROFILE_DEFAULTS: Record<UserProfile, readonly StrategyId[]> = {
   BEGINNER: ['data_quality', 'momentum_basics', 'noop'],
-  MIDDLE: ['trend_following', 'mean_reversion', 'momentum_basics'],
+  MIDDLE: ['trend_following', 'snapshot_change', 'mean_reversion'],
   ADVANCED: ['fib_levels', 'mean_reversion', 'noop'],
 };
 

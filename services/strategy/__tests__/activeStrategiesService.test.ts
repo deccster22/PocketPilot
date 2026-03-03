@@ -7,10 +7,9 @@ describe('resolveActiveStrategies', () => {
     expect(result.map((strategy) => strategy.id)).toEqual(['data_quality', 'noop']);
   });
 
-  it('returns noop when defaults are only unimplemented strategies', () => {
+  it('resolves middle profile to implemented snapshot_change strategy', () => {
     const result = resolveActiveStrategies({ profile: 'MIDDLE' });
 
-    expect(result).toHaveLength(1);
-    expect(result[0]?.id).toBe('noop');
+    expect(result.map((strategy) => strategy.id)).toEqual(['snapshot_change']);
   });
 });

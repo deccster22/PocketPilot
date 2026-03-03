@@ -3,11 +3,13 @@ import type { Strategy } from '@/core/strategy/types';
 
 import { dataQualityStrategy } from '@/core/strategy/strategies/dataQualityStrategy';
 import { noopStrategy } from '@/core/strategy/strategies/noopStrategy';
+import { snapshotChangeStrategy } from '@/core/strategy/strategies/snapshotChangeStrategy';
 import { defaultStrategyIdsForProfile } from '@/core/strategy/profileDefaults';
 
 const implementedStrategiesById: Record<string, Strategy> = {
   [dataQualityStrategy.id]: dataQualityStrategy,
   [noopStrategy.id]: noopStrategy,
+  [snapshotChangeStrategy.id]: snapshotChangeStrategy,
 };
 
 export function resolveActiveStrategies(params: { profile: UserProfile }): Strategy[] {

@@ -39,6 +39,14 @@ export const STRATEGY_CATALOG: readonly StrategyCatalogEntry[] = [
     sortOrder: 40,
   },
   {
+    id: 'snapshot_change',
+    name: 'Snapshot Change',
+    archetype: 'MIDDLE',
+    shortDescription: 'Flags symbols with notable movement versus an optional baseline snapshot.',
+    sortOrder: 45,
+    tags: ['delta', 'snapshot'],
+  },
+  {
     id: 'mean_reversion',
     name: 'Mean Reversion',
     archetype: 'MIDDLE',

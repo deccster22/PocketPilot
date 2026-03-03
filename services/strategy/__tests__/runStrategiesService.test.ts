@@ -1,4 +1,5 @@
 import type { Strategy } from '@/core/strategy/types';
+import { dataQualityStrategy } from '@/core/strategy/strategies/dataQualityStrategy';
 import { noopStrategy } from '@/core/strategy/strategies/noopStrategy';
 import { runStrategies } from '@/services/strategy/runStrategiesService';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -31,14 +32,43 @@ describe('runStrategies', () => {
     },
   };
 
-  it('returns empty signals for noop strategy', () => {
-    const result = runStrategies({
+  it('returns empty signals for noop strategy with or without baseline', () => {
+    const withoutBaseline = runStrategies({
       scan: baseScan,
       strategies: [noopStrategy],
       nowMs: 1_700_000_123_456,
     });
+    const withBaseline = runStrategies({
+      scan: baseScan,
+      baselineScan: baseScan,
+      strategies: [noopStrategy],
+      nowMs: 1_700_000_123_456,
+    });
 
-    expect(result).toEqual([]);
+    expect(withoutBaseline).toEqual([]);
+    expect(withBaseline).toEqual([]);
+  });
+
+  it('baseline is optional and does not affect data quality output', () => {
+    const withoutBaseline = runStrategies({
+      scan: baseScan,
+      strategies: [dataQualityStrategy],
+      nowMs: 1_700_000_123_456,
+    });
+    const withBaseline = runStrategies({
+      scan: baseScan,
+      baselineScan: {
+        ...baseScan,
+        quotes: [
+          { ...baseScan.quotes[0], price: 50 },
+          { ...baseScan.quotes[1], price: 100 },
+        ],
+      },
+      strategies: [dataQualityStrategy],
+      nowMs: 1_700_000_123_456,
+    });
+
+    expect(withBaseline).toEqual(withoutBaseline);
   });
 
   it('preserves deterministic ordering by strategy then signal', () => {
@@ -110,5 +140,46 @@ describe('runStrategies', () => {
     });
 
     expect(signal.timestampMs).toBe(nowMs);
+  });
+
+  it('provides pctChangeBySymbol when baselineScan is supplied', () => {
+    const captureScanInputStrategy: Strategy = {
+      id: 'capture-input',
+      name: 'Capture Input',
+      evaluate: (scan) => [
+        {
+          strategyId: 'capture-input',
+          severity: 'INFO',
+          title: 'capture',
+          message: JSON.stringify(scan.pctChangeBySymbol),
+          timestampMs: 0,
+        },
+      ],
+    };
+
+    const result = runStrategies({
+      scan: {
+        ...baseScan,
+        symbols: ['MSFT', 'AAPL', 'MISSING', 'ZERO'],
+        quotes: [
+          { ...baseScan.quotes[1], symbol: 'MSFT', price: 210 },
+          { ...baseScan.quotes[0], symbol: 'AAPL', price: 121 },
+          { symbol: 'ZERO', price: 7, source: 'stub-feed', timestampMs: 1, estimated: true },
+        ],
+      },
+      baselineScan: {
+        ...baseScan,
+        quotes: [
+          { ...baseScan.quotes[1], symbol: 'MSFT', price: 200 },
+          { ...baseScan.quotes[0], symbol: 'AAPL', price: 110 },
+          { symbol: 'ZERO', price: 0, source: 'stub-feed', timestampMs: 1, estimated: true },
+        ],
+      },
+      strategies: [captureScanInputStrategy],
+      nowMs: 1,
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.message).toBe(JSON.stringify({ MSFT: 0.05, AAPL: 0.1 }));
   });
 });

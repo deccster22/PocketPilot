@@ -15,8 +15,8 @@ describe('defaultStrategyIdsForProfile', () => {
     ]);
     expect(defaultStrategyIdsForProfile('MIDDLE')).toEqual([
       'trend_following',
+      'snapshot_change',
       'mean_reversion',
-      'momentum_basics',
     ]);
     expect(defaultStrategyIdsForProfile('ADVANCED')).toEqual(['fib_levels', 'mean_reversion', 'noop']);
   });

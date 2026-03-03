@@ -30,6 +30,8 @@ export type StrategyScanInput = {
   symbols: string[];
   quotes: Quote[];
   instrumentation: StrategyScanInstrumentation;
+  baselineQuotesBySymbol?: Record<string, Quote>;
+  pctChangeBySymbol?: Record<string, number>;
 };
 
 export type Strategy = {
