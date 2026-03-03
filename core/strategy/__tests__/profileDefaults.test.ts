@@ -10,8 +10,8 @@ describe('defaultStrategyIdsForProfile', () => {
   it('returns deterministic ordering for each profile', () => {
     expect(defaultStrategyIdsForProfile('BEGINNER')).toEqual([
       'data_quality',
+      'dip_buying',
       'momentum_basics',
-      'noop',
     ]);
     expect(defaultStrategyIdsForProfile('MIDDLE')).toEqual([
       'trend_following',

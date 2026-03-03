@@ -28,7 +28,7 @@ export const STRATEGY_CATALOG: readonly StrategyCatalogEntry[] = [
     id: 'dip_buying',
     name: 'Dip Buying',
     archetype: 'BEGINNER',
-    shortDescription: 'Identifies pullbacks for potential recovery monitoring.',
+    shortDescription: 'Flags symbols down >=4% versus baseline for calm dip monitoring.',
     sortOrder: 30,
   },
   {

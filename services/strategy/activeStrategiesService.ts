@@ -2,12 +2,14 @@ import type { UserProfile } from '@/core/profile/types';
 import type { Strategy } from '@/core/strategy/types';
 
 import { dataQualityStrategy } from '@/core/strategy/strategies/dataQualityStrategy';
+import { dipBuyingStrategy } from '@/core/strategy/strategies/dipBuyingStrategy';
 import { noopStrategy } from '@/core/strategy/strategies/noopStrategy';
 import { snapshotChangeStrategy } from '@/core/strategy/strategies/snapshotChangeStrategy';
 import { defaultStrategyIdsForProfile } from '@/core/strategy/profileDefaults';
 
 const implementedStrategiesById: Record<string, Strategy> = {
   [dataQualityStrategy.id]: dataQualityStrategy,
+  [dipBuyingStrategy.id]: dipBuyingStrategy,
   [noopStrategy.id]: noopStrategy,
   [snapshotChangeStrategy.id]: snapshotChangeStrategy,
 };
