@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/core', '<rootDir>/providers', '<rootDir>/app'],
+  roots: ['<rootDir>/core', '<rootDir>/providers', '<rootDir>/app', '<rootDir>/services'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
     '^expo-haptics$': '<rootDir>/__mocks__/expo-haptics.ts',
