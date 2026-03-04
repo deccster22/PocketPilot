@@ -1,12 +1,15 @@
 import type { UserProfile } from '@/core/profile/types';
-import type { StrategyId } from '@/core/strategy/types';
+import type { StrategyBundleId } from '@/core/strategy/bundles';
 
-const PROFILE_DEFAULTS: Record<UserProfile, readonly StrategyId[]> = {
-  BEGINNER: ['data_quality', 'dip_buying', 'momentum_basics'],
-  MIDDLE: ['trend_following', 'snapshot_change', 'mean_reversion'],
-  ADVANCED: ['fib_levels', 'mean_reversion', 'noop'],
+// P1J switches profile defaults from direct strategy IDs to bundle IDs.
+// Each profile maps to one deterministic core bundle that expands to a
+// three-strategy sequence during active strategy resolution.
+const PROFILE_DEFAULTS: Record<UserProfile, readonly StrategyBundleId[]> = {
+  BEGINNER: ['beginner_core'],
+  MIDDLE: ['middle_core'],
+  ADVANCED: ['advanced_core'],
 };
 
-export function defaultStrategyIdsForProfile(profile: UserProfile): StrategyId[] {
+export function defaultBundleIdsForProfile(profile: UserProfile): StrategyBundleId[] {
   return [...PROFILE_DEFAULTS[profile]];
 }

@@ -1,23 +1,15 @@
-import { defaultStrategyIdsForProfile } from '@/core/strategy/profileDefaults';
+import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
 
-describe('defaultStrategyIdsForProfile', () => {
-  it('returns exactly 3 default strategy ids per profile', () => {
-    expect(defaultStrategyIdsForProfile('BEGINNER')).toHaveLength(3);
-    expect(defaultStrategyIdsForProfile('MIDDLE')).toHaveLength(3);
-    expect(defaultStrategyIdsForProfile('ADVANCED')).toHaveLength(3);
+describe('defaultBundleIdsForProfile', () => {
+  it('returns exactly 1 default bundle id per profile in P1J', () => {
+    expect(defaultBundleIdsForProfile('BEGINNER')).toHaveLength(1);
+    expect(defaultBundleIdsForProfile('MIDDLE')).toHaveLength(1);
+    expect(defaultBundleIdsForProfile('ADVANCED')).toHaveLength(1);
   });
 
-  it('returns deterministic ordering for each profile', () => {
-    expect(defaultStrategyIdsForProfile('BEGINNER')).toEqual([
-      'data_quality',
-      'dip_buying',
-      'momentum_basics',
-    ]);
-    expect(defaultStrategyIdsForProfile('MIDDLE')).toEqual([
-      'trend_following',
-      'snapshot_change',
-      'mean_reversion',
-    ]);
-    expect(defaultStrategyIdsForProfile('ADVANCED')).toEqual(['fib_levels', 'mean_reversion', 'noop']);
+  it('returns deterministic ordering for each profile bundle list', () => {
+    expect(defaultBundleIdsForProfile('BEGINNER')).toEqual(['beginner_core']);
+    expect(defaultBundleIdsForProfile('MIDDLE')).toEqual(['middle_core']);
+    expect(defaultBundleIdsForProfile('ADVANCED')).toEqual(['advanced_core']);
   });
 });
