@@ -21,7 +21,7 @@ export const STRATEGY_CATALOG: readonly StrategyCatalogEntry[] = [
     id: 'momentum_basics',
     name: 'Momentum Basics',
     archetype: 'BEGINNER',
-    shortDescription: 'Tracks directional persistence using simple momentum cues.',
+    shortDescription: 'Flags symbols up >=4% versus baseline with beginner-safe momentum context.',
     sortOrder: 20,
   },
   {
