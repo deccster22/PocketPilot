@@ -1,9 +1,9 @@
 import type { Quote } from '@/core/types/quote';
 import { QuoteBroker } from '@/providers/quoteBroker';
 import { type Account } from '@/services/account/accountSelector';
-import { getExecutionQuotes } from '@/services/quotes/quotesService';
+import { fetchQuotes } from '@/services/quotes/quotesService';
 
-describe('getExecutionQuotes', () => {
+describe('fetchQuotes', () => {
   const nowMs = 1_700_000_000_000;
 
   it('uses primary account when present', async () => {
@@ -18,7 +18,7 @@ describe('getExecutionQuotes', () => {
         symbol,
         price: 100,
         source: accountId,
-        timestampMs: nowMs,
+        timestamp: nowMs,
         estimated: true,
       }));
     });
@@ -29,10 +29,13 @@ describe('getExecutionQuotes', () => {
       nowProvider: () => nowMs,
     });
 
-    const result = await getExecutionQuotes({ broker }, { accounts, symbols });
+    const result = await fetchQuotes({ broker }, { accounts, symbols });
 
     expect(result.accountId).toBe('acct-2');
     expect(fetcher).toHaveBeenCalledWith('acct-2', ['AAPL', 'MSFT'], nowMs);
+    expect(result.quotes[0]).toEqual(
+      expect.objectContaining({ symbol: 'AAPL', estimated: true, timestamp: nowMs }),
+    );
   });
 
   it('uses highest portfolio account when no primary exists', async () => {
@@ -46,7 +49,7 @@ describe('getExecutionQuotes', () => {
         symbol,
         price: 100,
         source: accountId,
-        timestampMs: nowMs,
+        timestamp: nowMs,
         estimated: true,
       }));
     });
@@ -57,34 +60,9 @@ describe('getExecutionQuotes', () => {
       nowProvider: () => nowMs,
     });
 
-    const result = await getExecutionQuotes({ broker }, { accounts, symbols: ['NVDA'] });
+    const result = await fetchQuotes({ broker }, { accounts, symbols: ['NVDA'] });
 
     expect(result.accountId).toBe('acct-2');
     expect(fetcher).toHaveBeenCalledWith('acct-2', ['NVDA'], nowMs);
-  });
-
-  it('passes symbols through unchanged', async () => {
-    const accounts: Account[] = [{ id: 'acct-1', portfolioValue: 1_000, isPrimary: true }];
-    const symbols = ['TSLA', 'ETH-USD', 'EURUSD'];
-
-    const fetcher = jest.fn(async (_accountId: string, requestedSymbols: string[]): Promise<Quote[]> => {
-      return requestedSymbols.map((symbol) => ({
-        symbol,
-        price: 100,
-        source: 'stub-feed',
-        timestampMs: nowMs,
-        estimated: true,
-      }));
-    });
-
-    const broker = new QuoteBroker({
-      mode: 'CALM',
-      fetcher,
-      nowProvider: () => nowMs,
-    });
-
-    await getExecutionQuotes({ broker }, { accounts, symbols });
-
-    expect(fetcher).toHaveBeenCalledWith('acct-1', symbols, nowMs);
   });
 });

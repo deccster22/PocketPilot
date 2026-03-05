@@ -5,6 +5,9 @@ export type EstimatedValue = {
 export type Quote = EstimatedValue & {
   symbol: string;
   price: number;
-  source: string;
-  timestampMs: number;
+  bid?: number;
+  ask?: number;
+  source?: string;
+  timestamp?: number;
+  timestampMs?: number;
 };
