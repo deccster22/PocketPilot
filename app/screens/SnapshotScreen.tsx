@@ -1,13 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ChangeListTile, type ChangeListItem } from '@/app/components/ChangeListTile';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { SignalsList } from '@/app/components/SignalsList';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
-import { runDemoScan } from '@/services/scan/runDemoScan';
+import { fetchSnapshotVM, type SnapshotVM } from '@/services/snapshot/snapshotService';
 
-function topMovers(pctChangeBySymbol: Record<string, number>, estimatedBySymbol: Record<string, boolean>) {
+function topMovers(
+  pctChangeBySymbol: Record<string, number>,
+  estimatedBySymbol: Record<string, boolean>,
+) {
   return Object.entries(pctChangeBySymbol)
     .filter(([, pct]) => pct > 0)
     .sort((a, b) => b[1] - a[1])
@@ -33,18 +36,38 @@ function topDips(pctChangeBySymbol: Record<string, number>, estimatedBySymbol: R
 
 export function SnapshotScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
-  const snapshot = useMemo(
-    () => runDemoScan({ profile, nowMs: 1_700_000_000_000 }),
-    [profile],
-  );
+  const [snapshot, setSnapshot] = useState<SnapshotVM | null>(null);
+  const [baselineScan, setBaselineScan] = useState<SnapshotVM['scan']>();
 
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchSnapshotVM({ profile, baselineScan })
+      .then((nextSnapshot) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setSnapshot(nextSnapshot);
+        setBaselineScan((currentBaseline) => currentBaseline ?? nextSnapshot.scan);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setSnapshot(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [profile, baselineScan]);
+
+  const pctChangeBySymbol = snapshot?.scan.pctChangeBySymbol ?? {};
   const estimatedBySymbol = useMemo(
-    () =>
-      snapshot.scan.quotes.reduce<Record<string, boolean>>((acc, quote) => {
-        acc[quote.symbol] = quote.estimated;
-        return acc;
-      }, {}),
-    [snapshot.scan.quotes],
+    () => snapshot?.scan.estimatedFlags ?? {},
+    [snapshot?.scan.estimatedFlags],
   );
 
   return (
@@ -55,26 +78,23 @@ export function SnapshotScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Profile</Text>
           <ProfileSelector value={profile} onChange={setProfile} />
-          <Text style={styles.bundleLabel}>Bundle: {snapshot.bundleName}</Text>
+          <Text style={styles.bundleLabel}>Bundle: {snapshot?.bundleName ?? 'Loading...'}</Text>
+          <Text style={styles.bundleLabel}>Portfolio Value: {snapshot?.portfolioValue.toFixed(2) ?? '--'}</Text>
+          <Text style={styles.bundleLabel}>24h Change: {((snapshot?.change24h ?? 0) * 100).toFixed(2)}%</Text>
+          <Text style={styles.bundleLabel}>Strategy Alignment: {snapshot?.strategyAlignment ?? '--'}</Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Current state (estimated where noted)</Text>
           <View style={styles.tiles}>
-            <ChangeListTile
-              title="Top Movers"
-              items={topMovers(snapshot.pctChangeBySymbol, estimatedBySymbol)}
-            />
-            <ChangeListTile
-              title="Top Dips"
-              items={topDips(snapshot.pctChangeBySymbol, estimatedBySymbol)}
-            />
+            <ChangeListTile title="Top Movers" items={topMovers(pctChangeBySymbol, estimatedBySymbol)} />
+            <ChangeListTile title="Top Dips" items={topDips(pctChangeBySymbol, estimatedBySymbol)} />
           </View>
         </View>
 
-        <SignalsList signals={snapshot.signals} />
+        <SignalsList signals={snapshot?.signals ?? []} />
 
-        <Text style={styles.footer}>Demo data</Text>
+        <Text style={styles.footer}>Live quotes via QuoteBroker</Text>
       </ScrollView>
     </SafeAreaView>
   );

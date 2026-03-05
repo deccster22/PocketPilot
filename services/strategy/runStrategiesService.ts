@@ -5,7 +5,7 @@ import type {
   StrategySignal,
 } from '@/core/strategy/types';
 import { pctChange } from '@/core/utils/pctChange';
-import { indexQuotesBySymbol } from '@/core/utils/quoteIndex';
+
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export function runStrategies(params: {
@@ -17,13 +17,13 @@ export function runStrategies(params: {
   const input: StrategyScanInput = {
     accountId: params.scan.accountId,
     symbols: params.scan.symbols,
-    quotes: params.scan.quotes,
+    quotes: Object.values(params.scan.quotes),
     instrumentation: params.scan.instrumentation,
   };
 
   if (params.baselineScan) {
-    const baselineQuotesBySymbol = indexQuotesBySymbol(params.baselineScan.quotes);
-    const currentQuotesBySymbol = indexQuotesBySymbol(params.scan.quotes);
+    const baselineQuotesBySymbol = params.baselineScan.quotes;
+    const currentQuotesBySymbol = params.scan.quotes;
     const pctChangeBySymbol: Record<string, number> = {};
 
     for (const symbol of params.scan.symbols) {
