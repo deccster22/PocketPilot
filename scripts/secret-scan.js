@@ -58,7 +58,7 @@ function isIgnored(filePath) {
   if (p.includes("/core/config/__tests__/")) return true;
 
   
-  return `${match.slice(0, 4)}…[REDACTED]`;
+  return false; // or your existing default
 }
 
 function scanFile(filePath) {
