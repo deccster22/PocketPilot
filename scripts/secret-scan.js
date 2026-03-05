@@ -61,8 +61,19 @@ function isIgnored(filePath) {
   return false; // or your existing default
 }
 
+// helpers
+function truncateMatch(match) {
+  if (match.length <= 8) {
+    return '[REDACTED]';
+  }
+
+  return `${match.slice(0, 4)}…[REDACTED]`;
+}
+
+// scanning logic
 function scanFile(filePath) {
   let content;
+
   try {
     content = readFileSync(filePath, 'utf8');
   } catch {
@@ -81,7 +92,7 @@ function scanFile(filePath) {
           filePath,
           line: index + 1,
           type: pattern.name,
-          sample: truncateMatch(match[0]),
+          sample: truncateMatch(match[0]),  // <-- now defined
         });
       });
     });
