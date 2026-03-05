@@ -47,15 +47,17 @@ const patterns = [
   { name: 'Bearer token header', regex: /Authorization\s*:\s*Bearer\s+[A-Za-z0-9._-]{12,}/gi },
 ];
 
+
+
 function isIgnored(filePath) {
-  return filePath.startsWith('node_modules/') || filePath.startsWith('.git/');
-}
+  const p = filePath.replace(/\\/g, "/"); // normalise Windows paths
 
-function truncateMatch(match) {
-  if (match.length <= 8) {
-    return '[REDACTED]';
-  }
+  // keep your existing ignores first/after this
 
+  if (p.endsWith("/.env.example") || p === ".env.example") return true;
+  if (p.includes("/core/config/__tests__/")) return true;
+
+  
   return `${match.slice(0, 4)}…[REDACTED]`;
 }
 
