@@ -11,6 +11,21 @@ function run(command) {
   }
 }
 
+// Files that intentionally contain example or test secrets
+const ALLOWLIST_FILES = new Set([
+  ".env.example",
+  "core/config/__tests__/redact.test.ts",
+]);
+
+function normalizePath(p) {
+  return p.replace(/\\/g, "/");
+}
+
+function isAllowlisted(filePath) {
+  const normalized = normalizePath(filePath);
+  return ALLOWLIST_FILES.has(normalized);
+}
+
 function getTargetFiles() {
   const baseRef = process.env.GITHUB_BASE_REF;
   if (baseRef) {
@@ -86,7 +101,14 @@ function scanFile(filePath) {
   lines.forEach((line, index) => {
     patterns.forEach((pattern) => {
       const matches = [...line.matchAll(pattern.regex)];
+const allowlistedFiles = new Set([
+  "core/config/__tests__/redact.test.ts",
+  ".env.example",
+]);
 
+// …when creating findings:
+const rel = filePath.replace(process.cwd() + path.sep, "").replace(/\\/g, "/");
+if (allowlistedFiles.has(rel)) return;
       matches.forEach((match) => {
         findings.push({
           filePath,
@@ -106,13 +128,21 @@ function main() {
   const findings = [];
 
   files.forEach((filePath) => {
-    findings.push(...scanFile(filePath));
-  });
+  const relPath = normalizePath(
+    filePath.replace(process.cwd() + require("path").sep, "")
+  );
+
+  if (isAllowlisted(relPath)) {
+    return;
+  }
+
+  findings.push(...scanFile(filePath));
+});
 
   const trackedEnvFiles = run("git ls-files '.env' '.env.*'")
-    .split('\n')
-    .map((file) => file.trim())
-    .filter(Boolean);
+   .split('\n')
+   .map((file) => file.trim())
+   .filter((file) => file && file !== ".env.example");
 
   trackedEnvFiles.forEach((filePath) => {
     findings.push({
