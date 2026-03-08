@@ -9,12 +9,20 @@ export type QuotesServiceDeps = {
   broker: QuoteBroker;
 };
 
-export async function getExecutionQuotes(
+export type FetchQuotesResult = {
+  accountId: string;
+  quotes: Quote[];
+};
+
+export async function fetchQuotes(
   deps: QuotesServiceDeps,
   params: { accounts: Account[]; symbols: string[] },
-): Promise<{ accountId: string; quotes: Quote[] }> {
+): Promise<FetchQuotesResult> {
   const accountId = selectExecutionAccount(params.accounts);
   const quotes = await deps.broker.getQuotes(accountId, params.symbols);
 
-  return { accountId, quotes };
+  return {
+    accountId,
+    quotes,
+  };
 }

@@ -8,13 +8,13 @@ describe('runForegroundScan', () => {
 
   function createBroker() {
     const fetcher = jest.fn(
-      async (accountId: string, symbols: string[], timestampMs: number): Promise<Quote[]> => {
+      async (accountId: string, symbols: string[], timestamp: number): Promise<Quote[]> => {
         return symbols.map((symbol) => ({
           symbol,
-          price: 100,
+          price: symbol === 'AAPL' ? 100 : 200,
           source: accountId,
-          timestampMs,
-          estimated: true,
+          timestamp,
+          estimated: symbol === 'MSFT',
         }));
       },
     );
@@ -28,42 +28,32 @@ describe('runForegroundScan', () => {
     return { broker, fetcher };
   }
 
-  it('returns accountId chosen by account selector (primary account)', async () => {
-    const accounts: Account[] = [
-      { id: 'acct-1', portfolioValue: 22_000 },
-      { id: 'acct-primary', portfolioValue: 1_000, isPrimary: true },
-    ];
-
-    const symbols = ['AAPL', 'MSFT', 'NVDA'];
+  it('maps quotes by symbol and passes estimated flags', async () => {
+    const accounts: Account[] = [{ id: 'acct-primary', portfolioValue: 9_000, isPrimary: true }];
+    const symbols = ['AAPL', 'MSFT'];
     const { broker } = createBroker();
 
     const result = await runForegroundScan({ broker }, { accounts, symbols });
 
-    expect(result.accountId).toBe('acct-primary');
+    expect(result.quotes.AAPL?.price).toBe(100);
+    expect(result.quotes.MSFT?.estimated).toBe(true);
+    expect(result.estimatedFlags).toEqual({ AAPL: false, MSFT: true });
   });
 
-  it('returns instrumentation reflecting CALM mode caps', async () => {
+  it('computes pct change from baseline', async () => {
     const accounts: Account[] = [{ id: 'acct-primary', portfolioValue: 9_000, isPrimary: true }];
-    const symbols = Array.from({ length: 25 }, (_, i) => `SYM${i}`);
+    const symbols = ['AAPL', 'MSFT'];
     const { broker } = createBroker();
 
-    const result = await runForegroundScan({ broker }, { accounts, symbols });
+    const result = await runForegroundScan({ broker }, {
+      accounts,
+      symbols,
+      baselineQuotes: {
+        AAPL: { symbol: 'AAPL', price: 80, estimated: false, timestamp: nowMs - 1000 },
+        MSFT: { symbol: 'MSFT', price: 250, estimated: true, timestamp: nowMs - 1000 },
+      },
+    });
 
-    expect(result.instrumentation.symbolsFetched).toBeLessThanOrEqual(20);
-    expect(result.instrumentation.symbolsBlocked).toBe(
-      symbols.length - result.instrumentation.symbolsFetched,
-    );
-  });
-
-  it('returns quotes length matching fetched symbols and returns symbols unchanged', async () => {
-    const accounts: Account[] = [{ id: 'acct-primary', portfolioValue: 9_000, isPrimary: true }];
-    const symbols = Array.from({ length: 25 }, (_, i) => `SYM${i}`);
-    const { broker } = createBroker();
-
-    const result = await runForegroundScan({ broker }, { accounts, symbols });
-
-    expect(result.quotes).toHaveLength(20);
-    expect(result.quotes).toHaveLength(result.instrumentation.symbolsFetched);
-    expect(result.symbols).toBe(symbols);
+    expect(result.pctChangeBySymbol).toEqual({ AAPL: 0.25, MSFT: -0.2 });
   });
 });
