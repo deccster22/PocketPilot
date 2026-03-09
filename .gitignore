@@ -27,3 +27,7 @@ yarn-error.log*
 
 # windows
 Thumbs.db
+
+# temp file
+docs/incoming
+docs/governance/*.pdf
