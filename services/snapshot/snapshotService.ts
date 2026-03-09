@@ -3,6 +3,7 @@ import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
 import { QuoteBroker } from '@/providers/quoteBroker';
 import { fetchLiveQuotes } from '@/providers/liveQuoteFetcher';
 import type { UserProfile } from '@/app/state/profileState';
+import { createQuoteBrokerProvider, getQuotesForSymbols } from '@/services/providers/providerRouter';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
 import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
 import { runStrategies } from '@/services/strategy/runStrategiesService';
@@ -32,9 +33,20 @@ export async function fetchSnapshotVM(params: {
     fetcher: fetchLiveQuotes,
     nowProvider,
   });
+  const primaryProvider = createQuoteBrokerProvider(broker, 'broker:live');
 
   const scan = await runForegroundScan(
-    { broker },
+    {
+      getQuotesForSymbols: (routerParams) =>
+        getQuotesForSymbols(
+          {
+            primary: primaryProvider,
+          },
+          routerParams,
+        ),
+      nowProvider,
+      getInstrumentation: () => broker.instrumentation,
+    },
     {
       accounts: SNAPSHOT_ACCOUNTS,
       symbols: [...SNAPSHOT_SYMBOLS],
