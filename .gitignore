@@ -27,3 +27,6 @@ yarn-error.log*
 
 # windows
 Thumbs.db
+
+# temp file folders
+docs/incoming
