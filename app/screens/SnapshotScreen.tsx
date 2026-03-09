@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ChangeListTile, type ChangeListItem } from '@/app/components/ChangeListTile';
+import { DebugObservatoryPanel } from '@/app/components/debug/DebugObservatoryPanel';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { SignalsList } from '@/app/components/SignalsList';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { Config } from '@/core/config/Config';
 import { fetchSnapshotVM, type SnapshotVM } from '@/services/snapshot/snapshotService';
 
 function topMovers(
@@ -38,11 +40,14 @@ export function SnapshotScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [snapshot, setSnapshot] = useState<SnapshotVM | null>(null);
   const [baselineScan, setBaselineScan] = useState<SnapshotVM['scan']>();
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
+
+  const isDebugPanelEnabled = __DEV__ && Config.ENABLE_DEBUG_PANEL;
 
   useEffect(() => {
     let isMounted = true;
 
-    fetchSnapshotVM({ profile, baselineScan })
+    fetchSnapshotVM({ profile, baselineScan, includeDebugObservatory: isDebugPanelEnabled })
       .then((nextSnapshot) => {
         if (!isMounted) {
           return;
@@ -62,7 +67,7 @@ export function SnapshotScreen() {
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan]);
+  }, [profile, baselineScan, isDebugPanelEnabled]);
 
   const pctChangeBySymbol = snapshot?.scan.pctChangeBySymbol ?? {};
   const estimatedBySymbol = useMemo(
@@ -93,6 +98,24 @@ export function SnapshotScreen() {
         </View>
 
         <SignalsList signals={snapshot?.signals ?? []} />
+
+        {isDebugPanelEnabled ? (
+          <View style={styles.section}>
+            <Pressable
+              style={styles.debugToggle}
+              onPress={() => {
+                setShowDebugPanel((current) => !current);
+              }}
+            >
+              <Text style={styles.debugToggleText}>
+                {showDebugPanel ? 'Hide Debug Observatory' : 'Show Debug Observatory'}
+              </Text>
+            </Pressable>
+            {showDebugPanel && snapshot?.debugObservatory ? (
+              <DebugObservatoryPanel payload={snapshot.debugObservatory} />
+            ) : null}
+          </View>
+        ) : null}
 
         <Text style={styles.footer}>Live quotes via QuoteBroker</Text>
       </ScrollView>
@@ -133,6 +156,20 @@ const styles = StyleSheet.create({
   },
   tiles: {
     gap: 10,
+  },
+  debugToggle: {
+    borderWidth: 1,
+    borderColor: '#9ca3af',
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    alignSelf: 'flex-start',
+  },
+  debugToggleText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   footer: {
     textAlign: 'center',
