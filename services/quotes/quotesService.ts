@@ -1,28 +1,42 @@
 import type { Quote } from '@/core/types/quote';
-import { QuoteBroker } from '@/providers/quoteBroker';
+import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 import {
   selectExecutionAccount,
   type Account,
 } from '@/services/account/accountSelector';
 
 export type QuotesServiceDeps = {
-  broker: QuoteBroker;
+  getQuotesForSymbols: (params: {
+    accountId: string;
+    symbols: string[];
+    nowMs: number;
+    cachedQuotes?: Record<string, Quote>;
+  }) => Promise<ProviderRouterResult>;
+  nowProvider?: () => number;
 };
 
 export type FetchQuotesResult = {
   accountId: string;
-  quotes: Quote[];
+  quotes: Record<string, Quote>;
+  routerMeta: ProviderRouterResult['meta'];
 };
 
 export async function fetchQuotes(
   deps: QuotesServiceDeps,
-  params: { accounts: Account[]; symbols: string[] },
+  params: { accounts: Account[]; symbols: string[]; cachedQuotes?: Record<string, Quote> },
 ): Promise<FetchQuotesResult> {
   const accountId = selectExecutionAccount(params.accounts);
-  const quotes = await deps.broker.getQuotes(accountId, params.symbols);
+  const nowMs = deps.nowProvider ? deps.nowProvider() : Date.now();
+  const routerResult = await deps.getQuotesForSymbols({
+    accountId,
+    symbols: params.symbols,
+    nowMs,
+    cachedQuotes: params.cachedQuotes,
+  });
 
   return {
     accountId,
-    quotes,
+    quotes: routerResult.quotes,
+    routerMeta: routerResult.meta,
   };
 }

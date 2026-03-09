@@ -1,23 +1,18 @@
-import type { QuoteBroker } from '@/providers/quoteBroker';
+import type { Quote } from '@/core/types/quote';
 import type { Account } from '@/services/account/accountSelector';
 import { fetchQuotes } from '@/services/quotes/quotesService';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type ForegroundScanDeps = {
-  broker: QuoteBroker;
+  getQuotesForSymbols: Parameters<typeof fetchQuotes>[0]['getQuotesForSymbols'];
+  nowProvider?: () => number;
+  getInstrumentation: () => ForegroundScanResult['instrumentation'];
 };
-
-function toQuoteRecord(quotes: Awaited<ReturnType<typeof fetchQuotes>>['quotes']) {
-  return quotes.reduce<Record<string, (typeof quotes)[number]>>((acc, quote) => {
-    acc[quote.symbol] = quote;
-    return acc;
-  }, {});
-}
 
 function computePctChange(
   symbols: string[],
-  baselineQuotes: Record<string, Awaited<ReturnType<typeof fetchQuotes>>['quotes'][number]> | undefined,
-  currentQuotes: Record<string, Awaited<ReturnType<typeof fetchQuotes>>['quotes'][number]>,
+  baselineQuotes: Record<string, Quote> | undefined,
+  currentQuotes: Record<string, Quote>,
 ): Record<string, number> | undefined {
   if (!baselineQuotes) {
     return undefined;
@@ -40,27 +35,33 @@ function computePctChange(
 
 export async function runForegroundScan(
   deps: ForegroundScanDeps,
-  params: { accounts: Account[]; symbols: string[]; baselineQuotes?: Record<string, Awaited<ReturnType<typeof fetchQuotes>>['quotes'][number]> },
+  params: { accounts: Account[]; symbols: string[]; baselineQuotes?: Record<string, Quote> },
 ): Promise<ForegroundScanResult> {
-  const { accountId, quotes } = await fetchQuotes(
-    { broker: deps.broker },
-    { accounts: params.accounts, symbols: params.symbols },
+  const { accountId, quotes, routerMeta } = await fetchQuotes(
+    {
+      getQuotesForSymbols: deps.getQuotesForSymbols,
+      nowProvider: deps.nowProvider,
+    },
+    {
+      accounts: params.accounts,
+      symbols: params.symbols,
+
+    },
   );
 
-  const quoteRecord = toQuoteRecord(quotes);
-
-  const estimatedFlags = Object.keys(quoteRecord).reduce<Record<string, boolean>>((acc, symbol) => {
-    acc[symbol] = quoteRecord[symbol]?.estimated ?? false;
+  const estimatedFlags = Object.keys(quotes).reduce<Record<string, boolean>>((acc, symbol) => {
+    acc[symbol] = quotes[symbol]?.estimated ?? false;
     return acc;
   }, {});
 
   return {
     accountId,
     symbols: params.symbols,
-    quotes: quoteRecord,
+    quotes,
     baselineQuotes: params.baselineQuotes,
-    pctChangeBySymbol: computePctChange(params.symbols, params.baselineQuotes, quoteRecord),
+    pctChangeBySymbol: computePctChange(params.symbols, params.baselineQuotes, quotes),
     estimatedFlags,
-    instrumentation: deps.broker.instrumentation,
+    instrumentation: deps.getInstrumentation(),
+    quoteMeta: routerMeta,
   };
 }
