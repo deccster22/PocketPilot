@@ -3,6 +3,10 @@ import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
 import { QuoteBroker } from '@/providers/quoteBroker';
 import { fetchLiveQuotes } from '@/providers/liveQuoteFetcher';
 import type { UserProfile } from '@/app/state/profileState';
+import {
+  buildDebugObservatoryPayload,
+  type DebugObservatoryPayload,
+} from '@/services/debug/debugObservatoryService';
 import { createQuoteBrokerProvider, getQuotesForSymbols } from '@/services/providers/providerRouter';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
 import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
@@ -20,12 +24,14 @@ export type SnapshotVM = {
   bundleName: string;
   scan: ForegroundScanResult;
   signals: ReturnType<typeof runStrategies>;
+  debugObservatory?: DebugObservatoryPayload;
 };
 
 export async function fetchSnapshotVM(params: {
   profile: UserProfile;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
+  includeDebugObservatory?: boolean;
 }): Promise<SnapshotVM> {
   const nowProvider = params.nowProvider ?? Date.now;
   const broker = new QuoteBroker({
@@ -55,11 +61,12 @@ export async function fetchSnapshotVM(params: {
   );
 
   const strategies = resolveActiveStrategies({ profile: params.profile });
+  const strategyNowMs = nowProvider();
   const signals = runStrategies({
     scan,
     baselineScan: params.baselineScan,
     strategies,
-    nowMs: nowProvider(),
+    nowMs: strategyNowMs,
   });
 
   const prices = Object.values(scan.quotes).map((quote) => quote.price);
@@ -75,6 +82,23 @@ export async function fetchSnapshotVM(params: {
     STRATEGY_BUNDLES.find((bundle) => bundle.id === defaultBundleId)?.name ?? 'Unknown bundle';
 
   const strategyAlignment = signals.length === 0 ? 'Aligned' : 'Needs review';
+  const debugObservatory = params.includeDebugObservatory
+    ? buildDebugObservatoryPayload({
+        timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
+        symbols: scan.symbols,
+        quotes: scan.quotes,
+        quoteMeta: scan.quoteMeta,
+        deltas: scan.pctChangeBySymbol,
+        strategySignals: signals,
+        snapshot: {
+          portfolioValue,
+          change24h,
+          strategyAlignment,
+          bundleName,
+          accountId: scan.accountId,
+        },
+      })
+    : undefined;
 
   return {
     portfolioValue,
@@ -83,5 +107,6 @@ export async function fetchSnapshotVM(params: {
     bundleName,
     scan,
     signals,
+    debugObservatory,
   };
 }
