@@ -38,22 +38,44 @@ export const snapshotChangeStrategy: Strategy = {
       .slice(0, MAX_SYMBOL_SIGNALS)
       .map(([symbol, pct]) => ({
         strategyId: STRATEGY_ID,
+        signalCode: 'snapshot_move_threshold_met',
         symbol,
         severity: 'WATCH',
         title: 'Fast move',
         message: `${symbol} is ${formatDirectionAndPct(pct)} vs baseline.`,
         timestampMs: ctx.nowMs,
         tags: ['delta', 'snapshot'],
+        eventHint: {
+          eventType: 'PRICE_MOVEMENT',
+          alignmentState: 'WATCHFUL',
+          confidenceScore: Math.min(0.92, 0.68 + Math.abs(pct)),
+          relatedSymbols: [symbol],
+          metadata: {
+            threshold: MOVEMENT_THRESHOLD,
+            direction: pct >= 0 ? 'up' : 'down',
+          },
+        },
       }));
 
     if (qualifying.length > MAX_SYMBOL_SIGNALS) {
       signals.push({
         strategyId: STRATEGY_ID,
+        signalCode: 'snapshot_move_summary',
         severity: 'INFO',
         title: 'More movers',
         message: `${qualifying.length} symbols moved >=3% vs baseline.`,
         timestampMs: ctx.nowMs,
         tags: ['delta', 'snapshot'],
+        eventHint: {
+          eventType: 'PRICE_MOVEMENT',
+          alignmentState: 'WATCHFUL',
+          confidenceScore: 0.76,
+          relatedSymbols: qualifying.map(([symbol]) => symbol),
+          metadata: {
+            qualifyingCount: qualifying.length,
+            threshold: MOVEMENT_THRESHOLD,
+          },
+        },
       });
     }
 

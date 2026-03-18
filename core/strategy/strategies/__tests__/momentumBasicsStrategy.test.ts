@@ -40,6 +40,7 @@ describe('momentumBasicsStrategy', () => {
     expect(result).toHaveLength(2);
     expect(result.every((signal) => signal.severity === 'WATCH')).toBe(true);
     expect(result.map((signal) => signal.symbol)).toEqual(['TSLA', 'AAPL']);
+    expect(result.every((signal) => signal.eventHint.eventType === 'MOMENTUM_BUILDING')).toBe(true);
   });
 
   it('sorts largest pct first; ties by symbol', () => {
@@ -80,14 +81,17 @@ describe('momentumBasicsStrategy', () => {
       'CCC',
       'BBB',
     ]);
-    expect(result[5]).toEqual({
-      strategyId: 'momentum_basics',
-      severity: 'INFO',
-      title: 'More movers',
-      message: '6 symbols are up >=4% vs baseline.',
-      timestampMs: ctx.nowMs,
-      tags: ['delta', 'momentum', 'beginner'],
-    });
+    expect(result[5]).toEqual(
+      expect.objectContaining({
+        strategyId: 'momentum_basics',
+        signalCode: 'momentum_summary',
+        severity: 'INFO',
+        title: 'More movers',
+        message: '6 symbols are up >=4% vs baseline.',
+        timestampMs: ctx.nowMs,
+        tags: ['delta', 'momentum', 'beginner'],
+      }),
+    );
   });
 
   it('includes estimated quote note when matching quote is estimated', () => {

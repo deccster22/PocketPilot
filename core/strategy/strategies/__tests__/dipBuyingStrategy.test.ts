@@ -40,6 +40,7 @@ describe('dipBuyingStrategy', () => {
     expect(result).toHaveLength(2);
     expect(result.every((signal) => signal.severity === 'WATCH')).toBe(true);
     expect(result.map((signal) => signal.symbol)).toEqual(['TSLA', 'AAPL']);
+    expect(result.every((signal) => signal.eventHint.eventType === 'DIP_DETECTED')).toBe(true);
   });
 
   it('sorts most negative first; ties by symbol', () => {
@@ -80,14 +81,17 @@ describe('dipBuyingStrategy', () => {
       'CCC',
       'BBB',
     ]);
-    expect(result[5]).toEqual({
-      strategyId: 'dip_buying',
-      severity: 'INFO',
-      title: 'More dips',
-      message: '6 symbols are down >=4% vs baseline.',
-      timestampMs: ctx.nowMs,
-      tags: ['delta', 'dip', 'beginner'],
-    });
+    expect(result[5]).toEqual(
+      expect.objectContaining({
+        strategyId: 'dip_buying',
+        signalCode: 'dip_summary',
+        severity: 'INFO',
+        title: 'More dips',
+        message: '6 symbols are down >=4% vs baseline.',
+        timestampMs: ctx.nowMs,
+        tags: ['delta', 'dip', 'beginner'],
+      }),
+    );
   });
 
   it('includes estimated quote note when matching quote is estimated', () => {

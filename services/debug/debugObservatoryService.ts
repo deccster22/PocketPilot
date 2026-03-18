@@ -1,4 +1,5 @@
 import type { StrategySignal } from '@/core/strategy/types';
+import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
 import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 
@@ -30,6 +31,7 @@ export type DebugObservatoryPayload = {
   };
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
+  marketEvents?: MarketEvent[];
   snapshot?: DebugObservatorySnapshot;
 };
 
@@ -40,6 +42,7 @@ export type BuildDebugObservatoryPayloadParams = {
   quoteMeta?: ProviderRouterResult['meta'];
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
+  marketEvents?: MarketEvent[];
   snapshot?: DebugObservatorySnapshot;
 };
 
@@ -86,6 +89,7 @@ export function buildDebugObservatoryPayload(
     },
     deltas: params.deltas,
     strategySignals: params.strategySignals,
+    marketEvents: params.marketEvents,
     snapshot: params.snapshot,
   };
 }

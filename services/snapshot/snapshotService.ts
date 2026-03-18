@@ -1,5 +1,6 @@
 import { STRATEGY_BUNDLES } from '@/core/strategy/bundles';
 import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
+import type { AlignmentState, MarketEvent } from '@/core/types/marketEvent';
 import { QuoteBroker } from '@/providers/quoteBroker';
 import { fetchLiveQuotes } from '@/providers/liveQuoteFetcher';
 import type { UserProfile } from '@/app/state/profileState';
@@ -7,7 +8,16 @@ import {
   buildDebugObservatoryPayload,
   type DebugObservatoryPayload,
 } from '@/services/debug/debugObservatoryService';
-import { createQuoteBrokerProvider, getQuotesForSymbols } from '@/services/providers/providerRouter';
+import { createMarketEvents } from '@/services/events/createMarketEvents';
+import {
+  createEventStream,
+  summarizeAlignment,
+  type EventStream,
+} from '@/services/events/eventStream';
+import {
+  createQuoteBrokerProvider,
+  getQuotesForSymbols,
+} from '@/services/providers/providerRouter';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
 import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
 import { runStrategies } from '@/services/strategy/runStrategiesService';
@@ -24,8 +34,21 @@ export type SnapshotVM = {
   bundleName: string;
   scan: ForegroundScanResult;
   signals: ReturnType<typeof runStrategies>;
+  marketEvents: MarketEvent[];
+  eventStream: EventStream;
   debugObservatory?: DebugObservatoryPayload;
 };
+
+export function formatAlignmentState(alignmentState: AlignmentState): string {
+  switch (alignmentState) {
+    case 'NEEDS_REVIEW':
+      return 'Needs review';
+    case 'WATCHFUL':
+      return 'Watchful';
+    default:
+      return 'Aligned';
+  }
+}
 
 export async function fetchSnapshotVM(params: {
   profile: UserProfile;
@@ -68,6 +91,17 @@ export async function fetchSnapshotVM(params: {
     strategies,
     nowMs: strategyNowMs,
   });
+  const marketEvents = createMarketEvents({
+    accountId: scan.accountId,
+    quotesBySymbol: scan.quotes,
+    pctChangeBySymbol: scan.pctChangeBySymbol,
+    signals,
+  });
+  const eventStream = createEventStream({
+    accountId: scan.accountId,
+    timestamp: strategyNowMs,
+    events: marketEvents,
+  });
 
   const prices = Object.values(scan.quotes).map((quote) => quote.price);
   const portfolioValue = prices.reduce((sum, price) => sum + price, 0);
@@ -81,7 +115,7 @@ export async function fetchSnapshotVM(params: {
   const bundleName =
     STRATEGY_BUNDLES.find((bundle) => bundle.id === defaultBundleId)?.name ?? 'Unknown bundle';
 
-  const strategyAlignment = signals.length === 0 ? 'Aligned' : 'Needs review';
+  const strategyAlignment = formatAlignmentState(summarizeAlignment(eventStream.events));
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
         timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
@@ -90,6 +124,7 @@ export async function fetchSnapshotVM(params: {
         quoteMeta: scan.quoteMeta,
         deltas: scan.pctChangeBySymbol,
         strategySignals: signals,
+        marketEvents,
         snapshot: {
           portfolioValue,
           change24h,
@@ -107,6 +142,8 @@ export async function fetchSnapshotVM(params: {
     bundleName,
     scan,
     signals,
+    marketEvents,
+    eventStream,
     debugObservatory,
   };
 }
