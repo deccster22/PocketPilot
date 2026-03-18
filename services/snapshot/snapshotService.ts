@@ -1,5 +1,6 @@
 import { STRATEGY_BUNDLES } from '@/core/strategy/bundles';
 import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
+import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import type { AlignmentState, MarketEvent } from '@/core/types/marketEvent';
 import { QuoteBroker } from '@/providers/quoteBroker';
 import { fetchLiveQuotes } from '@/providers/liveQuoteFetcher';
@@ -8,6 +9,18 @@ import {
   buildDebugObservatoryPayload,
   type DebugObservatoryPayload,
 } from '@/services/debug/debugObservatoryService';
+import {
+  createSinceLastChecked,
+  type SinceLastCheckedPayload,
+} from '@/services/events/createSinceLastChecked';
+import {
+  defaultEventLedgerService,
+  type EventLedgerService,
+} from '@/services/events/eventLedgerService';
+import {
+  createEventLedgerQueries,
+  type EventLedgerQueries,
+} from '@/services/events/eventLedgerQueries';
 import { createMarketEvents } from '@/services/events/createMarketEvents';
 import {
   createEventStream,
@@ -36,6 +49,8 @@ export type SnapshotVM = {
   signals: ReturnType<typeof runStrategies>;
   marketEvents: MarketEvent[];
   eventStream: EventStream;
+  eventsSinceLastViewed?: EventLedgerEntry[];
+  sinceLastChecked?: SinceLastCheckedPayload;
   debugObservatory?: DebugObservatoryPayload;
 };
 
@@ -55,8 +70,14 @@ export async function fetchSnapshotVM(params: {
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   includeDebugObservatory?: boolean;
+  eventLedger?: EventLedgerService;
+  eventLedgerQueries?: EventLedgerQueries;
+  lastViewedTimestamp?: number;
 }): Promise<SnapshotVM> {
   const nowProvider = params.nowProvider ?? Date.now;
+  const eventLedger = params.eventLedger ?? defaultEventLedgerService;
+  const eventLedgerQueries =
+    params.eventLedgerQueries ?? createEventLedgerQueries(eventLedger);
   const broker = new QuoteBroker({
     mode: 'CALM',
     fetcher: fetchLiveQuotes,
@@ -102,6 +123,15 @@ export async function fetchSnapshotVM(params: {
     timestamp: strategyNowMs,
     events: marketEvents,
   });
+  eventLedger.appendEvents(eventStream.events);
+  const sinceLastChecked =
+    params.lastViewedTimestamp === undefined
+      ? undefined
+      : createSinceLastChecked({
+          sinceTimestamp: params.lastViewedTimestamp,
+          accountId: scan.accountId,
+          eventQueries: eventLedgerQueries,
+        });
 
   const prices = Object.values(scan.quotes).map((quote) => quote.price);
   const portfolioValue = prices.reduce((sum, price) => sum + price, 0);
@@ -124,7 +154,9 @@ export async function fetchSnapshotVM(params: {
         quoteMeta: scan.quoteMeta,
         deltas: scan.pctChangeBySymbol,
         strategySignals: signals,
-        marketEvents,
+        marketEvents: eventStream.events,
+        eventLedger,
+        accountId: scan.accountId,
         snapshot: {
           portfolioValue,
           change24h,
@@ -144,6 +176,8 @@ export async function fetchSnapshotVM(params: {
     signals,
     marketEvents,
     eventStream,
+    eventsSinceLastViewed: sinceLastChecked?.events,
+    sinceLastChecked,
     debugObservatory,
   };
 }

@@ -1,3 +1,4 @@
+import type { EventLedger, EventLedgerEntry } from '@/core/types/eventLedger';
 import type { StrategySignal } from '@/core/strategy/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
@@ -32,6 +33,14 @@ export type DebugObservatoryPayload = {
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
   marketEvents?: MarketEvent[];
+  eventLedger?: {
+    liveEvents: MarketEvent[];
+    persistedEvents: EventLedgerEntry[];
+    liveEventIds: string[];
+    persistedEventIds: string[];
+    countsMatch: boolean;
+    sequencesMatch: boolean;
+  };
   snapshot?: DebugObservatorySnapshot;
 };
 
@@ -43,8 +52,37 @@ export type BuildDebugObservatoryPayloadParams = {
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
   marketEvents?: MarketEvent[];
+  eventLedger?: Pick<EventLedger, 'getEventsByAccount'>;
+  accountId?: string;
   snapshot?: DebugObservatorySnapshot;
 };
+
+function buildEventLedgerComparison(params: {
+  accountId?: string;
+  marketEvents?: MarketEvent[];
+  eventLedger?: Pick<EventLedger, 'getEventsByAccount'>;
+}) {
+  if (!params.marketEvents || !params.eventLedger || !params.accountId) {
+    return undefined;
+  }
+
+  const persistedEvents = params
+    .eventLedger.getEventsByAccount(params.accountId)
+    .slice(-params.marketEvents.length);
+  const liveEventIds = params.marketEvents.map((event) => event.eventId);
+  const persistedEventIds = persistedEvents.map((event) => event.eventId);
+
+  return {
+    liveEvents: params.marketEvents,
+    persistedEvents,
+    liveEventIds,
+    persistedEventIds,
+    countsMatch: liveEventIds.length === persistedEventIds.length,
+    sequencesMatch:
+      liveEventIds.length === persistedEventIds.length &&
+      liveEventIds.every((eventId, index) => eventId === persistedEventIds[index]),
+  };
+}
 
 function buildQuoteMeta(
   timestampMs: number,
@@ -90,6 +128,11 @@ export function buildDebugObservatoryPayload(
     deltas: params.deltas,
     strategySignals: params.strategySignals,
     marketEvents: params.marketEvents,
+    eventLedger: buildEventLedgerComparison({
+      accountId: params.accountId,
+      marketEvents: params.marketEvents,
+      eventLedger: params.eventLedger,
+    }),
     snapshot: params.snapshot,
   };
 }
