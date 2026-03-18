@@ -40,6 +40,7 @@ describe('snapshotChangeStrategy', () => {
     expect(result).toHaveLength(2);
     expect(result.map((signal) => signal.symbol)).toEqual(['AAPL', 'MSFT']);
     expect(result.every((signal) => signal.severity === 'WATCH')).toBe(true);
+    expect(result.every((signal) => signal.eventHint.eventType === 'PRICE_MOVEMENT')).toBe(true);
     expect(result[0]?.message).toBe('AAPL is up ~3.2% vs baseline.');
     expect(result[1]?.message).toBe('MSFT is down ~3.0% vs baseline.');
   });
@@ -82,14 +83,17 @@ describe('snapshotChangeStrategy', () => {
       'CCC',
       'BBB',
     ]);
-    expect(result[5]).toEqual({
-      strategyId: 'snapshot_change',
-      severity: 'INFO',
-      title: 'More movers',
-      message: '6 symbols moved >=3% vs baseline.',
-      timestampMs: ctx.nowMs,
-      tags: ['delta', 'snapshot'],
-    });
+    expect(result[5]).toEqual(
+      expect.objectContaining({
+        strategyId: 'snapshot_change',
+        signalCode: 'snapshot_move_summary',
+        severity: 'INFO',
+        title: 'More movers',
+        message: '6 symbols moved >=3% vs baseline.',
+        timestampMs: ctx.nowMs,
+        tags: ['delta', 'snapshot'],
+      }),
+    );
   });
 
   it('uses ctx.nowMs for every signal timestamp', () => {

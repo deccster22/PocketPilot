@@ -1,4 +1,5 @@
 import type { StrategySignal } from '@/core/strategy/types';
+import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
 import { buildDebugObservatoryPayload } from '@/services/debug/debugObservatoryService';
 
@@ -6,8 +7,20 @@ describe('debugObservatoryService', () => {
   const nowMs = 1_700_000_000_000;
   const symbols = ['BTC', 'ETH'];
   const quotes: Record<string, Quote> = {
-    BTC: { symbol: 'BTC', price: 100_000, source: 'primary-feed', estimated: false, timestamp: nowMs },
-    ETH: { symbol: 'ETH', price: 4_000, source: 'fallback-feed', estimated: true, timestamp: nowMs },
+    BTC: {
+      symbol: 'BTC',
+      price: 100_000,
+      source: 'primary-feed',
+      estimated: false,
+      timestamp: nowMs,
+    },
+    ETH: {
+      symbol: 'ETH',
+      price: 4_000,
+      source: 'fallback-feed',
+      estimated: true,
+      timestamp: nowMs,
+    },
   };
 
   it('returns structured payload and preserves router metadata', () => {
@@ -46,15 +59,43 @@ describe('debugObservatoryService', () => {
     );
   });
 
-  it('includes strategy signals and snapshot output when present', () => {
+  it('includes strategy signals, market events, and snapshot output when present', () => {
     const strategySignals: StrategySignal[] = [
       {
         strategyId: 'momentum-basics',
+        signalCode: 'momentum_threshold_met',
         symbol: 'BTC',
         severity: 'WATCH',
         title: 'Momentum cooling',
         message: 'Change trend has flattened',
         timestampMs: nowMs,
+        eventHint: {
+          eventType: 'MOMENTUM_BUILDING',
+          alignmentState: 'WATCHFUL',
+          confidenceScore: 0.77,
+        },
+      },
+    ];
+    const marketEvents: MarketEvent[] = [
+      {
+        eventId: 'acct-live:momentum-basics:momentum_threshold_met:BTC:1700000000000',
+        timestamp: nowMs,
+        accountId: 'acct-live',
+        symbol: 'BTC',
+        strategyId: 'momentum-basics',
+        eventType: 'MOMENTUM_BUILDING',
+        alignmentState: 'WATCHFUL',
+        signalsTriggered: ['momentum_threshold_met'],
+        confidenceScore: 0.77,
+        certainty: 'confirmed',
+        price: 100_000,
+        pctChange: 0.05,
+        metadata: {
+          signalSeverity: 'WATCH',
+          signalTitle: 'Momentum cooling',
+          signalTags: [],
+          relatedSymbols: ['BTC'],
+        },
       },
     ];
 
@@ -63,6 +104,7 @@ describe('debugObservatoryService', () => {
       symbols,
       quotes,
       strategySignals,
+      marketEvents,
       snapshot: {
         portfolioValue: 104_000,
         change24h: 0.025,
@@ -73,6 +115,7 @@ describe('debugObservatoryService', () => {
     });
 
     expect(result.strategySignals).toEqual(strategySignals);
+    expect(result.marketEvents).toEqual(marketEvents);
     expect(result.snapshot).toEqual(
       expect.objectContaining({
         portfolioValue: 104_000,
@@ -91,6 +134,7 @@ describe('debugObservatoryService', () => {
 
     expect(result.deltas).toBeUndefined();
     expect(result.strategySignals).toBeUndefined();
+    expect(result.marketEvents).toBeUndefined();
     expect(result.snapshot).toBeUndefined();
     expect(result.quoteResult.meta.provider).toBe('unknown');
     expect(result.quoteResult.meta.fallbackUsed).toBe(false);

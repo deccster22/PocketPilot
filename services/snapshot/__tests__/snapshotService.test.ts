@@ -1,0 +1,127 @@
+import { DEFAULT_USER_PROFILE } from '@/app/state/profileState';
+import type { StrategySignal } from '@/core/strategy/types';
+import { runForegroundScan } from '@/services/scan/foregroundScanService';
+import { fetchSnapshotVM, formatAlignmentState } from '@/services/snapshot/snapshotService';
+import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
+import { runStrategies } from '@/services/strategy/runStrategiesService';
+
+jest.mock('@/services/scan/foregroundScanService');
+jest.mock('@/services/strategy/activeStrategiesService');
+jest.mock('@/services/strategy/runStrategiesService');
+
+describe('snapshotService market event integration', () => {
+  const mockRunForegroundScan = jest.mocked(runForegroundScan);
+  const mockResolveActiveStrategies = jest.mocked(resolveActiveStrategies);
+  const mockRunStrategies = jest.mocked(runStrategies);
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+
+    mockRunForegroundScan.mockResolvedValue({
+      accountId: 'acct-test',
+      symbols: ['AAPL', 'MSFT'],
+      quotes: {
+        AAPL: {
+          symbol: 'AAPL',
+          price: 100,
+          source: 'stub',
+          timestampMs: 1_700_000_000_000,
+          estimated: false,
+        },
+        MSFT: {
+          symbol: 'MSFT',
+          price: 200,
+          source: 'stub',
+          timestampMs: 1_700_000_000_000,
+          estimated: true,
+        },
+      },
+      baselineQuotes: undefined,
+      pctChangeBySymbol: { AAPL: 0.05, MSFT: -0.02 },
+      estimatedFlags: { AAPL: false, MSFT: true },
+      instrumentation: {
+        requests: 1,
+        symbolsRequested: 2,
+        symbolsFetched: 2,
+        symbolsBlocked: 0,
+      },
+      quoteMeta: {
+        provider: 'broker:live',
+        fallbackUsed: false,
+        requestedSymbols: ['AAPL', 'MSFT'],
+        returnedSymbols: ['AAPL', 'MSFT'],
+        missingSymbols: [],
+        timestampMs: 1_700_000_000_000,
+        providersTried: ['broker:live'],
+        sourceBySymbol: {
+          AAPL: 'stub',
+          MSFT: 'stub',
+        },
+      },
+    });
+    mockResolveActiveStrategies.mockReturnValue([]);
+  });
+
+  it('turns strategy signals into first-class market events and event stream output', async () => {
+    const signals: StrategySignal[] = [
+      {
+        strategyId: 'data_quality',
+        signalCode: 'estimated_quote',
+        symbol: 'MSFT',
+        severity: 'INFO',
+        title: 'Estimated quote',
+        message: 'Price may be delayed or inferred.',
+        timestampMs: 1_700_000_000_005,
+        tags: ['data', 'estimated'],
+        eventHint: {
+          eventType: 'ESTIMATED_PRICE',
+          alignmentState: 'WATCHFUL',
+          confidenceScore: 0.8,
+          relatedSymbols: ['MSFT'],
+        },
+      },
+      {
+        strategyId: 'data_quality',
+        signalCode: 'budget_blocked_symbols',
+        severity: 'WATCH',
+        title: 'Scan incomplete',
+        message: '1 symbols were blocked by quote budget limits, so some quotes may be missing.',
+        timestampMs: 1_700_000_000_001,
+        tags: ['data', 'budget'],
+        eventHint: {
+          eventType: 'DATA_QUALITY',
+          alignmentState: 'NEEDS_REVIEW',
+          confidenceScore: 0.98,
+          relatedSymbols: ['AAPL'],
+        },
+      },
+    ];
+    mockRunStrategies.mockReturnValue(signals);
+
+    const result = await fetchSnapshotVM({
+      profile: DEFAULT_USER_PROFILE,
+      nowProvider: () => 1_700_000_000_100,
+    });
+
+    expect(result.marketEvents).toHaveLength(2);
+    expect(result.marketEvents[0]).toEqual(
+      expect.objectContaining({
+        accountId: 'acct-test',
+        symbol: 'MSFT',
+        certainty: 'estimated',
+        eventType: 'ESTIMATED_PRICE',
+      }),
+    );
+    expect(result.eventStream.events.map((event) => event.eventId)).toEqual([
+      'acct-test:data_quality:budget_blocked_symbols:AAPL:1700000000001',
+      'acct-test:data_quality:estimated_quote:MSFT:1700000000005',
+    ]);
+    expect(result.strategyAlignment).toBe('Needs review');
+  });
+
+  it('formats alignment labels for UI-facing layers', () => {
+    expect(formatAlignmentState('ALIGNED')).toBe('Aligned');
+    expect(formatAlignmentState('WATCHFUL')).toBe('Watchful');
+    expect(formatAlignmentState('NEEDS_REVIEW')).toBe('Needs review');
+  });
+});

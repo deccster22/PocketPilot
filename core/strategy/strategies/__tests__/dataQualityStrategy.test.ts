@@ -32,14 +32,21 @@ describe('dataQualityStrategy', () => {
       ctx,
     );
 
-    expect(result).toContainEqual({
-      strategyId: 'data_quality',
-      severity: 'WATCH',
-      title: 'Scan incomplete',
-      message: '2 symbols were blocked by quote budget limits, so some quotes may be missing.',
-      timestampMs: ctx.nowMs,
-      tags: ['data', 'budget'],
-    });
+    expect(result).toContainEqual(
+      expect.objectContaining({
+        strategyId: 'data_quality',
+        signalCode: 'budget_blocked_symbols',
+        severity: 'WATCH',
+        title: 'Scan incomplete',
+        message: '2 symbols were blocked by quote budget limits, so some quotes may be missing.',
+        timestampMs: ctx.nowMs,
+        tags: ['data', 'budget'],
+        eventHint: expect.objectContaining({
+          eventType: 'DATA_QUALITY',
+          alignmentState: 'NEEDS_REVIEW',
+        }),
+      }),
+    );
   });
 
   it('returns per-symbol estimated signals sorted by symbol', () => {
@@ -57,6 +64,7 @@ describe('dataQualityStrategy', () => {
     expect(result).toHaveLength(2);
     expect(result.map((signal) => signal.symbol)).toEqual(['AAPL', 'MSFT']);
     expect(result.map((signal) => signal.title)).toEqual(['Estimated quote', 'Estimated quote']);
+    expect(result.every((signal) => signal.eventHint.eventType === 'ESTIMATED_PRICE')).toBe(true);
   });
 
   it('caps to 5 per-symbol + adds summary when more than 5 estimated quotes exist', () => {
@@ -84,14 +92,17 @@ describe('dataQualityStrategy', () => {
       'EEE',
     ]);
 
-    expect(result[5]).toEqual({
-      strategyId: 'data_quality',
-      severity: 'INFO',
-      title: 'Estimated quotes present',
-      message: '7 symbols are estimated.',
-      timestampMs: ctx.nowMs,
-      tags: ['data', 'estimated'],
-    });
+    expect(result[5]).toEqual(
+      expect.objectContaining({
+        strategyId: 'data_quality',
+        signalCode: 'estimated_quotes_present',
+        severity: 'INFO',
+        title: 'Estimated quotes present',
+        message: '7 symbols are estimated.',
+        timestampMs: ctx.nowMs,
+        tags: ['data', 'estimated'],
+      }),
+    );
   });
 
   it('returns [] when no issues', () => {

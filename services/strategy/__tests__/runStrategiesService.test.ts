@@ -79,10 +79,16 @@ describe('runStrategies', () => {
       evaluate: (scan) => [
         {
           strategyId: 'capture-input',
+          signalCode: 'capture_scan_input',
           severity: 'INFO',
           title: 'capture',
           message: JSON.stringify(scan.pctChangeBySymbol),
           timestampMs: 0,
+          eventHint: {
+            eventType: 'PRICE_MOVEMENT',
+            alignmentState: 'WATCHFUL',
+            confidenceScore: 0.5,
+          },
         },
       ],
     };
