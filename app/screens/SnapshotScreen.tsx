@@ -85,8 +85,12 @@ export function SnapshotScreen() {
           <ProfileSelector value={profile} onChange={setProfile} />
           <Text style={styles.bundleLabel}>Bundle: {snapshot?.bundleName ?? 'Loading...'}</Text>
           <Text style={styles.bundleLabel}>Portfolio Value: {snapshot?.portfolioValue.toFixed(2) ?? '--'}</Text>
-          <Text style={styles.bundleLabel}>24h Change: {((snapshot?.change24h ?? 0) * 100).toFixed(2)}%</Text>
-          <Text style={styles.bundleLabel}>Strategy Alignment: {snapshot?.strategyAlignment ?? '--'}</Text>
+          <Text style={styles.bundleLabel}>
+            24h Change: {((snapshot?.snapshotModel.core.currentState.pctChange24h ?? 0) * 100).toFixed(2)}%
+          </Text>
+          <Text style={styles.bundleLabel}>
+            Strategy Alignment: {snapshot?.snapshotModel.core.strategyStatus.alignmentState ?? '--'}
+          </Text>
         </View>
 
         <View style={styles.section}>
