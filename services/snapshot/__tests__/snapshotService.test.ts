@@ -124,6 +124,26 @@ describe('snapshotService market event integration', () => {
       result.eventStream.events.map((event) => event.eventId),
     );
     expect(result.strategyAlignment).toBe('Needs review');
+    expect(result.snapshotModel).toEqual({
+      core: {
+        currentState: {
+          price: 200,
+          pctChange24h: -0.02,
+          certainty: 'estimated',
+        },
+        strategyStatus: {
+          alignmentState: 'Needs review',
+          latestEventType: 'ESTIMATED_PRICE',
+          trendDirection: 'weakening',
+        },
+      },
+      secondary: {},
+      history: {
+        hasMeaningfulChanges: false,
+        eventsSinceLastViewedCount: 0,
+        sinceLastCheckedSummaryCount: null,
+      },
+    });
     expect(result.orientationContext.currentState.latestRelevantEvent).toEqual(
       result.eventStream.events[1],
     );
@@ -218,6 +238,11 @@ describe('snapshotService market event integration', () => {
       accountId: 'acct-test',
       events: result.eventsSinceLastViewed,
       summaryCount: 1,
+    });
+    expect(result.snapshotModel.history).toEqual({
+      hasMeaningfulChanges: true,
+      eventsSinceLastViewedCount: 1,
+      sinceLastCheckedSummaryCount: 1,
     });
     expect(result.orientationContext.historyContext.eventsSinceLastViewed).toEqual(
       result.eventsSinceLastViewed,

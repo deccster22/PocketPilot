@@ -41,6 +41,10 @@ import {
   getQuotesForSymbols,
 } from '@/services/providers/providerRouter';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
+import {
+  createSnapshotModel,
+  type SnapshotModel,
+} from '@/services/snapshot/createSnapshotModel';
 import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
 import { runStrategies } from '@/services/strategy/runStrategiesService';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -50,6 +54,7 @@ const SNAPSHOT_SYMBOLS = ['BTC', 'ETH', 'SOL', 'DOGE'] as const;
 const SNAPSHOT_ACCOUNTS = [{ id: 'acct-live', portfolioValue: 10_000, isPrimary: true }];
 
 export type SnapshotVM = {
+  snapshotModel: SnapshotModel;
   portfolioValue: number;
   change24h: number;
   strategyAlignment: string;
@@ -170,6 +175,7 @@ export async function fetchSnapshotVM(params: {
     strategyAlignment,
     sinceLastChecked,
   });
+  const snapshotModel = createSnapshotModel(orientationContext);
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
         timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
@@ -192,6 +198,7 @@ export async function fetchSnapshotVM(params: {
     : undefined;
 
   return {
+    snapshotModel,
     portfolioValue,
     change24h,
     strategyAlignment,
