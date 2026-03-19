@@ -2,6 +2,7 @@ import type { StrategySignal } from '@/core/strategy/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
 import { buildDebugObservatoryPayload } from '@/services/debug/debugObservatoryService';
+import { createEventLedgerService } from '@/services/events/eventLedgerService';
 
 describe('debugObservatoryService', () => {
   const nowMs = 1_700_000_000_000;
@@ -125,6 +126,51 @@ describe('debugObservatoryService', () => {
     );
   });
 
+  it('can compare live events against persisted ledger entries', () => {
+    const ledger = createEventLedgerService();
+    const marketEvents: MarketEvent[] = [
+      {
+        eventId: 'acct-live:momentum-basics:momentum_threshold_met:BTC:1700000000000',
+        timestamp: nowMs,
+        accountId: 'acct-live',
+        symbol: 'BTC',
+        strategyId: 'momentum-basics',
+        eventType: 'MOMENTUM_BUILDING',
+        alignmentState: 'WATCHFUL',
+        signalsTriggered: ['momentum_threshold_met'],
+        confidenceScore: 0.77,
+        certainty: 'confirmed',
+        price: 100_000,
+        pctChange: 0.05,
+        metadata: {
+          signalSeverity: 'WATCH',
+          signalTitle: 'Momentum cooling',
+          signalTags: [],
+          relatedSymbols: ['BTC'],
+        },
+      },
+    ];
+    ledger.appendEvents(marketEvents);
+
+    const result = buildDebugObservatoryPayload({
+      timestampMs: nowMs,
+      symbols,
+      quotes,
+      marketEvents,
+      eventLedger: ledger,
+      accountId: 'acct-live',
+    });
+
+    expect(result.eventLedger).toEqual(
+      expect.objectContaining({
+        liveEventIds: [marketEvents[0]?.eventId],
+        persistedEventIds: [marketEvents[0]?.eventId],
+        countsMatch: true,
+        sequencesMatch: true,
+      }),
+    );
+  });
+
   it('degrades safely when optional sections are missing', () => {
     const result = buildDebugObservatoryPayload({
       timestampMs: nowMs,
@@ -135,6 +181,7 @@ describe('debugObservatoryService', () => {
     expect(result.deltas).toBeUndefined();
     expect(result.strategySignals).toBeUndefined();
     expect(result.marketEvents).toBeUndefined();
+    expect(result.eventLedger).toBeUndefined();
     expect(result.snapshot).toBeUndefined();
     expect(result.quoteResult.meta.provider).toBe('unknown');
     expect(result.quoteResult.meta.fallbackUsed).toBe(false);
