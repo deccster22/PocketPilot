@@ -39,6 +39,15 @@ In this phase it produces a structured payload:
 
 This is preparation input for future Snapshot or Insights usage. It does not generate user-facing prose.
 
+## Relationship To Orientation Context
+P3-4 adds `OrientationContext` as the next assembly seam above event queries and `Since Last Checked`.
+
+- `EventLedgerQueries` still owns typed retrieval only.
+- `Since Last Checked` still owns the minimal time-window payload.
+- `OrientationContext` combines those history results with current interpreted snapshot state.
+
+This keeps query logic separate from consumer-specific assembly while preserving deterministic ledger order.
+
 ## Intentional Non-Goals
 P3-3 does not add:
 - analytics scoring

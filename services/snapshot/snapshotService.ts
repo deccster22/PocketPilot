@@ -28,6 +28,15 @@ import {
   type EventStream,
 } from '@/services/events/eventStream';
 import {
+  createOrientationContext,
+  type OrientationContext,
+} from '@/services/orientation/createOrientationContext';
+import {
+  defaultLastViewedState,
+  SNAPSHOT_LAST_VIEWED_SURFACE_ID,
+  type LastViewedState,
+} from '@/services/orientation/lastViewedState';
+import {
   createQuoteBrokerProvider,
   getQuotesForSymbols,
 } from '@/services/providers/providerRouter';
@@ -49,6 +58,7 @@ export type SnapshotVM = {
   signals: ReturnType<typeof runStrategies>;
   marketEvents: MarketEvent[];
   eventStream: EventStream;
+  orientationContext: OrientationContext;
   eventsSinceLastViewed?: EventLedgerEntry[];
   sinceLastChecked?: SinceLastCheckedPayload;
   debugObservatory?: DebugObservatoryPayload;
@@ -73,11 +83,13 @@ export async function fetchSnapshotVM(params: {
   eventLedger?: EventLedgerService;
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
+  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
 }): Promise<SnapshotVM> {
   const nowProvider = params.nowProvider ?? Date.now;
   const eventLedger = params.eventLedger ?? defaultEventLedgerService;
   const eventLedgerQueries =
     params.eventLedgerQueries ?? createEventLedgerQueries(eventLedger);
+  const lastViewedState = params.lastViewedState ?? defaultLastViewedState;
   const broker = new QuoteBroker({
     mode: 'CALM',
     fetcher: fetchLiveQuotes,
@@ -124,11 +136,17 @@ export async function fetchSnapshotVM(params: {
     events: marketEvents,
   });
   eventLedger.appendEvents(eventStream.events);
+  const resolvedLastViewedTimestamp =
+    params.lastViewedTimestamp ??
+    lastViewedState.getLastViewedTimestamp({
+      surfaceId: SNAPSHOT_LAST_VIEWED_SURFACE_ID,
+      accountId: scan.accountId,
+    });
   const sinceLastChecked =
-    params.lastViewedTimestamp === undefined
+    resolvedLastViewedTimestamp === undefined
       ? undefined
       : createSinceLastChecked({
-          sinceTimestamp: params.lastViewedTimestamp,
+          sinceTimestamp: resolvedLastViewedTimestamp,
           accountId: scan.accountId,
           eventQueries: eventLedgerQueries,
         });
@@ -146,6 +164,12 @@ export async function fetchSnapshotVM(params: {
     STRATEGY_BUNDLES.find((bundle) => bundle.id === defaultBundleId)?.name ?? 'Unknown bundle';
 
   const strategyAlignment = formatAlignmentState(summarizeAlignment(eventStream.events));
+  const orientationContext = createOrientationContext({
+    accountId: scan.accountId,
+    currentEvents: eventStream.events,
+    strategyAlignment,
+    sinceLastChecked,
+  });
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
         timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
@@ -176,8 +200,15 @@ export async function fetchSnapshotVM(params: {
     signals,
     marketEvents,
     eventStream,
-    eventsSinceLastViewed: sinceLastChecked?.events,
-    sinceLastChecked,
+    orientationContext,
+    eventsSinceLastViewed:
+      orientationContext.historyContext.sinceLastChecked === null
+        ? undefined
+        : orientationContext.historyContext.eventsSinceLastViewed,
+    sinceLastChecked:
+      orientationContext.historyContext.sinceLastChecked === null
+        ? undefined
+        : orientationContext.historyContext.sinceLastChecked,
     debugObservatory,
   };
 }
