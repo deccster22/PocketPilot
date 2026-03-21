@@ -1,4 +1,4 @@
-import { DEFAULT_USER_PROFILE } from '@/app/state/profileState';
+import type { UserProfile } from '@/core/profile/types';
 import type { StrategySignal } from '@/core/strategy/types';
 import { createEventLedgerService } from '@/services/events/eventLedgerService';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
@@ -11,6 +11,7 @@ jest.mock('@/services/strategy/activeStrategiesService');
 jest.mock('@/services/strategy/runStrategiesService');
 
 describe('snapshotService market event integration', () => {
+  const defaultProfile: UserProfile = 'BEGINNER';
   const mockRunForegroundScan = jest.mocked(runForegroundScan);
   const mockResolveActiveStrategies = jest.mocked(resolveActiveStrategies);
   const mockRunStrategies = jest.mocked(runStrategies);
@@ -101,11 +102,28 @@ describe('snapshotService market event integration', () => {
     mockRunStrategies.mockReturnValue(signals);
 
     const result = await fetchSnapshotVM({
-      profile: DEFAULT_USER_PROFILE,
+      profile: defaultProfile,
       nowProvider: () => 1_700_000_000_100,
       eventLedger: ledger,
     });
 
+    expect(result.model.core).toEqual({
+      currentState: {
+        label: 'Current State',
+        value: 'Up',
+        trendDirection: 'UP',
+      },
+      change24h: {
+        label: 'Last 24h Change',
+        value: 0.015000000000000001,
+      },
+      strategyStatus: {
+        label: 'Strategy Status',
+        value: 'Needs review',
+      },
+    });
+    expect(result.model.secondary).toBeUndefined();
+    expect('signals' in result.model).toBe(false);
     expect(result.marketEvents).toHaveLength(2);
     expect(result.marketEvents[0]).toEqual(
       expect.objectContaining({
@@ -147,7 +165,7 @@ describe('snapshotService market event integration', () => {
     ]);
 
     const result = await fetchSnapshotVM({
-      profile: DEFAULT_USER_PROFILE,
+      profile: defaultProfile,
       nowProvider: () => 1_700_000_000_100,
       includeDebugObservatory: true,
       eventLedger: ledger,
@@ -199,12 +217,13 @@ describe('snapshotService market event integration', () => {
     ]);
 
     const result = await fetchSnapshotVM({
-      profile: DEFAULT_USER_PROFILE,
+      profile: defaultProfile,
       nowProvider: () => 1_700_000_000_100,
       eventLedger: ledger,
       lastViewedTimestamp: 1_700_000_000_001,
     });
 
+    expect(result.model.history).toBeUndefined();
     expect(result.eventsSinceLastViewed?.map((event) => event.eventId)).toEqual([
       'acct-test:data_quality:estimated_quote:MSFT:1700000000005',
     ]);
@@ -220,5 +239,37 @@ describe('snapshotService market event integration', () => {
     expect(formatAlignmentState('ALIGNED')).toBe('Aligned');
     expect(formatAlignmentState('WATCHFUL')).toBe('Watchful');
     expect(formatAlignmentState('NEEDS_REVIEW')).toBe('Needs review');
+  });
+
+  it('keeps advanced secondary fields within the model seam', async () => {
+    mockRunStrategies.mockReturnValue([]);
+
+    const result = await fetchSnapshotVM({
+      profile: 'ADVANCED',
+      nowProvider: () => 1_700_000_000_100,
+      lastViewedTimestamp: 1_700_000_000_001,
+    });
+
+    expect(result.model.secondary).toEqual({
+      bundleName: 'Advanced Core',
+      portfolioValue: 300,
+    });
+    expect(result.model.history).toEqual({
+      hasNewSinceLastCheck: false,
+    });
+  });
+
+  it('keeps legacy bridge fields aligned while consumers transition to SnapshotModel', async () => {
+    mockRunStrategies.mockReturnValue([]);
+
+    const result = await fetchSnapshotVM({
+      profile: 'ADVANCED',
+      nowProvider: () => 1_700_000_000_100,
+    });
+
+    expect(result.bundleName).toBe(result.model.secondary?.bundleName);
+    expect(result.portfolioValue).toBe(result.model.secondary?.portfolioValue);
+    expect(result.change24h).toBe(result.model.core.change24h.value);
+    expect(result.strategyAlignment).toBe(result.model.core.strategyStatus.value);
   });
 });
