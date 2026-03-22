@@ -1,4 +1,6 @@
-export type UserProfile = 'BEGINNER' | 'MIDDLE' | 'ADVANCED';
+export type { UserProfile } from '@/core/profile/types';
+
+import type { UserProfile } from '@/core/profile/types';
 
 export const DEFAULT_USER_PROFILE: UserProfile = 'BEGINNER';
 

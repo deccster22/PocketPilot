@@ -1,14 +1,9 @@
-# Snapshot Vision Alignment Note (P4-1)
+# Snapshot Vision
 
-P4-1 introduces a dedicated `SnapshotModel` so Snapshot can remain a calm, zero-interpretation surface even while the underlying event/history system grows.
+Snapshot remains a calm orientation surface, not a feed. Profile-aware shaping should reduce or omit supporting detail rather than adding richer presentation layers.
 
-The model is intentionally narrow:
-- core state only for the three-part Snapshot center
-- optional subordinate secondary placeholders
-- compact history counts rather than raw event detail
-
-This keeps Snapshot aligned with the product vision:
-- no raw signal leakage
-- no dashboard-style context expansion
-- no narrative pressure or action-driving prose
-- one stable model prepared in `services/`, not interpreted inside `app/`
+For P4-2 the contract is:
+- the three-part core remains primary
+- supporting context stays compact and optional
+- shaping happens in `services/`, not in React components
+- raw signals do not leak into Snapshot-facing UI models

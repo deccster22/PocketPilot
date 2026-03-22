@@ -1,116 +1,110 @@
-import type { MarketEvent } from '@/core/types/marketEvent';
-import type { OrientationContext } from '@/services/orientation/createOrientationContext';
-import { createSnapshotModel } from '@/services/snapshot/createSnapshotModel';
-
-const latestEvent: MarketEvent = {
-  eventId: 'acct-1:strategy-a:latest:ETH:200',
-  timestamp: 200,
-  accountId: 'acct-1',
-  symbol: 'ETH',
-  strategyId: 'strategy-a',
-  eventType: 'ESTIMATED_PRICE',
-  alignmentState: 'NEEDS_REVIEW',
-  signalsTriggered: ['estimated_quote'],
-  confidenceScore: 0.91,
-  certainty: 'estimated',
-  price: 200,
-  pctChange: -0.03,
-  metadata: {},
-};
-
-function buildOrientationContext(
-  overrides?: Partial<OrientationContext>,
-): OrientationContext {
-  return {
-    accountId: 'acct-1',
-    symbol: 'ETH',
-    strategyId: 'strategy-a',
-    currentState: {
-      latestRelevantEvent: latestEvent,
-      strategyAlignment: 'Needs review',
-      certainty: 'estimated',
-    },
-    historyContext: {
-      eventsSinceLastViewed: [latestEvent],
-      sinceLastChecked: {
-        sinceTimestamp: 150,
-        accountId: 'acct-1',
-        events: [latestEvent],
-        summaryCount: 1,
-      },
-    },
-    ...overrides,
-  };
-}
+import {
+  createSnapshotModel,
+  deriveTrendDirection,
+  formatCurrentState,
+} from '@/services/snapshot/createSnapshotModel';
 
 describe('createSnapshotModel', () => {
-  it('maps orientation context into the canonical snapshot shape', () => {
-    const model = createSnapshotModel(buildOrientationContext());
+  const scan = {
+    accountId: 'acct-test',
+    symbols: ['BTC', 'ETH', 'SOL', 'DOGE'],
+    quotes: {
+      BTC: {
+        symbol: 'BTC',
+        price: 100,
+        source: 'stub',
+        timestampMs: 1,
+        estimated: false,
+      },
+      ETH: {
+        symbol: 'ETH',
+        price: 200,
+        source: 'stub',
+        timestampMs: 1,
+        estimated: true,
+      },
+      SOL: {
+        symbol: 'SOL',
+        price: 300,
+        source: 'stub',
+        timestampMs: 1,
+        estimated: false,
+      },
+      DOGE: {
+        symbol: 'DOGE',
+        price: 400,
+        source: 'stub',
+        timestampMs: 1,
+        estimated: false,
+      },
+    },
+    baselineQuotes: undefined,
+    pctChangeBySymbol: {
+      BTC: 0.01,
+      ETH: -0.04,
+      SOL: 0.08,
+      DOGE: -0.02,
+    },
+    estimatedFlags: {
+      BTC: false,
+      ETH: true,
+      SOL: false,
+      DOGE: false,
+    },
+    instrumentation: {
+      requests: 1,
+      symbolsRequested: 4,
+      symbolsFetched: 4,
+      symbolsBlocked: 0,
+    },
+  };
 
-    expect(model).toEqual({
-      core: {
-        currentState: {
-          price: 200,
-          pctChange24h: -0.03,
-          certainty: 'estimated',
-        },
-        strategyStatus: {
-          alignmentState: 'Needs review',
-          latestEventType: 'ESTIMATED_PRICE',
-          trendDirection: 'weakening',
-        },
+  it('builds the canonical Snapshot core from deterministic inputs', () => {
+    const model = createSnapshotModel({
+      profile: 'ADVANCED',
+      scan,
+      bundleName: 'Calm Starter',
+      portfolioValue: 1_000,
+      change24h: 0.0075,
+      strategyAlignment: 'Watchful',
+      sinceLastChecked: {
+        sinceTimestamp: 1,
+        accountId: 'acct-test',
+        events: [],
+        summaryCount: 0,
       },
-      secondary: {},
-      history: {
-        hasMeaningfulChanges: true,
-        eventsSinceLastViewedCount: 1,
-        sinceLastCheckedSummaryCount: 1,
+    });
+
+    expect(model.core).toEqual({
+      currentState: {
+        label: 'Current State',
+        value: 'Up',
+        trendDirection: 'UP',
       },
+      change24h: {
+        label: 'Last 24h Change',
+        value: 0.0075,
+      },
+      strategyStatus: {
+        label: 'Strategy Status',
+        value: 'Watchful',
+      },
+    });
+    expect(model.secondary).toEqual({
+      bundleName: 'Calm Starter',
+      portfolioValue: 1_000,
+    });
+    expect(model.history).toEqual({
+      hasNewSinceLastCheck: false,
     });
   });
 
-  it('keeps secondary fields subordinate and optional', () => {
-    const model = createSnapshotModel(buildOrientationContext());
-
-    expect(model.secondary.volatilityContext).toBeUndefined();
-    expect(model.secondary.strategyFit).toBeUndefined();
-    expect(model.secondary.contributingEventCount).toBeUndefined();
-  });
-
-  it('returns null current values and no meaningful history when there is no latest event', () => {
-    const model = createSnapshotModel(
-      buildOrientationContext({
-        currentState: {
-          latestRelevantEvent: null,
-          strategyAlignment: 'Aligned',
-          certainty: null,
-        },
-        historyContext: {
-          eventsSinceLastViewed: [],
-          sinceLastChecked: null,
-        },
-      }),
-    );
-
-    expect(model).toEqual({
-      core: {
-        currentState: {
-          price: null,
-          pctChange24h: null,
-          certainty: null,
-        },
-        strategyStatus: {
-          alignmentState: 'Aligned',
-          latestEventType: null,
-          trendDirection: 'neutral',
-        },
-      },
-      secondary: {},
-      history: {
-        hasMeaningfulChanges: false,
-        eventsSinceLastViewedCount: 0,
-        sinceLastCheckedSummaryCount: null,
-      },
-    });
+  it('keeps trend direction derivation deterministic at each boundary', () => {
+    expect(deriveTrendDirection(0.01)).toBe('UP');
+    expect(deriveTrendDirection(-0.01)).toBe('DOWN');
+    expect(deriveTrendDirection(0)).toBe('FLAT');
+    expect(formatCurrentState('UP')).toBe('Up');
+    expect(formatCurrentState('DOWN')).toBe('Down');
+    expect(formatCurrentState('FLAT')).toBe('Flat');
   });
 });

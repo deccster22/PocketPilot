@@ -1,96 +1,69 @@
-import type { EventLedgerEntry } from '@/core/types/eventLedger';
-import type { Certainty } from '@/core/types/marketEvent';
-import type { OrientationContext } from '@/services/orientation/createOrientationContext';
-import {
-  deriveSnapshotTrendDirection,
-  type SnapshotTrendDirection,
-} from '@/services/snapshot/deriveSnapshotTrendDirection';
+import type { UserProfile } from '@/core/profile/types';
+import type { SinceLastCheckedPayload } from '@/services/events/createSinceLastChecked';
+import type { ForegroundScanResult } from '@/services/types/scan';
 
-export type SnapshotCertainty = Certainty | null;
+import type { SnapshotModel, SnapshotTrendDirection } from '@/services/snapshot/types';
 
-export type SnapshotModel = {
-  core: {
-    currentState: {
-      price: number | null;
-      pctChange24h: number | null;
-      certainty: SnapshotCertainty;
-    };
-    strategyStatus: {
-      alignmentState: string | null;
-      latestEventType: string | null;
-      trendDirection: SnapshotTrendDirection;
-    };
-  };
-  secondary: {
-    volatilityContext?: null;
-    strategyFit?: null;
-    contributingEventCount?: null;
-  };
-  history: {
-    hasMeaningfulChanges: boolean;
-    eventsSinceLastViewedCount: number;
-    sinceLastCheckedSummaryCount: number | null;
-  };
-};
+export function deriveTrendDirection(change24h: number): SnapshotTrendDirection {
+  if (change24h > 0) {
+    return 'UP';
+  }
 
-function isMarketEvent(
-  event: EventLedgerEntry | OrientationContext['currentState']['latestRelevantEvent'],
-): event is NonNullable<OrientationContext['currentState']['latestRelevantEvent']> & {
-  eventType: string;
-  price: number | null;
-  pctChange: number | null;
-} {
-  return Boolean(event && 'eventType' in event);
+  if (change24h < 0) {
+    return 'DOWN';
+  }
+
+  return 'FLAT';
 }
 
-function createCurrentState(
-  orientationContext: OrientationContext,
-): SnapshotModel['core']['currentState'] {
-  const latestRelevantEvent = orientationContext.currentState.latestRelevantEvent;
-
-  return {
-    price: isMarketEvent(latestRelevantEvent) ? latestRelevantEvent.price : null,
-    pctChange24h: isMarketEvent(latestRelevantEvent) ? latestRelevantEvent.pctChange : null,
-    certainty: orientationContext.currentState.certainty ?? null,
-  };
+export function formatCurrentState(trendDirection: SnapshotTrendDirection): string {
+  switch (trendDirection) {
+    case 'UP':
+      return 'Up';
+    case 'DOWN':
+      return 'Down';
+    default:
+      return 'Flat';
+  }
 }
 
-function createStrategyStatus(
-  orientationContext: OrientationContext,
-): SnapshotModel['core']['strategyStatus'] {
-  const latestRelevantEvent = orientationContext.currentState.latestRelevantEvent;
+export function createSnapshotModel(params: {
+  profile: UserProfile;
+  scan: ForegroundScanResult;
+  bundleName: string;
+  portfolioValue: number;
+  change24h: number;
+  strategyAlignment: string;
+  sinceLastChecked?: SinceLastCheckedPayload;
+}): SnapshotModel {
+  const trendDirection = deriveTrendDirection(params.change24h);
 
   return {
-    alignmentState: orientationContext.currentState.strategyAlignment ?? null,
-    latestEventType: isMarketEvent(latestRelevantEvent) ? latestRelevantEvent.eventType : null,
-    trendDirection: deriveSnapshotTrendDirection(orientationContext),
-  };
-}
-
-function createHistory(
-  orientationContext: OrientationContext,
-): SnapshotModel['history'] {
-  const eventsSinceLastViewedCount =
-    orientationContext.historyContext.eventsSinceLastViewed.length;
-  const sinceLastCheckedSummaryCount =
-    orientationContext.historyContext.sinceLastChecked?.summaryCount ?? null;
-
-  return {
-    hasMeaningfulChanges: eventsSinceLastViewedCount > 0,
-    eventsSinceLastViewedCount,
-    sinceLastCheckedSummaryCount,
-  };
-}
-
-export function createSnapshotModel(
-  orientationContext: OrientationContext,
-): SnapshotModel {
-  return {
+    profile: params.profile,
     core: {
-      currentState: createCurrentState(orientationContext),
-      strategyStatus: createStrategyStatus(orientationContext),
+      currentState: {
+        label: 'Current State',
+        value: formatCurrentState(trendDirection),
+        trendDirection,
+      },
+      change24h: {
+        label: 'Last 24h Change',
+        value: params.change24h,
+      },
+      strategyStatus: {
+        label: 'Strategy Status',
+        value: params.strategyAlignment,
+      },
     },
-    secondary: {},
-    history: createHistory(orientationContext),
+    secondary: {
+      bundleName: params.bundleName,
+      portfolioValue: params.portfolioValue,
+    },
+    history:
+      params.sinceLastChecked === undefined
+        ? undefined
+        : {
+            hasNewSinceLastCheck: params.sinceLastChecked.summaryCount > 0,
+          },
   };
 }

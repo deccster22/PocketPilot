@@ -1,67 +1,48 @@
-# Snapshot Spec (P4-1)
+# Snapshot Spec
 
 ## Purpose
-`SnapshotModel` is the canonical shaping seam between `OrientationContext` and Snapshot-facing UI.
+Snapshot is PocketPilot's calm, zero-scroll orientation surface. It consumes a prepared `SnapshotModel` from `services/snapshot` and does not interpret raw strategy output in `app/`.
 
-This phase does not define final rendering. It defines the strict structured model the Snapshot surface should consume so presentation stays calm, deterministic, and free of UI-owned interpretation logic.
+## Canonical Consumption Path
+- `services/snapshot/snapshotService.ts` produces orchestration output and a prepared `model`.
+- `services/snapshot/createSnapshotModel.ts` builds the canonical Snapshot model from deterministic scan output.
+- `services/snapshot/createProfileAwareSnapshotModel.ts` applies profile-aware shaping at the service seam.
+- `app/` reads `snapshot.model` through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
 
-## Canonical Model
+## Core vs Secondary Discipline
+- Core fields are always present:
+  - current state
+  - last 24h change
+  - strategy status
+- Secondary fields are optional and subordinate:
+  - bundle name
+  - portfolio value
+  - history cue
+- Secondary fields must never replace or visually outweigh the core orientation blocks.
 
-```ts
-type SnapshotModel = {
-  core: {
-    currentState: {
-      price: number | null
-      pctChange24h: number | null
-      certainty: "confirmed" | "estimated" | null
-    }
-    strategyStatus: {
-      alignmentState: string | null
-      latestEventType: string | null
-      trendDirection: "strengthening" | "weakening" | "neutral"
-    }
-  }
-  secondary: {
-    volatilityContext?: null
-    strategyFit?: null
-    contributingEventCount?: null
-  }
-  history: {
-    hasMeaningfulChanges: boolean
-    eventsSinceLastViewedCount: number
-    sinceLastCheckedSummaryCount: number | null
-  }
-}
-```
+## Profile-Aware Shaping Rules
+- Beginner:
+  - canonical core stays fully visible
+  - no secondary fields
+  - no history cue exposure
+- Middle:
+  - canonical core stays fully visible
+  - may expose compact secondary context already present in the model
+  - currently limited to `portfolioValue`
+- Advanced:
+  - canonical core stays fully visible
+  - may expose compact secondary context and a small history cue
+  - currently limited to `bundleName`, `portfolioValue`, and optional history
+  - still no dense supporting detail, raw indicators, or raw signal lists
 
-## Mapping From OrientationContext
-- `core.currentState.price` maps from `orientationContext.currentState.latestRelevantEvent?.price`.
-- `core.currentState.pctChange24h` maps from `orientationContext.currentState.latestRelevantEvent?.pctChange`.
-- `core.currentState.certainty` maps from `orientationContext.currentState.certainty`.
-- `core.strategyStatus.alignmentState` maps from `orientationContext.currentState.strategyAlignment`.
-- `core.strategyStatus.latestEventType` maps from `orientationContext.currentState.latestRelevantEvent?.eventType`.
-- `core.strategyStatus.trendDirection` is deterministically derived from the latest relevant event type, with alignment fallback when no latest event exists.
-- `history.eventsSinceLastViewedCount` maps from `orientationContext.historyContext.eventsSinceLastViewed.length`.
-- `history.sinceLastCheckedSummaryCount` maps from `orientationContext.historyContext.sinceLastChecked?.summaryCount`.
-- `history.hasMeaningfulChanges` is true only when `eventsSinceLastViewedCount > 0`.
+## Intentional Exclusions
+- raw strategy signal lists
+- raw indicators
+- charts
+- notification delivery
+- dashboard shaping
+- prose generation beyond fixed UI labels
+- top movers and top dips as primary Snapshot content
 
-## Core vs Secondary vs History
-- `core` is the three-part Snapshot center: current state, 24h change, and strategy status.
-- `secondary` exists for later subordinate context only. P4-1 intentionally leaves these fields unset.
-- `history` is count-based and compact. It supports re-entry awareness without flattening ledger history into the surface.
-
-## What Snapshot Intentionally Excludes
-- Raw signal arrays
-- Raw indicator payloads
-- Full event history lists
-- Dashboard shaping
-- Narrative prose generation
-- Notification logic
-- Analytics or scoring layers
-
-## Data Flow
-The Snapshot preparation chain is now:
-
-`MarketEvent -> EventLedger -> Event queries -> Since Last Checked -> OrientationContext -> SnapshotModel -> UI`
-
-`app/` should consume `SnapshotModel` for Snapshot-facing interpretation instead of recomputing meaning from scan or event internals.
+## Transitional Legacy Handling
+`SnapshotVM` still carries legacy top-level bridge fields (`bundleName`, `portfolioValue`, `change24h`, `strategyAlignment`) for temporary compatibility and debug payload support. Snapshot consumers should prefer `snapshot.model`; bridge fields remain aligned until retirement is safe.

@@ -1,10 +1,10 @@
 import { STRATEGY_BUNDLES } from '@/core/strategy/bundles';
+import type { UserProfile } from '@/core/profile/types';
 import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
 import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import type { AlignmentState, MarketEvent } from '@/core/types/marketEvent';
 import { QuoteBroker } from '@/providers/quoteBroker';
 import { fetchLiveQuotes } from '@/providers/liveQuoteFetcher';
-import type { UserProfile } from '@/app/state/profileState';
 import {
   buildDebugObservatoryPayload,
   type DebugObservatoryPayload,
@@ -41,10 +41,9 @@ import {
   getQuotesForSymbols,
 } from '@/services/providers/providerRouter';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
-import {
-  createSnapshotModel,
-  type SnapshotModel,
-} from '@/services/snapshot/createSnapshotModel';
+import { createProfileAwareSnapshotModel } from '@/services/snapshot/createProfileAwareSnapshotModel';
+import { createSnapshotModel } from '@/services/snapshot/createSnapshotModel';
+import type { SnapshotModel } from '@/services/snapshot/types';
 import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
 import { runStrategies } from '@/services/strategy/runStrategiesService';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -54,7 +53,8 @@ const SNAPSHOT_SYMBOLS = ['BTC', 'ETH', 'SOL', 'DOGE'] as const;
 const SNAPSHOT_ACCOUNTS = [{ id: 'acct-live', portfolioValue: 10_000, isPrimary: true }];
 
 export type SnapshotVM = {
-  snapshotModel: SnapshotModel;
+  model: SnapshotModel;
+  // Legacy bridge fields remain aligned during the SnapshotModel transition.
   portfolioValue: number;
   change24h: number;
   strategyAlignment: string;
@@ -175,7 +175,15 @@ export async function fetchSnapshotVM(params: {
     strategyAlignment,
     sinceLastChecked,
   });
-  const snapshotModel = createSnapshotModel(orientationContext);
+  const baseSnapshotModel = createSnapshotModel({
+    profile: params.profile,
+    scan,
+    bundleName,
+    portfolioValue,
+    change24h,
+    strategyAlignment,
+    sinceLastChecked,
+  });
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
         timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
@@ -197,8 +205,13 @@ export async function fetchSnapshotVM(params: {
       })
     : undefined;
 
+  const snapshotModel = createProfileAwareSnapshotModel({
+    profile: params.profile,
+    model: baseSnapshotModel,
+  });
+
   return {
-    snapshotModel,
+    model: snapshotModel,
     portfolioValue,
     change24h,
     strategyAlignment,
