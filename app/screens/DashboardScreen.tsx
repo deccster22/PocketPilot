@@ -1,0 +1,148 @@
+import { useEffect, useMemo, useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { ProfileSelector } from '@/app/components/ProfileSelector';
+import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { createDashboardScreenViewData } from '@/app/screens/dashboardScreenView';
+import { fetchDashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { DashboardSurfaceModel } from '@/services/dashboard/types';
+import type { ForegroundScanResult } from '@/services/types/scan';
+
+function DashboardZone(props: {
+  title: string;
+  items: Array<{
+    title: string;
+    subtitle: string;
+    certaintyText: string;
+  }>;
+}) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{props.title}</Text>
+      {props.items.length === 0 ? <Text style={styles.emptyState}>No items prepared.</Text> : null}
+      {props.items.map((item) => (
+        <View key={`${props.title}:${item.title}:${item.subtitle}`} style={styles.card}>
+          <Text style={styles.cardTitle}>{item.title}</Text>
+          <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+          <Text style={styles.cardMeta}>{item.certaintyText}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+export function DashboardScreen() {
+  const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
+  const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceModel | null>(null);
+  const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchDashboardSurfaceVM({ profile, baselineScan })
+      .then((dashboard) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setSurfaceModel(dashboard.model);
+        setBaselineScan((currentBaseline) => currentBaseline ?? dashboard.scan);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setSurfaceModel(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [profile, baselineScan]);
+
+  const screenView = useMemo(
+    () => createDashboardScreenViewData(surfaceModel),
+    [surfaceModel],
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.header}>PocketPilot</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Dashboard</Text>
+          <Text style={styles.label}>Profile</Text>
+          <ProfileSelector value={profile} onChange={setProfile} />
+          <Text style={styles.label}>Prepared surface for {screenView?.profileLabel ?? profile}</Text>
+        </View>
+        <DashboardZone
+          title={screenView?.primeZone.title ?? 'Prime Zone'}
+          items={screenView?.primeZone.items ?? []}
+        />
+        <DashboardZone
+          title={screenView?.secondaryZone.title ?? 'Secondary Zone'}
+          items={screenView?.secondaryZone.items ?? []}
+        />
+        <DashboardZone
+          title={screenView?.deepZone.title ?? 'Deep Zone'}
+          items={screenView?.deepZone.items ?? []}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  container: {
+    padding: 16,
+    gap: 16,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  section: {
+    gap: 8,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  label: {
+    fontSize: 13,
+    color: '#4b5563',
+    fontWeight: '500',
+  },
+  card: {
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    padding: 12,
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  cardSubtitle: {
+    fontSize: 13,
+    color: '#374151',
+  },
+  cardMeta: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  emptyState: {
+    fontSize: 13,
+    color: '#6b7280',
+  },
+});

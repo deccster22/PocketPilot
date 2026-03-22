@@ -20,6 +20,24 @@ export type DashboardModel = {
   background: DashboardItem[];
 };
 
+export type DashboardSurfaceZone = {
+  items: DashboardItem[];
+};
+
+export type DashboardSurfaceMeta = {
+  profile: UserProfile;
+  hasPrimeItems: boolean;
+  hasSecondaryItems: boolean;
+  hasDeepItems: boolean;
+};
+
+export type DashboardSurfaceModel = {
+  primeZone: DashboardSurfaceZone;
+  secondaryZone: DashboardSurfaceZone;
+  deepZone: DashboardSurfaceZone;
+  meta: DashboardSurfaceMeta;
+};
+
 export type OrientationContextAsset = {
   symbol?: string;
   accountId?: string;

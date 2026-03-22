@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 
-import { SnapshotScreen } from '@/app/screens/SnapshotScreen';
+import { DashboardScreen } from '@/app/screens/DashboardScreen';
 
 export default function App() {
   return (
     <>
-      <SnapshotScreen />
+      <DashboardScreen />
       <StatusBar style="dark" />
     </>
   );
