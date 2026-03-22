@@ -67,3 +67,27 @@ This seam exists so later phases can:
 - attach execution adapters only after product and governance phases explicitly allow it
 
 Until then, the model remains informational and read-only.
+
+## Relationship To Trade Hub Surface
+P5-2 adds `TradeHubSurfaceModel` as the UI-facing presentation contract built on top of `ProtectionPlan`.
+
+The boundary is:
+
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> app`
+
+This keeps:
+- event interpretation in shared services
+- action framing in `ProtectionPlan`
+- presentation shaping in Trade Hub services
+- rendering-only behavior in `app/`
+
+Trade Hub cards expose only the fields needed for safe presentation:
+- intent
+- symbol
+- alignment
+- certainty
+- summary
+- supporting event count
+- explicit action state
+
+They do not expose raw signal codes, event metadata, execution instructions, or hidden heuristics.
