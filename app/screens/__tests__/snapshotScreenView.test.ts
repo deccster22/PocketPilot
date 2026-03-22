@@ -34,6 +34,13 @@ describe('createSnapshotScreenViewData', () => {
       signals: [],
       marketEvents: [],
       eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
+      orientationContext: {
+        currentState: {},
+        historyContext: {
+          eventsSinceLastViewed: [],
+          sinceLastChecked: null,
+        },
+      },
     } as SnapshotVM;
 
     expect(createSnapshotScreenViewData(snapshot)).toEqual({
@@ -70,6 +77,21 @@ describe('createSnapshotScreenViewData', () => {
             label: 'Strategy Status',
             value: 'Aligned',
           },
+        },
+      },
+      bundleName: '',
+      portfolioValue: 0,
+      change24h: 0,
+      strategyAlignment: 'Aligned',
+      scan: {} as SnapshotVM['scan'],
+      signals: [],
+      marketEvents: [],
+      eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
+      orientationContext: {
+        currentState: {},
+        historyContext: {
+          eventsSinceLastViewed: [],
+          sinceLastChecked: null,
         },
       },
     } as SnapshotVM;

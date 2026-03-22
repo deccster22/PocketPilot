@@ -175,7 +175,15 @@ export async function fetchSnapshotVM(params: {
     strategyAlignment,
     sinceLastChecked,
   });
-  const snapshotModel = createSnapshotModel(orientationContext);
+  const baseSnapshotModel = createSnapshotModel({
+    profile: params.profile,
+    scan,
+    bundleName,
+    portfolioValue,
+    change24h,
+    strategyAlignment,
+    sinceLastChecked,
+  });
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
         timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
@@ -197,21 +205,13 @@ export async function fetchSnapshotVM(params: {
       })
     : undefined;
 
-  const model = createProfileAwareSnapshotModel({
+  const snapshotModel = createProfileAwareSnapshotModel({
     profile: params.profile,
-    model: createSnapshotModel({
-      profile: params.profile,
-      scan,
-      bundleName,
-      portfolioValue,
-      change24h,
-      strategyAlignment,
-      sinceLastChecked,
-    }),
+    model: baseSnapshotModel,
   });
 
   return {
-    snapshotModel: model,
+    model: snapshotModel,
     portfolioValue,
     change24h,
     strategyAlignment,

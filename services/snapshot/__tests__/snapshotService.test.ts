@@ -142,25 +142,25 @@ describe('snapshotService market event integration', () => {
       result.eventStream.events.map((event) => event.eventId),
     );
     expect(result.strategyAlignment).toBe('Needs review');
-    expect(result.snapshotModel).toEqual({
+    expect(result.model).toEqual({
+      profile: defaultProfile,
       core: {
         currentState: {
-          price: 200,
-          pctChange24h: -0.02,
-          certainty: 'estimated',
+          label: 'Current State',
+          value: 'Up',
+          trendDirection: 'UP',
+        },
+        change24h: {
+          label: 'Last 24h Change',
+          value: 0.015000000000000001,
         },
         strategyStatus: {
-          alignmentState: 'Needs review',
-          latestEventType: 'ESTIMATED_PRICE',
-          trendDirection: 'weakening',
+          label: 'Strategy Status',
+          value: 'Needs review',
         },
       },
-      secondary: {},
-      history: {
-        hasMeaningfulChanges: false,
-        eventsSinceLastViewedCount: 0,
-        sinceLastCheckedSummaryCount: null,
-      },
+      secondary: undefined,
+      history: undefined,
     });
     expect(result.orientationContext.currentState.latestRelevantEvent).toEqual(
       result.eventStream.events[1],
@@ -258,11 +258,6 @@ describe('snapshotService market event integration', () => {
       events: result.eventsSinceLastViewed,
       summaryCount: 1,
     });
-    expect(result.snapshotModel.history).toEqual({
-      hasMeaningfulChanges: true,
-      eventsSinceLastViewedCount: 1,
-      sinceLastCheckedSummaryCount: 1,
-    });
     expect(result.orientationContext.historyContext.eventsSinceLastViewed).toEqual(
       result.eventsSinceLastViewed,
     );
@@ -314,7 +309,7 @@ describe('snapshotService market event integration', () => {
     ]);
 
     const result = await fetchSnapshotVM({
-      profile: DEFAULT_USER_PROFILE,
+      profile: defaultProfile,
       nowProvider: () => 1_700_000_000_100,
       eventLedger: ledger,
       lastViewedState,
