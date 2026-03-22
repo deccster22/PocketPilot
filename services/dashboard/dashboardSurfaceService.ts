@@ -1,9 +1,8 @@
-import type { UserProfile } from '@/core/profile/types';
-import type { MarketEvent } from '@/core/types/marketEvent';
 import { createDashboardModel } from '@/services/dashboard/createDashboardModel';
 import { createDashboardSurfaceModel } from '@/services/dashboard/createDashboardSurfaceModel';
+import { fetchDashboardData } from '@/services/dashboard/dashboardDataService';
 import type { DashboardSurfaceModel } from '@/services/dashboard/types';
-import { fetchSnapshotVM } from '@/services/snapshot/snapshotService';
+import type { UserProfile } from '@/core/profile/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type DashboardSurfaceVM = {
@@ -11,30 +10,15 @@ export type DashboardSurfaceVM = {
   scan: ForegroundScanResult;
 };
 
-function createDashboardEvents(events: ReadonlyArray<MarketEvent>): MarketEvent[] {
-  return events.map((event) => ({
-    ...event,
-    signalsTriggered: [...event.signalsTriggered],
-    metadata: { ...event.metadata },
-  }));
-}
-
 export async function fetchDashboardSurfaceVM(params: {
   profile: UserProfile;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
 }): Promise<DashboardSurfaceVM> {
-  const snapshot = await fetchSnapshotVM({
-    profile: params.profile,
-    baselineScan: params.baselineScan,
-    nowProvider: params.nowProvider,
-  });
+  const dashboardData = await fetchDashboardData(params);
   const dashboardModel = createDashboardModel({
-    orientationContext: {
-      profile: params.profile,
-      assets: [],
-    },
-    events: createDashboardEvents(snapshot.marketEvents),
+    orientationContext: dashboardData.orientationContext,
+    events: dashboardData.events,
   });
 
   return {
@@ -42,6 +26,6 @@ export async function fetchDashboardSurfaceVM(params: {
       model: dashboardModel,
       profile: params.profile,
     }),
-    scan: snapshot.scan,
+    scan: dashboardData.scan,
   };
 }
