@@ -1,56 +1,21 @@
-import { STRATEGY_BUNDLES } from '@/core/strategy/bundles';
 import type { UserProfile } from '@/core/profile/types';
-import { defaultBundleIdsForProfile } from '@/core/strategy/profileDefaults';
 import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import type { AlignmentState, MarketEvent } from '@/core/types/marketEvent';
-import { QuoteBroker } from '@/providers/quoteBroker';
-import { fetchLiveQuotes } from '@/providers/liveQuoteFetcher';
 import {
   buildDebugObservatoryPayload,
   type DebugObservatoryPayload,
 } from '@/services/debug/debugObservatoryService';
-import {
-  createSinceLastChecked,
-  type SinceLastCheckedPayload,
-} from '@/services/events/createSinceLastChecked';
-import {
-  defaultEventLedgerService,
-  type EventLedgerService,
-} from '@/services/events/eventLedgerService';
-import {
-  createEventLedgerQueries,
-  type EventLedgerQueries,
-} from '@/services/events/eventLedgerQueries';
-import { createMarketEvents } from '@/services/events/createMarketEvents';
-import {
-  createEventStream,
-  summarizeAlignment,
-  type EventStream,
-} from '@/services/events/eventStream';
-import {
-  createOrientationContext,
-  type OrientationContext,
-} from '@/services/orientation/createOrientationContext';
-import {
-  defaultLastViewedState,
-  SNAPSHOT_LAST_VIEWED_SURFACE_ID,
-  type LastViewedState,
-} from '@/services/orientation/lastViewedState';
-import {
-  createQuoteBrokerProvider,
-  getQuotesForSymbols,
-} from '@/services/providers/providerRouter';
-import { runForegroundScan } from '@/services/scan/foregroundScanService';
+import type { SinceLastCheckedPayload } from '@/services/events/createSinceLastChecked';
+import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
+import type { EventLedgerService } from '@/services/events/eventLedgerService';
+import type { EventStream } from '@/services/events/eventStream';
+import type { OrientationContext } from '@/services/orientation/createOrientationContext';
+import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createProfileAwareSnapshotModel } from '@/services/snapshot/createProfileAwareSnapshotModel';
 import { createSnapshotModel } from '@/services/snapshot/createSnapshotModel';
 import type { SnapshotModel } from '@/services/snapshot/types';
-import { resolveActiveStrategies } from '@/services/strategy/activeStrategiesService';
-import { runStrategies } from '@/services/strategy/runStrategiesService';
 import type { ForegroundScanResult } from '@/services/types/scan';
-
-const SNAPSHOT_SYMBOLS = ['BTC', 'ETH', 'SOL', 'DOGE'] as const;
-
-const SNAPSHOT_ACCOUNTS = [{ id: 'acct-live', portfolioValue: 10_000, isPrimary: true }];
+import { fetchSurfaceContext, type SurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
 export type SnapshotVM = {
   model: SnapshotModel;
@@ -60,7 +25,7 @@ export type SnapshotVM = {
   strategyAlignment: string;
   bundleName: string;
   scan: ForegroundScanResult;
-  signals: ReturnType<typeof runStrategies>;
+  signals: SurfaceContext['signals'];
   marketEvents: MarketEvent[];
   eventStream: EventStream;
   orientationContext: OrientationContext;
@@ -91,116 +56,41 @@ export async function fetchSnapshotVM(params: {
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
 }): Promise<SnapshotVM> {
   const nowProvider = params.nowProvider ?? Date.now;
-  const eventLedger = params.eventLedger ?? defaultEventLedgerService;
-  const eventLedgerQueries =
-    params.eventLedgerQueries ?? createEventLedgerQueries(eventLedger);
-  const lastViewedState = params.lastViewedState ?? defaultLastViewedState;
-  const broker = new QuoteBroker({
-    mode: 'CALM',
-    fetcher: fetchLiveQuotes,
-    nowProvider,
-  });
-  const primaryProvider = createQuoteBrokerProvider(broker, 'broker:live');
-
-  const scan = await runForegroundScan(
-    {
-      getQuotesForSymbols: (routerParams) =>
-        getQuotesForSymbols(
-          {
-            primary: primaryProvider,
-          },
-          routerParams,
-        ),
-      nowProvider,
-      getInstrumentation: () => broker.instrumentation,
-    },
-    {
-      accounts: SNAPSHOT_ACCOUNTS,
-      symbols: [...SNAPSHOT_SYMBOLS],
-      baselineQuotes: params.baselineScan?.quotes,
-    },
-  );
-
-  const strategies = resolveActiveStrategies({ profile: params.profile });
-  const strategyNowMs = nowProvider();
-  const signals = runStrategies({
-    scan,
+  const upstream = await fetchSurfaceContext({
+    profile: params.profile,
     baselineScan: params.baselineScan,
-    strategies,
-    nowMs: strategyNowMs,
-  });
-  const marketEvents = createMarketEvents({
-    accountId: scan.accountId,
-    quotesBySymbol: scan.quotes,
-    pctChangeBySymbol: scan.pctChangeBySymbol,
-    signals,
-  });
-  const eventStream = createEventStream({
-    accountId: scan.accountId,
-    timestamp: strategyNowMs,
-    events: marketEvents,
-  });
-  eventLedger.appendEvents(eventStream.events);
-  const resolvedLastViewedTimestamp =
-    params.lastViewedTimestamp ??
-    lastViewedState.getLastViewedTimestamp({
-      surfaceId: SNAPSHOT_LAST_VIEWED_SURFACE_ID,
-      accountId: scan.accountId,
-    });
-  const sinceLastChecked =
-    resolvedLastViewedTimestamp === undefined
-      ? undefined
-      : createSinceLastChecked({
-          sinceTimestamp: resolvedLastViewedTimestamp,
-          accountId: scan.accountId,
-          eventQueries: eventLedgerQueries,
-        });
-
-  const prices = Object.values(scan.quotes).map((quote) => quote.price);
-  const portfolioValue = prices.reduce((sum, price) => sum + price, 0);
-  const changeValues = Object.values(scan.pctChangeBySymbol ?? {});
-  const change24h =
-    changeValues.length > 0
-      ? changeValues.reduce((sum, change) => sum + change, 0) / changeValues.length
-      : 0;
-
-  const defaultBundleId = defaultBundleIdsForProfile(params.profile)[0];
-  const bundleName =
-    STRATEGY_BUNDLES.find((bundle) => bundle.id === defaultBundleId)?.name ?? 'Unknown bundle';
-
-  const strategyAlignment = formatAlignmentState(summarizeAlignment(eventStream.events));
-  const orientationContext = createOrientationContext({
-    accountId: scan.accountId,
-    currentEvents: eventStream.events,
-    strategyAlignment,
-    sinceLastChecked,
+    nowProvider,
+    eventLedger: params.eventLedger,
+    eventLedgerQueries: params.eventLedgerQueries,
+    lastViewedTimestamp: params.lastViewedTimestamp,
+    lastViewedState: params.lastViewedState,
   });
   const baseSnapshotModel = createSnapshotModel({
     profile: params.profile,
-    scan,
-    bundleName,
-    portfolioValue,
-    change24h,
-    strategyAlignment,
-    sinceLastChecked,
+    scan: upstream.scan,
+    bundleName: upstream.bundleName,
+    portfolioValue: upstream.portfolioValue,
+    change24h: upstream.change24h,
+    strategyAlignment: upstream.strategyAlignment,
+    sinceLastChecked: upstream.sinceLastChecked,
   });
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
-        timestampMs: scan.quoteMeta?.timestampMs ?? strategyNowMs,
-        symbols: scan.symbols,
-        quotes: scan.quotes,
-        quoteMeta: scan.quoteMeta,
-        deltas: scan.pctChangeBySymbol,
-        strategySignals: signals,
-        marketEvents: eventStream.events,
-        eventLedger,
-        accountId: scan.accountId,
+        timestampMs: upstream.scan.quoteMeta?.timestampMs ?? nowProvider(),
+        symbols: upstream.scan.symbols,
+        quotes: upstream.scan.quotes,
+        quoteMeta: upstream.scan.quoteMeta,
+        deltas: upstream.scan.pctChangeBySymbol,
+        strategySignals: upstream.signals,
+        marketEvents: upstream.eventStream.events,
+        eventLedger: upstream.eventLedger,
+        accountId: upstream.scan.accountId,
         snapshot: {
-          portfolioValue,
-          change24h,
-          strategyAlignment,
-          bundleName,
-          accountId: scan.accountId,
+          portfolioValue: upstream.portfolioValue,
+          change24h: upstream.change24h,
+          strategyAlignment: upstream.strategyAlignment,
+          bundleName: upstream.bundleName,
+          accountId: upstream.scan.accountId,
         },
       })
     : undefined;
@@ -212,23 +102,17 @@ export async function fetchSnapshotVM(params: {
 
   return {
     model: snapshotModel,
-    portfolioValue,
-    change24h,
-    strategyAlignment,
-    bundleName,
-    scan,
-    signals,
-    marketEvents,
-    eventStream,
-    orientationContext,
-    eventsSinceLastViewed:
-      orientationContext.historyContext.sinceLastChecked === null
-        ? undefined
-        : orientationContext.historyContext.eventsSinceLastViewed,
-    sinceLastChecked:
-      orientationContext.historyContext.sinceLastChecked === null
-        ? undefined
-        : orientationContext.historyContext.sinceLastChecked,
+    portfolioValue: upstream.portfolioValue,
+    change24h: upstream.change24h,
+    strategyAlignment: upstream.strategyAlignment,
+    bundleName: upstream.bundleName,
+    scan: upstream.scan,
+    signals: upstream.signals,
+    marketEvents: upstream.marketEvents,
+    eventStream: upstream.eventStream,
+    orientationContext: upstream.orientationContext,
+    eventsSinceLastViewed: upstream.eventsSinceLastViewed,
+    sinceLastChecked: upstream.sinceLastChecked,
     debugObservatory,
   };
 }
