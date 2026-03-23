@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-4)
+# Trade Intent Model (P5-5)
 
 ## Purpose
 `ProtectionPlan` is the canonical action-framing object for the P5 action layer.
@@ -72,10 +72,11 @@ Until then, the model remains informational and read-only.
 P5-2 adds `TradeHubSurfaceModel` as the UI-facing presentation contract built on top of `ProtectionPlan`.
 P5-3 adds `TradePlanPreview` as the confirmation-safe detail contract for one selected plan.
 P5-4 adds `TradePlanConfirmationShell` as the capability-aware confirmation contract for one selected plan.
+P5-5 adds `ConfirmationFlow` as the deterministic confirmation-step contract derived from one selected shell.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> ConfirmationFlow -> app`
 
 This keeps:
 - event interpretation in shared services
@@ -108,12 +109,27 @@ Trade plan confirmation shells expose only the fields needed for safe confirmati
 - explicit constraints
 - placeholder availability for future payload and execution previews
 
+Confirmation flows expose only the fields needed for safe step orchestration:
+- stable step identifiers
+- explicit step types
+- prepared labels
+- explicit completion state
+- current step focus
+- explicit blocked status
+
 Confirmation shells intentionally describe presentation-safe capability context only. They do not imply:
 - real broker compatibility
 - executable order instructions
 - submission readiness
 - payload construction
 - live adapter behavior
+
+Confirmation flows intentionally describe progression-safe scaffolding only. They do not imply:
+- execution permission
+- order submission readiness
+- adapter integration
+- hidden advancement
+- persisted confirmation history
 
 They intentionally do not expose:
 - raw signals

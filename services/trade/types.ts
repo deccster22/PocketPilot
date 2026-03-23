@@ -121,3 +121,25 @@ export type TradePlanConfirmationShell = {
     executionPreviewAvailable: boolean;
   };
 };
+
+export type ConfirmationFlowStepType =
+  | 'REVIEW'
+  | 'CONSTRAINT_CHECK'
+  | 'CONFIRM_INTENT'
+  | 'UNAVAILABLE';
+
+export type ConfirmationFlowStep = {
+  stepId: string;
+  type: ConfirmationFlowStepType;
+  label: string;
+  completed: boolean;
+  required: boolean;
+};
+
+export type ConfirmationFlow = {
+  planId: string;
+  steps: ConfirmationFlowStep[];
+  currentStepId: string;
+  canProceed: boolean;
+  blockedReason?: string;
+};

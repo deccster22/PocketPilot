@@ -3,12 +3,12 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
-import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
+import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
-import { fetchTradePlanConfirmationVM } from '@/services/trade/fetchTradePlanConfirmationVM';
+import { fetchConfirmationFlowVM } from '@/services/trade/fetchConfirmationFlowVM';
 import { fetchTradePlanPreviewVM } from '@/services/trade/fetchTradePlanPreviewVM';
-import type { TradePlanConfirmationShell, TradePlanPreview } from '@/services/trade/types';
+import type { ConfirmationFlow, TradePlanPreview } from '@/services/trade/types';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -47,8 +47,7 @@ export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
   const [tradePlanPreview, setTradePlanPreview] = useState<TradePlanPreview | null>(null);
-  const [confirmationShell, setConfirmationShell] =
-    useState<TradePlanConfirmationShell | null>(null);
+  const [confirmationFlow, setConfirmationFlow] = useState<ConfirmationFlow | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -84,9 +83,9 @@ export function TradeHubScreen() {
     () => createTradePlanPreviewViewData(tradePlanPreview),
     [tradePlanPreview],
   );
-  const confirmationView = useMemo(
-    () => createTradePlanConfirmationViewData(confirmationShell),
-    [confirmationShell],
+  const confirmationFlowView = useMemo(
+    () => createTradeConfirmationFlowViewData(confirmationFlow),
+    [confirmationFlow],
   );
 
   useEffect(() => {
@@ -117,13 +116,13 @@ export function TradeHubScreen() {
   useEffect(() => {
     let isMounted = true;
 
-    fetchTradePlanConfirmationVM({ profile, baselineScan })
+    fetchConfirmationFlowVM({ profile, baselineScan })
       .then((result) => {
         if (!isMounted) {
           return;
         }
 
-        setConfirmationShell(result.confirmationShell);
+        setConfirmationFlow(result.confirmationFlow);
         setBaselineScan((currentBaseline) => currentBaseline ?? result.scan);
       })
       .catch(() => {
@@ -131,7 +130,7 @@ export function TradeHubScreen() {
           return;
         }
 
-        setConfirmationShell(null);
+        setConfirmationFlow(null);
       });
 
     return () => {
@@ -196,22 +195,24 @@ export function TradeHubScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Confirmation Shell</Text>
-          {confirmationView ? (
+          <Text style={styles.sectionTitle}>Confirmation Flow</Text>
+          {confirmationFlowView ? (
             <View style={styles.card}>
-              <Text style={styles.cardEyebrow}>Capability-aware shell</Text>
+              <Text style={styles.cardEyebrow}>Step-based confirmation</Text>
               <Text style={styles.cardTitle}>
-                {confirmationView.intentLabel} - {confirmationView.symbolLabel}
+                Current step: {confirmationFlowView.currentStepId}
               </Text>
-              <Text style={styles.cardMeta}>{confirmationView.actionStateText}</Text>
-              <Text style={styles.cardMeta}>{confirmationView.readinessText}</Text>
-              <Text style={styles.cardMeta}>{confirmationView.constraintsText}</Text>
-              <Text style={styles.cardMeta}>{confirmationView.confirmationText}</Text>
-              <Text style={styles.cardMeta}>{confirmationView.placeholderText}</Text>
-              <Text style={styles.cardId}>Plan: {confirmationView.planId}</Text>
+              <Text style={styles.cardMeta}>{confirmationFlowView.canProceedText}</Text>
+              <Text style={styles.cardMeta}>{confirmationFlowView.blockedReasonText}</Text>
+              {confirmationFlowView.steps.map((step) => (
+                <Text key={step.stepId} style={styles.cardMeta}>
+                  {step.type} | {step.label} | {step.statusText}
+                </Text>
+              ))}
+              <Text style={styles.cardId}>Plan: {confirmationFlowView.planId}</Text>
             </View>
           ) : (
-            <Text style={styles.emptyState}>No confirmation shell is prepared right now.</Text>
+            <Text style={styles.emptyState}>No confirmation flow is prepared right now.</Text>
           )}
         </View>
       </ScrollView>
