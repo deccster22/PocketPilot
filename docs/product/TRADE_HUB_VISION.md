@@ -11,4 +11,10 @@ For the initial P5 foundation:
 - certainty and alignment must remain explicit
 - estimated or low-confidence contexts must never be shown as confirmed action
 
+For P5-2 specifically:
+- the surface presents one primary framed plan plus limited alternatives
+- action posture is explicit through `READY`, `CAUTION`, and `WAIT` states
+- confirmation safety remains visible and always-on
+- app consumers render a prepared Trade Hub contract instead of classifying plans locally
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.
