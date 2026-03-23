@@ -1,0 +1,36 @@
+import type { ProtectionPlan, TradePlanPreview } from '@/services/trade/types';
+import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
+
+export function createTradePlanPreview(plan: ProtectionPlan): TradePlanPreview {
+  return {
+    planId: plan.planId,
+    headline: {
+      intentType: plan.intentType,
+      symbol: plan.symbol,
+      actionState: resolveTradeHubActionState(plan),
+    },
+    rationale: {
+      summary: plan.rationale.summary,
+      primaryEventId: plan.rationale.primaryEventId,
+      supportingEventIds: [...plan.rationale.supportingEventIds],
+      supportingEventCount: plan.rationale.supportingEventIds.length,
+    },
+    constraints: {
+      requiresConfirmation: true,
+      ...(plan.constraints.maxPositionSize !== undefined
+        ? { maxPositionSize: plan.constraints.maxPositionSize }
+        : {}),
+      ...(plan.constraints.cooldownActive !== undefined
+        ? { cooldownActive: plan.constraints.cooldownActive }
+        : {}),
+    },
+    readiness: {
+      alignment: plan.riskProfile.alignment,
+      certainty: plan.riskProfile.certainty,
+    },
+    placeholders: {
+      orderPreviewAvailable: false,
+      executionPreviewAvailable: false,
+    },
+  };
+}

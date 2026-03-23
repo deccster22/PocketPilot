@@ -3,7 +3,10 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
+import { fetchTradePlanPreviewVM } from '@/services/trade/fetchTradePlanPreviewVM';
+import type { TradePlanPreview } from '@/services/trade/types';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -41,6 +44,7 @@ function TradeHubPlanCard(props: {
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
+  const [tradePlanPreview, setTradePlanPreview] = useState<TradePlanPreview | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -72,6 +76,35 @@ export function TradeHubScreen() {
     () => createTradeHubScreenViewData(surfaceModel),
     [surfaceModel],
   );
+  const previewView = useMemo(
+    () => createTradePlanPreviewViewData(tradePlanPreview),
+    [tradePlanPreview],
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchTradePlanPreviewVM({ profile, baselineScan })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setTradePlanPreview(result.preview);
+        setBaselineScan((currentBaseline) => currentBaseline ?? result.scan);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setTradePlanPreview(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [profile, baselineScan]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -104,6 +137,28 @@ export function TradeHubScreen() {
             ))
           ) : (
             <Text style={styles.emptyState}>No alternative plans are prepared.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Plan Preview</Text>
+          {previewView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Confirmation-safe detail</Text>
+              <Text style={styles.cardTitle}>
+                {previewView.intentLabel} - {previewView.symbolLabel}
+              </Text>
+              <Text style={styles.cardSummary}>{previewView.rationaleSummary}</Text>
+              <Text style={styles.cardMeta}>{previewView.actionStateText}</Text>
+              <Text style={styles.cardMeta}>{previewView.readinessText}</Text>
+              <Text style={styles.cardMeta}>{previewView.constraintsText}</Text>
+              <Text style={styles.cardMeta}>{previewView.rationaleTraceText}</Text>
+              <Text style={styles.cardMeta}>{previewView.confirmationText}</Text>
+              <Text style={styles.cardMeta}>{previewView.placeholderText}</Text>
+              <Text style={styles.cardId}>Plan: {previewView.planId}</Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No plan preview is prepared right now.</Text>
           )}
         </View>
       </ScrollView>

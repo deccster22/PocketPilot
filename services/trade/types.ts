@@ -50,3 +50,31 @@ export type TradeHubSurfaceModel = {
     requiresConfirmation: boolean;
   };
 };
+
+export type TradePlanPreview = {
+  planId: string;
+  headline: {
+    intentType: ProtectionPlanIntentType;
+    symbol: string | null;
+    actionState: TradeHubActionState;
+  };
+  rationale: {
+    summary: string;
+    primaryEventId: string | null;
+    supportingEventIds: string[];
+    supportingEventCount: number;
+  };
+  constraints: {
+    requiresConfirmation: true;
+    maxPositionSize?: number;
+    cooldownActive?: boolean;
+  };
+  readiness: {
+    alignment: ProtectionPlanRiskAlignment;
+    certainty: ProtectionPlanRiskCertainty;
+  };
+  placeholders: {
+    orderPreviewAvailable: boolean;
+    executionPreviewAvailable: boolean;
+  };
+};
