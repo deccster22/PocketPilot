@@ -1,12 +1,13 @@
-# Trade Hub Spec (P5-3)
+# Trade Hub Spec (P5-4)
 
 ## Purpose
 Trade Hub is the action surface for PocketPilot's read-only framing layer.
 
-In P5-3 it presents:
+In P5-4 it presents:
 - one primary framed action when available
 - a small set of alternative framed actions
 - one confirmation-safe preview for a selected plan
+- one capability-aware confirmation shell for a selected plan
 - explicit confirmation-safe posture
 
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
@@ -76,6 +77,41 @@ The preview contract shape is:
 
 The preview is for future confirmation UI scaffolding. It expands exactly one selected plan into safe detail without adding execution behavior.
 
+Trade Hub confirmation consumers also consume a prepared `TradePlanConfirmationShell` from `services/trade/`.
+
+The confirmation shell contract shape is:
+
+```ts
+{
+  planId: string,
+  headline: {
+    intentType: 'ACCUMULATE' | 'REDUCE' | 'HOLD' | 'WAIT',
+    symbol: string | null,
+    actionState: 'READY' | 'CAUTION' | 'WAIT'
+  },
+  readiness: {
+    alignment: 'ALIGNED' | 'NEUTRAL' | 'MISALIGNED',
+    certainty: 'HIGH' | 'MEDIUM' | 'LOW'
+  },
+  confirmation: {
+    requiresConfirmation: true,
+    pathType: 'BRACKET' | 'OCO' | 'GUIDED_SEQUENCE' | 'UNAVAILABLE',
+    stepsLabel: string,
+    executionAvailable: boolean
+  },
+  constraints: {
+    cooldownActive?: boolean,
+    maxPositionSize?: number
+  },
+  placeholders: {
+    orderPayloadAvailable: boolean,
+    executionPreviewAvailable: boolean
+  }
+}
+```
+
+The confirmation shell is a prepared UI contract that combines a selected `TradePlanPreview`-adjacent plan shape with deterministic account capability context. It describes what confirmation would require on the current platform path without creating a real order ticket, routing logic, or live payload.
+
 ## Presentation Rules
 - Trade Hub shows one primary plan and limited alternatives.
 - Alternatives are capped by profile to reduce overload.
@@ -84,26 +120,35 @@ The preview is for future confirmation UI scaffolding. It expands exactly one se
   - `CAUTION`
   - `WAIT`
 - `requiresConfirmation` remains `true` in this phase.
+- `pathType` remains explicit and deterministic:
+  - `BRACKET`
+  - `OCO`
+  - `GUIDED_SEQUENCE`
+  - `UNAVAILABLE`
 
 The screen may format labels for readability, but it must not reprioritise plans or derive new action logic.
 The screen may format preview labels for readability, but it must not construct rationale, readiness, or constraints on its own.
+The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 
 ## Safety Posture
 Trade Hub is support, not enforcement.
 
-In P5-3:
+In P5-4:
 - no trade execution exists
 - no one-tap action exists
 - no hidden automation exists
-- no confirmation flow is implemented yet
+- no live confirmation flow is implemented yet
+- no execution guarantee is implied by a capability-aware path
 - order and execution preview fields remain explicit placeholders only
 
-The contract is intentionally shaped so later phases can add confirmation and order-preview steps without moving decision logic into `app/`.
+The confirmation shell is intentionally presentation-safe rather than execution-safe. It is designed so later phases can add a confirmation flow and adapter seams without moving decision logic into `app/`.
 
 ## Intentional Exclusions
-P5-3 does not add:
+P5-4 does not add:
 - exchange connectivity
 - order entry
+- live order payload construction
+- order submission
 - notifications
 - journaling
 - exports
@@ -115,7 +160,8 @@ P5-3 does not add:
 - `ProtectionPlan` remains the canonical action-framing object.
 - `TradeHubSurfaceModel` remains the list/card contract for primary and alternative plans.
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
+- `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
 
 The boundary remains:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> app`

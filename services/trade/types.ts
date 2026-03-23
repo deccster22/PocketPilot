@@ -78,3 +78,46 @@ export type TradePlanPreview = {
     executionPreviewAvailable: boolean;
   };
 };
+
+export type AccountCapabilityContext = {
+  accountId: string;
+  brokerId?: string;
+  supportsBracketOrders: boolean;
+  supportsOCO: boolean;
+  requiresSeparateOrders: boolean;
+  supportsStopLoss: boolean;
+  supportsTakeProfit: boolean;
+};
+
+export type TradePlanConfirmationPathType =
+  | 'BRACKET'
+  | 'OCO'
+  | 'GUIDED_SEQUENCE'
+  | 'UNAVAILABLE';
+
+export type TradePlanConfirmationShell = {
+  planId: string;
+  headline: {
+    intentType: ProtectionPlanIntentType;
+    symbol: string | null;
+    actionState: TradeHubActionState;
+  };
+  readiness: {
+    alignment: ProtectionPlanRiskAlignment;
+    certainty: ProtectionPlanRiskCertainty;
+  };
+  confirmation: {
+    requiresConfirmation: true;
+    pathType: TradePlanConfirmationPathType;
+    stepsLabel: string;
+    executionAvailable: boolean;
+  };
+  constraints: {
+    cooldownActive?: boolean;
+    maxPositionSize?: number;
+  };
+  placeholders: {
+    orderPayloadAvailable: boolean;
+    executionPreviewAvailable: boolean;
+  };
+};
