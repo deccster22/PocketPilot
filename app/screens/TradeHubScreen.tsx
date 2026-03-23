@@ -3,10 +3,12 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
+import { fetchConfirmationFlowVM } from '@/services/trade/fetchConfirmationFlowVM';
 import { fetchTradePlanPreviewVM } from '@/services/trade/fetchTradePlanPreviewVM';
-import type { TradePlanPreview } from '@/services/trade/types';
+import type { ConfirmationFlow, TradePlanPreview } from '@/services/trade/types';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -45,6 +47,7 @@ export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
   const [tradePlanPreview, setTradePlanPreview] = useState<TradePlanPreview | null>(null);
+  const [confirmationFlow, setConfirmationFlow] = useState<ConfirmationFlow | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -80,6 +83,10 @@ export function TradeHubScreen() {
     () => createTradePlanPreviewViewData(tradePlanPreview),
     [tradePlanPreview],
   );
+  const confirmationFlowView = useMemo(
+    () => createTradeConfirmationFlowViewData(confirmationFlow),
+    [confirmationFlow],
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -99,6 +106,31 @@ export function TradeHubScreen() {
         }
 
         setTradePlanPreview(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [profile, baselineScan]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchConfirmationFlowVM({ profile, baselineScan })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setConfirmationFlow(result.confirmationFlow);
+        setBaselineScan((currentBaseline) => currentBaseline ?? result.scan);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setConfirmationFlow(null);
       });
 
     return () => {
@@ -159,6 +191,28 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>No plan preview is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Confirmation Flow</Text>
+          {confirmationFlowView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Step-based confirmation</Text>
+              <Text style={styles.cardTitle}>
+                Current step: {confirmationFlowView.currentStepId}
+              </Text>
+              <Text style={styles.cardMeta}>{confirmationFlowView.canProceedText}</Text>
+              <Text style={styles.cardMeta}>{confirmationFlowView.blockedReasonText}</Text>
+              {confirmationFlowView.steps.map((step) => (
+                <Text key={step.stepId} style={styles.cardMeta}>
+                  {step.type} | {step.label} | {step.statusText}
+                </Text>
+              ))}
+              <Text style={styles.cardId}>Plan: {confirmationFlowView.planId}</Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No confirmation flow is prepared right now.</Text>
           )}
         </View>
       </ScrollView>

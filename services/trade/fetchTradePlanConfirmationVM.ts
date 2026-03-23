@@ -3,19 +3,20 @@ import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
-import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
+import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
+import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
-import type { TradePlanPreview } from '@/services/trade/types';
+import type { TradePlanConfirmationShell } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
-export type TradePlanPreviewVM = {
-  preview: TradePlanPreview | null;
+export type TradePlanConfirmationVM = {
+  confirmationShell: TradePlanConfirmationShell | null;
   selectedPlanId: string | null;
   scan: ForegroundScanResult;
 };
 
-export async function fetchTradePlanPreviewVM(params: {
+export async function fetchTradePlanConfirmationVM(params: {
   profile: UserProfile;
   selectedPlanId?: string;
   baselineScan?: ForegroundScanResult;
@@ -24,7 +25,7 @@ export async function fetchTradePlanPreviewVM(params: {
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
-}): Promise<TradePlanPreviewVM> {
+}): Promise<TradePlanConfirmationVM> {
   const upstream = await fetchSurfaceContext({
     profile: params.profile,
     baselineScan: params.baselineScan,
@@ -44,9 +45,22 @@ export async function fetchTradePlanPreviewVM(params: {
     selectedPlanId: params.selectedPlanId,
   });
 
+  if (!selectedPlan) {
+    return {
+      confirmationShell: null,
+      selectedPlanId: null,
+      scan: upstream.scan,
+    };
+  }
+
+  const capabilities = await getAccountCapabilities(selectedPlan.accountId);
+
   return {
-    preview: selectedPlan ? createTradePlanPreview(selectedPlan) : null,
-    selectedPlanId: selectedPlan?.planId ?? null,
+    confirmationShell: createTradePlanConfirmationShell({
+      plan: selectedPlan,
+      capabilities,
+    }),
+    selectedPlanId: selectedPlan.planId,
     scan: upstream.scan,
   };
 }

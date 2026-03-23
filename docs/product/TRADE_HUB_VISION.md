@@ -23,4 +23,18 @@ For P5-3 specifically:
 - rationale, readiness, and constraints stay explicit for future confirmation UX
 - order and execution detail remain placeholder-only until a later phase explicitly unlocks them
 
+For P5-4 specifically:
+- a selected plan can also expand into a capability-aware confirmation shell
+- the shell describes what confirmation would require on the current platform path
+- path types stay explicit through `BRACKET`, `OCO`, `GUIDED_SEQUENCE`, or `UNAVAILABLE`
+- capability handling stays in `services/`, not in `app/`
+- no execution guarantee is implied and no live order payload exists yet
+
+For P5-5 specifically:
+- the confirmation shell can expand into a simple, linear confirmation flow
+- flow steps stay explicit through `REVIEW`, `CONSTRAINT_CHECK`, `CONFIRM_INTENT`, and `UNAVAILABLE`
+- progression remains user-driven, deterministic, and in-memory only
+- app surfaces render prepared flow steps instead of inferring confirmation rules locally
+- execution still does not exist, even when all required steps are marked complete
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.
