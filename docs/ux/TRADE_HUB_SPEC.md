@@ -165,12 +165,18 @@ In P5-5:
 - no hidden automation exists
 - confirmation flow remains user-driven and in-memory only
 - no execution guarantee is implied by a capability-aware path
+In P5-3:
+- no trade execution exists
+- no one-tap action exists
+- no hidden automation exists
+- no confirmation flow is implemented yet
 - order and execution preview fields remain explicit placeholders only
 
 The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell so later phases can add adapter seams without moving decision logic into `app/`.
 
 ## Intentional Exclusions
 P5-5 does not add:
+P5-3 does not add:
 - exchange connectivity
 - order entry
 - live order payload construction
@@ -192,3 +198,7 @@ P5-5 does not add:
 The boundary remains:
 
 `MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> ConfirmationFlow -> app`
+
+The boundary remains:
+
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview -> app`
