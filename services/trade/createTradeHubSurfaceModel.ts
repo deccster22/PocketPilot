@@ -6,6 +6,7 @@ import type {
   TradeHubPlanCard,
   TradeHubSurfaceModel,
 } from '@/services/trade/types';
+import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
 
 const ACTION_STATE_PRIORITY: Record<TradeHubActionState, number> = {
   READY: 0,
@@ -32,22 +33,6 @@ const ALTERNATIVE_LIMIT_BY_PROFILE: Record<UserProfile, number> = {
   ADVANCED: 3,
 };
 
-function resolveActionState(plan: ProtectionPlan): TradeHubActionState {
-  if (plan.intentType === 'WAIT' || plan.riskProfile.certainty === 'LOW') {
-    return 'WAIT';
-  }
-
-  if (
-    plan.intentType === 'HOLD' ||
-    plan.riskProfile.alignment !== 'ALIGNED' ||
-    plan.riskProfile.certainty === 'MEDIUM'
-  ) {
-    return 'CAUTION';
-  }
-
-  return 'READY';
-}
-
 function createPlanCard(plan: ProtectionPlan): TradeHubPlanCard {
   return {
     planId: plan.planId,
@@ -57,7 +42,7 @@ function createPlanCard(plan: ProtectionPlan): TradeHubPlanCard {
     certainty: plan.riskProfile.certainty,
     summary: plan.rationale.summary,
     supportingEventCount: plan.rationale.supportingEventIds.length,
-    actionState: resolveActionState(plan),
+    actionState: resolveTradeHubActionState(plan),
   };
 }
 

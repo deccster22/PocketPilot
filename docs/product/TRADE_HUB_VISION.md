@@ -17,4 +17,10 @@ For P5-2 specifically:
 - confirmation safety remains visible and always-on
 - app consumers render a prepared Trade Hub contract instead of classifying plans locally
 
+For P5-3 specifically:
+- a selected plan can expand into a structured preview/detail layer
+- the preview remains framed, read-only, and confirmation-safe
+- rationale, readiness, and constraints stay explicit for future confirmation UX
+- order and execution detail remain placeholder-only until a later phase explicitly unlocks them
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.

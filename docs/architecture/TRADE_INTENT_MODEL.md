@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-1)
+# Trade Intent Model (P5-3)
 
 ## Purpose
 `ProtectionPlan` is the canonical action-framing object for the P5 action layer.
@@ -68,12 +68,13 @@ This seam exists so later phases can:
 
 Until then, the model remains informational and read-only.
 
-## Relationship To Trade Hub Surface
+## Relationship To Trade Hub Surface And Preview
 P5-2 adds `TradeHubSurfaceModel` as the UI-facing presentation contract built on top of `ProtectionPlan`.
+P5-3 adds `TradePlanPreview` as the confirmation-safe detail contract for one selected plan.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview -> app`
 
 This keeps:
 - event interpretation in shared services
@@ -91,3 +92,17 @@ Trade Hub cards expose only the fields needed for safe presentation:
 - explicit action state
 
 They do not expose raw signal codes, event metadata, execution instructions, or hidden heuristics.
+
+Trade plan previews expose only the fields needed for safe detail:
+- headline intent, symbol, and action state
+- structured rationale references and supporting counts
+- explicit readiness state
+- explicit constraints including required confirmation
+- placeholder availability for later order and execution expansion
+
+They intentionally do not expose:
+- raw signals
+- event metadata blobs
+- execution routing details
+- hidden heuristics
+- executable order instructions
