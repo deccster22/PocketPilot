@@ -1,5 +1,6 @@
 # Trade Intent Model (P5-4)
 
+
 ## Purpose
 `ProtectionPlan` is the canonical action-framing object for the P5 action layer.
 

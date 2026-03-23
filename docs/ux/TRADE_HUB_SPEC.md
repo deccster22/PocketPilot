@@ -1,5 +1,4 @@
 # Trade Hub Spec (P5-4)
-
 ## Purpose
 Trade Hub is the action surface for PocketPilot's read-only framing layer.
 
@@ -8,7 +7,6 @@ In P5-4 it presents:
 - a small set of alternative framed actions
 - one confirmation-safe preview for a selected plan
 - one capability-aware confirmation shell for a selected plan
-- explicit confirmation-safe posture
 
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
 
@@ -139,12 +137,12 @@ In P5-4:
 - no hidden automation exists
 - no live confirmation flow is implemented yet
 - no execution guarantee is implied by a capability-aware path
-- order and execution preview fields remain explicit placeholders only
 
 The confirmation shell is intentionally presentation-safe rather than execution-safe. It is designed so later phases can add a confirmation flow and adapter seams without moving decision logic into `app/`.
 
 ## Intentional Exclusions
 P5-4 does not add:
+
 - exchange connectivity
 - order entry
 - live order payload construction
@@ -165,3 +163,4 @@ P5-4 does not add:
 The boundary remains:
 
 `MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> app`
+
