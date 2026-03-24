@@ -133,7 +133,9 @@ export type ConfirmationFlowStep = {
   type: ConfirmationFlowStepType;
   label: string;
   completed: boolean;
+  acknowledged: boolean;
   required: boolean;
+  acknowledgementLabel?: string;
 };
 
 export type ConfirmationFlow = {
@@ -141,5 +143,12 @@ export type ConfirmationFlow = {
   steps: ConfirmationFlowStep[];
   currentStepId: string;
   canProceed: boolean;
+  allRequiredAcknowledged: boolean;
   blockedReason?: string;
+};
+
+export type ConfirmationFlowActions = {
+  acknowledgeStep(flow: ConfirmationFlow, stepId: string): ConfirmationFlow;
+  unacknowledgeStep(flow: ConfirmationFlow, stepId: string): ConfirmationFlow;
+  resetFlow(flow: ConfirmationFlow): ConfirmationFlow;
 };

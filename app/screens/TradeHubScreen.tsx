@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
@@ -8,7 +8,11 @@ import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewVi
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 import { fetchConfirmationFlowVM } from '@/services/trade/fetchConfirmationFlowVM';
 import { fetchTradePlanPreviewVM } from '@/services/trade/fetchTradePlanPreviewVM';
-import type { ConfirmationFlow, TradePlanPreview } from '@/services/trade/types';
+import type {
+  ConfirmationFlow,
+  ConfirmationFlowActions,
+  TradePlanPreview,
+} from '@/services/trade/types';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -48,6 +52,8 @@ export function TradeHubScreen() {
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
   const [tradePlanPreview, setTradePlanPreview] = useState<TradePlanPreview | null>(null);
   const [confirmationFlow, setConfirmationFlow] = useState<ConfirmationFlow | null>(null);
+  const [confirmationFlowActions, setConfirmationFlowActions] =
+    useState<ConfirmationFlowActions | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -123,6 +129,7 @@ export function TradeHubScreen() {
         }
 
         setConfirmationFlow(result.confirmationFlow);
+        setConfirmationFlowActions(result.actions);
         setBaselineScan((currentBaseline) => currentBaseline ?? result.scan);
       })
       .catch(() => {
@@ -131,12 +138,43 @@ export function TradeHubScreen() {
         }
 
         setConfirmationFlow(null);
+        setConfirmationFlowActions(null);
       });
 
     return () => {
       isMounted = false;
     };
   }, [profile, baselineScan]);
+
+  function handleAcknowledgeStep(stepId: string) {
+    if (!confirmationFlowActions) {
+      return;
+    }
+
+    setConfirmationFlow((currentFlow) =>
+      currentFlow ? confirmationFlowActions.acknowledgeStep(currentFlow, stepId) : currentFlow,
+    );
+  }
+
+  function handleUnacknowledgeStep(stepId: string) {
+    if (!confirmationFlowActions) {
+      return;
+    }
+
+    setConfirmationFlow((currentFlow) =>
+      currentFlow ? confirmationFlowActions.unacknowledgeStep(currentFlow, stepId) : currentFlow,
+    );
+  }
+
+  function handleResetFlow() {
+    if (!confirmationFlowActions) {
+      return;
+    }
+
+    setConfirmationFlow((currentFlow) =>
+      currentFlow ? confirmationFlowActions.resetFlow(currentFlow) : currentFlow,
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -203,12 +241,55 @@ export function TradeHubScreen() {
                 Current step: {confirmationFlowView.currentStepId}
               </Text>
               <Text style={styles.cardMeta}>{confirmationFlowView.canProceedText}</Text>
+              <Text style={styles.cardMeta}>
+                {confirmationFlowView.allRequiredAcknowledgedText}
+              </Text>
               <Text style={styles.cardMeta}>{confirmationFlowView.blockedReasonText}</Text>
               {confirmationFlowView.steps.map((step) => (
-                <Text key={step.stepId} style={styles.cardMeta}>
-                  {step.type} | {step.label} | {step.statusText}
-                </Text>
+                <View key={step.stepId} style={styles.stepRow}>
+                  <Text style={styles.cardMeta}>
+                    {step.type} | {step.label} | {step.statusText}
+                  </Text>
+                  {step.acknowledgementLabel ? (
+                    <View style={styles.stepActions}>
+                      <Pressable
+                        accessibilityRole="button"
+                        onPress={() => handleAcknowledgeStep(step.stepId)}
+                        style={({ pressed }) => [
+                          styles.stepButton,
+                          pressed ? styles.stepButtonPressed : null,
+                        ]}
+                      >
+                        <Text style={styles.stepButtonText}>{step.acknowledgementLabel}</Text>
+                      </Pressable>
+                      {step.acknowledged ? (
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={() => handleUnacknowledgeStep(step.stepId)}
+                          style={({ pressed }) => [
+                            styles.stepButton,
+                            styles.secondaryStepButton,
+                            pressed ? styles.stepButtonPressed : null,
+                          ]}
+                        >
+                          <Text style={styles.stepButtonText}>Undo acknowledgement</Text>
+                        </Pressable>
+                      ) : null}
+                    </View>
+                  ) : null}
+                </View>
               ))}
+              <Pressable
+                accessibilityRole="button"
+                onPress={handleResetFlow}
+                style={({ pressed }) => [
+                  styles.stepButton,
+                  styles.secondaryStepButton,
+                  pressed ? styles.stepButtonPressed : null,
+                ]}
+              >
+                <Text style={styles.stepButtonText}>Reset acknowledgement flow</Text>
+              </Pressable>
               <Text style={styles.cardId}>Plan: {confirmationFlowView.planId}</Text>
             </View>
           ) : (
@@ -281,6 +362,33 @@ const styles = StyleSheet.create({
   cardId: {
     fontSize: 11,
     color: '#6b7280',
+  },
+  stepRow: {
+    gap: 6,
+  },
+  stepActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  stepButton: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  secondaryStepButton: {
+    backgroundColor: '#f8fafc',
+  },
+  stepButtonPressed: {
+    opacity: 0.8,
+  },
+  stepButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   emptyState: {
     fontSize: 13,

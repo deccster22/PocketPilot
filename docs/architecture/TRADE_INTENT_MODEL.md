@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-5)
+# Trade Intent Model (P5-6)
 
 ## Purpose
 `ProtectionPlan` is the canonical action-framing object for the P5 action layer.
@@ -73,6 +73,7 @@ P5-2 adds `TradeHubSurfaceModel` as the UI-facing presentation contract built on
 P5-3 adds `TradePlanPreview` as the confirmation-safe detail contract for one selected plan.
 P5-4 adds `TradePlanConfirmationShell` as the capability-aware confirmation contract for one selected plan.
 P5-5 adds `ConfirmationFlow` as the deterministic confirmation-step contract derived from one selected shell.
+P5-6 adds explicit acknowledgement state plus service-owned confirmation-flow actions for reversible, in-memory progression.
 
 The boundary is:
 
@@ -114,6 +115,7 @@ Confirmation flows expose only the fields needed for safe step orchestration:
 - explicit step types
 - prepared labels
 - explicit completion state
+- explicit acknowledgement state and acknowledgement labels
 - current step focus
 - explicit blocked status
 
@@ -130,6 +132,17 @@ Confirmation flows intentionally describe progression-safe scaffolding only. The
 - adapter integration
 - hidden advancement
 - persisted confirmation history
+
+Confirmation-flow actions intentionally remain small and deterministic. They only:
+- acknowledge a known required step
+- reverse an acknowledgement
+- reset in-memory acknowledgement state
+
+They do not:
+- auto-complete steps
+- persist confirmation progress
+- generate executable payloads
+- execute trades
 
 They intentionally do not expose:
 - raw signals

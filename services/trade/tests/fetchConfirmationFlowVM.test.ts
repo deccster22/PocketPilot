@@ -73,6 +73,7 @@ describe('fetchConfirmationFlowVM', () => {
     });
 
     expect(result.selectedPlanId).toBe('plan-btc');
+    expect(result.actions).not.toBeNull();
     expect(result.confirmationFlow).toEqual({
       planId: 'plan-btc',
       steps: [
@@ -81,20 +82,25 @@ describe('fetchConfirmationFlowVM', () => {
           type: 'REVIEW',
           label: 'Review separate order steps',
           completed: false,
+          acknowledged: false,
           required: true,
+          acknowledgementLabel: 'Acknowledge review',
         },
         {
           stepId: 'constraint-check',
           type: 'CONSTRAINT_CHECK',
           label: 'Review constraints: cooldown active',
           completed: false,
+          acknowledged: false,
           required: true,
+          acknowledgementLabel: 'Acknowledge constraints',
         },
         {
           stepId: 'unavailable',
           type: 'UNAVAILABLE',
           label: 'Execution remains unavailable in this phase',
           completed: false,
+          acknowledged: false,
           required: true,
         },
         {
@@ -102,13 +108,19 @@ describe('fetchConfirmationFlowVM', () => {
           type: 'CONFIRM_INTENT',
           label: 'Confirm user intent before any later execution step',
           completed: false,
+          acknowledged: false,
           required: true,
+          acknowledgementLabel: 'Acknowledge intent',
         },
       ],
       currentStepId: 'review',
       canProceed: false,
+      allRequiredAcknowledged: false,
       blockedReason: 'Execution remains unavailable in this phase.',
     });
+    expect(
+      result.actions?.acknowledgeStep(result.confirmationFlow!, 'review').steps[0].acknowledged,
+    ).toBe(true);
     expect(JSON.stringify(result.confirmationFlow)).not.toContain('hidden-signal');
   });
 
@@ -147,6 +159,7 @@ describe('fetchConfirmationFlowVM', () => {
     });
 
     expect(result.confirmationFlow).toBeNull();
+    expect(result.actions).toBeNull();
     expect(result.selectedPlanId).toBeNull();
   });
 

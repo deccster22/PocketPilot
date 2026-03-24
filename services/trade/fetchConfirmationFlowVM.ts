@@ -3,12 +3,14 @@ import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createConfirmationFlow } from '@/services/trade/createConfirmationFlow';
+import { createConfirmationFlowActions } from '@/services/trade/createConfirmationFlowActions';
 import { fetchTradePlanConfirmationVM } from '@/services/trade/fetchTradePlanConfirmationVM';
-import type { ConfirmationFlow } from '@/services/trade/types';
+import type { ConfirmationFlow, ConfirmationFlowActions } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type ConfirmationFlowVM = {
   confirmationFlow: ConfirmationFlow | null;
+  actions: ConfirmationFlowActions | null;
   selectedPlanId: string | null;
   scan: ForegroundScanResult;
 };
@@ -28,6 +30,9 @@ export async function fetchConfirmationFlowVM(params: {
   return {
     confirmationFlow: confirmationVm.confirmationShell
       ? createConfirmationFlow({ shell: confirmationVm.confirmationShell })
+      : null,
+    actions: confirmationVm.confirmationShell
+      ? createConfirmationFlowActions({ shell: confirmationVm.confirmationShell })
       : null,
     selectedPlanId: confirmationVm.selectedPlanId,
     scan: confirmationVm.scan,
