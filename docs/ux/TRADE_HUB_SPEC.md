@@ -176,6 +176,11 @@ In P5-6:
 - confirmation flow remains user-driven and in-memory only
 - acknowledgement remains explicit and reversible
 - no execution guarantee is implied by a capability-aware path
+In P5-3:
+- no trade execution exists
+- no one-tap action exists
+- no hidden automation exists
+- no confirmation flow is implemented yet
 - order and execution preview fields remain explicit placeholders only
 
 The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell so later phases can add adapter seams without moving decision logic into `app/`.
@@ -203,3 +208,7 @@ P5-6 does not add:
 The boundary remains:
 
 `MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> ConfirmationFlow -> app`
+
+The boundary remains:
+
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview -> app`
