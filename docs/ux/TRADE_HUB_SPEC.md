@@ -1,9 +1,9 @@
-# Trade Hub Spec (P5-5)
+# Trade Hub Spec (P5-6)
 
 ## Purpose
 Trade Hub is the action surface for PocketPilot's read-only framing layer.
 
-In P5-5 it presents:
+In P5-6 it presents:
 - one primary framed action when available
 - a small set of alternative framed actions
 - one confirmation-safe preview for a selected plan
@@ -126,16 +126,26 @@ The confirmation-flow contract shape is:
       type: 'REVIEW' | 'CONSTRAINT_CHECK' | 'CONFIRM_INTENT' | 'UNAVAILABLE',
       label: string,
       completed: boolean,
-      required: boolean
+      acknowledged: boolean,
+      required: boolean,
+      acknowledgementLabel?: string
     }
   ],
   currentStepId: string,
   canProceed: boolean,
+  allRequiredAcknowledged: boolean,
   blockedReason?: string
 }
 ```
 
 The confirmation flow is a deterministic, linear progression model derived from the confirmation shell. It scaffolds how a user would move through confirmation safely without adding execution behavior, persistence, or hidden automation.
+
+P5-6 also adds a small service-owned acknowledgement action API:
+- `acknowledgeStep(flow, stepId)`
+- `unacknowledgeStep(flow, stepId)`
+- `resetFlow(flow)`
+
+These actions live in `services/trade/` and deterministically recompute the prepared flow after each user-driven acknowledgement change. They do not persist state, auto-advance steps, construct orders, or execute anything.
 
 ## Presentation Rules
 - Trade Hub shows one primary plan and limited alternatives.
@@ -159,11 +169,12 @@ The screen may format confirmation flow labels for readability, but it must not 
 ## Safety Posture
 Trade Hub is support, not enforcement.
 
-In P5-5:
+In P5-6:
 - no trade execution exists
 - no one-tap action exists
 - no hidden automation exists
 - confirmation flow remains user-driven and in-memory only
+- acknowledgement remains explicit and reversible
 - no execution guarantee is implied by a capability-aware path
 In P5-3:
 - no trade execution exists
@@ -175,8 +186,7 @@ In P5-3:
 The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell so later phases can add adapter seams without moving decision logic into `app/`.
 
 ## Intentional Exclusions
-P5-5 does not add:
-P5-3 does not add:
+P5-6 does not add:
 - exchange connectivity
 - order entry
 - live order payload construction
@@ -193,7 +203,7 @@ P5-3 does not add:
 - `TradeHubSurfaceModel` remains the list/card contract for primary and alternative plans.
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
 - `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
-- `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract.
+- `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract with explicit acknowledgement state.
 
 The boundary remains:
 

@@ -37,4 +37,11 @@ For P5-5 specifically:
 - app surfaces render prepared flow steps instead of inferring confirmation rules locally
 - execution still does not exist, even when all required steps are marked complete
 
+For P5-6 specifically:
+- each confirmation step can carry explicit acknowledgement state
+- acknowledgements are reversible and remain non-persistent
+- service-owned actions recompute the flow after acknowledge, unacknowledge, and reset events
+- app surfaces invoke those service actions instead of owning progression logic
+- execution still does not exist, even when acknowledgements are complete
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.

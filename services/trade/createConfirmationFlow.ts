@@ -9,6 +9,25 @@ const CONSTRAINT_CHECK_STEP_ID = 'constraint-check';
 const UNAVAILABLE_STEP_ID = 'unavailable';
 const CONFIRM_INTENT_STEP_ID = 'confirm-intent';
 
+function resolveAcknowledgementLabel(
+  step: Pick<ConfirmationFlowStep, 'type'>,
+): string | undefined {
+  switch (step.type) {
+    case 'REVIEW':
+      return 'Acknowledge review';
+    case 'CONSTRAINT_CHECK':
+      return 'Acknowledge constraints';
+    case 'CONFIRM_INTENT':
+      return 'Acknowledge intent';
+    default:
+      return undefined;
+  }
+}
+
+function stepSupportsAcknowledgement(step: ConfirmationFlowStep): boolean {
+  return step.required && step.type !== 'UNAVAILABLE';
+}
+
 function resolveReviewLabel(shell: TradePlanConfirmationShell): string {
   const stepsLabel = shell.confirmation.stepsLabel.trim();
 
@@ -26,7 +45,9 @@ function buildSteps(shell: TradePlanConfirmationShell): ConfirmationFlowStep[] {
       type: 'REVIEW',
       label: resolveReviewLabel(shell),
       completed: false,
+      acknowledged: false,
       required: true,
+      acknowledgementLabel: 'Acknowledge review',
     },
   ];
 
@@ -49,7 +70,9 @@ function buildSteps(shell: TradePlanConfirmationShell): ConfirmationFlowStep[] {
       type: 'CONSTRAINT_CHECK',
       label: `Review constraints: ${constraintParts.join(' | ')}`,
       completed: false,
+      acknowledged: false,
       required: true,
+      acknowledgementLabel: 'Acknowledge constraints',
     });
   }
 
@@ -59,6 +82,7 @@ function buildSteps(shell: TradePlanConfirmationShell): ConfirmationFlowStep[] {
       type: 'UNAVAILABLE',
       label: 'Execution remains unavailable in this phase',
       completed: false,
+      acknowledged: false,
       required: true,
     });
   }
@@ -68,20 +92,25 @@ function buildSteps(shell: TradePlanConfirmationShell): ConfirmationFlowStep[] {
     type: 'CONFIRM_INTENT',
     label: 'Confirm user intent before any later execution step',
     completed: false,
+    acknowledged: false,
     required: true,
+    acknowledgementLabel: 'Acknowledge intent',
   });
 
   return steps;
 }
 
-function applyCompletedSteps(
+function applyAcknowledgedSteps(
   steps: ConfirmationFlowStep[],
-  completedStepIds: readonly string[],
+  acknowledgedStepIds: readonly string[],
 ): ConfirmationFlowStep[] {
   return steps.map((step) => ({
     ...step,
+    acknowledged:
+      stepSupportsAcknowledgement(step) && acknowledgedStepIds.includes(step.stepId),
     completed:
-      step.type === 'UNAVAILABLE' ? false : completedStepIds.includes(step.stepId),
+      stepSupportsAcknowledgement(step) && acknowledgedStepIds.includes(step.stepId),
+    acknowledgementLabel: resolveAcknowledgementLabel(step),
   }));
 }
 
@@ -91,14 +120,16 @@ function resolveBlockedReason(steps: ConfirmationFlowStep[]): string | undefined
   }
 
   const incompleteConstraintStep = steps.find(
-    (step) => step.type === 'CONSTRAINT_CHECK' && step.required && !step.completed,
+    (step) => step.type === 'CONSTRAINT_CHECK' && step.required && !step.acknowledged,
   );
 
   if (incompleteConstraintStep) {
     return 'Review active constraints before proceeding.';
   }
 
-  const incompleteRequiredStep = steps.find((step) => step.required && !step.completed);
+  const incompleteRequiredStep = steps.find(
+    (step) => stepSupportsAcknowledgement(step) && !step.acknowledged,
+  );
 
   if (incompleteRequiredStep) {
     return 'Complete all required confirmation steps before proceeding.';
@@ -108,47 +139,33 @@ function resolveBlockedReason(steps: ConfirmationFlowStep[]): string | undefined
 }
 
 function resolveCurrentStepId(steps: ConfirmationFlowStep[]): string {
-  return steps.find((step) => !step.completed)?.stepId ?? steps[steps.length - 1].stepId;
+  return (
+    steps.find((step) => stepSupportsAcknowledgement(step) && !step.acknowledged)?.stepId ??
+    steps.find((step) => !step.completed)?.stepId ??
+    steps[steps.length - 1].stepId
+  );
 }
 
 export function createConfirmationFlow(params: {
   shell: TradePlanConfirmationShell;
-  completedStepIds?: readonly string[];
+  acknowledgedStepIds?: readonly string[];
 }): ConfirmationFlow {
-  const steps = applyCompletedSteps(
+  const steps = applyAcknowledgedSteps(
     buildSteps(params.shell),
-    params.completedStepIds ?? [],
+    params.acknowledgedStepIds ?? [],
   );
   const blockedReason = resolveBlockedReason(steps);
+  const allRequiredAcknowledged = steps
+    .filter((step) => stepSupportsAcknowledgement(step))
+    .every((step) => step.acknowledged);
 
   return {
     planId: params.shell.planId,
     steps,
     currentStepId: resolveCurrentStepId(steps),
     canProceed:
-      !steps.some((step) => step.type === 'UNAVAILABLE') &&
-      steps.every((step) => !step.required || step.completed),
+      !steps.some((step) => step.type === 'UNAVAILABLE') && allRequiredAcknowledged,
+    allRequiredAcknowledged,
     ...(blockedReason ? { blockedReason } : {}),
   };
-}
-
-export function markConfirmationFlowStepComplete(
-  params: {
-    shell: TradePlanConfirmationShell;
-    flow: ConfirmationFlow;
-    stepId: string;
-  },
-): ConfirmationFlow {
-  const completedStepIds = params.flow.steps
-    .filter((step) => step.completed)
-    .map((step) => step.stepId);
-
-  if (!completedStepIds.includes(params.stepId)) {
-    completedStepIds.push(params.stepId);
-  }
-
-  return createConfirmationFlow({
-    shell: params.shell,
-    completedStepIds,
-  });
 }
