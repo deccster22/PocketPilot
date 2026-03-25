@@ -89,11 +89,7 @@ export type AccountCapabilityContext = {
   supportsTakeProfit: boolean;
 };
 
-export type TradePlanConfirmationPathType =
-  | 'BRACKET'
-  | 'OCO'
-  | 'GUIDED_SEQUENCE'
-  | 'UNAVAILABLE';
+export type TradePlanConfirmationPathType = 'BRACKET' | 'OCO' | 'GUIDED_SEQUENCE' | 'UNAVAILABLE';
 
 export type TradePlanConfirmationShell = {
   planId: string;
@@ -165,4 +161,70 @@ export type ConfirmationSessionActions = {
   unacknowledgeStep(stepId: string): ConfirmationSession;
   resetFlow(): ConfirmationSession;
   selectPlan(planId: string | null): Promise<ConfirmationSession>;
+};
+
+export type ExecutionPayloadType = 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE';
+
+export type ExecutionAdapterCapability = {
+  adapterId: string;
+  supportsBracket: boolean;
+  supportsOCO: boolean;
+  supportsMarketBuy: boolean;
+  supportsLimitBuy: boolean;
+  supportsStopLoss: boolean;
+  supportsTakeProfit: boolean;
+};
+
+export type ExecutionPathPreview = {
+  planId: string | null;
+  adapterId: string;
+  confirmationPathType: TradePlanConfirmationPathType;
+  payloadType: ExecutionPayloadType;
+  label: string;
+  supported: boolean;
+  executable: false;
+};
+
+export type OrderPayloadPreview = {
+  payloadType: ExecutionPayloadType;
+  symbol: string | null;
+  orderCount: number;
+  fieldsPresent: string[];
+  executable: false;
+};
+
+export type ExecutionPreviewVM = {
+  planId: string | null;
+  adapterCapability: ExecutionAdapterCapability | null;
+  pathPreview: ExecutionPathPreview | null;
+  payloadPreview: OrderPayloadPreview | null;
+};
+
+export type ReadinessBlockerCode =
+  | 'NOT_ACKNOWLEDGED'
+  | 'UNAVAILABLE_PATH'
+  | 'CAPABILITY_MISSING'
+  | 'NO_PLAN_SELECTED';
+
+export type ReadinessWarningCode = 'LOW_CERTAINTY' | 'CAUTION_STATE' | 'PARTIAL_CAPABILITY';
+
+export type ReadinessBlocker = {
+  code: ReadinessBlockerCode;
+  message: string;
+};
+
+export type ReadinessWarning = {
+  code: ReadinessWarningCode;
+  message: string;
+};
+
+export type ExecutionReadiness = {
+  eligible: boolean;
+  blockers: ReadinessBlocker[];
+  warnings: ReadinessWarning[];
+  summary: {
+    requiresAcknowledgement: boolean;
+    hasUnavailablePath: boolean;
+    hasCapabilityMismatch: boolean;
+  };
 };
