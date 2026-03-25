@@ -203,6 +203,11 @@ In P5-7:
 - confirmation session remains user-driven and in-memory only
 - acknowledgement remains explicit and reversible
 - no execution guarantee is implied by a capability-aware path
+In P5-3:
+- no trade execution exists
+- no one-tap action exists
+- no hidden automation exists
+- no confirmation flow is implemented yet
 - order and execution preview fields remain explicit placeholders only
 
 The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, and the session seam owns the selected-plan composition so later phases can add adapter seams without moving decision logic into `app/`.
