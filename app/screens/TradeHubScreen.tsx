@@ -4,21 +4,19 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
+import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
-import { fetchConfirmationFlowVM } from '@/services/trade/fetchConfirmationFlowVM';
-import { fetchTradePlanPreviewVM } from '@/services/trade/fetchTradePlanPreviewVM';
-import type {
-  ConfirmationFlow,
-  ConfirmationFlowActions,
-  TradePlanPreview,
-} from '@/services/trade/types';
+import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
+import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 function TradeHubPlanCard(props: {
   title: string;
+  selected?: boolean;
+  onPress?: () => void;
   plan: {
     planId: string;
     intentLabel: string;
@@ -30,8 +28,10 @@ function TradeHubPlanCard(props: {
     supportingEventsText: string;
   };
 }) {
-  return (
-    <View style={styles.card}>
+  const cardStyle = [styles.card, props.selected ? styles.selectedCard : null];
+
+  const content = (
+    <View style={cardStyle}>
       <Text style={styles.cardEyebrow}>{props.title}</Text>
       <Text style={styles.cardTitle}>
         {props.plan.intentLabel} - {props.plan.symbolLabel}
@@ -43,17 +43,31 @@ function TradeHubPlanCard(props: {
       </Text>
       <Text style={styles.cardMeta}>{props.plan.supportingEventsText}</Text>
       <Text style={styles.cardId}>Plan: {props.plan.planId}</Text>
+      {props.selected ? <Text style={styles.cardMeta}>Selected confirmation session</Text> : null}
     </View>
+  );
+
+  if (!props.onPress) {
+    return content;
+  }
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={props.onPress}
+      style={({ pressed }) => [pressed ? styles.stepButtonPressed : null]}
+    >
+      {content}
+    </Pressable>
   );
 }
 
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
-  const [tradePlanPreview, setTradePlanPreview] = useState<TradePlanPreview | null>(null);
-  const [confirmationFlow, setConfirmationFlow] = useState<ConfirmationFlow | null>(null);
-  const [confirmationFlowActions, setConfirmationFlowActions] =
-    useState<ConfirmationFlowActions | null>(null);
+  const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
+    null,
+  );
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -86,24 +100,28 @@ export function TradeHubScreen() {
     [surfaceModel],
   );
   const previewView = useMemo(
-    () => createTradePlanPreviewViewData(tradePlanPreview),
-    [tradePlanPreview],
+    () => createTradePlanPreviewViewData(confirmationSessionVm?.session.preview ?? null),
+    [confirmationSessionVm],
+  );
+  const confirmationShellView = useMemo(
+    () => createTradePlanConfirmationViewData(confirmationSessionVm?.session.shell ?? null),
+    [confirmationSessionVm],
   );
   const confirmationFlowView = useMemo(
-    () => createTradeConfirmationFlowViewData(confirmationFlow),
-    [confirmationFlow],
+    () => createTradeConfirmationFlowViewData(confirmationSessionVm?.session.flow ?? null),
+    [confirmationSessionVm],
   );
 
   useEffect(() => {
     let isMounted = true;
 
-    fetchTradePlanPreviewVM({ profile, baselineScan })
+    fetchConfirmationSessionVM({ profile, baselineScan })
       .then((result) => {
         if (!isMounted) {
           return;
         }
 
-        setTradePlanPreview(result.preview);
+        setConfirmationSessionVm(result);
         setBaselineScan((currentBaseline) => currentBaseline ?? result.scan);
       })
       .catch(() => {
@@ -111,34 +129,7 @@ export function TradeHubScreen() {
           return;
         }
 
-        setTradePlanPreview(null);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [profile, baselineScan]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    fetchConfirmationFlowVM({ profile, baselineScan })
-      .then((result) => {
-        if (!isMounted) {
-          return;
-        }
-
-        setConfirmationFlow(result.confirmationFlow);
-        setConfirmationFlowActions(result.actions);
-        setBaselineScan((currentBaseline) => currentBaseline ?? result.scan);
-      })
-      .catch(() => {
-        if (!isMounted) {
-          return;
-        }
-
-        setConfirmationFlow(null);
-        setConfirmationFlowActions(null);
+        setConfirmationSessionVm(null);
       });
 
     return () => {
@@ -147,33 +138,57 @@ export function TradeHubScreen() {
   }, [profile, baselineScan]);
 
   function handleAcknowledgeStep(stepId: string) {
-    if (!confirmationFlowActions) {
-      return;
-    }
-
-    setConfirmationFlow((currentFlow) =>
-      currentFlow ? confirmationFlowActions.acknowledgeStep(currentFlow, stepId) : currentFlow,
+    setConfirmationSessionVm((currentVm) =>
+      currentVm
+        ? {
+            ...currentVm,
+            session: currentVm.actions.acknowledgeStep(stepId),
+          }
+        : currentVm,
     );
   }
 
   function handleUnacknowledgeStep(stepId: string) {
-    if (!confirmationFlowActions) {
-      return;
-    }
-
-    setConfirmationFlow((currentFlow) =>
-      currentFlow ? confirmationFlowActions.unacknowledgeStep(currentFlow, stepId) : currentFlow,
+    setConfirmationSessionVm((currentVm) =>
+      currentVm
+        ? {
+            ...currentVm,
+            session: currentVm.actions.unacknowledgeStep(stepId),
+          }
+        : currentVm,
     );
   }
 
   function handleResetFlow() {
-    if (!confirmationFlowActions) {
+    setConfirmationSessionVm((currentVm) =>
+      currentVm
+        ? {
+            ...currentVm,
+            session: currentVm.actions.resetFlow(),
+          }
+        : currentVm,
+    );
+  }
+
+  function handleSelectPlan(planId: string) {
+    const currentVm = confirmationSessionVm;
+
+    if (!currentVm) {
       return;
     }
 
-    setConfirmationFlow((currentFlow) =>
-      currentFlow ? confirmationFlowActions.resetFlow(currentFlow) : currentFlow,
-    );
+    currentVm.actions.selectPlan(planId).then((session) => {
+      setConfirmationSessionVm((latestVm) =>
+        latestVm && latestVm.actions === currentVm.actions
+          ? {
+              ...latestVm,
+              session,
+            }
+          : latestVm,
+      );
+    }).catch(() => {
+      setConfirmationSessionVm((latestVm) => latestVm);
+    });
   }
 
   return (
@@ -193,7 +208,12 @@ export function TradeHubScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Prepared surface for {screenView?.profileLabel ?? profile}</Text>
           {screenView?.primaryPlan ? (
-            <TradeHubPlanCard title="Primary Plan" plan={screenView.primaryPlan} />
+            <TradeHubPlanCard
+              title="Primary Plan"
+              plan={screenView.primaryPlan}
+              selected={confirmationSessionVm?.session.planId === screenView.primaryPlan.planId}
+              onPress={() => handleSelectPlan(screenView.primaryPlan.planId)}
+            />
           ) : (
             <Text style={styles.emptyState}>No primary plan is prepared right now.</Text>
           )}
@@ -203,7 +223,13 @@ export function TradeHubScreen() {
           <Text style={styles.sectionTitle}>Alternatives</Text>
           {screenView?.alternativePlans.length ? (
             screenView.alternativePlans.map((plan) => (
-              <TradeHubPlanCard key={plan.planId} title="Alternative Plan" plan={plan} />
+              <TradeHubPlanCard
+                key={plan.planId}
+                title="Alternative Plan"
+                plan={plan}
+                selected={confirmationSessionVm?.session.planId === plan.planId}
+                onPress={() => handleSelectPlan(plan.planId)}
+              />
             ))
           ) : (
             <Text style={styles.emptyState}>No alternative plans are prepared.</Text>
@@ -229,6 +255,26 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>No plan preview is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Confirmation Shell</Text>
+          {confirmationShellView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Capability-aware confirmation</Text>
+              <Text style={styles.cardTitle}>
+                {confirmationShellView.intentLabel} - {confirmationShellView.symbolLabel}
+              </Text>
+              <Text style={styles.cardMeta}>{confirmationShellView.actionStateText}</Text>
+              <Text style={styles.cardMeta}>{confirmationShellView.readinessText}</Text>
+              <Text style={styles.cardMeta}>{confirmationShellView.confirmationText}</Text>
+              <Text style={styles.cardMeta}>{confirmationShellView.constraintsText}</Text>
+              <Text style={styles.cardMeta}>{confirmationShellView.placeholderText}</Text>
+              <Text style={styles.cardId}>Plan: {confirmationShellView.planId}</Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No confirmation shell is prepared right now.</Text>
           )}
         </View>
 
@@ -339,6 +385,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#ffffff',
     padding: 12,
+  },
+  selectedCard: {
+    borderColor: '#2563eb',
   },
   cardEyebrow: {
     fontSize: 12,

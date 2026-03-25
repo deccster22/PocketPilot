@@ -74,5 +74,9 @@ describe('createTradeConfirmationFlowViewData', () => {
     expect(screenSource).not.toMatch(/supportsOCO/);
     expect(screenSource).not.toMatch(/requiresSeparateOrders/);
     expect(screenSource).not.toMatch(/createConfirmationFlow/);
+    expect(screenSource).not.toMatch(/fetchConfirmationFlowVM/);
+    expect(screenSource).not.toMatch(/fetchTradePlanPreviewVM/);
+    expect(screenSource).not.toMatch(/useState<ConfirmationFlow/);
+    expect(screenSource).toMatch(/fetchConfirmationSessionVM/);
   });
 });

@@ -44,4 +44,11 @@ For P5-6 specifically:
 - app surfaces invoke those service actions instead of owning progression logic
 - execution still does not exist, even when acknowledgements are complete
 
+For P5-7 specifically:
+- one service-owned confirmation session owns one selected plan at a time
+- the session carries prepared preview, shell, flow, and explicit session actions together
+- raw confirmation-flow state moves out of `app/` and into `services/`
+- plan switching remains explicit, local to the screen lifecycle, and non-persistent
+- the seam preserves room for a later execution adapter without introducing execution now
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.

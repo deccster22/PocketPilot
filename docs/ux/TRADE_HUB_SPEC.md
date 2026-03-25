@@ -1,14 +1,15 @@
-# Trade Hub Spec (P5-6)
+# Trade Hub Spec (P5-7)
 
 ## Purpose
 Trade Hub is the action surface for PocketPilot's read-only framing layer.
 
-In P5-6 it presents:
+In P5-7 it presents:
 - one primary framed action when available
 - a small set of alternative framed actions
 - one confirmation-safe preview for a selected plan
 - one capability-aware confirmation shell for a selected plan
 - one deterministic confirmation flow for a selected plan
+- one non-persistent confirmation session seam for one selected plan at a time
 - explicit confirmation-safe posture
 
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
@@ -42,7 +43,31 @@ Each `TradeHubPlanCard` contains:
 
 No raw market events, signal codes, or hidden strategy metadata are exposed to the UI.
 
-Trade Hub detail consumers also consume a prepared `TradePlanPreview` from `services/trade/`.
+Trade Hub confirmation-session consumers consume a prepared `ConfirmationSession` VM from `services/trade/`.
+
+The confirmation-session contract shape is:
+
+```ts
+{
+  session: {
+    planId: string | null,
+    preview: TradePlanPreview | null,
+    shell: TradePlanConfirmationShell | null,
+    flow: ConfirmationFlow | null
+  },
+  actions: {
+    acknowledgeStep(stepId: string): ConfirmationSession,
+    unacknowledgeStep(stepId: string): ConfirmationSession,
+    resetFlow(): ConfirmationSession,
+    selectPlan(planId: string | null): Promise<ConfirmationSession>
+  },
+  scan: ForegroundScanResult
+}
+```
+
+The confirmation session is an in-memory service seam, not persistence and not a global store. It owns one selected plan plus its prepared preview, shell, flow, and explicit session actions so `app/` can consume a single prepared contract.
+
+Trade Hub detail consumers read the prepared `TradePlanPreview` from that session.
 
 The preview contract shape is:
 
@@ -140,12 +165,13 @@ The confirmation-flow contract shape is:
 
 The confirmation flow is a deterministic, linear progression model derived from the confirmation shell. It scaffolds how a user would move through confirmation safely without adding execution behavior, persistence, or hidden automation.
 
-P5-6 also adds a small service-owned acknowledgement action API:
-- `acknowledgeStep(flow, stepId)`
-- `unacknowledgeStep(flow, stepId)`
-- `resetFlow(flow)`
+P5-7 moves raw flow-state ownership out of `app/` and adds a small service-owned confirmation-session action API:
+- `acknowledgeStep(stepId)`
+- `unacknowledgeStep(stepId)`
+- `resetFlow()`
+- `selectPlan(planId | null)`
 
-These actions live in `services/trade/` and deterministically recompute the prepared flow after each user-driven acknowledgement change. They do not persist state, auto-advance steps, construct orders, or execute anything.
+These actions live in `services/trade/` and deterministically recompute the prepared session after each user-driven change. They do not persist state, auto-advance steps, construct orders, or execute anything.
 
 ## Presentation Rules
 - Trade Hub shows one primary plan and limited alternatives.
@@ -165,15 +191,16 @@ The screen may format labels for readability, but it must not reprioritise plans
 The screen may format preview labels for readability, but it must not construct rationale, readiness, or constraints on its own.
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.
+The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.
 
 ## Safety Posture
 Trade Hub is support, not enforcement.
 
-In P5-6:
+In P5-7:
 - no trade execution exists
 - no one-tap action exists
 - no hidden automation exists
-- confirmation flow remains user-driven and in-memory only
+- confirmation session remains user-driven and in-memory only
 - acknowledgement remains explicit and reversible
 - no execution guarantee is implied by a capability-aware path
 In P5-3:
@@ -183,10 +210,10 @@ In P5-3:
 - no confirmation flow is implemented yet
 - order and execution preview fields remain explicit placeholders only
 
-The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell so later phases can add adapter seams without moving decision logic into `app/`.
+The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, and the session seam owns the selected-plan composition so later phases can add adapter seams without moving decision logic into `app/`.
 
 ## Intentional Exclusions
-P5-6 does not add:
+P5-7 does not add:
 - exchange connectivity
 - order entry
 - live order payload construction
@@ -204,11 +231,8 @@ P5-6 does not add:
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
 - `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
 - `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract with explicit acknowledgement state.
+- `ConfirmationSession` owns one selected plan plus its prepared preview, shell, flow, and action closures for the Trade Hub confirmation seam.
 
 The boundary remains:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> ConfirmationFlow -> app`
-
-The boundary remains:
-
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> app`
