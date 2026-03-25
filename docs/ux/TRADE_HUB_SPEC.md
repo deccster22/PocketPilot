@@ -1,20 +1,25 @@
-# Trade Hub Spec (P5-7)
+# Trade Hub Spec (P5-9)
 
 ## Purpose
+
 Trade Hub is the action surface for PocketPilot's read-only framing layer.
 
-In P5-7 it presents:
+In P5-9 it presents:
+
 - one primary framed action when available
 - a small set of alternative framed actions
 - one confirmation-safe preview for a selected plan
 - one capability-aware confirmation shell for a selected plan
 - one deterministic confirmation flow for a selected plan
 - one non-persistent confirmation session seam for one selected plan at a time
+- one execution adapter scaffold and non-executing payload preview for the selected plan
+- one execution readiness gate that evaluates submission eligibility without dispatch
 - explicit confirmation-safe posture
 
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
 
 ## Surface Contract
+
 Trade Hub consumes a prepared `TradeHubSurfaceModel` from `services/trade/`.
 
 The contract shape is:
@@ -32,6 +37,7 @@ The contract shape is:
 ```
 
 Each `TradeHubPlanCard` contains:
+
 - `planId`
 - `intentType`
 - `symbol`
@@ -165,7 +171,74 @@ The confirmation-flow contract shape is:
 
 The confirmation flow is a deterministic, linear progression model derived from the confirmation shell. It scaffolds how a user would move through confirmation safely without adding execution behavior, persistence, or hidden automation.
 
+Trade Hub execution-preview consumers also consume a prepared `ExecutionPreviewVM` from `services/trade/`.
+
+The execution-preview contract shape is:
+
+```ts
+{
+  planId: string | null,
+  adapterCapability: {
+    adapterId: string,
+    supportsBracket: boolean,
+    supportsOCO: boolean,
+    supportsMarketBuy: boolean,
+    supportsLimitBuy: boolean,
+    supportsStopLoss: boolean,
+    supportsTakeProfit: boolean
+  } | null,
+  pathPreview: {
+    planId: string | null,
+    adapterId: string,
+    confirmationPathType: 'BRACKET' | 'OCO' | 'GUIDED_SEQUENCE' | 'UNAVAILABLE',
+    payloadType: 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE',
+    label: string,
+    supported: boolean,
+    executable: false
+  } | null,
+  payloadPreview: {
+    payloadType: 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE',
+    symbol: string | null,
+    orderCount: number,
+    fieldsPresent: string[],
+    executable: false
+  } | null
+}
+```
+
+The execution preview is a service-owned boundary between confirmation-ready plans and future execution adapters. It remains placeholder-only, explicitly non-executable, and contains no broker call behavior.
+
+Trade Hub execution-readiness consumers also consume a prepared `ExecutionReadiness` VM from `services/trade/`.
+
+The execution-readiness contract shape is:
+
+```ts
+{
+  eligible: boolean,
+  blockers: [
+    {
+      code: 'NOT_ACKNOWLEDGED' | 'UNAVAILABLE_PATH' | 'CAPABILITY_MISSING' | 'NO_PLAN_SELECTED',
+      message: string
+    }
+  ],
+  warnings: [
+    {
+      code: 'LOW_CERTAINTY' | 'CAUTION_STATE' | 'PARTIAL_CAPABILITY',
+      message: string
+    }
+  ],
+  summary: {
+    requiresAcknowledgement: boolean,
+    hasUnavailablePath: boolean,
+    hasCapabilityMismatch: boolean
+  }
+}
+```
+
+The readiness gate is a service-owned submission-eligibility seam that consumes the prepared `ConfirmationSession` plus `ExecutionPreviewVM`. It distinguishes blocking conditions from non-blocking warnings, remains deterministic, and explicitly does not submit anything.
+
 P5-7 moves raw flow-state ownership out of `app/` and adds a small service-owned confirmation-session action API:
+
 - `acknowledgeStep(stepId)`
 - `unacknowledgeStep(stepId)`
 - `resetFlow()`
@@ -173,7 +246,22 @@ P5-7 moves raw flow-state ownership out of `app/` and adds a small service-owned
 
 These actions live in `services/trade/` and deterministically recompute the prepared session after each user-driven change. They do not persist state, auto-advance steps, construct orders, or execute anything.
 
+P5-8 adds:
+
+- `getExecutionAdapterCapability(shell)`
+- `createExecutionPayloadPreview({ confirmationSession | confirmationShell })`
+- `fetchExecutionPreviewVM({ confirmationSession })`
+
+P5-9 adds:
+
+- `createExecutionReadiness({ confirmationSession, executionPreview })`
+- `fetchExecutionReadinessVM({ confirmationSession, executionPreview })`
+
+These execution-preview seams live in `services/trade/` and shape adapter capability plus payload placeholders only. They do not submit orders, hold secrets, or expose silently executable payloads.
+The readiness seams live beside them in `services/trade/` and evaluate eligibility only. They do not recompute confirmation logic, construct real payloads, dispatch to brokers, or imply that execution exists in this phase.
+
 ## Presentation Rules
+
 - Trade Hub shows one primary plan and limited alternatives.
 - Alternatives are capped by profile to reduce overload.
 - `actionState` stays explicit:
@@ -192,11 +280,15 @@ The screen may format preview labels for readability, but it must not construct 
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.
 The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.
+The screen may render prepared execution-preview labels, but it must not construct payload fields, adapter capability, or execution paths on its own.
+The screen may render prepared readiness blockers, warnings, and summaries, but it must not derive submission eligibility or validation rules on its own.
 
 ## Safety Posture
+
 Trade Hub is support, not enforcement.
 
-In P5-7:
+In P5-9:
+
 - no trade execution exists
 - no one-tap action exists
 - no hidden automation exists
@@ -209,11 +301,16 @@ In P5-3:
 - no hidden automation exists
 - no confirmation flow is implemented yet
 - order and execution preview fields remain explicit placeholders only
+- payload previews remain explicit placeholders with `executable: false`
+- readiness warnings never make a session eligible or ineligible on their own
+- readiness blockers are explicit and remain non-dispatching
 
-The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, and the session seam owns the selected-plan composition so later phases can add adapter seams without moving decision logic into `app/`.
+The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, the session seam owns the selected-plan composition, the execution preview defines the adapter boundary, and the readiness gate adds an explicit non-dispatch submission seam without introducing real execution.
 
 ## Intentional Exclusions
-P5-7 does not add:
+
+P5-8 does not add:
+
 - exchange connectivity
 - order entry
 - live order payload construction
@@ -226,13 +323,16 @@ P5-7 does not add:
 - new Snapshot or Dashboard behavior
 
 ## Relationship Between Layers
+
 - `ProtectionPlan` remains the canonical action-framing object.
 - `TradeHubSurfaceModel` remains the list/card contract for primary and alternative plans.
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
 - `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
 - `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract with explicit acknowledgement state.
 - `ConfirmationSession` owns one selected plan plus its prepared preview, shell, flow, and action closures for the Trade Hub confirmation seam.
+- `ExecutionPreviewVM` consumes the selected confirmation session and produces adapter capability plus non-executing payload placeholders for future adapter work.
+- `ExecutionReadiness` consumes the selected confirmation session plus prepared execution preview and produces explicit eligibility, blockers, warnings, and summary state without dispatch.
 
 The boundary remains:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> app`

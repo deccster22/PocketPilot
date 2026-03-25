@@ -1,6 +1,7 @@
-# Trade Intent Model (P5-7)
+# Trade Intent Model (P5-9)
 
 ## Purpose
+
 `ProtectionPlan` is the canonical action-framing object for the P5 action layer.
 
 It converts interpreted market context into a small, structured plan that can be carried forward into later decision surfaces without exposing raw strategy internals.
@@ -8,7 +9,9 @@ It converts interpreted market context into a small, structured plan that can be
 This phase defines what a good action shape looks like. It does not execute anything.
 
 ## What A ProtectionPlan Is
+
 `ProtectionPlan` is a deterministic service-layer object with:
+
 - a stable identity
 - a scoped account, strategy, and optional symbol target
 - an intent type such as `ACCUMULATE`, `HOLD`, or `WAIT`
@@ -19,7 +22,9 @@ This phase defines what a good action shape looks like. It does not execute anyt
 The object is intentionally structured and explainable. It is not narrative generation.
 
 ## What It Is Not
+
 `ProtectionPlan` is not:
+
 - a trade execution instruction
 - financial advice
 - a sizing engine
@@ -30,6 +35,7 @@ The object is intentionally structured and explainable. It is not narrative gene
 P5-1 keeps the object minimal so later phases can render or refine it without moving decision logic into `app/`.
 
 ## Relationship To OrientationContext
+
 `OrientationContext` remains the system's orientation seam.
 
 `ProtectionPlan` sits one layer after orientation assembly:
@@ -37,11 +43,13 @@ P5-1 keeps the object minimal so later phases can render or refine it without mo
 `MarketEvent -> EventLedger -> OrientationContext -> ProtectionPlan`
 
 In this phase:
+
 - `OrientationContext` provides current interpreted state and history boundaries
 - `MarketEvent[]` provides the concrete event set for intent mapping
 - `createProtectionPlans` deterministically translates those inputs into a small set of action frames
 
 The mapping is explicit rather than heuristic:
+
 - `DATA_QUALITY` or `ESTIMATED_PRICE` leads to `WAIT`
 - `DIP_DETECTED` leads to `ACCUMULATE`
 - `MOMENTUM_BUILDING` leads to `ACCUMULATE`
@@ -49,7 +57,9 @@ The mapping is explicit rather than heuristic:
 - plain `PRICE_MOVEMENT` leads to `HOLD`
 
 ## Determinism Rules
+
 The trade-intent seam follows the same deterministic rules as the rest of PocketPilot:
+
 - no ambient time
 - no randomness
 - no hidden state
@@ -59,9 +69,11 @@ The trade-intent seam follows the same deterministic rules as the rest of Pocket
 Plan identifiers, rationale references, ordering, and `createdAt` are all derived from the input events.
 
 ## Decision To Action Boundary
+
 P5-1 introduces the first Action-layer contract without creating a trading engine.
 
 This seam exists so later phases can:
+
 - render action framing in a dedicated surface
 - add safeguards around user intent confirmation
 - attach execution adapters only after product and governance phases explicitly allow it
@@ -69,24 +81,29 @@ This seam exists so later phases can:
 Until then, the model remains informational and read-only.
 
 ## Relationship To Trade Hub Surface, Preview, And Confirmation Shell
+
 P5-2 adds `TradeHubSurfaceModel` as the UI-facing presentation contract built on top of `ProtectionPlan`.
 P5-3 adds `TradePlanPreview` as the confirmation-safe detail contract for one selected plan.
 P5-4 adds `TradePlanConfirmationShell` as the capability-aware confirmation contract for one selected plan.
 P5-5 adds `ConfirmationFlow` as the deterministic confirmation-step contract derived from one selected shell.
 P5-6 adds explicit acknowledgement state plus service-owned confirmation-flow actions for reversible, in-memory progression.
 P5-7 adds `ConfirmationSession` as the in-memory composition seam that owns one selected plan plus its prepared preview, shell, flow, and session actions.
+P5-8 adds `ExecutionPreviewVM` plus execution-adapter capability and payload-preview contracts as the boundary between confirmation state and later adapter work.
+P5-9 adds `ExecutionReadiness` as the deterministic submission-eligibility seam between prepared execution preview data and any future execution work.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> app`
 
 This keeps:
+
 - event interpretation in shared services
 - action framing in `ProtectionPlan`
 - presentation shaping in Trade Hub services
 - rendering-only behavior in `app/`
 
 Trade Hub cards expose only the fields needed for safe presentation:
+
 - intent
 - symbol
 - alignment
@@ -98,6 +115,7 @@ Trade Hub cards expose only the fields needed for safe presentation:
 They do not expose raw signal codes, event metadata, execution instructions, or hidden heuristics.
 
 Trade plan previews expose only the fields needed for safe detail:
+
 - headline intent, symbol, and action state
 - structured rationale references and supporting counts
 - explicit readiness state
@@ -105,6 +123,7 @@ Trade plan previews expose only the fields needed for safe detail:
 - placeholder availability for later order and execution expansion
 
 Trade plan confirmation shells expose only the fields needed for safe confirmation framing:
+
 - headline intent, symbol, and action state
 - explicit readiness state
 - deterministic confirmation path type and short steps label
@@ -112,6 +131,7 @@ Trade plan confirmation shells expose only the fields needed for safe confirmati
 - placeholder availability for future payload and execution previews
 
 Confirmation flows expose only the fields needed for safe step orchestration:
+
 - stable step identifiers
 - explicit step types
 - prepared labels
@@ -121,13 +141,29 @@ Confirmation flows expose only the fields needed for safe step orchestration:
 - explicit blocked status
 
 Confirmation sessions expose only the fields needed for safe selected-plan ownership:
+
 - one selected `planId` or `null`
 - one prepared preview
 - one prepared confirmation shell
 - one prepared confirmation flow
 - explicit service-owned actions for acknowledge, unacknowledge, reset, and plan selection
 
+Execution preview contracts expose only the fields needed for safe adapter scaffolding:
+
+- placeholder adapter capability flags
+- confirmation-path-to-payload mapping
+- payload field names only
+- explicit `executable: false`
+
+Execution readiness contracts expose only the fields needed for safe submission gating:
+
+- one explicit `eligible` flag
+- explicit blocker codes and messages
+- explicit warning codes and messages
+- small summary booleans for acknowledgement, path availability, and capability mismatch
+
 Confirmation shells intentionally describe presentation-safe capability context only. They do not imply:
+
 - real broker compatibility
 - executable order instructions
 - submission readiness
@@ -135,6 +171,7 @@ Confirmation shells intentionally describe presentation-safe capability context 
 - live adapter behavior
 
 Confirmation flows intentionally describe progression-safe scaffolding only. They do not imply:
+
 - execution permission
 - order submission readiness
 - adapter integration
@@ -142,25 +179,45 @@ Confirmation flows intentionally describe progression-safe scaffolding only. The
 - persisted confirmation history
 
 Confirmation-flow actions intentionally remain small and deterministic. They only:
+
 - acknowledge a known required step
 - reverse an acknowledgement
 - reset in-memory acknowledgement state
 
 Confirmation-session actions intentionally remain small and deterministic. They only:
+
 - recompute the in-memory selected-plan session
 - switch the selected plan explicitly
 - keep preview, shell, and flow synchronized in one service seam
 
+Execution-preview seams intentionally remain small and deterministic. They only:
+
+- map confirmation context into placeholder adapter capability
+- map confirmation path into a non-executing payload preview
+- prepare a UI-safe execution preview VM
+
+Execution-readiness seams intentionally remain small and deterministic. They only:
+
+- consume the prepared confirmation session plus execution preview
+- evaluate whether submission would be eligible on the prepared path
+- separate blockers from warnings in a UI-safe contract
+
 They do not:
+
 - auto-complete steps
 - persist confirmation progress
 - generate executable payloads
 - execute trades
 - create a global store
+- call brokers
+- submit orders
+- recompute confirmation rules independently of the prepared session
 
 They intentionally do not expose:
+
 - raw signals
 - event metadata blobs
 - execution routing details
 - hidden heuristics
 - executable order instructions
+- raw signal payloads

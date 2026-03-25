@@ -4,13 +4,21 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
+import { createTradeExecutionReadinessViewData } from '@/app/screens/tradeExecutionReadinessView';
+import { createTradeExecutionPreviewViewData } from '@/app/screens/tradeExecutionPreviewView';
 import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
+import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
+import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
-import type { TradeHubSurfaceModel } from '@/services/trade/types';
+import type {
+  ExecutionPreviewVM,
+  ExecutionReadiness,
+  TradeHubSurfaceModel,
+} from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 function TradeHubPlanCard(props: {
@@ -68,6 +76,8 @@ export function TradeHubScreen() {
   const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
     null,
   );
+  const [executionPreviewVm, setExecutionPreviewVm] = useState<ExecutionPreviewVM | null>(null);
+  const [executionReadinessVm, setExecutionReadinessVm] = useState<ExecutionReadiness | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -95,10 +105,7 @@ export function TradeHubScreen() {
     };
   }, [profile, baselineScan]);
 
-  const screenView = useMemo(
-    () => createTradeHubScreenViewData(surfaceModel),
-    [surfaceModel],
-  );
+  const screenView = useMemo(() => createTradeHubScreenViewData(surfaceModel), [surfaceModel]);
   const previewView = useMemo(
     () => createTradePlanPreviewViewData(confirmationSessionVm?.session.preview ?? null),
     [confirmationSessionVm],
@@ -110,6 +117,15 @@ export function TradeHubScreen() {
   const confirmationFlowView = useMemo(
     () => createTradeConfirmationFlowViewData(confirmationSessionVm?.session.flow ?? null),
     [confirmationSessionVm],
+  );
+  const executionPreviewView = useMemo(
+    () => createTradeExecutionPreviewViewData(executionPreviewVm),
+    [executionPreviewVm],
+  );
+  const executionReadinessView = useMemo(
+    () =>
+      executionReadinessVm ? createTradeExecutionReadinessViewData(executionReadinessVm) : null,
+    [executionReadinessVm],
   );
 
   useEffect(() => {
@@ -136,6 +152,59 @@ export function TradeHubScreen() {
       isMounted = false;
     };
   }, [profile, baselineScan]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchExecutionPreviewVM({
+      confirmationSession: confirmationSessionVm?.session ?? null,
+    })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setExecutionPreviewVm(result);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setExecutionPreviewVm(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [confirmationSessionVm]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchExecutionReadinessVM({
+      confirmationSession: confirmationSessionVm?.session ?? null,
+      executionPreview: executionPreviewVm,
+    })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setExecutionReadinessVm(result);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setExecutionReadinessVm(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [confirmationSessionVm, executionPreviewVm]);
 
   function handleAcknowledgeStep(stepId: string) {
     setConfirmationSessionVm((currentVm) =>
@@ -177,18 +246,21 @@ export function TradeHubScreen() {
       return;
     }
 
-    currentVm.actions.selectPlan(planId).then((session) => {
-      setConfirmationSessionVm((latestVm) =>
-        latestVm && latestVm.actions === currentVm.actions
-          ? {
-              ...latestVm,
-              session,
-            }
-          : latestVm,
-      );
-    }).catch(() => {
-      setConfirmationSessionVm((latestVm) => latestVm);
-    });
+    currentVm.actions
+      .selectPlan(planId)
+      .then((session) => {
+        setConfirmationSessionVm((latestVm) =>
+          latestVm && latestVm.actions === currentVm.actions
+            ? {
+                ...latestVm,
+                session,
+              }
+            : latestVm,
+        );
+      })
+      .catch(() => {
+        setConfirmationSessionVm((latestVm) => latestVm);
+      });
   }
 
   return (
@@ -199,14 +271,18 @@ export function TradeHubScreen() {
           <Text style={styles.sectionTitle}>Trade Hub</Text>
           <Text style={styles.label}>Profile</Text>
           <ProfileSelector value={profile} onChange={setProfile} />
-          <Text style={styles.supportText}>{screenView?.safetyText ?? 'Preparing Trade Hub...'}</Text>
+          <Text style={styles.supportText}>
+            {screenView?.safetyText ?? 'Preparing Trade Hub...'}
+          </Text>
           <Text style={styles.supportText}>
             {screenView?.confirmationText ?? 'Trade actions remain read-only in this phase.'}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Prepared surface for {screenView?.profileLabel ?? profile}</Text>
+          <Text style={styles.label}>
+            Prepared surface for {screenView?.profileLabel ?? profile}
+          </Text>
           {screenView?.primaryPlan ? (
             <TradeHubPlanCard
               title="Primary Plan"
@@ -340,6 +416,54 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>No confirmation flow is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Execution Preview</Text>
+          {executionPreviewView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Non-executing payload boundary</Text>
+              <Text style={styles.cardTitle}>{executionPreviewView.pathText}</Text>
+              <Text style={styles.cardMeta}>{executionPreviewView.adapterText}</Text>
+              <Text style={styles.cardMeta}>{executionPreviewView.payloadText}</Text>
+              <Text style={styles.cardMeta}>{executionPreviewView.fieldsText}</Text>
+              <Text style={styles.cardMeta}>{executionPreviewView.executableText}</Text>
+              <Text style={styles.cardId}>Plan: {executionPreviewView.planId}</Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No execution preview is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Execution Readiness</Text>
+          {executionReadinessView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Service-owned submission gate</Text>
+              <Text style={styles.cardTitle}>{executionReadinessView.eligibilityText}</Text>
+              <Text style={styles.cardMeta}>{executionReadinessView.blockerCountText}</Text>
+              <Text style={styles.cardMeta}>{executionReadinessView.warningCountText}</Text>
+              {executionReadinessView.summaryText.map((summaryLine) => (
+                <Text key={summaryLine} style={styles.cardMeta}>
+                  {summaryLine}
+                </Text>
+              ))}
+              <Text style={styles.cardMeta}>
+                Blockers:{' '}
+                {executionReadinessView.blockers.length
+                  ? executionReadinessView.blockers.join(' | ')
+                  : 'None'}
+              </Text>
+              <Text style={styles.cardMeta}>
+                Warnings:{' '}
+                {executionReadinessView.warnings.length
+                  ? executionReadinessView.warnings.join(' | ')
+                  : 'None'}
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No execution readiness is prepared right now.</Text>
           )}
         </View>
       </ScrollView>
