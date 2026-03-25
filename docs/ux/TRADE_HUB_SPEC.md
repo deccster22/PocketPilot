@@ -342,6 +342,11 @@ In P5-10:
 - confirmation session remains user-driven and in-memory only
 - acknowledgement remains explicit and reversible
 - no execution guarantee is implied by a capability-aware path
+In P5-3:
+- no trade execution exists
+- no one-tap action exists
+- no hidden automation exists
+- no confirmation flow is implemented yet
 - order and execution preview fields remain explicit placeholders only
 - payload previews remain explicit placeholders with `executable: false`
 - readiness warnings never make a session eligible or ineligible on their own
