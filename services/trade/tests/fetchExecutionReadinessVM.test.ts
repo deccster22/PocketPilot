@@ -4,6 +4,7 @@ import type { ConfirmationSession, ExecutionPreviewVM } from '@/services/trade/t
 function createSession(): ConfirmationSession {
   return {
     planId: 'plan-btc',
+    accountId: 'acct-live',
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -132,6 +133,7 @@ describe('fetchExecutionReadinessVM', () => {
       await fetchExecutionReadinessVM({
         confirmationSession: {
           planId: null,
+          accountId: null,
           preview: null,
           shell: null,
           flow: null,

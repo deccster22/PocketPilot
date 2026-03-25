@@ -154,6 +154,7 @@ async function buildConfirmationSession(params: {
   if (!params.plan) {
     return {
       planId: null,
+      accountId: null,
       preview: null,
       shell: null,
       flow: null,
@@ -174,6 +175,7 @@ async function buildConfirmationSession(params: {
 
   return {
     planId: params.plan.planId,
+    accountId: params.plan.accountId,
     preview,
     shell,
     flow: createConfirmationFlow({ shell }),

@@ -1,10 +1,10 @@
-# Trade Hub Spec (P5-9)
+# Trade Hub Spec (P5-10)
 
 ## Purpose
 
 Trade Hub is the action surface for PocketPilot's read-only framing layer.
 
-In P5-9 it presents:
+In P5-10 it presents:
 
 - one primary framed action when available
 - a small set of alternative framed actions
@@ -14,6 +14,7 @@ In P5-9 it presents:
 - one non-persistent confirmation session seam for one selected plan at a time
 - one execution adapter scaffold and non-executing payload preview for the selected plan
 - one execution readiness gate that evaluates submission eligibility without dispatch
+- one submission-intent seam that returns an explicit blocked-or-ready non-dispatch result
 - explicit confirmation-safe posture
 
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
@@ -57,6 +58,7 @@ The confirmation-session contract shape is:
 {
   session: {
     planId: string | null,
+    accountId: string | null,
     preview: TradePlanPreview | null,
     shell: TradePlanConfirmationShell | null,
     flow: ConfirmationFlow | null
@@ -237,6 +239,44 @@ The execution-readiness contract shape is:
 
 The readiness gate is a service-owned submission-eligibility seam that consumes the prepared `ConfirmationSession` plus `ExecutionPreviewVM`. It distinguishes blocking conditions from non-blocking warnings, remains deterministic, and explicitly does not submit anything.
 
+Trade Hub submission-intent consumers also consume a prepared `SubmissionIntentResult` from `services/trade/`.
+
+The submission-intent contract shape is:
+
+```ts
+{
+  status: 'BLOCKED',
+  blockers: [
+    {
+      code: 'NOT_ACKNOWLEDGED' | 'UNAVAILABLE_PATH' | 'CAPABILITY_MISSING' | 'NO_PLAN_SELECTED',
+      message: string
+    }
+  ],
+  warnings: [
+    {
+      code: 'LOW_CERTAINTY' | 'CAUTION_STATE' | 'PARTIAL_CAPABILITY',
+      message: string
+    }
+  ]
+} | {
+  status: 'READY',
+  adapterType: 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS',
+  placeholderOnly: true,
+  planId: string,
+  accountId: string,
+  symbol: string | null,
+  payloadPreview: OrderPayloadPreview[],
+  warnings: [
+    {
+      code: 'LOW_CERTAINTY' | 'CAUTION_STATE' | 'PARTIAL_CAPABILITY',
+      message: string
+    }
+  ]
+}
+```
+
+Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching.
+
 P5-7 moves raw flow-state ownership out of `app/` and adds a small service-owned confirmation-session action API:
 
 - `acknowledgeStep(stepId)`
@@ -257,8 +297,14 @@ P5-9 adds:
 - `createExecutionReadiness({ confirmationSession, executionPreview })`
 - `fetchExecutionReadinessVM({ confirmationSession, executionPreview })`
 
+P5-10 adds:
+
+- `createSubmissionIntent({ confirmationSession, executionPreview, executionReadiness })`
+- `fetchSubmissionIntentVM({ confirmationSession })`
+
 These execution-preview seams live in `services/trade/` and shape adapter capability plus payload placeholders only. They do not submit orders, hold secrets, or expose silently executable payloads.
 The readiness seams live beside them in `services/trade/` and evaluate eligibility only. They do not recompute confirmation logic, construct real payloads, dispatch to brokers, or imply that execution exists in this phase.
+The submission-intent seams live after readiness and shape the final pre-adapter placeholder contract only. They do not dispatch, call brokers, persist intent, or construct live broker payloads.
 
 ## Presentation Rules
 
@@ -282,12 +328,13 @@ The screen may format confirmation flow labels for readability, but it must not 
 The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.
 The screen may render prepared execution-preview labels, but it must not construct payload fields, adapter capability, or execution paths on its own.
 The screen may render prepared readiness blockers, warnings, and summaries, but it must not derive submission eligibility or validation rules on its own.
+The screen may render prepared submission-intent status, blockers, warnings, and placeholder summaries, but it must not construct submission contracts or adapter payloads on its own.
 
 ## Safety Posture
 
 Trade Hub is support, not enforcement.
 
-In P5-9:
+In P5-10:
 
 - no trade execution exists
 - no one-tap action exists
@@ -299,8 +346,9 @@ In P5-9:
 - payload previews remain explicit placeholders with `executable: false`
 - readiness warnings never make a session eligible or ineligible on their own
 - readiness blockers are explicit and remain non-dispatching
+- submission intent remains explicit, placeholder-only, and non-dispatching even when ready
 
-The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, the session seam owns the selected-plan composition, the execution preview defines the adapter boundary, and the readiness gate adds an explicit non-dispatch submission seam without introducing real execution.
+The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, the session seam owns the selected-plan composition, the execution preview defines the adapter boundary, the readiness gate evaluates eligibility, and the submission-intent seam shapes the final pre-adapter placeholder contract without introducing real execution.
 
 ## Intentional Exclusions
 
@@ -327,7 +375,8 @@ P5-8 does not add:
 - `ConfirmationSession` owns one selected plan plus its prepared preview, shell, flow, and action closures for the Trade Hub confirmation seam.
 - `ExecutionPreviewVM` consumes the selected confirmation session and produces adapter capability plus non-executing payload placeholders for future adapter work.
 - `ExecutionReadiness` consumes the selected confirmation session plus prepared execution preview and produces explicit eligibility, blockers, warnings, and summary state without dispatch.
+- `SubmissionIntentResult` consumes the selected confirmation session, prepared execution preview, and prepared execution readiness to produce an explicit blocked-or-ready placeholder submission contract without dispatch.
 
 The boundary remains:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> app`

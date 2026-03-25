@@ -8,15 +8,18 @@ import { createTradeExecutionReadinessViewData } from '@/app/screens/tradeExecut
 import { createTradeExecutionPreviewViewData } from '@/app/screens/tradeExecutionPreviewView';
 import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
+import { createTradeSubmissionIntentViewData } from '@/app/screens/tradeSubmissionIntentView';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
+import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type {
   ExecutionPreviewVM,
   ExecutionReadiness,
+  SubmissionIntentResult,
   TradeHubSurfaceModel,
 } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -78,6 +81,7 @@ export function TradeHubScreen() {
   );
   const [executionPreviewVm, setExecutionPreviewVm] = useState<ExecutionPreviewVM | null>(null);
   const [executionReadinessVm, setExecutionReadinessVm] = useState<ExecutionReadiness | null>(null);
+  const [submissionIntentVm, setSubmissionIntentVm] = useState<SubmissionIntentResult | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -126,6 +130,10 @@ export function TradeHubScreen() {
     () =>
       executionReadinessVm ? createTradeExecutionReadinessViewData(executionReadinessVm) : null,
     [executionReadinessVm],
+  );
+  const submissionIntentView = useMemo(
+    () => (submissionIntentVm ? createTradeSubmissionIntentViewData(submissionIntentVm) : null),
+    [submissionIntentVm],
   );
 
   useEffect(() => {
@@ -205,6 +213,32 @@ export function TradeHubScreen() {
       isMounted = false;
     };
   }, [confirmationSessionVm, executionPreviewVm]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchSubmissionIntentVM({
+      confirmationSession: confirmationSessionVm?.session ?? null,
+    })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setSubmissionIntentVm(result);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setSubmissionIntentVm(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [confirmationSessionVm]);
 
   function handleAcknowledgeStep(stepId: string) {
     setConfirmationSessionVm((currentVm) =>
@@ -464,6 +498,39 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>No execution readiness is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Submission Intent</Text>
+          {submissionIntentView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Prepared non-dispatching seam</Text>
+              <Text style={styles.cardTitle}>{submissionIntentView.statusText}</Text>
+              <Text style={styles.cardMeta}>{submissionIntentView.detailText}</Text>
+              <Text style={styles.cardMeta}>{submissionIntentView.warningCountText}</Text>
+              <Text style={styles.cardMeta}>{submissionIntentView.placeholderText}</Text>
+              <Text style={styles.cardMeta}>
+                Blockers:{' '}
+                {submissionIntentView.blockers.length
+                  ? submissionIntentView.blockers.join(' | ')
+                  : 'None'}
+              </Text>
+              <Text style={styles.cardMeta}>
+                Warnings:{' '}
+                {submissionIntentView.warnings.length
+                  ? submissionIntentView.warnings.join(' | ')
+                  : 'None'}
+              </Text>
+              <Text style={styles.cardMeta}>
+                Payload:{' '}
+                {submissionIntentView.payloadSummary.length
+                  ? submissionIntentView.payloadSummary.join(' | ')
+                  : 'None'}
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No submission intent is prepared right now.</Text>
           )}
         </View>
       </ScrollView>
