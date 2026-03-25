@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-9)
+# Trade Intent Model (P5-10)
 
 ## Purpose
 
@@ -90,10 +90,11 @@ P5-6 adds explicit acknowledgement state plus service-owned confirmation-flow ac
 P5-7 adds `ConfirmationSession` as the in-memory composition seam that owns one selected plan plus its prepared preview, shell, flow, and session actions.
 P5-8 adds `ExecutionPreviewVM` plus execution-adapter capability and payload-preview contracts as the boundary between confirmation state and later adapter work.
 P5-9 adds `ExecutionReadiness` as the deterministic submission-eligibility seam between prepared execution preview data and any future execution work.
+P5-10 adds `SubmissionIntentResult` as the final non-dispatching placeholder seam between readiness and any future live execution adapter.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> app`
 
 This keeps:
 
@@ -143,6 +144,7 @@ Confirmation flows expose only the fields needed for safe step orchestration:
 Confirmation sessions expose only the fields needed for safe selected-plan ownership:
 
 - one selected `planId` or `null`
+- one selected `accountId` or `null`
 - one prepared preview
 - one prepared confirmation shell
 - one prepared confirmation flow
@@ -161,6 +163,15 @@ Execution readiness contracts expose only the fields needed for safe submission 
 - explicit blocker codes and messages
 - explicit warning codes and messages
 - small summary booleans for acknowledgement, path availability, and capability mismatch
+
+Submission intent contracts expose only the fields needed for the final pre-adapter placeholder boundary:
+
+- one explicit `status` of `BLOCKED` or `READY`
+- explicit blocker and warning lists when blocked
+- explicit adapter type when ready
+- explicit `placeholderOnly: true`
+- selected `planId`, `accountId`, and `symbol`
+- prepared payload preview placeholders only
 
 Confirmation shells intentionally describe presentation-safe capability context only. They do not imply:
 
@@ -202,6 +213,12 @@ Execution-readiness seams intentionally remain small and deterministic. They onl
 - evaluate whether submission would be eligible on the prepared path
 - separate blockers from warnings in a UI-safe contract
 
+Submission-intent seams intentionally remain small and deterministic. They only:
+
+- consume the prepared confirmation session, execution preview, and readiness result
+- trust readiness instead of recomputing submission eligibility
+- return either an explicit blocked result or a placeholder-only ready contract for a future adapter
+
 They do not:
 
 - auto-complete steps
@@ -211,6 +228,7 @@ They do not:
 - create a global store
 - call brokers
 - submit orders
+- persist submission intent
 - recompute confirmation rules independently of the prepared session
 
 They intentionally do not expose:

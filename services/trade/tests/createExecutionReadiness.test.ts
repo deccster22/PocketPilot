@@ -18,6 +18,7 @@ function createSession(params?: {
 
   return {
     planId: params?.planId ?? 'plan-btc',
+    accountId: params?.planId === null ? null : 'acct-live',
     preview: {
       planId: params?.planId ?? 'plan-btc',
       headline: {
@@ -274,6 +275,7 @@ describe('createExecutionReadiness', () => {
     const result = createExecutionReadiness({
       confirmationSession: {
         planId: null,
+        accountId: null,
         preview: null,
         shell: null,
         flow: null,

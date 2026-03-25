@@ -4,6 +4,7 @@ import type { ConfirmationSession, TradePlanConfirmationPathType } from '@/servi
 function createSession(pathType: TradePlanConfirmationPathType): ConfirmationSession {
   return {
     planId: 'plan-btc',
+    accountId: 'acct-live',
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -98,6 +99,7 @@ describe('fetchExecutionPreviewVM', () => {
       await fetchExecutionPreviewVM({
         confirmationSession: {
           planId: null,
+          accountId: null,
           preview: null,
           shell: null,
           flow: null,

@@ -39,6 +39,7 @@ function createSession(
 ): ConfirmationSession {
   return {
     planId: 'plan-btc',
+    accountId: 'acct-live',
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -118,6 +119,7 @@ describe('createExecutionPayloadPreview', () => {
       createExecutionPayloadPreview({
         confirmationSession: {
           planId: null,
+          accountId: null,
           preview: null,
           shell: null,
           flow: null,

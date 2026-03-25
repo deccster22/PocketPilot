@@ -74,4 +74,12 @@ For P5-9 specifically:
 - readiness creates a seam before any later execution work without dispatching anything
 - broker APIs, payload submission, and one-tap execution still do not exist in this phase
 
+For P5-10 specifically:
+
+- a service-owned submission-intent seam consumes confirmation session, execution preview, and readiness
+- the result stays brutally explicit as either `BLOCKED` with reasons or `READY` with a placeholder-only contract
+- readiness remains the eligibility gate; submission intent shapes the final pre-adapter contract and does not recompute readiness
+- app surfaces render prepared submission-intent state instead of constructing submission details locally
+- broker APIs, live payload dispatch, and persistence still do not exist in this phase
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.

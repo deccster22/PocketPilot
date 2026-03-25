@@ -151,6 +151,7 @@ export type ConfirmationFlowActions = {
 
 export type ConfirmationSession = {
   planId: string | null;
+  accountId: string | null;
   preview: TradePlanPreview | null;
   shell: TradePlanConfirmationShell | null;
   flow: ConfirmationFlow | null;
@@ -228,3 +229,22 @@ export type ExecutionReadiness = {
     hasCapabilityMismatch: boolean;
   };
 };
+
+export type SubmissionIntentAdapterType = 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS';
+
+export type SubmissionIntentResult =
+  | {
+      status: 'BLOCKED';
+      blockers: ReadonlyArray<ReadinessBlocker>;
+      warnings: ReadonlyArray<ReadinessWarning>;
+    }
+  | {
+      status: 'READY';
+      adapterType: SubmissionIntentAdapterType;
+      placeholderOnly: true;
+      planId: string;
+      accountId: string;
+      symbol: string | null;
+      payloadPreview: ReadonlyArray<OrderPayloadPreview>;
+      warnings: ReadonlyArray<ReadinessWarning>;
+    };
