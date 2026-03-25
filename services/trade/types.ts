@@ -152,3 +152,17 @@ export type ConfirmationFlowActions = {
   unacknowledgeStep(flow: ConfirmationFlow, stepId: string): ConfirmationFlow;
   resetFlow(flow: ConfirmationFlow): ConfirmationFlow;
 };
+
+export type ConfirmationSession = {
+  planId: string | null;
+  preview: TradePlanPreview | null;
+  shell: TradePlanConfirmationShell | null;
+  flow: ConfirmationFlow | null;
+};
+
+export type ConfirmationSessionActions = {
+  acknowledgeStep(stepId: string): ConfirmationSession;
+  unacknowledgeStep(stepId: string): ConfirmationSession;
+  resetFlow(): ConfirmationSession;
+  selectPlan(planId: string | null): Promise<ConfirmationSession>;
+};

@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-6)
+# Trade Intent Model (P5-7)
 
 ## Purpose
 `ProtectionPlan` is the canonical action-framing object for the P5 action layer.
@@ -74,10 +74,11 @@ P5-3 adds `TradePlanPreview` as the confirmation-safe detail contract for one se
 P5-4 adds `TradePlanConfirmationShell` as the capability-aware confirmation contract for one selected plan.
 P5-5 adds `ConfirmationFlow` as the deterministic confirmation-step contract derived from one selected shell.
 P5-6 adds explicit acknowledgement state plus service-owned confirmation-flow actions for reversible, in-memory progression.
+P5-7 adds `ConfirmationSession` as the in-memory composition seam that owns one selected plan plus its prepared preview, shell, flow, and session actions.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel / TradePlanPreview / TradePlanConfirmationShell -> ConfirmationFlow -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> app`
 
 This keeps:
 - event interpretation in shared services
@@ -119,6 +120,13 @@ Confirmation flows expose only the fields needed for safe step orchestration:
 - current step focus
 - explicit blocked status
 
+Confirmation sessions expose only the fields needed for safe selected-plan ownership:
+- one selected `planId` or `null`
+- one prepared preview
+- one prepared confirmation shell
+- one prepared confirmation flow
+- explicit service-owned actions for acknowledge, unacknowledge, reset, and plan selection
+
 Confirmation shells intentionally describe presentation-safe capability context only. They do not imply:
 - real broker compatibility
 - executable order instructions
@@ -138,11 +146,17 @@ Confirmation-flow actions intentionally remain small and deterministic. They onl
 - reverse an acknowledgement
 - reset in-memory acknowledgement state
 
+Confirmation-session actions intentionally remain small and deterministic. They only:
+- recompute the in-memory selected-plan session
+- switch the selected plan explicitly
+- keep preview, shell, and flow synchronized in one service seam
+
 They do not:
 - auto-complete steps
 - persist confirmation progress
 - generate executable payloads
 - execute trades
+- create a global store
 
 They intentionally do not expose:
 - raw signals
