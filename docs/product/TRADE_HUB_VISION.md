@@ -82,4 +82,12 @@ For P5-10 specifically:
 - app surfaces render prepared submission-intent state instead of constructing submission details locally
 - broker APIs, live payload dispatch, and persistence still do not exist in this phase
 
+For P5-11 specifically:
+
+- a service-owned execution-adapter seam now sits after submission intent
+- the seam consumes only submission intent and returns either blocked passthrough or a simulated adapter response
+- simulated adapter responses stay explicit with `dispatchEnabled=false` and `placeholderOnly=true`
+- app surfaces render prepared adapter-attempt state instead of constructing adapter behavior locally
+- real broker dispatch, network calls, and one-click execution still do not exist in this phase
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.
