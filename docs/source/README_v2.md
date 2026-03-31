@@ -1,8 +1,3 @@
-Title: PocketPilot Documentation Index
-Version: v2 markdown source
-Source: docs/source/README_v2.md
-Last Updated: 2026-04-01
-
 # PocketPilot Documentation Index
 
 **Last updated:** 2026-04-01  
@@ -54,7 +49,7 @@ Start with:
 
 These are the recurring PocketPilot laws that should survive every refactor, prompt pack, branch, and shiny late-night feature idea:
 
-- **Strategy-first.** PocketPilot interprets the market through the user's chosen strategy.
+- **Strategy-first.** PocketPilot interprets the market through the user’s chosen strategy.
 - **Execution-aware.** Execution venue truth beats synthetic or averaged global purity.
 - **Calm in tone.** No urgency language, volatility theatre, dopamine loops, or shame.
 - **User-directed.** No hidden automation. No silent control shifts. User remains the pilot.
@@ -221,7 +216,7 @@ Examples:
 - `research/REVIEW_MERGES.md`
 - `research/FEATURE_EXPLORATION.md`
 
-Question answered: **What informed PocketPilot's evolution?**
+Question answered: **What informed PocketPilot’s evolution?**
 
 ---
 
@@ -267,25 +262,25 @@ As of the current documentation set, the core system spine is:
 
 ```text
 Market Providers
--> Provider Router
--> QuoteBroker
--> MarketEvent
--> EventStream
--> EventLedger
--> Event Queries / Since Last Checked
--> OrientationContext
--> SnapshotModel
--> DashboardModel
--> Trade Hub Surface
--> Confirmation Session
--> Execution Preview
--> Readiness Gate
--> Submission Intent
+→ Provider Router
+→ QuoteBroker
+→ MarketEvent
+→ EventStream
+→ EventLedger
+→ Event Queries / Since Last Checked
+→ OrientationContext
+→ SnapshotModel
+→ DashboardModel
+→ Trade Hub Surface
+→ Confirmation Session
+→ Execution Preview
+→ Readiness Gate
+→ Submission Intent
 ```
 
 Key rule: **services own truth, app renders prepared contracts**.
 
-The UI should not be inventing interpretation logic from raw data. If it feels like the UI is "figuring things out," something has probably drifted.
+The UI should not be inventing interpretation logic from raw data. If it feels like the UI is “figuring things out,” something has probably drifted.
 
 ---
 
@@ -294,10 +289,10 @@ The UI should not be inventing interpretation logic from raw data. If it feels l
 PocketPilot is easiest to read at two levels.
 
 ### Macro phases
-- **Macro Phase 1 - Foundation**
-- **Macro Phase 2 - Context and Reflection**
-- **Macro Phase 3 - Intelligence**
-- **Macro Phase 4 - Copilot and Hardening**
+- **Macro Phase 1 — Foundation**
+- **Macro Phase 2 — Context and Reflection**
+- **Macro Phase 3 — Intelligence**
+- **Macro Phase 4 — Copilot and Hardening**
 
 ### Workstream / delivery phases
 - `P0` Vision, doctrine, architecture, repo discipline foundation
@@ -385,16 +380,16 @@ If any of those are fuzzy, stop and reconcile before pushing.
 ## Practical Reading Paths
 
 ### Product / founder lens
-`DOCTRINE` -> `COMPASS` -> `FOUNDER_ONE_PAGER` -> `PRODUCT_SPEC`
+`DOCTRINE` → `COMPASS` → `FOUNDER_ONE_PAGER` → `PRODUCT_SPEC`
 
 ### Governance / engineering lens
-`CANON` -> `GUARDRAILS` -> `CONTEXT_SUITE` -> `ENGINEERING_CONTRACT`
+`CANON` → `GUARDRAILS` → `CONTEXT_SUITE` → `ENGINEERING_CONTRACT`
 
 ### Architecture / build lens
-`ARCHITECTURE_OVERVIEW` -> `ARCHITECTURE_MAP` -> relevant architecture seam doc(s) -> phase/runbook doc
+`ARCHITECTURE_OVERVIEW` → `ARCHITECTURE_MAP` → relevant architecture seam doc(s) → phase/runbook doc
 
 ### Recovery / handover lens
-`CANON` -> `GUARDRAILS` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
+`CANON` → `GUARDRAILS` → `PRODUCT_SPEC` → latest forensic handover → phase reports
 
 ---
 
@@ -404,12 +399,12 @@ PocketPilot should grow like this:
 
 ```text
 Doctrine
--> Compass
--> Canon
--> Guardrails
--> Product Spec
--> Architecture
--> Phased implementation
+→ Compass
+→ Canon
+→ Guardrails
+→ Product Spec
+→ Architecture
+→ Phased implementation
 ```
 
 Not like this:
@@ -419,15 +414,3 @@ feature + feature + feature + feature = chaos goblin repo
 ```
 
 The repo exists to keep PocketPilot coherent as it moves from strategy-first interpretation into execution-aware product reality without losing its calm, trustworthy core.
-
-## Conversion Notes
-
-Replaced prior section headings from the older index:
-- `Documentation Principles`
-- `Folder Structure`
-- `Governance`
-- `Product`
-- `Architecture`
-- `Phases`
-- `Source Artifacts`
-- `Incoming`

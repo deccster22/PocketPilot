@@ -93,6 +93,7 @@ P5-9 adds `ExecutionReadiness` as the deterministic submission-eligibility seam 
 P5-10 adds `SubmissionIntentResult` as the final non-dispatching placeholder seam between readiness and any future live execution adapter.
 P5-11 adds `ExecutionAdapterAttemptResult` as the first post-intent execution-adapter seam, returning either explicit blocked passthrough or a deterministic simulated adapter response.
 P5-13 adds `ExecutionCapabilityResolution` plus `resolveExecutionCapability` as the single canonical capability seam that resolves execution-path truth once in `services/trade/` before shell, preview, readiness, submission intent, and later adapter-facing shaping.
+P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:
 
@@ -242,6 +243,7 @@ Execution-adapter seams intentionally remain small and deterministic. They only:
 - accept only `ReadySubmissionIntent` into the simulated adapter builder
 - shape deterministic simulated order identifiers and summary fields
 - preserve warnings from the submission-intent seam
+- remain simulated-only even when the internal mock outcome is `SIMULATED_ACCEPTABLE`
 
 They do not:
 
@@ -267,3 +269,10 @@ They intentionally do not expose:
 - hidden heuristics
 - executable order instructions
 - raw signal payloads
+
+P5-X also requires user-facing execution-boundary wording to stay calm and explicit:
+
+- `UNAVAILABLE` should read like path unavailability, not trade failure
+- `BLOCKED` should read like an unmet prerequisite, not a punitive rejection
+- `READY` should read like a prepared simulated handoff, not a live submission affordance
+- `SIMULATED` should read like a mock adapter record, not a filled or accepted live order

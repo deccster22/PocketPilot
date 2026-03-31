@@ -18,7 +18,7 @@ export function createExecutionAdapterResponse(
     dispatchEnabled: false,
     placeholderOnly: true,
     adapterType: submissionIntent.adapterType,
-    outcome: 'ACCEPTED',
+    outcome: 'SIMULATED_ACCEPTABLE',
     simulatedOrderIds,
     executionSummary: {
       planId: submissionIntent.planId,

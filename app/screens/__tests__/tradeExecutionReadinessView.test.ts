@@ -54,4 +54,15 @@ describe('createTradeExecutionReadinessViewData', () => {
     expect(screenSource).not.toMatch(/createExecutionReadiness/);
     expect(screenSource).toMatch(/fetchExecutionReadinessVM/);
   });
+
+  it('reads readiness wording from the shared execution-boundary display helper', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'tradeExecutionReadinessView.ts'),
+      'utf8',
+    );
+
+    expect(source).toMatch(/createExecutionReadinessDisplayState/);
+    expect(source).not.toMatch(/Required acknowledgement is still pending/);
+    expect(source).not.toMatch(/Submission is not eligible in the prepared readiness gate/);
+  });
 });

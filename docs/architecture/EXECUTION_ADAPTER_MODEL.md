@@ -1,4 +1,4 @@
-# Execution Adapter Model (P5-13)
+# Execution Adapter Model (P5-X)
 
 ## Purpose
 
@@ -42,7 +42,7 @@ type ExecutionAdapterAttemptResult =
       dispatchEnabled: false;
       placeholderOnly: true;
       adapterType: SubmissionIntentAdapterType;
-      outcome: 'ACCEPTED' | 'REJECTED';
+      outcome: 'SIMULATED_ACCEPTABLE' | 'SIMULATED_UNAVAILABLE';
       simulatedOrderIds: ReadonlyArray<string>;
       executionSummary: {
         planId: string;
@@ -96,8 +96,24 @@ The execution-adapter seam trusts submission intent. It does not second-guess it
 
 After P5-13, that also means the adapter seam does not re-derive capability or path support locally. Canonical capability truth is resolved upstream in `services/trade/resolveExecutionCapability.ts`, then carried into submission intent through prepared downstream contracts.
 
+P5-X hardens that promise with contract tests that require:
+
+- blocked submission intent to pass through unchanged
+- ready submission intent to produce simulated output only
+- `dispatchEnabled=false` and `placeholderOnly=true` on every simulated response
+- adapter type and path summary to stay aligned with upstream canonical capability truth rather than payload-shape guesswork
+
+## Calm State Language
+
+User-facing wording for this seam must stay explicit and non-pushy:
+
+- say "simulated adapter response" instead of live-execution phrasing
+- say "blocked" or "unavailable" when prerequisites or path support are missing
+- do not present `SIMULATED_ACCEPTABLE` as a live order outcome
+- do not imply that dispatch, routing, or broker submission occurred
+
 ## Future Direction
 
 This boundary is intentionally small so later phases can introduce real adapter implementations behind the same seam.
 
-P5-13 unifies capability truth before adapters, but it still does not introduce a plugin framework, command bus, broker integration layer, or live dispatch path.
+P5-13 unifies capability truth before adapters, and P5-X makes regressions across that boundary loud, but neither phase introduces a plugin framework, command bus, broker integration layer, or live dispatch path.

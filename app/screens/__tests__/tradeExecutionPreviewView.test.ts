@@ -43,11 +43,11 @@ describe('createTradeExecutionPreviewViewData', () => {
       }),
     ).toEqual({
       planId: 'plan-btc',
-      adapterText: 'Adapter adapter-preview-bracket',
+      adapterText: 'Prepared adapter adapter-preview-bracket',
       pathText: 'BRACKET path | Bracket payload placeholder',
-      payloadText: 'BRACKET placeholder | 1 order preview',
+      payloadText: 'BRACKET payload placeholder only | 1 order preview',
       fieldsText: 'Fields: symbol, entryOrderType, stopLossPrice, takeProfitPrice',
-      executableText: 'Executable is always false in this phase.',
+      executableText: 'Executable payload remains unavailable in this phase.',
     });
   });
 
@@ -64,5 +64,46 @@ describe('createTradeExecutionPreviewViewData', () => {
     expect(screenSource).not.toMatch(/createExecutionPayloadPreview/);
     expect(screenSource).not.toMatch(/getExecutionAdapterCapability/);
     expect(screenSource).toMatch(/fetchExecutionPreviewVM/);
+  });
+
+  it('keeps preview wording explicit without implying live execution', () => {
+    const result = createTradeExecutionPreviewViewData({
+      planId: 'plan-btc',
+      capabilityResolution: {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      },
+      adapterCapability: {
+        adapterId: 'adapter-preview-bracket',
+        supportsBracket: true,
+        supportsOCO: false,
+        supportsMarketBuy: true,
+        supportsLimitBuy: true,
+        supportsStopLoss: true,
+        supportsTakeProfit: true,
+      },
+      pathPreview: {
+        planId: 'plan-btc',
+        adapterId: 'adapter-preview-bracket',
+        confirmationPathType: 'BRACKET',
+        payloadType: 'BRACKET',
+        label: 'Bracket payload placeholder',
+        supported: true,
+        executable: false,
+      },
+      payloadPreview: {
+        payloadType: 'BRACKET',
+        symbol: 'BTC',
+        orderCount: 1,
+        fieldsPresent: ['symbol'],
+        executable: false,
+      },
+    });
+
+    expect(JSON.stringify(result)).toContain('placeholder only');
+    expect(JSON.stringify(result)).not.toMatch(/\bsubmit\b|\baccepted\b/i);
   });
 });

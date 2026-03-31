@@ -269,14 +269,14 @@ export type SubmissionIntentResult =
 
 export type ReadySubmissionIntent = Extract<SubmissionIntentResult, { status: 'READY' }>;
 
-export type MockExecutionOutcome = 'ACCEPTED' | 'REJECTED';
+export type SimulatedExecutionOutcome = 'SIMULATED_ACCEPTABLE' | 'SIMULATED_UNAVAILABLE';
 
 export type MockExecutionAdapterResponse = {
   status: 'SIMULATED';
   dispatchEnabled: false;
   placeholderOnly: true;
   adapterType: SubmissionIntentAdapterType;
-  outcome: MockExecutionOutcome;
+  outcome: SimulatedExecutionOutcome;
   simulatedOrderIds: ReadonlyArray<string>;
   executionSummary: {
     planId: string;

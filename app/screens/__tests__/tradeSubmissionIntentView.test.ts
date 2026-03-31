@@ -23,9 +23,9 @@ describe('createTradeSubmissionIntentViewData', () => {
         ],
       }),
     ).toEqual({
-      statusText: 'Submission intent is blocked in the prepared non-dispatch seam.',
+      statusText: 'Submission intent is blocked at the non-dispatch boundary.',
       detailText:
-        'Prepared blockers must clear before a placeholder submission contract can exist.',
+        'Blocked until readiness requirements are complete; no simulated adapter handoff is prepared.',
       warningCountText: '1 warning',
       blockers: [
         'NOT_ACKNOWLEDGED: Complete every required acknowledgement before submission can become eligible.',
@@ -59,8 +59,8 @@ describe('createTradeSubmissionIntentViewData', () => {
         warnings: [],
       }),
     ).toEqual({
-      statusText: 'Submission intent is ready as a placeholder-only contract.',
-      detailText: 'BRACKET adapter path prepared for plan plan-btc.',
+      statusText: 'Submission intent is ready for simulated adapter handoff.',
+      detailText: 'BRACKET path prepared for plan plan-btc; dispatch remains unavailable.',
       warningCountText: '0 warnings',
       blockers: [],
       warnings: [],
@@ -77,5 +77,40 @@ describe('createTradeSubmissionIntentViewData', () => {
 
     expect(screenSource).not.toMatch(/createSubmissionIntent\(/);
     expect(screenSource).toMatch(/fetchSubmissionIntentVM/);
+  });
+
+  it('keeps submission-intent wording calm and non-dispatching', () => {
+    const blocked = createTradeSubmissionIntentViewData({
+      status: 'BLOCKED',
+      blockers: [
+        {
+          code: 'UNAVAILABLE_PATH',
+          message: 'The current confirmation session has no available execution path.',
+        },
+      ],
+      warnings: [],
+    });
+    const ready = createTradeSubmissionIntentViewData({
+      status: 'READY',
+      adapterType: 'SEPARATE_ORDERS',
+      placeholderOnly: true,
+      planId: 'plan-btc',
+      accountId: 'acct-live',
+      symbol: 'BTC',
+      payloadPreview: [
+        {
+          payloadType: 'SEPARATE_ORDERS',
+          symbol: 'BTC',
+          orderCount: 3,
+          fieldsPresent: ['symbol'],
+          executable: false,
+        },
+      ],
+      warnings: [],
+    });
+
+    expect(`${blocked.statusText} ${blocked.detailText}`).toContain('blocked');
+    expect(`${ready.statusText} ${ready.detailText}`).toContain('simulated adapter handoff');
+    expect(JSON.stringify({ blocked, ready })).not.toMatch(/place order|submit order|buy now/i);
   });
 });

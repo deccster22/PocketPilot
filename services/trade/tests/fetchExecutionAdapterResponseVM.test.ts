@@ -86,7 +86,7 @@ describe('fetchExecutionAdapterResponseVM', () => {
       dispatchEnabled: false,
       placeholderOnly: true,
       adapterType: 'SEPARATE_ORDERS',
-      outcome: 'ACCEPTED',
+      outcome: 'SIMULATED_ACCEPTABLE',
       simulatedOrderIds: ['mock-plan-btc-1', 'mock-plan-btc-2', 'mock-plan-btc-3'],
       executionSummary: {
         planId: 'plan-btc',

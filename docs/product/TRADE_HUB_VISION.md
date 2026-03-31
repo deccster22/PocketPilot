@@ -98,4 +98,12 @@ For P5-13 specifically:
 - this lowers divergence risk before future adapter integration without changing the non-dispatching product posture
 - `dispatchEnabled` remains `false` everywhere
 
+For P5-X specifically:
+
+- cross-seam invariant tests harden the boundary from capability resolution through simulated adapter response
+- blocked, unavailable, ready, and simulated states stay explicit instead of bleeding into one another
+- execution-aware wording stays calm, precise, and non-authoritative
+- prepared states may describe simulated handoff or simulated adapter response, but never live dispatch
+- future real-adapter work must preserve both the invariant chain and the calm language posture
+
 Trade Hub intentionally does not include execution flows, journaling, notifications, AI-generated explanations, or exchange integration in this phase.
