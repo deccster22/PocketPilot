@@ -1,10 +1,23 @@
 import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
-import type { ConfirmationSession, ExecutionPreviewVM } from '@/services/trade/types';
+import type {
+  ConfirmationSession,
+  ExecutionCapabilityResolution,
+  ExecutionPreviewVM,
+} from '@/services/trade/types';
 
 function createSession(): ConfirmationSession {
+  const executionCapability: ExecutionCapabilityResolution = {
+    accountId: 'acct-live',
+    path: 'SEPARATE_ORDERS',
+    confirmationPath: 'GUIDED_SEQUENCE',
+    supported: true,
+    unavailableReason: null,
+  };
+
   return {
     planId: 'plan-btc',
     accountId: 'acct-live',
+    executionCapability,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -66,6 +79,13 @@ function createSession(): ConfirmationSession {
 function createPreview(): ExecutionPreviewVM {
   return {
     planId: 'plan-btc',
+    capabilityResolution: {
+      accountId: 'acct-live',
+      path: 'SEPARATE_ORDERS',
+      confirmationPath: 'GUIDED_SEQUENCE',
+      supported: true,
+      unavailableReason: null,
+    },
     adapterCapability: {
       adapterId: 'adapter-preview-separate-orders',
       supportsBracket: false,
@@ -134,12 +154,14 @@ describe('fetchExecutionReadinessVM', () => {
         confirmationSession: {
           planId: null,
           accountId: null,
+          executionCapability: null,
           preview: null,
           shell: null,
           flow: null,
         },
         executionPreview: {
           planId: null,
+          capabilityResolution: null,
           adapterCapability: null,
           pathPreview: null,
           payloadPreview: null,

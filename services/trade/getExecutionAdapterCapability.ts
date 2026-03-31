@@ -1,43 +1,34 @@
 import type {
+  ExecutionCapabilityResolution,
   ExecutionAdapterCapability,
-  TradePlanConfirmationPathType,
-  TradePlanConfirmationShell,
 } from '@/services/trade/types';
 
 export function getExecutionAdapterCapability(
-  shell: TradePlanConfirmationShell,
+  capabilityResolution: ExecutionCapabilityResolution,
 ): ExecutionAdapterCapability {
-  switch (shell.confirmation.pathType) {
+  return createAdapterCapability(resolveAdapterId(capabilityResolution.path), capabilityResolution);
+}
+
+function resolveAdapterId(path: ExecutionCapabilityResolution['path']): string {
+  switch (path) {
     case 'BRACKET':
-      return createAdapterCapability({
-        adapterId: 'adapter-preview-bracket',
-        pathType: shell.confirmation.pathType,
-      });
+      return 'adapter-preview-bracket';
     case 'OCO':
-      return createAdapterCapability({
-        adapterId: 'adapter-preview-oco',
-        pathType: shell.confirmation.pathType,
-      });
-    case 'GUIDED_SEQUENCE':
-      return createAdapterCapability({
-        adapterId: 'adapter-preview-separate-orders',
-        pathType: shell.confirmation.pathType,
-      });
+      return 'adapter-preview-oco';
+    case 'SEPARATE_ORDERS':
+      return 'adapter-preview-separate-orders';
     default:
-      return createAdapterCapability({
-        adapterId: 'adapter-preview-unavailable',
-        pathType: shell.confirmation.pathType,
-      });
+      return 'adapter-preview-unavailable';
   }
 }
 
-function createAdapterCapability(params: {
-  adapterId: string;
-  pathType: TradePlanConfirmationPathType;
-}): ExecutionAdapterCapability {
-  if (params.pathType === 'UNAVAILABLE') {
+function createAdapterCapability(
+  adapterId: string,
+  capabilityResolution: ExecutionCapabilityResolution,
+): ExecutionAdapterCapability {
+  if (!capabilityResolution.supported) {
     return {
-      adapterId: params.adapterId,
+      adapterId,
       supportsBracket: false,
       supportsOCO: false,
       supportsMarketBuy: false,
@@ -48,9 +39,9 @@ function createAdapterCapability(params: {
   }
 
   return {
-    adapterId: params.adapterId,
-    supportsBracket: params.pathType === 'BRACKET',
-    supportsOCO: params.pathType === 'OCO',
+    adapterId,
+    supportsBracket: capabilityResolution.path === 'BRACKET',
+    supportsOCO: capabilityResolution.path === 'OCO',
     supportsMarketBuy: true,
     supportsLimitBuy: true,
     supportsStopLoss: true,

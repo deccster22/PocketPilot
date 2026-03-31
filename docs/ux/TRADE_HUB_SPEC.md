@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-11)
+# Trade Hub Spec (P5-13)
 
 ## Purpose
 
@@ -60,6 +60,7 @@ The confirmation-session contract shape is:
   session: {
     planId: string | null,
     accountId: string | null,
+    executionCapability: ExecutionCapabilityResolution | null,
     preview: TradePlanPreview | null,
     shell: TradePlanConfirmationShell | null,
     flow: ConfirmationFlow | null
@@ -75,6 +76,18 @@ The confirmation-session contract shape is:
 ```
 
 The confirmation session is an in-memory service seam, not persistence and not a global store. It owns one selected plan plus its prepared preview, shell, flow, and explicit session actions so `app/` can consume a single prepared contract.
+
+`ExecutionCapabilityResolution` is:
+
+```ts
+{
+  accountId: string,
+  path: 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE',
+  confirmationPath: 'BRACKET' | 'OCO' | 'GUIDED_SEQUENCE' | 'UNAVAILABLE',
+  supported: boolean,
+  unavailableReason: string | null
+}
+```
 
 Trade Hub detail consumers read the prepared `TradePlanPreview` from that session.
 
@@ -181,6 +194,13 @@ The execution-preview contract shape is:
 ```ts
 {
   planId: string | null,
+  capabilityResolution: {
+    accountId: string,
+    path: 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE',
+    confirmationPath: 'BRACKET' | 'OCO' | 'GUIDED_SEQUENCE' | 'UNAVAILABLE',
+    supported: boolean,
+    unavailableReason: string | null
+  } | null,
   adapterCapability: {
     adapterId: string,
     supportsBracket: boolean,
@@ -209,7 +229,7 @@ The execution-preview contract shape is:
 }
 ```
 
-The execution preview is a service-owned boundary between confirmation-ready plans and future execution adapters. It remains placeholder-only, explicitly non-executable, and contains no broker call behavior.
+The execution preview is a service-owned boundary between confirmation-ready plans and future execution adapters. It remains placeholder-only, explicitly non-executable, and contains no broker call behavior. Canonical capability truth is carried into this seam rather than recomputed from shell display fields.
 
 Trade Hub execution-readiness consumers also consume a prepared `ExecutionReadiness` VM from `services/trade/`.
 
@@ -238,7 +258,7 @@ The execution-readiness contract shape is:
 }
 ```
 
-The readiness gate is a service-owned submission-eligibility seam that consumes the prepared `ConfirmationSession` plus `ExecutionPreviewVM`. It distinguishes blocking conditions from non-blocking warnings, remains deterministic, and explicitly does not submit anything.
+The readiness gate is a service-owned submission-eligibility seam that consumes the prepared `ConfirmationSession` plus `ExecutionPreviewVM`. It distinguishes blocking conditions from non-blocking warnings, remains deterministic, explicitly does not submit anything, and trusts canonical capability for supported-versus-unavailable path truth.
 
 Trade Hub submission-intent consumers also consume a prepared `SubmissionIntentResult` from `services/trade/`.
 
@@ -276,7 +296,7 @@ The submission-intent contract shape is:
 }
 ```
 
-Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching.
+Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, trusts canonical capability instead of inferring adapter type from payload shape, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching.
 
 Trade Hub execution-adapter consumers also consume a prepared `ExecutionAdapterAttemptResult` from `services/trade/`.
 
@@ -352,9 +372,15 @@ P5-11 adds:
 - `createExecutionAdapterResponse(submissionIntent)`
 - `fetchExecutionAdapterResponseVM({ submissionIntent })`
 
+P5-13 adds:
+
+- `resolveExecutionCapability(capabilities)`
+- `ExecutionCapabilityResolution`
+
 These execution-preview seams live in `services/trade/` and shape adapter capability plus payload placeholders only. They do not submit orders, hold secrets, or expose silently executable payloads.
-The readiness seams live beside them in `services/trade/` and evaluate eligibility only. They do not recompute confirmation logic, construct real payloads, dispatch to brokers, or imply that execution exists in this phase.
-The submission-intent seams live after readiness and shape the final pre-adapter placeholder contract only. They do not dispatch, call brokers, persist intent, or construct live broker payloads.
+The capability-resolution seam lives upstream in `services/trade/` and resolves execution-path truth once. It does not own readiness, submission intent, adapter response, or UI copy.
+The readiness seams live beside them in `services/trade/` and evaluate eligibility only. They do not recompute confirmation logic, re-derive capability truth, construct real payloads, dispatch to brokers, or imply that execution exists in this phase.
+The submission-intent seams live after readiness and shape the final pre-adapter placeholder contract only. They do not dispatch, call brokers, persist intent, construct live broker payloads, or re-derive capability locally.
 The execution-adapter seams live after submission intent and shape deterministic simulated adapter responses only. They do not call brokers, dispatch orders, recompute earlier seams, or imply that live execution exists.
 
 ## Presentation Rules
@@ -429,11 +455,12 @@ P5-8 does not add:
 - `TradeHubSurfaceModel` remains the list/card contract for primary and alternative plans.
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
 - `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
+- `ExecutionCapabilityResolution` is the canonical capability seam that resolves internal execution path and confirmation-facing path once for downstream consumers.
 - `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract with explicit acknowledgement state.
 - `ConfirmationSession` owns one selected plan plus its prepared preview, shell, flow, and action closures for the Trade Hub confirmation seam.
-- `ExecutionPreviewVM` consumes the selected confirmation session and produces adapter capability plus non-executing payload placeholders for future adapter work.
-- `ExecutionReadiness` consumes the selected confirmation session plus prepared execution preview and produces explicit eligibility, blockers, warnings, and summary state without dispatch.
-- `SubmissionIntentResult` consumes the selected confirmation session, prepared execution preview, and prepared execution readiness to produce an explicit blocked-or-ready placeholder submission contract without dispatch.
+- `ExecutionPreviewVM` consumes the selected confirmation session plus canonical execution capability and produces adapter capability plus non-executing payload placeholders for future adapter work.
+- `ExecutionReadiness` consumes the selected confirmation session plus prepared execution preview and uses canonical capability to produce explicit eligibility, blockers, warnings, and summary state without dispatch.
+- `SubmissionIntentResult` consumes the selected confirmation session, prepared execution preview, and prepared execution readiness to produce an explicit blocked-or-ready placeholder submission contract without dispatch or path re-derivation.
 - `ExecutionAdapterAttemptResult` consumes the selected submission intent result and produces an explicit blocked-or-simulated adapter response without dispatch.
 
 The boundary remains:

@@ -1,13 +1,15 @@
-﻿---
+---
 Title: PocketPilot - CANON
-Version: 0.4
-Source: docs/incoming/CANON v0.4.pdf
-Last Updated: 2026-03-09
+Version: 0.5
+Source: docs/source/PocketPilot_CANON.pdf
+Last Updated: 2026-03-12
 ---
 
-# PocketPilot - CANON v0.4
+# PocketPilot - CANON v0.5
 
-Product Philosophy + Locked Architecture Decisions.
+Product philosophy, locked architecture decisions, canonical object definitions, and phased delivery rules.
+
+This revision preserves the major section structure of CANON v0.4, adds missing architectural primitives, coalesces phase models, and records genuine tensions where naming or sequencing diverges across sources.
 
 ## North Star
 
@@ -25,184 +27,332 @@ It reduces chaos without manufacturing urgency.
 ## Anti-Vision (Non-Negotiables)
 
 PocketPilot does not:
-- Inject urgency language
+- Inject urgent language
 - Gamify trading outcomes
 - Auto-switch strategies
 - Override user decisions
 - Shame inactivity
 - Flash red warnings or dramatise volatility
-- Present global strategy signals that do not match execution venue
+- Present global strategy signals that do not match the execution venue
+- Turn raw signal output into the visible product surface
+- Allow explanation, reflection, or guardrails to become patronising
+- Hide meaningful complexity behind fake certainty
 
 ## Data Integrity and Budget Discipline
 
-- Quote Broker abstraction required.
-- All network calls routed through provider layer.
-- Hard caps enforced per interval.
-- No background scanning in Phase 1.
-- Haptic throttle per symbol.
-- Estimated state can never present as confirmed certainty.
-- Core layer must remain deterministic and side-effect free.
+- Quote Broker abstraction required
+- All network calls are routed through the provider layer
+- Hard caps enforced per interval
+- No background scanning in Phase 1
+- Haptic throttle per symbol
+- Estimated state can never present as confirmed certainty
+- The core layer must remain deterministic and side-effect free
+- Execution truth beats synthetic purity
+
+Strategy alignment, meaningful events, and action-support logic must be derived from the selected execution account's feed, not an averaged or global proxy.
 
 ## Core Architecture Principles
 
 ### 1. Strategy Is Account-Scoped
 
-- Strategy alignment is calculated using the price feed of the selected execution account.
-- No canonical strategy feed that diverges from execution price.
-- Signals must match where trades will occur.
-- Trust over aggregation purity.
+- Strategy alignment is calculated using the price feed of the selected execution account
+- There is no canonical global strategy feed that diverges from execution price
+- Signals must match where trades will occur
+- Trust is more important than aggregation purity
 
 ### 2. Market Regime Is Contextual, Not Controlling
 
-- Regime classification exists as an independent descriptive layer.
-- Regime influences strategy only through strategy logic (no global overrides).
-- No regime-level enforcement.
-- Regime exposure scales by profile:
-- Beginner: off by default, simplified label if enabled.
-- Middle: on, simple label plus short contextual phrase.
-- Advanced: full statistical detail.
+- Regime classification exists as an independent descriptive layer
+- Regime influences strategy only through strategy logic
+- No regime-level global overrides
+- Beginner exposure should be lighter than advanced exposure
 
 ### 3. Strategy Fit Indicator
 
-- Lives on Dashboard (not Snapshot).
-- Subtle spectrum: Favourable -> Mixed -> Unfavourable.
-- No percentages and no red alarms.
-- Beginner: textual only.
-- Middle: soft spectrum plus contextual link.
-- Advanced: spectrum only, no knowledge link.
+- Fit is descriptive, not directive
+- Fit can express favourable, mixed, or unfavourable conditions for the selected strategy
+- Fit must not function as a switch recommendation engine
+- Fit should be secondary to core alignment state
 
 ### 4. Snapshot Is Sacred
 
-Snapshot shows only:
-- Current state
-- Last 24h change
-- Strategy alignment
-
-No regime drama.
-No fit warnings.
-No behavioural commentary.
-
-Optional:
-- 30,000 ft View chip (manual access; highlighted during abnormal volatility).
+- Snapshot remains a zero-scroll, calm briefing surface
+- Current State, Last 24h Change, and Strategy Status are its core elements
+- It should update quietly rather than theatrically
+- It must support quick open-close behaviour
+- Snapshot should behave like a financial Primary Flight Display: trend + state + change, not raw data overload
+- Permitted secondary indicators include strategy fit, volatility context, and signals contributing to alignment, but they must remain visually subordinate to the core triad
+- Snapshot answers "What's going on for my strategy?" in under three seconds
 
 ### 5. 30,000 ft View
 
-- Always manually accessible.
-- Highlighted (not forced) during statistical volatility spikes.
-- Provides macro context.
-- Does not recommend action.
-
-## Trade Hub - Locked Decisions
+- Provides macro context during elevated volatility or major structural shifts
+- Should stabilise the user emotionally without changing the product tone
+- Must not recommend action
+- Must not escalate urgency
+- Extreme volatility should surface as a calm context affordance, not a siren
+- Useful payload may include volatility percentile, volatility expansion, macro comparison, trend structure, and historical grounding context
 
 ### 6. SL/TP Calculator
 
-Lives inside Trade Hub (slide-up panel).
-
-Pre-fills:
-- Entry price
-- Account portfolio value
-- Position size
-
-Never auto-applies without confirmation.
+- Calculator logic is support, not enforcement
+- It should calculate suggested stop, take profit, position size, max loss, and risk/reward, not auto-execute by default
+- Placement belongs inside the Trade Hub
 
 ### 7. Risk Basis Toggle
 
-Two distinct modes:
-- Trade Amount (Position Risk)
-- Portfolio Risk
+- Risk basis should remain explicit and legible
+- Any user-selected risk basis must flow into `ProtectionPlan` and related summaries
 
-User must consciously choose.
-Display max loss in both contexts for clarity.
-Recent risk percentage values shown as suggestions (not auto-defaulted).
+### 8. ProtectionPlan Object
 
-### 8. Protection Plan Object
+When the user calculates SL/TP, the system creates a `ProtectionPlan` object.
 
-When user calculates SL/TP, system creates a `ProtectionPlan` object containing:
-- Account ID
-- Entry intent
-- Stop level
-- Take profit level
-- Risk basis
-- Timestamp
-- Status
+Fields include:
+- `accountId`
+- `entryIntent`
+- `stopLevel`
+- `takeProfitLevel`
+- `riskBasis`
+- `timestamp`
+- `status`
+- `executionCapability`
 
-Execution flow adapts to platform capability:
+Expanded canonical sketch:
+
+```ts
+type ProtectionPlan = {
+  accountId: string;
+  entryIntent: string;
+  stopLevel: number;
+  takeProfitLevel: number;
+  riskBasis: string;
+  timestamp: number;
+  status: string;
+  executionCapability: string;
+};
+```
+
+- Calculator logic is platform-independent
+- Execution layer adapts per platform capability
 - Bracket/OCO supported -> single API flow
 - Separate orders required -> post-trade guided sequence
-
-Calculator logic is platform-independent.
-Execution layer adapts per platform.
 
 ## Multi-Account Architecture
 
 ### 9. Accounts Are First-Class Objects
 
-Each account contains:
-- Platform capability matrix
-- Portfolio value
-- Base currency
-- Risk settings
-- Strategy assignment
+- Each account contains platform capability matrix, portfolio value, base currency, risk settings, and strategy assignment
+- Single-account mode hides unnecessary account selection UI
+- Multi-account mode supports a nominated primary account or highest-value fallback
 
-### 10. Single vs Multi Account UX
+### 10. Single vs Multi-Account UX
 
-Single account:
-- No account selector shown.
-- All data implicitly scoped to that account.
-
-Multi-account:
-- User can nominate Primary Account.
-- If none nominated, highest portfolio value is auto-selected.
-- Strategy is assignable per account.
-- Switching accounts switches strategy context.
+- Single account: no account selector shown; all data implicitly scoped to that account
+- Multi-account: user can nominate primary account; strategy is assignable per account; switching accounts switches strategy context
 
 ### 11. Aggregation Rules
 
-Allowed:
-- Portfolio value aggregation
-- Exposure aggregation
-- Asset-level position aggregation
-
-Not allowed:
-- Aggregated global strategy alignment
-- Aggregated fit signals
-
-Signals are account-bound.
+- Allowed: portfolio value aggregation, exposure aggregation, asset-level position aggregation
+- Not allowed: aggregated global strategy alignment, aggregated fit signals
+- Signals are account-bound
 
 ### 12. Snapshot Modes (Multi-Account)
 
 - Primary Account (default)
 - All Accounts (compact stacked view)
 - Aggregate (positions only)
+- Dashboard remains account-scoped
 
-Dashboard is always account-scoped.
+## Canonical Contracts
+
+### 13. MarketEvent Is Canonical
+
+`MarketEvent` is the canonical unit of meaningful interpreted change inside PocketPilot.
+
+```ts
+type MarketEvent = {
+  eventType: string;
+  timestamp: number;
+  accountId: string;
+  symbol?: string;
+  strategyId?: string;
+  alignmentState: string;
+  signalsTriggered: string[];
+  confidenceScore?: number;
+  price?: number;
+  pctChange?: number;
+  metadata?: Record<string, unknown>;
+  strategyImpact?: string;
+  profileNarration?: string;
+};
+```
+
+- Strategy alignment change, volatility spike, candle pattern formation, regime shift, and price threshold all resolve to `MarketEvent` instances
+- `MarketEvent` is the backbone for alerts, Snapshot updates, Since Last Checked, Event Ledger, reflection, journaling, and exports
+- Do not proliferate ad-hoc event formats
+
+### 14. EventLedger and UserActionEvent
+
+The Event Ledger records market events and user action events in one coherent memory layer.
+
+```ts
+type EventLedgerEntry = {
+  eventId: string;
+  eventClass: 'market' | 'user_action';
+  accountId: string;
+  symbol?: string;
+  strategyId?: string;
+  timestamp: number;
+  alignmentState?: string;
+  signalContext: string[];
+  payload: Record<string, unknown>;
+};
+```
+
+- User actions should record strategy active at the time, alignment state, signal context, price, and action metadata
+- The ledger exists to contextualise, not moralise
+- Reflection summaries may compare aligned vs outside-strategy actions without shaming language
+
+### 15. StrategyContext Contract
+
+```ts
+type StrategyContext = {
+  accountId: string;
+  strategyId: string;
+  profileId: string;
+  selectedAssetSet: string[];
+  fitState?: string;
+  regimeState?: string;
+  activeSignals: string[];
+  alignmentState: string;
+};
+```
+
+- `StrategyContext` is the active interpretation frame for the selected account
+- Trade Hub, Snapshot, Alerts, and Insights should all consume a consistent `StrategyContext` rather than rebuilding fragments independently
+
+### 16. ProfileConfig and ProfileVoicePolicy
+
+Profiles remain separate from strategies and separate from voice tone.
+
+```ts
+type ProfileConfig = {
+  profileId: string;
+  uiDensity: string;
+  guidanceLevel: string;
+  featureAccess: string[];
+  alertSensitivity: string;
+  knowledgeExposure: string;
+  regimeExposure: string;
+};
+
+type ProfileVoicePolicy = {
+  voiceStyle: string;
+  phraseLength: string;
+  certaintyRules: string[];
+  suggestionRules: string[];
+};
+```
+
+- `ProfileConfig` is the canonical user-facing behaviour object
+- `ProfileVoicePolicy` is the narration rule layer nested beneath the profile
+- Beginner suggestions must remain observational rather than directive
+
+### 17. KnowledgeNode and Knowledge Layer
+
+```ts
+type KnowledgeNode = {
+  topicId: string;
+  title: string;
+  content: string;
+  mediaType: 'article' | 'diagram' | 'video' | 'interactive' | 'case_study';
+  strategyLinks: string[];
+  signalLinks: string[];
+  difficulty: string;
+};
+```
+
+- Knowledge supports guardrails but does not gate features
+- Beginner access should be stable and obvious
+- Intermediate access should include contextual links during drift or ambiguity
+- Advanced access should remain available without constant surfacing
+- Knowledge Library should exist as a persistent tab and as a contextual support layer
+- Knowledge must remain accessible, optional, and non-intrusive
+
+### 18. Relevance Principle and Message Filtering
+
+PocketPilot avoids signal overproduction by filtering output through Strategy -> Profile -> Relevance.
+
+- Users see signals relevant to their strategy, assets, and account context
+- Alert volume must be subordinate to interpreted usefulness
+- No raw-indicator-to-push pipeline is allowed
+
+### 19. Strategy Preview / Strategy Navigator
+
+A future exploratory mode should allow the user to select a strategy, view a simulated scenario or event feed, and watch the interface transform. This may live in onboarding, the Knowledge Library, or both.
+
+- Shows how signals appear
+- Shows how alerts behave
+- Shows how the dashboard shifts
+- Reduces beginner commitment anxiety
+
+### 20. Quick Action Panel Rules
+
+Quick actions belong inside Trade Hub and should remain constrained.
+
+- Default audience: advanced profile or explicit unlock path
+- Always require confirmation
+- Prefer alignment-strength or equivalent discipline gate before surfacing high-velocity actions
+- Do not let quick actions collapse PocketPilot into casino behaviour
+
+### 21. Signal Rules
+
+Signals must express confidence, not certainty.
+
+The system may describe:
+- possible
+- forming
+- strengthening
+- weakening
+
+The system must not claim:
+- guaranteed
+- confirmed outcome
+- high probability of profit
+
+Signal exposure must scale by profile and strategy relevance.
+
+- Beginner: only major strategy events
+- Intermediate: major plus secondary alignment signals
+- Advanced: full strategy signal stream
 
 ## Alerts Logic
 
-- Strategy alignment alerts are account-scoped.
-- Risk alerts are account-scoped.
-- No global signal aggregation.
+- Strategy alignment alerts are account-scoped
+- Risk alerts are account-scoped
+- No global signal aggregation
+- Foreground-only scanning remains the Phase 1 rule
+- Any future push logic must be explicitly phase-gated and cannot rely on background market polling until guardrails are revised
+- Messaging tone varies by profile, but event logic stays canonical
 
 ## Knowledge Layer
 
-- Beginner: stable, always-visible strategy knowledge access.
-- Middle: contextual links during drift.
-- Advanced: documentation accessible but not surfaced.
+- Beginner: stable, always-visible strategy knowledge access
+- Intermediate: contextual links during drift
+- Advanced: documentation accessible but not constantly surfaced
+- Knowledge Library must also support multiple media types and contextual linking from signals, strategies, and events
 
-Knowledge supports guardrails but does not gate features.
+## Guardrails Philosophy (Phase 2 and Beyond)
 
-## Guardrails Philosophy (Phase 2)
-
-Optional tools:
-- Risk limits
-- Daily loss thresholds
-- Cooldowns
-- Position caps
-
-All opt-in.
-All knowledge-backed.
-None default-on.
-None auto-blocking unless explicitly enabled.
+- Optional tools: risk limits, daily loss thresholds, cooldowns, position caps
+- All opt-in
+- All knowledge-backed
+- None default-on
+- None auto-blocking unless explicitly enabled
+- PocketPilot may alert, suggest, or notify. It must not silently prevent or override by default
+- Guardrails should mirror informed structure and self-chosen discipline rather than external control
+- Strategy logic, market regime, and risk management intersect but do not collapse into one override layer
 
 ## Open Questions (Parked)
 
@@ -211,308 +361,102 @@ None auto-blocking unless explicitly enabled.
 - SL/TP hard enforcement mode
 - Background monitoring limits
 - Account pinning UX refinement
-
-## Known Issues Register
-
-- `PP_KI1`: `npm audit` reports `tar` vulnerability via Expo CLI; do not `--force` upgrade Expo.
-
-## Backlog
-
-- `PP_BL_01`: Security review for Expo SDK upgrade path and audit remediation after Phase 2 UI skeleton stabilises.
+- Canonical product name for Strategy Preview / Strategy Navigator
+- How much of the financial-PFD metaphor becomes visible language vs internal design principle
+- Exact placement of Year in Review and compare-period tooling within Insights
+- Whether quick actions remain advanced-only forever or become capability-gated by explicit consent
 
 ## Phase Targets
 
-### Phase 1 - Strategy Engine
+### Macro Phase 1 - Foundation
 
-- Single account flawless experience
+- Single-account flawless experience
 - Multi-account stable primary switching
-- Strategy engine account-scoped
-- Trade Hub + Protection Plan architecture working
-- No background scanning
+- Account-scoped strategy engine
+- Trade Hub entry architecture
+- Snapshot and dashboard skeleton
+- Knowledge baseline
+- Foreground-only scanning and alerts
 - Stability over feature density
 
-### Phase 2 - Snapshot UI
+### Macro Phase 2 - Context and Reflection
 
-- P2B: Live quote wiring
-- P2C: Snapshot + real portfolio state; system observability and better user experience
-- P2D: Dashboard UI
-- Output: first usable app demo
+- Event Ledger
+- Since Last Checked
+- Portfolio and trade context
+- Reflection summaries and export model
+- Reorientation flows
 
-### Phase 3 - Strategy Clarity
+### Macro Phase 3 - Intelligence
 
-Add explanation layer:
-- Why panel
-- Signal explanation
-- Metric breakdown
+- Pattern formation detection
+- Confluence recognition
+- Why panel and signal explanation layer
+- Regime engine and richer fit/context model
+- Strategy preview simulations
 
-This is where PocketPilot becomes intellectually interesting.
+### Macro Phase 4 - Copilot and Hardening
 
-### Phase 4 - Portfolio Context
-
-- Portfolio history
-- Trade context
-- Learning signals
-
-### Phase 5 - Trade Hub
-
-- SL/TP calculator
-- Risk layers
-- Protection plan object
-
-### Phase 6 - Alerts
-
-Foreground alerts, including:
-- Strategy alignment shift
-- Volatility spike
-
-Still foreground-only per CANON.
-
-### Phase 7 - Knowledge Library
-
-ELI5 + Nerdy lessons.
-Example topics:
-- Spread
-- Breakeven
-- Volatility
-- Cooldown
-
-### Phase 8 - Regime Engine
-
-Market context layer.
-Examples:
-- Trending
-- Ranging
-- Volatile
-
-Reminder: Regime must never override strategies.
-
-### Phase 9 - Insight Layer
-
-User learning.
-Examples:
+- AI-assisted explanation where it improves clarity
+- Strategy simulation
 - Behaviour insights
-- Missed opportunity patterns
+- Diagnostics, logging, Sentry, debug export
+- Launch preparation, onboarding polish, compliance review, store copy
 
-### Phase 10 - Beta Hardening
+## Development Workstream Phasing
 
-- Sentry
-- Diagnostics modal
-- Debug export
+### Historical / Already Done
 
-### Phase 11 - Launch Preparation
+- P0: Vision, doctrine, architecture and repo discipline foundation
+- P1: Strategy engine foundations
+- P2: Snapshot / provider / governance / debug observatory foundation
 
-- App Store copy
-- Onboarding polish
-- Compliance review
+### Next Phases
+
+- P3: Event system and orientation layer
+- P4: Snapshot + Dashboard UX shaping
+- P5: Trade Hub and `ProtectionPlan`
+- P6: Alerts and message policy
+- P7: Knowledge baseline
+- P8: Insights / Event Ledger / Since Last Checked / Reorientation
+- P9: Pattern Navigator / Strategy Navigator / richer explanation layer
+- P10: Beta hardening
+- P11: Launch prep
 
 ## Decision Register
 
-### Phase 1 Decisions
+v0.4 retained decisions remain valid unless explicitly superseded below.
 
-`P1D1`
-Decision: P1D will introduce the Strategy Engine skeleton (types + deterministic orchestration + noop strategy) with no UI/persistence.
-Rationale: Locks a stable contract for initial strategies without refactors; preserves deterministic core; enables early unit tests and CI guardrails.
-Implications: Future strategies implement the same `Strategy` interface and consume `ForegroundScanResult`; signal format is stable across profiles.
+- `P1D1`: Strategy Engine skeleton introduced as deterministic contract first
+- `P1D2`: Strategy Catalog and Profile Defaults introduced as pure deterministic layer
+- `P1D3`: Data Quality / Confidence as first real strategy
+- `P1D4`: `BaselineScan` pathway and deterministic quote deltas
+- `P1D5`: beginner-safe `dip_buying` strategy using deltas only
+- `P1D6`: beginner-safe `momentum_basics` using deltas only
+- `P1D7`: `StrategyBundle` as user-facing grouping mechanism
+- `P1D8`: proper PR flow with `verify` required before push to `main`
+- `P2D1`: freeze first working device build for recovery safety
+- `P2D2`: `MarketEvent` becomes the canonical interpreted event contract
+- `P2D3`: `EventLedger` must record both market events and user action events
+- `P2D4`: `ProfileConfig` becomes the canonical profile object; voice rules remain a nested subsystem
+- `P2D5`: `KnowledgeNode` becomes the canonical content-linking object
+- `P2D6`: Snapshot keeps a locked three-part core with optional subordinate secondary chips only
+- `P2D7`: Strategy Preview / Strategy Navigator is preserved as a future feature family rather than discarded
+- `P2D8`: Macro phases are introduced without deleting the detailed workstream phase map
+- `P2D9`: `ProfileConfig` is the primary object and `ProfileVoicePolicy` is the nested narration rules subsystem
+- `P2D10`: Strategy Preview vs Strategy Navigator are the same feature family, not two separate roadmap items. Canonical internal family name: Strategy Navigator. Onboarding sub-mode: Strategy Preview. Same concept, two labels. The final product-facing name remains open.
+- `P2D11`: Canonical system lifecycle: Formation -> Development -> Confirmation / Invalidation -> Resolution. Allowed explanatory copy: "aftermath" as human-facing language.
 
-`P1D2`
-Decision: P1E introduces Strategy Catalog + Profile Defaults (pure/deterministic), selectable without UI or persistence.
-Rationale: Scales from one noop strategy to many with consistent metadata, ordering, and profile defaults.
-Implications: Metadata becomes single source of truth for strategy lists/order; services compute active strategies deterministically.
-
-`P1D3`
-Decision: P1F implements `data_quality` as the first real strategy using current-scan quotes and broker instrumentation (`estimated`, `symbolsBlocked`) for confidence signals.
-Rationale: Delivers immediate value without history/persistence; aligns with clarity over hype.
-Implications: Establishes strategy pattern over scan metadata for later extension.
-
-`P1D4`
-Decision: P1G adds optional caller-supplied `baselineScan` and deterministic quote deltas (`pctChangeBySymbol`), plus first delta-based strategy `snapshot_change`.
-Rationale: Enables movement signals without candle/history storage while preserving determinism.
-Implications: Strategy input expands to baseline/delta maps; orchestration remains in services.
-
-`P1D5`
-Decision: P1H implements beginner-safe `dip_buying` using baseline deltas only, with calm watchlist-style output.
-Rationale: Adds practical value early without historical data and keeps tone beginner-safe.
-Implications: Establishes threshold-based strategy tone/patterns reusable in later strategies.
-
-`P1D6`
-Decision: P1I implements beginner `momentum_basics` using baseline deltas only, with "momentum building" WATCH signals plus a non-hype caution.
-Rationale: Completes beginner strategy pair using deterministic mechanics.
-Implications: Establishes consistent thresholds/ordering/caps across beginner strategies.
-
-`P1D7`
-Decision: Introduce `StrategyBundle` and make profile defaults resolve to bundles (bundle -> strategy IDs), while keeping raw strategy IDs internally.
-Rationale: Reduces cognitive load and UI complexity; supports feature flags/packs/experiments without engine refactors.
-Implications: `profileDefaults` returns bundle IDs; active strategy resolution expands bundle -> IDs -> implementations.
-
-`P1D8`
-Decision: Before P2, add proper PR flow + required checks.
-Rationale: Prevent direct pushes to `main` without green `verify`.
-Implications:
-- Branch protection on `main`
-- Require pull request
-- Require `verify` status check
-- Require branches up to date
-- Disable bypass for admins (or remove admin role in solo workflow)
-
-### Phase 2 Decisions
-
-`P2D1`
-Decision: Freeze code for first working device version of PocketPilot app.
-Rationale: Preserve a known-good restore point if later phases break.
-Implications: Keep a stable baseline device build reference before further expansion.
-
-## Phase Reports
-
-### Phase 1 Reports
-
-`P1A` deterministic account selector:
-- Patch applied locally: Yes
-- Local verify: Not run
-- Commit hash: `fea39c60c3eca68130a34406d7e96b97bd171efb`
-- Pushed to GitHub: Yes (with non-fast-forward rejection noted)
-- GitHub Actions verify: Pass
-
-`P1B` execution quotes service wiring:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `c67c71ae4ebc578876ce4605d0969b689a37475f`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1C` Foreground Scan patch:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `fcc569877091762872ce50a061b2b802bc2548b5`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1D` strategy engine skeleton + noop:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `050a322c6d95bafb0f03ad63513993333ae7325a`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1E` Strategy Catalog + Profile Defaults:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `3cb4a080e28acab2757741e0a7752bbe7c5b86f5`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1F` first real strategy (Data Quality / Confidence):
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `bb0a96c1db7df3ddfa1676ce9af76be9d32b880f`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1G` baseline scan deltas + first delta-based strategy:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `91110d1c0c92e5735752b6576eab1eb3713a9768`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1H` beginner strategy Dip Buying:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `66032a27b8603eea1b1255257d55c3fcb3aad537`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1I` beginner strategy Momentum Basics:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `dd49b0dcf6ae908035e5d663a93be6cb1afb2267`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-`P1J` strategy bundles + profile defaults:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hash: `1f896b61e3f45621b2e12da950261ee5f0416b6b`
-- Pushed to GitHub: Yes
-- GitHub Actions verify: Pass
-
-## Phase 1 Summary
-
-What Phase 1 contains:
-- Expo TypeScript scaffold + deterministic guardrails
-- Quote budgets + instrumentation
-- Deterministic haptic throttle + provider wrapper
-- Data quality + estimated-language guardrail
-- Deterministic account selection
-- Quotes service wiring
-- Baseline scan deltas + percent change mapping
-- Strategies: `data_quality`, `snapshot_change`, `dip_buying`, `momentum_basics`, `noop`
-- Strategy bundles + profile defaults via bundles
-- Tests + local verify + green Actions
-
-What Phase 1 intentionally does not include:
-- UI (Snapshot/Dashboard/Trade Hub)
-- Persistence (journals/history/reorientation/exports)
-- Platform integrations (exchange APIs/auth/multi-account screens)
-- Regime engine
-- SL/TP calculator
-
-These are Phase 2+ by design.
-
-### Phase 2 Reports
-
-`P2A` Snapshot UI Skeleton (read-only) + demo scan wiring:
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hashes: `fea39c60c3eca68130a34406d7e96b97bd171efb`, `5c19f86bdc5218024ac708dd0424a6adc596755a`
-- Pushed/Pulled to GitHub: Yes
-- GitHub Actions verify: Pass
-- Merged to main: Yes
-
-`P2B` live quotes integration + snapshot wiring (mobile console fix deps):
-- Patch applied locally: Yes
-- Local verify: Pass
-- Commit hashes: `3880959564a5c0fd8d5add436e5333420a4f73c9`, `d7e375e541d14f5b6493f86aa849cb29bac1332e`, `6dae2b046e236f02803c50f075568a912ef96d32`
-- Pushed/Pulled to GitHub: Yes
-- GitHub Actions verify: Pass
-- Merged to main: Yes
-- Notes: merged into P2A branch, then main
-
-## P2C Outcomes
-
-What was shipped in P2C:
-- Secrets protection:
-- Added secret scanning (`scripts/secret-scan.js`)
-- CI blocks merges on credential-like patterns
-- Environment boundary enforcement:
-- Tests enforce env reads through config module boundaries
-- CI verification pipeline:
-- PR pipeline runs install, tests, and secret scan
-
-Why it matters long term:
-- Enables safer scaling and governance consistency.
-- Moves project from prototype toward engineered product foundation.
-
-## Current Foundation State
-
-PocketPilot currently has:
-- App UI
-- Quotes provider
-- Strategy engine
-- Snapshot generation
-- Testing framework
-- CI verification
-- Secret scanning
-- Config governance
-
-## Next Focus
-
-Next work should emphasize powerful, demo-worthy capabilities while preserving the CANON non-negotiables.
+Historical implementation reporting continues in the phase ledger; CANON remains the doctrine and architecture source of truth.
 
 ## Conversion Notes
 
-The following prior headings in `docs/governance/CANON.md` were replaced due to conflicts with source `CANON v0.4`:
-- Current Phase Target
-- Phase 1 Decisions
-- Phase 2 Phase Reports
-- What Phase 1 now contains (done)
-- What Phase 1 is not (intentionally)
+The following prior headings in `docs/governance/CANON.md` were replaced due to conflicts with the authoritative source PDF:
+- Trade Hub - Locked Decisions
+- Known Issues Register
+- Backlog
+- Phase Reports
+- Phase 1 Summary
+- P2C Outcomes
+- Current Foundation State
+- Next Focus

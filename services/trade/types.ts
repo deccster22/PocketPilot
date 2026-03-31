@@ -89,6 +89,22 @@ export type AccountCapabilityContext = {
   supportsTakeProfit: boolean;
 };
 
+export type ExecutionCapabilityPath = 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE';
+
+export type ConfirmationCapabilityPath =
+  | 'BRACKET'
+  | 'OCO'
+  | 'GUIDED_SEQUENCE'
+  | 'UNAVAILABLE';
+
+export type ExecutionCapabilityResolution = {
+  accountId: string;
+  path: ExecutionCapabilityPath;
+  confirmationPath: ConfirmationCapabilityPath;
+  supported: boolean;
+  unavailableReason: string | null;
+};
+
 export type TradePlanConfirmationPathType = 'BRACKET' | 'OCO' | 'GUIDED_SEQUENCE' | 'UNAVAILABLE';
 
 export type TradePlanConfirmationShell = {
@@ -152,6 +168,7 @@ export type ConfirmationFlowActions = {
 export type ConfirmationSession = {
   planId: string | null;
   accountId: string | null;
+  executionCapability: ExecutionCapabilityResolution | null;
   preview: TradePlanPreview | null;
   shell: TradePlanConfirmationShell | null;
   flow: ConfirmationFlow | null;
@@ -164,7 +181,7 @@ export type ConfirmationSessionActions = {
   selectPlan(planId: string | null): Promise<ConfirmationSession>;
 };
 
-export type ExecutionPayloadType = 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS' | 'UNAVAILABLE';
+export type ExecutionPayloadType = ExecutionCapabilityPath;
 
 export type ExecutionAdapterCapability = {
   adapterId: string;
@@ -196,6 +213,7 @@ export type OrderPayloadPreview = {
 
 export type ExecutionPreviewVM = {
   planId: string | null;
+  capabilityResolution: ExecutionCapabilityResolution | null;
   adapterCapability: ExecutionAdapterCapability | null;
   pathPreview: ExecutionPathPreview | null;
   payloadPreview: OrderPayloadPreview | null;
@@ -230,7 +248,7 @@ export type ExecutionReadiness = {
   };
 };
 
-export type SubmissionIntentAdapterType = 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS';
+export type SubmissionIntentAdapterType = Exclude<ExecutionCapabilityPath, 'UNAVAILABLE'>;
 
 export type SubmissionIntentResult =
   | {

@@ -1,43 +1,30 @@
 import type {
   ConfirmationSession,
-  ExecutionAdapterCapability,
+  ExecutionCapabilityResolution,
   ExecutionPreviewVM,
   ExecutionReadiness,
   ReadinessBlocker,
   ReadinessWarning,
-  TradePlanConfirmationPathType,
 } from '@/services/trade/types';
 
-function hasExecutableCapabilityForPath(
-  pathType: TradePlanConfirmationPathType | null,
-  adapterCapability: ExecutionAdapterCapability | null,
+function isPreviewConsistentWithCapability(
+  capabilityResolution: ExecutionCapabilityResolution,
+  executionPreview: ExecutionPreviewVM | null,
 ): boolean {
-  if (!pathType || !adapterCapability) {
+  if (
+    !executionPreview?.pathPreview ||
+    !executionPreview.payloadPreview ||
+    !executionPreview.adapterCapability
+  ) {
     return false;
   }
 
-  switch (pathType) {
-    case 'BRACKET':
-      return (
-        adapterCapability.supportsBracket &&
-        adapterCapability.supportsStopLoss &&
-        adapterCapability.supportsTakeProfit
-      );
-    case 'OCO':
-      return (
-        adapterCapability.supportsOCO &&
-        adapterCapability.supportsStopLoss &&
-        adapterCapability.supportsTakeProfit
-      );
-    case 'GUIDED_SEQUENCE':
-      return (
-        (adapterCapability.supportsMarketBuy || adapterCapability.supportsLimitBuy) &&
-        adapterCapability.supportsStopLoss &&
-        adapterCapability.supportsTakeProfit
-      );
-    default:
-      return false;
-  }
+  return (
+    executionPreview.pathPreview.confirmationPathType === capabilityResolution.confirmationPath &&
+    executionPreview.pathPreview.payloadType === capabilityResolution.path &&
+    executionPreview.pathPreview.supported === capabilityResolution.supported &&
+    executionPreview.payloadPreview.payloadType === capabilityResolution.path
+  );
 }
 
 function createBlockers(params: {
@@ -124,12 +111,14 @@ export function createExecutionReadiness(params: {
   const session = params.confirmationSession;
   const hasPlan = session?.planId !== null && session?.planId !== undefined;
   const allRequiredAcknowledged = session?.flow?.allRequiredAcknowledged ?? false;
-  const pathType = params.executionPreview?.pathPreview?.confirmationPathType ?? null;
-  const hasUnavailablePath = hasPlan && pathType === 'UNAVAILABLE';
+  const capabilityResolution =
+    session?.executionCapability ?? params.executionPreview?.capabilityResolution ?? null;
+  const hasUnavailablePath = hasPlan && capabilityResolution?.supported !== true;
   const hasCapabilityMismatch =
     hasPlan &&
     !hasUnavailablePath &&
-    !hasExecutableCapabilityForPath(pathType, params.executionPreview?.adapterCapability ?? null);
+    !!capabilityResolution &&
+    !isPreviewConsistentWithCapability(capabilityResolution, params.executionPreview);
   const blockers = createBlockers({
     hasPlan,
     allRequiredAcknowledged,

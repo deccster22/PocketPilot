@@ -2,6 +2,7 @@ import { createExecutionReadiness } from '@/services/trade/createExecutionReadin
 import type {
   ConfirmationSession,
   ExecutionAdapterCapability,
+  ExecutionCapabilityResolution,
   ExecutionPreviewVM,
   TradeHubActionState,
   TradePlanConfirmationPathType,
@@ -15,10 +16,12 @@ function createSession(params?: {
   pathType?: TradePlanConfirmationPathType;
 }): ConfirmationSession {
   const pathType = params?.pathType ?? 'BRACKET';
+  const executionCapability = createExecutionCapability(pathType);
 
   return {
     planId: params?.planId ?? 'plan-btc',
     accountId: params?.planId === null ? null : 'acct-live',
+    executionCapability: params?.planId === null ? null : executionCapability,
     preview: {
       planId: params?.planId ?? 'plan-btc',
       headline: {
@@ -105,27 +108,24 @@ function createCapability(
 function createPreview(params?: {
   pathType?: TradePlanConfirmationPathType;
   capability?: ExecutionAdapterCapability | null;
+  capabilityResolution?: ExecutionCapabilityResolution | null;
 }): ExecutionPreviewVM {
   const pathType = params?.pathType ?? 'BRACKET';
+  const capabilityResolution = params?.capabilityResolution ?? createExecutionCapability(pathType);
   const payloadType =
-    pathType === 'GUIDED_SEQUENCE'
-      ? 'SEPARATE_ORDERS'
-      : pathType === 'OCO'
-        ? 'OCO'
-        : pathType === 'UNAVAILABLE'
-          ? 'UNAVAILABLE'
-          : 'BRACKET';
+    capabilityResolution.path;
 
   return {
     planId: 'plan-btc',
+    capabilityResolution,
     adapterCapability: params?.capability ?? createCapability(),
     pathPreview: {
       planId: 'plan-btc',
       adapterId: 'adapter-preview',
-      confirmationPathType: pathType,
+      confirmationPathType: capabilityResolution.confirmationPath,
       payloadType,
       label: 'Prepared path',
-      supported: pathType !== 'UNAVAILABLE',
+      supported: capabilityResolution.supported,
       executable: false,
     },
     payloadPreview: {
@@ -136,6 +136,46 @@ function createPreview(params?: {
       executable: false,
     },
   };
+}
+
+function createExecutionCapability(
+  pathType: TradePlanConfirmationPathType,
+): ExecutionCapabilityResolution {
+  switch (pathType) {
+    case 'BRACKET':
+      return {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'OCO':
+      return {
+        accountId: 'acct-live',
+        path: 'OCO',
+        confirmationPath: 'OCO',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'GUIDED_SEQUENCE':
+      return {
+        accountId: 'acct-live',
+        path: 'SEPARATE_ORDERS',
+        confirmationPath: 'GUIDED_SEQUENCE',
+        supported: true,
+        unavailableReason: null,
+      };
+    default:
+      return {
+        accountId: 'acct-live',
+        path: 'UNAVAILABLE',
+        confirmationPath: 'UNAVAILABLE',
+        supported: false,
+        unavailableReason:
+          'Account capabilities do not support a protected execution path for this plan.',
+      };
+  }
 }
 
 describe('createExecutionReadiness', () => {
@@ -181,12 +221,12 @@ describe('createExecutionReadiness', () => {
     expect(result.summary.hasUnavailablePath).toBe(true);
   });
 
-  it('blocks submission when adapter capability does not support the selected path', () => {
+  it('blocks submission when the prepared preview diverges from canonical capability truth', () => {
     const result = createExecutionReadiness({
       confirmationSession: createSession({ allRequiredAcknowledged: true, pathType: 'BRACKET' }),
       executionPreview: createPreview({
         pathType: 'BRACKET',
-        capability: createCapability({ supportsBracket: false }),
+        capabilityResolution: createExecutionCapability('OCO'),
       }),
     });
 
@@ -276,12 +316,14 @@ describe('createExecutionReadiness', () => {
       confirmationSession: {
         planId: null,
         accountId: null,
+        executionCapability: null,
         preview: null,
         shell: null,
         flow: null,
       },
       executionPreview: {
         planId: null,
+        capabilityResolution: null,
         adapterCapability: null,
         pathPreview: null,
         payloadPreview: null,

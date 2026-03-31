@@ -1,14 +1,24 @@
 import { createSubmissionIntent } from '@/services/trade/createSubmissionIntent';
 import type {
   ConfirmationSession,
+  ExecutionCapabilityResolution,
   ExecutionPreviewVM,
   ExecutionReadiness,
 } from '@/services/trade/types';
 
 function createSession(): ConfirmationSession {
+  const executionCapability: ExecutionCapabilityResolution = {
+    accountId: 'acct-live',
+    path: 'SEPARATE_ORDERS',
+    confirmationPath: 'GUIDED_SEQUENCE',
+    supported: true,
+    unavailableReason: null,
+  };
+
   return {
     planId: 'plan-btc',
     accountId: 'acct-live',
+    executionCapability,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -70,6 +80,13 @@ function createSession(): ConfirmationSession {
 function createExecutionPreview(): ExecutionPreviewVM {
   return {
     planId: 'plan-btc',
+    capabilityResolution: {
+      accountId: 'acct-live',
+      path: 'SEPARATE_ORDERS',
+      confirmationPath: 'GUIDED_SEQUENCE',
+      supported: true,
+      unavailableReason: null,
+    },
     adapterCapability: {
       adapterId: 'adapter-preview-separate-orders',
       supportsBracket: false,
@@ -194,6 +211,30 @@ describe('createSubmissionIntent', () => {
             'This plan is currently in a caution state even when submission becomes eligible.',
         },
       ],
+    });
+  });
+
+  it('uses canonical capability truth instead of re-deriving adapter type from preview shape', () => {
+    const confirmationSession = createSession();
+    const executionPreview = createExecutionPreview();
+
+    executionPreview.payloadPreview = {
+      payloadType: 'BRACKET',
+      symbol: 'BTC',
+      orderCount: 3,
+      fieldsPresent: ['symbol', 'entryPreview', 'stopLossOrder', 'takeProfitOrder'],
+      executable: false,
+    };
+
+    const result = createSubmissionIntent({
+      confirmationSession,
+      executionPreview,
+      executionReadiness: createReadiness(),
+    });
+
+    expect(result).toMatchObject({
+      status: 'READY',
+      adapterType: 'SEPARATE_ORDERS',
     });
   });
 

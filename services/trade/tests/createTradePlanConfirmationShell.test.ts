@@ -1,4 +1,5 @@
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
+import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import type { AccountCapabilityContext, ProtectionPlan } from '@/services/trade/types';
 
 function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
@@ -45,11 +46,13 @@ describe('createTradePlanConfirmationShell', () => {
   it('creates the confirmation shell model shape without leaking raw plan internals', () => {
     const shell = createTradePlanConfirmationShell({
       plan: createPlan(),
-      capabilities: createCapabilities({
-        supportsBracketOrders: true,
-        supportsStopLoss: true,
-        supportsTakeProfit: true,
-      }),
+      capabilityResolution: resolveExecutionCapability(
+        createCapabilities({
+          supportsBracketOrders: true,
+          supportsStopLoss: true,
+          supportsTakeProfit: true,
+        }),
+      ),
     });
 
     expect(shell).toEqual({
@@ -109,11 +112,11 @@ describe('createTradePlanConfirmationShell', () => {
     (expectedPathType, capabilities, expectedStepsLabel) => {
       const first = createTradePlanConfirmationShell({
         plan: createPlan(),
-        capabilities,
+        capabilityResolution: resolveExecutionCapability(capabilities),
       });
       const second = createTradePlanConfirmationShell({
         plan: createPlan(),
-        capabilities,
+        capabilityResolution: resolveExecutionCapability(capabilities),
       });
 
       expect(first).toEqual(second);

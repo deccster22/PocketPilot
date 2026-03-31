@@ -8,6 +8,7 @@ import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
 import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
+import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import type {
   ConfirmationSession,
@@ -155,6 +156,7 @@ async function buildConfirmationSession(params: {
     return {
       planId: null,
       accountId: null,
+      executionCapability: null,
       preview: null,
       shell: null,
       flow: null,
@@ -167,15 +169,17 @@ async function buildConfirmationSession(params: {
     cachedCapabilities ?? (await getAccountCapabilities(params.plan.accountId));
 
   params.capabilityCache.set(params.plan.accountId, capabilities);
+  const executionCapability = resolveExecutionCapability(capabilities);
 
   const shell = createTradePlanConfirmationShell({
     plan: params.plan,
-    capabilities,
+    capabilityResolution: executionCapability,
   });
 
   return {
     planId: params.plan.planId,
     accountId: params.plan.accountId,
+    executionCapability,
     preview,
     shell,
     flow: createConfirmationFlow({ shell }),

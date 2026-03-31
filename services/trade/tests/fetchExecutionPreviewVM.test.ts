@@ -1,10 +1,17 @@
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
-import type { ConfirmationSession, TradePlanConfirmationPathType } from '@/services/trade/types';
+import type {
+  ConfirmationSession,
+  ExecutionCapabilityResolution,
+  TradePlanConfirmationPathType,
+} from '@/services/trade/types';
 
 function createSession(pathType: TradePlanConfirmationPathType): ConfirmationSession {
+  const executionCapability = createExecutionCapability(pathType);
+
   return {
     planId: 'plan-btc',
     accountId: 'acct-live',
+    executionCapability,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -57,6 +64,46 @@ function createSession(pathType: TradePlanConfirmationPathType): ConfirmationSes
   };
 }
 
+function createExecutionCapability(
+  pathType: TradePlanConfirmationPathType,
+): ExecutionCapabilityResolution {
+  switch (pathType) {
+    case 'BRACKET':
+      return {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'OCO':
+      return {
+        accountId: 'acct-live',
+        path: 'OCO',
+        confirmationPath: 'OCO',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'GUIDED_SEQUENCE':
+      return {
+        accountId: 'acct-live',
+        path: 'SEPARATE_ORDERS',
+        confirmationPath: 'GUIDED_SEQUENCE',
+        supported: true,
+        unavailableReason: null,
+      };
+    default:
+      return {
+        accountId: 'acct-live',
+        path: 'UNAVAILABLE',
+        confirmationPath: 'UNAVAILABLE',
+        supported: false,
+        unavailableReason:
+          'Account capabilities do not support a protected execution path for this plan.',
+      };
+  }
+}
+
 describe('fetchExecutionPreviewVM', () => {
   it('returns a prepared non-executing execution preview VM from the confirmation session', async () => {
     const result = await fetchExecutionPreviewVM({
@@ -65,6 +112,13 @@ describe('fetchExecutionPreviewVM', () => {
 
     expect(result).toEqual({
       planId: 'plan-btc',
+      capabilityResolution: {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      },
       adapterCapability: {
         adapterId: 'adapter-preview-bracket',
         supportsBracket: true,
@@ -100,6 +154,7 @@ describe('fetchExecutionPreviewVM', () => {
         confirmationSession: {
           planId: null,
           accountId: null,
+          executionCapability: null,
           preview: null,
           shell: null,
           flow: null,
@@ -107,6 +162,7 @@ describe('fetchExecutionPreviewVM', () => {
       }),
     ).toEqual({
       planId: null,
+      capabilityResolution: null,
       adapterCapability: null,
       pathPreview: null,
       payloadPreview: null,

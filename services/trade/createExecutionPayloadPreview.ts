@@ -1,20 +1,24 @@
 import type {
   ConfirmationSession,
+  ExecutionCapabilityResolution,
   ExecutionAdapterCapability,
-  ExecutionPayloadType,
   OrderPayloadPreview,
-  TradePlanConfirmationShell,
 } from '@/services/trade/types';
+import { resolveExecutionPayloadType } from '@/services/trade/resolveExecutionCapability';
 
 export function createExecutionPayloadPreview(params: {
   confirmationSession?: ConfirmationSession;
-  confirmationShell?: TradePlanConfirmationShell;
+  capabilityResolution?: ExecutionCapabilityResolution;
   adapterCapability?: ExecutionAdapterCapability;
 }): OrderPayloadPreview {
-  const shell = params.confirmationSession?.shell ?? params.confirmationShell ?? null;
+  const shell = params.confirmationSession?.shell ?? null;
+  const capabilityResolution =
+    params.confirmationSession?.executionCapability ?? params.capabilityResolution ?? null;
   const symbol =
     params.confirmationSession?.preview?.headline.symbol ?? shell?.headline.symbol ?? null;
-  const payloadType = resolvePayloadType(shell);
+  const payloadType = capabilityResolution
+    ? resolveExecutionPayloadType(capabilityResolution.path)
+    : 'UNAVAILABLE';
 
   switch (payloadType) {
     case 'BRACKET':
@@ -61,24 +65,5 @@ export function createExecutionPayloadPreview(params: {
         fieldsPresent: params.adapterCapability ? ['adapterId'] : [],
         executable: false,
       };
-  }
-}
-
-function resolvePayloadType(
-  shell: TradePlanConfirmationShell | null,
-): ExecutionPayloadType {
-  if (!shell) {
-    return 'UNAVAILABLE';
-  }
-
-  switch (shell.confirmation.pathType) {
-    case 'BRACKET':
-      return 'BRACKET';
-    case 'OCO':
-      return 'OCO';
-    case 'GUIDED_SEQUENCE':
-      return 'SEPARATE_ORDERS';
-    default:
-      return 'UNAVAILABLE';
   }
 }

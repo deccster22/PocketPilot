@@ -2,22 +2,8 @@ import type {
   ConfirmationSession,
   ExecutionPreviewVM,
   ExecutionReadiness,
-  SubmissionIntentAdapterType,
   SubmissionIntentResult,
 } from '@/services/trade/types';
-
-function resolveAdapterType(executionPreview: ExecutionPreviewVM): SubmissionIntentAdapterType | null {
-  switch (executionPreview.payloadPreview?.payloadType) {
-    case 'BRACKET':
-      return 'BRACKET';
-    case 'OCO':
-      return 'OCO';
-    case 'SEPARATE_ORDERS':
-      return 'SEPARATE_ORDERS';
-    default:
-      return null;
-  }
-}
 
 export function createSubmissionIntent(params: {
   confirmationSession: ConfirmationSession | null;
@@ -34,7 +20,11 @@ export function createSubmissionIntent(params: {
 
   const session = params.confirmationSession;
   const preview = params.executionPreview;
-  const adapterType = preview ? resolveAdapterType(preview) : null;
+  const adapterType =
+    session?.executionCapability?.supported === true &&
+    session.executionCapability.path !== 'UNAVAILABLE'
+      ? session.executionCapability.path
+      : null;
 
   if (
     !session?.planId ||

@@ -8,6 +8,13 @@ describe('createTradeExecutionPreviewViewData', () => {
     expect(
       createTradeExecutionPreviewViewData({
         planId: 'plan-btc',
+        capabilityResolution: {
+          accountId: 'acct-live',
+          path: 'BRACKET',
+          confirmationPath: 'BRACKET',
+          supported: true,
+          unavailableReason: null,
+        },
         adapterCapability: {
           adapterId: 'adapter-preview-bracket',
           supportsBracket: true,

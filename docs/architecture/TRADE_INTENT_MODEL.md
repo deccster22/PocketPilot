@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-11)
+# Trade Intent Model (P5-13)
 
 ## Purpose
 
@@ -92,10 +92,11 @@ P5-8 adds `ExecutionPreviewVM` plus execution-adapter capability and payload-pre
 P5-9 adds `ExecutionReadiness` as the deterministic submission-eligibility seam between prepared execution preview data and any future execution work.
 P5-10 adds `SubmissionIntentResult` as the final non-dispatching placeholder seam between readiness and any future live execution adapter.
 P5-11 adds `ExecutionAdapterAttemptResult` as the first post-intent execution-adapter seam, returning either explicit blocked passthrough or a deterministic simulated adapter response.
+P5-13 adds `ExecutionCapabilityResolution` plus `resolveExecutionCapability` as the single canonical capability seam that resolves execution-path truth once in `services/trade/` before shell, preview, readiness, submission intent, and later adapter-facing shaping.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> ExecutionAdapterAttemptResult -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / ExecutionCapabilityResolution / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> ExecutionAdapterAttemptResult -> app`
 
 This keeps:
 
@@ -146,6 +147,7 @@ Confirmation sessions expose only the fields needed for safe selected-plan owner
 
 - one selected `planId` or `null`
 - one selected `accountId` or `null`
+- one canonical execution-capability resolution or `null`
 - one prepared preview
 - one prepared confirmation shell
 - one prepared confirmation flow
@@ -153,8 +155,9 @@ Confirmation sessions expose only the fields needed for safe selected-plan owner
 
 Execution preview contracts expose only the fields needed for safe adapter scaffolding:
 
+- one carried-forward canonical execution-capability resolution or `null`
 - placeholder adapter capability flags
-- confirmation-path-to-payload mapping
+- canonical-path-to-payload mapping
 - payload field names only
 - explicit `executable: false`
 
@@ -209,17 +212,19 @@ Confirmation-session actions intentionally remain small and deterministic. They 
 
 - recompute the in-memory selected-plan session
 - switch the selected plan explicitly
-- keep preview, shell, and flow synchronized in one service seam
+- keep execution capability, preview, shell, and flow synchronized in one service seam
 
 Execution-preview seams intentionally remain small and deterministic. They only:
 
-- map confirmation context into placeholder adapter capability
-- map confirmation path into a non-executing payload preview
+- consume canonical execution capability from the prepared session
+- map canonical execution path into placeholder adapter capability
+- map canonical execution path into a non-executing payload preview
 - prepare a UI-safe execution preview VM
 
 Execution-readiness seams intentionally remain small and deterministic. They only:
 
 - consume the prepared confirmation session plus execution preview
+- trust canonical capability for path support and availability
 - evaluate whether submission would be eligible on the prepared path
 - separate blockers from warnings in a UI-safe contract
 
@@ -227,6 +232,7 @@ Submission-intent seams intentionally remain small and deterministic. They only:
 
 - consume the prepared confirmation session, execution preview, and readiness result
 - trust readiness instead of recomputing submission eligibility
+- trust canonical capability instead of re-deriving adapter path from payload shape
 - return either an explicit blocked result or a placeholder-only ready contract for a future adapter
 
 Execution-adapter seams intentionally remain small and deterministic. They only:
@@ -247,6 +253,7 @@ They do not:
 - call brokers
 - submit orders
 - persist submission intent
+- re-derive execution capability locally after canonical resolution
 - recompute confirmation rules independently of the prepared session
 - recompute readiness
 - rebuild submission intent

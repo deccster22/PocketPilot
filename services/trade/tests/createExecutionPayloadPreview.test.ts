@@ -1,7 +1,9 @@
 import { createExecutionPayloadPreview } from '@/services/trade/createExecutionPayloadPreview';
+import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import type {
   ConfirmationSession,
   ExecutionAdapterCapability,
+  ExecutionCapabilityResolution,
   TradePlanConfirmationPathType,
   TradePlanConfirmationShell,
 } from '@/services/trade/types';
@@ -37,9 +39,12 @@ function createShell(
 function createSession(
   pathType: TradePlanConfirmationPathType,
 ): ConfirmationSession {
+  const executionCapability = createExecutionCapability(pathType);
+
   return {
     planId: 'plan-btc',
     accountId: 'acct-live',
+    executionCapability,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -68,6 +73,46 @@ function createSession(
     shell: createShell(pathType),
     flow: null,
   };
+}
+
+function createExecutionCapability(
+  pathType: TradePlanConfirmationPathType,
+): ExecutionCapabilityResolution {
+  switch (pathType) {
+    case 'BRACKET':
+      return {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'OCO':
+      return {
+        accountId: 'acct-live',
+        path: 'OCO',
+        confirmationPath: 'OCO',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'GUIDED_SEQUENCE':
+      return {
+        accountId: 'acct-live',
+        path: 'SEPARATE_ORDERS',
+        confirmationPath: 'GUIDED_SEQUENCE',
+        supported: true,
+        unavailableReason: null,
+      };
+    default:
+      return resolveExecutionCapability({
+        accountId: 'acct-live',
+        supportsBracketOrders: false,
+        supportsOCO: false,
+        requiresSeparateOrders: false,
+        supportsStopLoss: false,
+        supportsTakeProfit: false,
+      });
+  }
 }
 
 const adapterCapability: ExecutionAdapterCapability = {
@@ -120,6 +165,7 @@ describe('createExecutionPayloadPreview', () => {
         confirmationSession: {
           planId: null,
           accountId: null,
+          executionCapability: null,
           preview: null,
           shell: null,
           flow: null,

@@ -146,6 +146,13 @@ describe('fetchConfirmationSessionVM', () => {
     expect(result.session).toEqual({
       planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
       accountId: 'acct-live',
+      executionCapability: {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      },
       preview: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
         headline: {
@@ -317,6 +324,7 @@ describe('fetchConfirmationSessionVM', () => {
     expect(await result.actions.selectPlan(null)).toEqual({
       planId: null,
       accountId: null,
+      executionCapability: null,
       preview: null,
       shell: null,
       flow: null,
