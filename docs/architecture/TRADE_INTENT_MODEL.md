@@ -1,4 +1,4 @@
-# Trade Intent Model (P5-10)
+# Trade Intent Model (P5-11)
 
 ## Purpose
 
@@ -91,10 +91,11 @@ P5-7 adds `ConfirmationSession` as the in-memory composition seam that owns one 
 P5-8 adds `ExecutionPreviewVM` plus execution-adapter capability and payload-preview contracts as the boundary between confirmation state and later adapter work.
 P5-9 adds `ExecutionReadiness` as the deterministic submission-eligibility seam between prepared execution preview data and any future execution work.
 P5-10 adds `SubmissionIntentResult` as the final non-dispatching placeholder seam between readiness and any future live execution adapter.
+P5-11 adds `ExecutionAdapterAttemptResult` as the first post-intent execution-adapter seam, returning either explicit blocked passthrough or a deterministic simulated adapter response.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> ExecutionAdapterAttemptResult -> app`
 
 This keeps:
 
@@ -173,6 +174,15 @@ Submission intent contracts expose only the fields needed for the final pre-adap
 - selected `planId`, `accountId`, and `symbol`
 - prepared payload preview placeholders only
 
+Execution-adapter attempt contracts expose only the fields needed for a simulated, non-dispatching post-intent seam:
+
+- one explicit `status` of `BLOCKED` or `SIMULATED`
+- explicit blocker and warning lists when blocked
+- explicit `dispatchEnabled: false`
+- explicit `placeholderOnly: true`
+- explicit adapter type, deterministic outcome, and deterministic simulated order identifiers
+- a small execution summary derived only from ready submission intent fields
+
 Confirmation shells intentionally describe presentation-safe capability context only. They do not imply:
 
 - real broker compatibility
@@ -219,6 +229,14 @@ Submission-intent seams intentionally remain small and deterministic. They only:
 - trust readiness instead of recomputing submission eligibility
 - return either an explicit blocked result or a placeholder-only ready contract for a future adapter
 
+Execution-adapter seams intentionally remain small and deterministic. They only:
+
+- consume `SubmissionIntentResult`
+- pass blocked results through unchanged
+- accept only `ReadySubmissionIntent` into the simulated adapter builder
+- shape deterministic simulated order identifiers and summary fields
+- preserve warnings from the submission-intent seam
+
 They do not:
 
 - auto-complete steps
@@ -230,6 +248,9 @@ They do not:
 - submit orders
 - persist submission intent
 - recompute confirmation rules independently of the prepared session
+- recompute readiness
+- rebuild submission intent
+- dispatch anything
 
 They intentionally do not expose:
 

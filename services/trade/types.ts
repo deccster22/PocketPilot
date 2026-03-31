@@ -248,3 +248,32 @@ export type SubmissionIntentResult =
       payloadPreview: ReadonlyArray<OrderPayloadPreview>;
       warnings: ReadonlyArray<ReadinessWarning>;
     };
+
+export type ReadySubmissionIntent = Extract<SubmissionIntentResult, { status: 'READY' }>;
+
+export type MockExecutionOutcome = 'ACCEPTED' | 'REJECTED';
+
+export type MockExecutionAdapterResponse = {
+  status: 'SIMULATED';
+  dispatchEnabled: false;
+  placeholderOnly: true;
+  adapterType: SubmissionIntentAdapterType;
+  outcome: MockExecutionOutcome;
+  simulatedOrderIds: ReadonlyArray<string>;
+  executionSummary: {
+    planId: string;
+    accountId: string;
+    symbol: string | null;
+    orderCount: number;
+    path: SubmissionIntentAdapterType;
+  };
+  warnings: ReadonlyArray<ReadinessWarning>;
+};
+
+export type ExecutionAdapterAttemptResult =
+  | {
+      status: 'BLOCKED';
+      blockers: ReadonlyArray<ReadinessBlocker>;
+      warnings: ReadonlyArray<ReadinessWarning>;
+    }
+  | MockExecutionAdapterResponse;

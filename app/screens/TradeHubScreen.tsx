@@ -4,11 +4,13 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
+import { createTradeExecutionAdapterViewData } from '@/app/screens/tradeExecutionAdapterView';
 import { createTradeExecutionReadinessViewData } from '@/app/screens/tradeExecutionReadinessView';
 import { createTradeExecutionPreviewViewData } from '@/app/screens/tradeExecutionPreviewView';
 import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeSubmissionIntentViewData } from '@/app/screens/tradeSubmissionIntentView';
+import { fetchExecutionAdapterResponseVM } from '@/services/trade/fetchExecutionAdapterResponseVM';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
@@ -17,6 +19,7 @@ import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentV
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type {
+  ExecutionAdapterAttemptResult,
   ExecutionPreviewVM,
   ExecutionReadiness,
   SubmissionIntentResult,
@@ -82,6 +85,9 @@ export function TradeHubScreen() {
   const [executionPreviewVm, setExecutionPreviewVm] = useState<ExecutionPreviewVM | null>(null);
   const [executionReadinessVm, setExecutionReadinessVm] = useState<ExecutionReadiness | null>(null);
   const [submissionIntentVm, setSubmissionIntentVm] = useState<SubmissionIntentResult | null>(null);
+  const [executionAdapterVm, setExecutionAdapterVm] = useState<ExecutionAdapterAttemptResult | null>(
+    null,
+  );
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -135,6 +141,11 @@ export function TradeHubScreen() {
     () => (submissionIntentVm ? createTradeSubmissionIntentViewData(submissionIntentVm) : null),
     [submissionIntentVm],
   );
+  const executionAdapterView = useMemo(
+    () =>
+      executionAdapterVm ? createTradeExecutionAdapterViewData(executionAdapterVm) : null,
+    [executionAdapterVm],
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -186,6 +197,39 @@ export function TradeHubScreen() {
       isMounted = false;
     };
   }, [confirmationSessionVm]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!submissionIntentVm) {
+      setExecutionAdapterVm(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    fetchExecutionAdapterResponseVM({
+      submissionIntent: submissionIntentVm,
+    })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setExecutionAdapterVm(result);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setExecutionAdapterVm(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [submissionIntentVm]);
 
   useEffect(() => {
     let isMounted = true;
@@ -531,6 +575,36 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>No submission intent is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Execution Adapter</Text>
+          {executionAdapterView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Simulated-only adapter seam</Text>
+              <Text style={styles.cardTitle}>{executionAdapterView.statusText}</Text>
+              <Text style={styles.cardMeta}>{executionAdapterView.detailText}</Text>
+              <Text style={styles.cardMeta}>{executionAdapterView.warningsText}</Text>
+              <Text style={styles.cardMeta}>{executionAdapterView.orderSummaryText}</Text>
+              <Text style={styles.cardMeta}>
+                Blockers:{' '}
+                {executionAdapterView.blockers.length
+                  ? executionAdapterView.blockers.join(' | ')
+                  : 'None'}
+              </Text>
+              <Text style={styles.cardMeta}>
+                Warnings:{' '}
+                {executionAdapterView.warnings.length
+                  ? executionAdapterView.warnings.join(' | ')
+                  : 'None'}
+              </Text>
+              <Text style={styles.cardMeta}>
+                Simulated IDs: {executionAdapterView.simulatedOrderIdsText}
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No execution adapter response is prepared right now.</Text>
           )}
         </View>
       </ScrollView>
