@@ -44,7 +44,7 @@ describe('createExecutionAdapterResponse', () => {
         dispatchEnabled: false,
         placeholderOnly: true,
         adapterType,
-        outcome: 'ACCEPTED',
+        outcome: 'SIMULATED_ACCEPTABLE',
         simulatedOrderIds,
         executionSummary: {
           planId: 'plan-btc',

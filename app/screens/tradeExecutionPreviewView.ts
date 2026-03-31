@@ -1,3 +1,4 @@
+import { createExecutionPreviewDisplayState } from '@/services/trade/createExecutionBoundaryDisplayState';
 import type { ExecutionPreviewVM } from '@/services/trade/types';
 
 export type TradeExecutionPreviewViewData = {
@@ -21,18 +22,14 @@ export function createTradeExecutionPreviewViewData(
     return null;
   }
 
+  const displayState = createExecutionPreviewDisplayState(preview);
+
   return {
     planId: preview.planId,
-    adapterText: `Adapter ${preview.adapterCapability.adapterId}`,
-    pathText: `${preview.pathPreview.confirmationPathType} path | ${preview.pathPreview.label}`,
-    payloadText: `${preview.payloadPreview.payloadType} placeholder | ${preview.payloadPreview.orderCount} order preview${
-      preview.payloadPreview.orderCount === 1 ? '' : 's'
-    }`,
-    fieldsText: preview.payloadPreview.fieldsPresent.length
-      ? `Fields: ${preview.payloadPreview.fieldsPresent.join(', ')}`
-      : 'Fields: none available in this phase.',
-    executableText: preview.payloadPreview.executable
-      ? 'Executable payload available.'
-      : 'Executable is always false in this phase.',
+    adapterText: displayState.adapterText,
+    pathText: displayState.pathText,
+    payloadText: displayState.payloadText,
+    fieldsText: displayState.fieldsText,
+    executableText: displayState.executableText,
   };
 }

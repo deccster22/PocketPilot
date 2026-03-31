@@ -23,9 +23,9 @@ describe('createTradeExecutionAdapterViewData', () => {
         ],
       }),
     ).toEqual({
-      statusText: 'Execution adapter remains blocked at the submission-intent boundary.',
+      statusText: 'Execution adapter remains blocked by submission intent.',
       detailText:
-        'A ready submission intent is required before the simulated adapter seam can respond.',
+        'Blocked submission intent passes through unchanged; no simulated adapter response is prepared.',
       warningsText: '1 warning',
       blockers: [
         'NOT_ACKNOWLEDGED: Complete every required acknowledgement before submission can become eligible.',
@@ -33,7 +33,7 @@ describe('createTradeExecutionAdapterViewData', () => {
       warnings: [
         'LOW_CERTAINTY: This plan is prepared with low certainty and should be reviewed carefully.',
       ],
-      orderSummaryText: 'No simulated orders are prepared while blockers remain.',
+      orderSummaryText: 'No simulated adapter response is prepared while blockers remain.',
       simulatedOrderIdsText: 'None',
     });
   });
@@ -45,7 +45,7 @@ describe('createTradeExecutionAdapterViewData', () => {
         dispatchEnabled: false,
         placeholderOnly: true,
         adapterType: 'BRACKET',
-        outcome: 'ACCEPTED',
+        outcome: 'SIMULATED_ACCEPTABLE',
         simulatedOrderIds: ['mock-plan-btc-1'],
         executionSummary: {
           planId: 'plan-btc',
@@ -57,8 +57,8 @@ describe('createTradeExecutionAdapterViewData', () => {
         warnings: [],
       }),
     ).toEqual({
-      statusText: 'Execution adapter response is simulated only.',
-      detailText: 'BRACKET path returned ACCEPTED with dispatchEnabled=false.',
+      statusText: 'Simulated adapter response prepared.',
+      detailText: 'BRACKET path produced a simulated adapter record with dispatchEnabled=false.',
       warningsText: '0 warnings',
       blockers: [],
       warnings: [],
@@ -75,5 +75,28 @@ describe('createTradeExecutionAdapterViewData', () => {
 
     expect(screenSource).not.toMatch(/createExecutionAdapterResponse\(/);
     expect(screenSource).toMatch(/fetchExecutionAdapterResponseVM/);
+  });
+
+  it('keeps adapter wording explicit about simulation rather than live outcomes', () => {
+    const result = createTradeExecutionAdapterViewData({
+      status: 'SIMULATED',
+      dispatchEnabled: false,
+      placeholderOnly: true,
+      adapterType: 'OCO',
+      outcome: 'SIMULATED_ACCEPTABLE',
+      simulatedOrderIds: ['mock-plan-btc-1', 'mock-plan-btc-2'],
+      executionSummary: {
+        planId: 'plan-btc',
+        accountId: 'acct-live',
+        symbol: 'BTC',
+        orderCount: 2,
+        path: 'OCO',
+      },
+      warnings: [],
+    });
+
+    expect(result.statusText).toContain('Simulated adapter response');
+    expect(result.detailText).toContain('dispatchEnabled=false');
+    expect(result.detailText).not.toMatch(/accepted|filled|submitted/i);
   });
 });

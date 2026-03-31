@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-13)
+# Trade Hub Spec (P5-X)
 
 ## Purpose
 
@@ -229,7 +229,7 @@ The execution-preview contract shape is:
 }
 ```
 
-The execution preview is a service-owned boundary between confirmation-ready plans and future execution adapters. It remains placeholder-only, explicitly non-executable, and contains no broker call behavior. Canonical capability truth is carried into this seam rather than recomputed from shell display fields.
+The execution preview is a service-owned boundary between confirmation-ready plans and future execution adapters. It remains placeholder-only, explicitly non-executable, and contains no broker call behavior. Canonical capability truth is carried into this seam rather than recomputed from shell display fields. User-facing wording should describe this seam as prepared preview scaffolding, not as live order entry.
 
 Trade Hub execution-readiness consumers also consume a prepared `ExecutionReadiness` VM from `services/trade/`.
 
@@ -296,7 +296,7 @@ The submission-intent contract shape is:
 }
 ```
 
-Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, trusts canonical capability instead of inferring adapter type from payload shape, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching.
+Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, trusts canonical capability instead of inferring adapter type from payload shape, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching. User-facing wording should describe `READY` here as readiness for simulated adapter handoff, not readiness to place a trade.
 
 Trade Hub execution-adapter consumers also consume a prepared `ExecutionAdapterAttemptResult` from `services/trade/`.
 
@@ -322,7 +322,7 @@ The execution-adapter contract shape is:
   dispatchEnabled: false,
   placeholderOnly: true,
   adapterType: 'BRACKET' | 'OCO' | 'SEPARATE_ORDERS',
-  outcome: 'ACCEPTED' | 'REJECTED',
+  outcome: 'SIMULATED_ACCEPTABLE' | 'SIMULATED_UNAVAILABLE',
   simulatedOrderIds: string[],
   executionSummary: {
     planId: string,
@@ -340,7 +340,7 @@ The execution-adapter contract shape is:
 }
 ```
 
-The execution-adapter seam sits after submission intent, consumes only submission intent, and returns a deterministic simulated response contract. It does not re-fetch readiness, rebuild submission intent, inspect confirmation internals, or dispatch orders.
+The execution-adapter seam sits after submission intent, consumes only submission intent, and returns a deterministic simulated response contract. It does not re-fetch readiness, rebuild submission intent, inspect confirmation internals, or dispatch orders. User-facing wording should describe `SIMULATED` here as a simulated adapter response, not as an accepted or filled live order.
 
 P5-7 moves raw flow-state ownership out of `app/` and adds a small service-owned confirmation-session action API:
 
@@ -408,6 +408,14 @@ The screen may render prepared readiness blockers, warnings, and summaries, but 
 The screen may render prepared submission-intent status, blockers, warnings, and placeholder summaries, but it must not construct submission contracts or adapter payloads on its own.
 The screen may render prepared execution-adapter attempt status, summaries, and simulated identifiers, but it must not select adapter paths, shape simulated responses, or dispatch anything on its own.
 
+P5-X also requires the following execution-boundary wording rules:
+
+- use calm, explicit labels such as "Execution path unavailable", "Submission intent is blocked", and "Simulated adapter response prepared"
+- do not imply urgency, pressure, or one-click action
+- do not describe blocked or unavailable states like system failures unless that is actually the seam truth
+- do not present simulated states as confirmed execution outcomes
+- keep confirmation wording clearly upstream of dispatch
+
 ## Safety Posture
 
 Trade Hub is support, not enforcement.
@@ -431,6 +439,7 @@ In P5-3:
 - readiness blockers are explicit and remain non-dispatching
 - submission intent remains explicit, placeholder-only, and non-dispatching even when ready
 - execution-adapter responses remain explicit, simulated-only, and non-dispatching even when accepted
+- cross-seam invariant tests must keep adjacent seams from disagreeing about availability, readiness, adapter type, or simulation posture
 
 The confirmation shell remains intentionally presentation-safe rather than execution-safe. The confirmation flow is derived from that shell, the session seam owns the selected-plan composition, the execution preview defines the adapter boundary, the readiness gate evaluates eligibility, the submission-intent seam shapes the final pre-adapter placeholder contract, and the execution-adapter seam returns a simulated-only post-intent response without introducing real execution.
 
@@ -462,6 +471,7 @@ P5-8 does not add:
 - `ExecutionReadiness` consumes the selected confirmation session plus prepared execution preview and uses canonical capability to produce explicit eligibility, blockers, warnings, and summary state without dispatch.
 - `SubmissionIntentResult` consumes the selected confirmation session, prepared execution preview, and prepared execution readiness to produce an explicit blocked-or-ready placeholder submission contract without dispatch or path re-derivation.
 - `ExecutionAdapterAttemptResult` consumes the selected submission intent result and produces an explicit blocked-or-simulated adapter response without dispatch.
+- P5-X invariant tests make regressions across those seams loud by checking unavailable, blocked, ready, canonical-path, deterministic, and no-signal-leak cases together.
 
 The boundary remains:
 

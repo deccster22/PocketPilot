@@ -1,4 +1,4 @@
-# Execution Capability Model (P5-13)
+# Execution Capability Model (P5-X)
 
 ## Purpose
 
@@ -58,13 +58,14 @@ It does not:
 
 ## Downstream Consumption Rules
 
-After P5-13:
+After P5-X:
 
 - confirmation shell consumes canonical capability and derives presentation labels from it
 - execution preview consumes canonical capability and shapes adapter scaffold plus payload preview from it
 - readiness consumes canonical capability for supported versus unavailable path truth
 - submission intent consumes upstream canonical capability truth instead of inferring adapter type from payload shape
 - future execution adapters must consume downstream contracts built from canonical capability truth, not re-derive capability locally
+- cross-seam invariant tests must fail if any adjacent seam disagrees with canonical capability truth
 
 ## Relationship To Neighboring Seams
 
@@ -77,9 +78,23 @@ Capability resolution, readiness, submission intent, and adapter response are di
 
 ## Non-Dispatch Guarantee
 
-P5-13 keeps PocketPilot fully non-dispatching.
+P5-X keeps PocketPilot fully non-dispatching.
 
 - `dispatchEnabled` remains `false`
 - previews remain placeholders only
 - submission intent remains placeholder-only
 - no broker calls or persistence are introduced
+
+## Boundary Hardening
+
+P5-X adds an explicit contract matrix for the non-dispatching execution boundary.
+
+That matrix proves:
+
+- unavailable capability cannot become ready downstream
+- blocked readiness cannot become simulated adapter output
+- ready submission intent can only become a simulated adapter response
+- `SEPARATE_ORDERS` may render as confirmation-facing `GUIDED_SEQUENCE`, but downstream internal path truth must stay canonical
+- payload shape does not outrank canonical capability truth
+
+See [EXECUTION_BOUNDARY_INVARIANTS.md](/D:/PocketPilot_Code/PocketPilot/docs/architecture/EXECUTION_BOUNDARY_INVARIANTS.md) for the full invariant list.
