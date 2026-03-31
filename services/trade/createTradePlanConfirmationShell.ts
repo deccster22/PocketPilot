@@ -1,40 +1,10 @@
 import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
 import type {
-  AccountCapabilityContext,
+  ExecutionCapabilityResolution,
   ProtectionPlan,
   TradePlanConfirmationPathType,
   TradePlanConfirmationShell,
 } from '@/services/trade/types';
-
-function resolvePathType(
-  capabilities: AccountCapabilityContext,
-): TradePlanConfirmationPathType {
-  if (
-    capabilities.supportsBracketOrders &&
-    capabilities.supportsStopLoss &&
-    capabilities.supportsTakeProfit
-  ) {
-    return 'BRACKET';
-  }
-
-  if (
-    capabilities.supportsOCO &&
-    capabilities.supportsStopLoss &&
-    capabilities.supportsTakeProfit
-  ) {
-    return 'OCO';
-  }
-
-  if (
-    capabilities.requiresSeparateOrders &&
-    capabilities.supportsStopLoss &&
-    capabilities.supportsTakeProfit
-  ) {
-    return 'GUIDED_SEQUENCE';
-  }
-
-  return 'UNAVAILABLE';
-}
 
 function resolveStepsLabel(pathType: TradePlanConfirmationPathType): string {
   switch (pathType) {
@@ -51,9 +21,9 @@ function resolveStepsLabel(pathType: TradePlanConfirmationPathType): string {
 
 export function createTradePlanConfirmationShell(params: {
   plan: ProtectionPlan;
-  capabilities: AccountCapabilityContext;
+  capabilityResolution: ExecutionCapabilityResolution;
 }): TradePlanConfirmationShell {
-  const pathType = resolvePathType(params.capabilities);
+  const pathType = params.capabilityResolution.confirmationPath;
 
   return {
     planId: params.plan.planId,

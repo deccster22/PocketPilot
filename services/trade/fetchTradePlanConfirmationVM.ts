@@ -5,6 +5,7 @@ import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
 import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
+import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import type { TradePlanConfirmationShell } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -54,11 +55,12 @@ export async function fetchTradePlanConfirmationVM(params: {
   }
 
   const capabilities = await getAccountCapabilities(selectedPlan.accountId);
+  const capabilityResolution = resolveExecutionCapability(capabilities);
 
   return {
     confirmationShell: createTradePlanConfirmationShell({
       plan: selectedPlan,
-      capabilities,
+      capabilityResolution,
     }),
     selectedPlanId: selectedPlan.planId,
     scan: upstream.scan,

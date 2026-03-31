@@ -1,32 +1,44 @@
 import { getExecutionAdapterCapability } from '@/services/trade/getExecutionAdapterCapability';
-import type { TradePlanConfirmationShell, TradePlanConfirmationPathType } from '@/services/trade/types';
+import type { ExecutionCapabilityResolution, TradePlanConfirmationPathType } from '@/services/trade/types';
 
-function createShell(
+function createCapabilityResolution(
   pathType: TradePlanConfirmationPathType,
-): TradePlanConfirmationShell {
-  return {
-    planId: 'plan-btc',
-    headline: {
-      intentType: 'ACCUMULATE',
-      symbol: 'BTC',
-      actionState: 'READY',
-    },
-    readiness: {
-      alignment: 'ALIGNED',
-      certainty: 'HIGH',
-    },
-    confirmation: {
-      requiresConfirmation: true,
-      pathType,
-      stepsLabel: 'Single confirmation flow',
-      executionAvailable: false,
-    },
-    constraints: {},
-    placeholders: {
-      orderPayloadAvailable: false,
-      executionPreviewAvailable: false,
-    },
-  };
+): ExecutionCapabilityResolution {
+  switch (pathType) {
+    case 'BRACKET':
+      return {
+        accountId: 'acct-live',
+        path: 'BRACKET',
+        confirmationPath: 'BRACKET',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'OCO':
+      return {
+        accountId: 'acct-live',
+        path: 'OCO',
+        confirmationPath: 'OCO',
+        supported: true,
+        unavailableReason: null,
+      };
+    case 'GUIDED_SEQUENCE':
+      return {
+        accountId: 'acct-live',
+        path: 'SEPARATE_ORDERS',
+        confirmationPath: 'GUIDED_SEQUENCE',
+        supported: true,
+        unavailableReason: null,
+      };
+    default:
+      return {
+        accountId: 'acct-live',
+        path: 'UNAVAILABLE',
+        confirmationPath: 'UNAVAILABLE',
+        supported: false,
+        unavailableReason:
+          'Account capabilities do not support a protected execution path for this plan.',
+      };
+  }
 }
 
 describe('getExecutionAdapterCapability', () => {
@@ -36,7 +48,7 @@ describe('getExecutionAdapterCapability', () => {
     ['GUIDED_SEQUENCE', 'adapter-preview-separate-orders'],
     ['UNAVAILABLE', 'adapter-preview-unavailable'],
   ] as const)('returns a deterministic placeholder capability for %s paths', (pathType, adapterId) => {
-    expect(getExecutionAdapterCapability(createShell(pathType))).toEqual({
+    expect(getExecutionAdapterCapability(createCapabilityResolution(pathType))).toEqual({
       adapterId,
       supportsBracket: pathType === 'BRACKET',
       supportsOCO: pathType === 'OCO',

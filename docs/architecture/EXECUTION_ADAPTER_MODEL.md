@@ -1,4 +1,4 @@
-# Execution Adapter Model (P5-11)
+# Execution Adapter Model (P5-13)
 
 ## Purpose
 
@@ -18,7 +18,7 @@ The execution-adapter seam consumes only `SubmissionIntentResult`.
 - `READY` submission intent is narrowed to `ReadySubmissionIntent`
 - only `ReadySubmissionIntent` may enter the simulated adapter builder
 
-This keeps submission intent as the sacred pre-execution boundary and prevents the adapter seam from peeking backward into confirmation session, confirmation flow, execution preview, or readiness internals.
+This keeps submission intent as the sacred pre-execution boundary and prevents the adapter seam from peeking backward into confirmation session, execution capability resolution, confirmation flow, execution preview, or readiness internals.
 
 ## Contracts
 
@@ -94,8 +94,10 @@ Submission intent and adapter response serve different purposes:
 
 The execution-adapter seam trusts submission intent. It does not second-guess it.
 
+After P5-13, that also means the adapter seam does not re-derive capability or path support locally. Canonical capability truth is resolved upstream in `services/trade/resolveExecutionCapability.ts`, then carried into submission intent through prepared downstream contracts.
+
 ## Future Direction
 
 This boundary is intentionally small so later phases can introduce real adapter implementations behind the same seam.
 
-Capability-unification across adapters remains a later concern. P5-11 does not introduce a plugin framework, command bus, or broker integration layer.
+P5-13 unifies capability truth before adapters, but it still does not introduce a plugin framework, command bus, broker integration layer, or live dispatch path.

@@ -1,10 +1,28 @@
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
-import type { ConfirmationSession } from '@/services/trade/types';
+import type { ConfirmationSession, ExecutionCapabilityResolution } from '@/services/trade/types';
 
 function createSession(pathType: 'BRACKET' | 'GUIDED_SEQUENCE', acknowledged = true): ConfirmationSession {
+  const executionCapability =
+    pathType === 'BRACKET'
+      ? {
+          accountId: 'acct-live',
+          path: 'BRACKET',
+          confirmationPath: 'BRACKET',
+          supported: true,
+          unavailableReason: null,
+        }
+      : {
+          accountId: 'acct-live',
+          path: 'SEPARATE_ORDERS',
+          confirmationPath: 'GUIDED_SEQUENCE',
+          supported: true,
+          unavailableReason: null,
+        };
+
   return {
     planId: 'plan-btc',
     accountId: 'acct-live',
+    executionCapability: executionCapability as ExecutionCapabilityResolution,
     preview: {
       planId: 'plan-btc',
       headline: {

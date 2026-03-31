@@ -1,10 +1,6 @@
 import { createExecutionPayloadPreview } from '@/services/trade/createExecutionPayloadPreview';
 import { getExecutionAdapterCapability } from '@/services/trade/getExecutionAdapterCapability';
-import type {
-  ConfirmationSession,
-  ExecutionPayloadType,
-  ExecutionPreviewVM,
-} from '@/services/trade/types';
+import type { ConfirmationSession, ExecutionPayloadType, ExecutionPreviewVM } from '@/services/trade/types';
 
 export async function fetchExecutionPreviewVM(params: {
   confirmationSession: ConfirmationSession | null;
@@ -14,28 +10,43 @@ export async function fetchExecutionPreviewVM(params: {
   if (!session?.shell) {
     return {
       planId: session?.planId ?? null,
+      capabilityResolution: session?.executionCapability ?? null,
       adapterCapability: null,
       pathPreview: null,
       payloadPreview: null,
     };
   }
 
-  const adapterCapability = getExecutionAdapterCapability(session.shell);
+  const capabilityResolution = session.executionCapability;
+
+  if (!capabilityResolution) {
+    return {
+      planId: session.planId,
+      capabilityResolution: null,
+      adapterCapability: null,
+      pathPreview: null,
+      payloadPreview: null,
+    };
+  }
+
+  const adapterCapability = getExecutionAdapterCapability(capabilityResolution);
   const payloadPreview = createExecutionPayloadPreview({
     confirmationSession: session,
+    capabilityResolution,
     adapterCapability,
   });
 
   return {
     planId: session.planId,
+    capabilityResolution,
     adapterCapability,
     pathPreview: {
       planId: session.planId,
       adapterId: adapterCapability.adapterId,
-      confirmationPathType: session.shell.confirmation.pathType,
+      confirmationPathType: capabilityResolution.confirmationPath,
       payloadType: payloadPreview.payloadType,
       label: resolvePathLabel(payloadPreview.payloadType),
-      supported: payloadPreview.payloadType !== 'UNAVAILABLE',
+      supported: capabilityResolution.supported,
       executable: false,
     },
     payloadPreview,
