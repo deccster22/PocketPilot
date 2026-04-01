@@ -22,7 +22,7 @@ export type ReorientationPreference = {
 
 export type ReorientationVisibilityInput = {
   dismissedAt?: string | null;
-  currentSessionDismissed?: boolean;
+  currentSessionDismissedAt?: string | null;
 };
 
 export type ReorientationEligibility =

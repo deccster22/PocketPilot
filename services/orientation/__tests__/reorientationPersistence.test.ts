@@ -91,17 +91,19 @@ describe('reorientationPersistence', () => {
       }),
     ).toEqual({
       dismissedAt: '2026-04-01T00:00:00.000Z',
-      currentSessionDismissed: undefined,
+      currentSessionDismissedAt: null,
     });
   });
 
-  it('remains deterministic for identical summary and persisted state inputs', () => {
+  it('keeps current-session dismissal cycle-aware and deterministic for identical inputs', () => {
     const params = {
       summary: availableSummary,
       dismissState: {
         dismissedAt: '2026-04-01T00:00:00.000Z',
       },
-      currentSessionDismissed: true,
+      currentSessionDismissState: {
+        dismissedAt: '2026-04-01T00:00:00.000Z',
+      },
     };
 
     expect(createReorientationVisibilityInput(params)).toEqual(

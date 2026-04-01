@@ -1,4 +1,4 @@
-# Reorientation Architecture Model (P6-R2)
+# Reorientation Architecture Model (P6-R4)
 
 ## Purpose
 `ReorientationSummary` is the service-owned seam for preparing an optional return briefing after a meaningful inactivity gap.
@@ -94,7 +94,15 @@ It does not decide thresholds, build summaries, or own screen placement.
 
 The service path continues to derive visibility from explicit inputs.
 Persisted dismissal is honored only when it still matches the current reorientation cycle.
+Current-session dismissal follows the same cycle-boundary rule through the same visibility seam.
 When a later eligible summary is built from a newer `lastActiveAt`, the old dismissal becomes stale and may be cleared.
+
+P6-R4 keeps one canonical foreground refresh path:
+
+`App lifecycle transition (background/inactive -> active) -> Snapshot screen refresh helper -> fetchSnapshotSurfaceVM -> ReorientationSurfaceState -> SnapshotSurfaceVM -> app`
+
+This does not add background processing or a second fetch seam.
+`app/` only detects the foreground transition and asks for the same prepared surface again.
 
 ## Determinism Rules
 - `createReorientationSummary` is pure and deterministic.
@@ -105,6 +113,7 @@ When a later eligible summary is built from a newer `lastActiveAt`, the old dism
 - Profile sensitivity changes threshold and wording depth only.
 - Visibility shaping remains explicit input-driven.
 - Identical inputs must produce identical outputs.
+- Foreground refresh is lifecycle-driven only and does not hinge on screen-focus churn.
 
 ## Copy and Safety Rules
 - Output must remain calm and non-punitive.

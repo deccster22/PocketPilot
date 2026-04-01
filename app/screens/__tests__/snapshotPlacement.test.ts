@@ -17,8 +17,10 @@ describe('reorientation placement', () => {
     );
 
     expect(snapshotScreenSource).toMatch(/ReorientationSummaryCard/);
-    expect(snapshotScreenSource).toMatch(/fetchSnapshotSurfaceVM/);
+    expect(snapshotScreenSource).toMatch(/AppState/);
+    expect(snapshotScreenSource).toMatch(/refreshSnapshotScreenSurface/);
     expect(snapshotScreenSource).toMatch(/defaultReorientationDismissStore/);
+    expect(snapshotScreenSource).not.toMatch(/useFocusEffect|useIsFocused/);
     expect(snapshotScreenSource).not.toMatch(/reason === 'AVAILABLE'/);
     expect(snapshotScreenSource).not.toMatch(/status === 'VISIBLE'/);
     expect(dashboardScreenSource).not.toMatch(/ReorientationSummaryCard/);
