@@ -15,6 +15,27 @@ export type ReorientationSummaryItem = {
   detail: string;
 };
 
+export type SnapshotBriefingItem = {
+  label: string;
+  detail: string;
+};
+
+export type SnapshotBriefingKind = 'REORIENTATION' | 'SINCE_LAST_CHECKED';
+
+export type SnapshotBriefingState =
+  | {
+      status: 'HIDDEN';
+      reason: 'NO_REORIENTATION' | 'NO_SINCE_LAST_CHECKED' | 'NO_MEANINGFUL_BRIEFING';
+    }
+  | {
+      status: 'VISIBLE';
+      kind: SnapshotBriefingKind;
+      title: string;
+      subtitle?: string | null;
+      items: ReadonlyArray<SnapshotBriefingItem>;
+      dismissible: boolean;
+    };
+
 export type ReorientationPreference = {
   enabled: boolean;
   thresholdDaysOverride?: number | null;

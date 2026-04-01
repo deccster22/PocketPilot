@@ -134,7 +134,141 @@ describe('fetchSnapshotSurfaceVM', () => {
         },
       ],
     });
+    expect(result.briefing).toEqual({
+      status: 'VISIBLE',
+      kind: 'REORIENTATION',
+      title: 'Welcome back',
+      subtitle: 'Welcome back. Here is a quick briefing to help you get your bearings.',
+      items: [
+        {
+          label: 'Data context',
+          detail: 'Some recent market context was captured with data quality limits in view.',
+        },
+        {
+          label: 'Current orientation',
+          detail: 'Snapshot reads up with strategy status at watchful.',
+        },
+      ],
+      dismissible: true,
+    });
     expect(JSON.stringify(result.reorientation.summary)).not.toMatch(/signalsTriggered|budget_blocked_symbols|signalTitle/);
+  });
+
+  it('uses Since Last Checked when reorientation is not available', async () => {
+    mockFetchSnapshotVM.mockResolvedValue({
+      model: {
+        profile: 'ADVANCED',
+        core: {
+          currentState: {
+            label: 'Current State',
+            value: 'Up',
+            trendDirection: 'UP',
+          },
+          change24h: {
+            label: 'Last 24h Change',
+            value: 0.03,
+          },
+          strategyStatus: {
+            label: 'Strategy Status',
+            value: 'Watchful',
+          },
+        },
+      },
+      portfolioValue: 100,
+      change24h: 0.03,
+      strategyAlignment: 'Watchful',
+      bundleName: 'Advanced Core',
+      scan: {
+        accountId: 'acct-1',
+        symbols: [],
+        quotes: {},
+        baselineQuotes: undefined,
+        pctChangeBySymbol: {},
+        estimatedFlags: {},
+        instrumentation: {
+          requests: 0,
+          symbolsRequested: 0,
+          symbolsFetched: 0,
+          symbolsBlocked: 0,
+        },
+      },
+      signals: [],
+      marketEvents: [],
+      eventStream: {
+        accountId: 'acct-1',
+        timestamp: Date.parse('2026-04-01T00:00:00.000Z'),
+        events: [],
+      },
+      orientationContext: {
+        accountId: 'acct-1',
+        currentState: {
+          latestRelevantEvent: null,
+          strategyAlignment: 'WATCHFUL',
+          certainty: null,
+        },
+        historyContext: {
+          eventsSinceLastViewed: [
+            {
+              eventId: 'acct-1:data_quality:budget_blocked_symbols:BTC:1',
+              timestamp: Date.parse('2026-03-20T00:00:00.000Z'),
+              accountId: 'acct-1',
+              symbol: 'BTC',
+              strategyId: 'data_quality',
+              eventType: 'DATA_QUALITY',
+              alignmentState: 'WATCHFUL',
+              signalsTriggered: ['budget_blocked_symbols'],
+              confidenceScore: 0.9,
+              certainty: 'confirmed',
+              price: 100,
+              pctChange: null,
+              metadata: {
+                signalTitle: 'Scan incomplete',
+              },
+            },
+          ],
+          sinceLastChecked: {
+            sinceTimestamp: Date.parse('2026-02-28T00:00:00.000Z'),
+            accountId: 'acct-1',
+            summaryCount: 1,
+            events: [],
+          },
+        },
+      },
+      eventsSinceLastViewed: [],
+      sinceLastChecked: {
+        sinceTimestamp: Date.parse('2026-02-28T00:00:00.000Z'),
+        accountId: 'acct-1',
+        summaryCount: 1,
+        events: [],
+      },
+    } as Awaited<ReturnType<typeof fetchSnapshotVM>>);
+
+    const result = await fetchSnapshotSurfaceVM({
+      profile: 'ADVANCED',
+      nowProvider: () => Date.parse('2026-04-01T00:00:00.000Z'),
+    });
+
+    expect(result.reorientation).toMatchObject({
+      status: 'HIDDEN',
+      reason: 'NOT_NEEDED',
+    });
+    expect(result.briefing).toEqual({
+      status: 'VISIBLE',
+      kind: 'SINCE_LAST_CHECKED',
+      title: 'Since last checked',
+      subtitle: 'A calm read on the most meaningful interpreted changes since your last visit.',
+      items: [
+        {
+          label: 'Data context',
+          detail: 'Some recent market context was captured with data quality limits in view.',
+        },
+        {
+          label: 'Current orientation',
+          detail: 'Snapshot reads up with strategy status at watchful.',
+        },
+      ],
+      dismissible: false,
+    });
   });
 
   it('hides the card when no meaningful reorientation summary is needed', async () => {
@@ -202,6 +336,10 @@ describe('fetchSnapshotSurfaceVM', () => {
         nowProvider: () => Date.parse('2026-04-01T00:00:00.000Z'),
       }),
     ).resolves.toMatchObject({
+      briefing: {
+        status: 'HIDDEN',
+        reason: 'NO_REORIENTATION',
+      },
       reorientation: {
         status: 'HIDDEN',
         reason: 'NOT_NEEDED',
@@ -309,6 +447,10 @@ describe('fetchSnapshotSurfaceVM', () => {
         },
       }),
     ).resolves.toMatchObject({
+      briefing: {
+        status: 'HIDDEN',
+        reason: 'NO_MEANINGFUL_BRIEFING',
+      },
       reorientation: {
         status: 'HIDDEN',
         reason: 'DISMISSED',
@@ -418,6 +560,10 @@ describe('fetchSnapshotSurfaceVM', () => {
       status: 'HIDDEN',
       reason: 'DISMISSED',
       dismissible: true,
+    });
+    expect(result.briefing).toEqual({
+      status: 'HIDDEN',
+      reason: 'NO_MEANINGFUL_BRIEFING',
     });
     expect(result.reorientation.summary).toMatchObject({
       status: 'AVAILABLE',
@@ -530,6 +676,10 @@ describe('fetchSnapshotSurfaceVM', () => {
       reason: 'AVAILABLE',
       dismissible: true,
     });
+    expect(result.briefing).toMatchObject({
+      status: 'VISIBLE',
+      kind: 'REORIENTATION',
+    });
     expect(JSON.stringify(result.reorientation.summary)).not.toMatch(
       /signalsTriggered|budget_blocked_symbols|signalTitle|unread|badge|reminder|urgent/,
     );
@@ -636,6 +786,10 @@ describe('fetchSnapshotSurfaceVM', () => {
       status: 'VISIBLE',
       reason: 'AVAILABLE',
       dismissible: true,
+    });
+    expect(result.briefing).toMatchObject({
+      status: 'VISIBLE',
+      kind: 'REORIENTATION',
     });
   });
 });

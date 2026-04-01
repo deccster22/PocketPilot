@@ -78,9 +78,14 @@ The data flow is:
 
 `EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> Snapshot consumers`
 
-In P6-R1, reorientation extends the same spine:
+In P6-R1 through P6-R5, reorientation and Snapshot briefing continue to extend the same spine:
 
-`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> app`
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> SnapshotBriefingState -> app`
+
+P6-R5 keeps Since Last Checked and reorientation on that same prepared history spine and adds one explicit rule:
+- Snapshot receives one subordinate briefing zone only
+- `services/` decides whether that zone shows reorientation, Since Last Checked, or nothing
+- `app/` does not rebuild history summaries or choose between candidates
 
 ## Last-Viewed Ownership
 P3-4 adds a dedicated last-viewed boundary so UI components do not become the long-term owners of history lookup rules.

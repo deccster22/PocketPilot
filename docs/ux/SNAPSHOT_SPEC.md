@@ -3,17 +3,18 @@
 ## Purpose
 Snapshot is PocketPilot's calm, zero-scroll orientation surface. It consumes a prepared `SnapshotModel` from `services/snapshot` and does not interpret raw strategy output in `app/`.
 
-P6-R2 adds the reorientation briefing as a subordinate Snapshot-only foreground element.
+P6-R5 unifies Snapshot's subordinate orientation layer into one canonical briefing zone.
 It remains optional, quiet, and secondary to the Snapshot core.
 
 ## Canonical Consumption Path
 - `services/snapshot/snapshotService.ts` produces orchestration output and a prepared `model`.
 - `services/snapshot/createSnapshotModel.ts` builds the canonical Snapshot model from deterministic scan output.
 - `services/snapshot/createProfileAwareSnapshotModel.ts` applies profile-aware shaping at the service seam.
-- `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes Snapshot placement state, including reorientation visibility.
+- `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes one prepared Snapshot surface VM, including the canonical briefing state.
 - `app/` reads the prepared Snapshot surface VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
 - P6-R3 keeps dismissal persistence behind that same prepared service path rather than moving visibility rules into `app/`.
 - P6-R4 re-reads that same prepared service path on app foreground return rather than adding a second Snapshot fetch route.
+- P6-R5 keeps reorientation and Since Last Checked on that same path and lets `services/` decide precedence once.
 
 ## Core vs Secondary Discipline
 - Core fields are always present:
@@ -24,18 +25,23 @@ It remains optional, quiet, and secondary to the Snapshot core.
   - bundle name
   - portfolio value
   - history cue
-  - optional reorientation briefing card
+  - optional Snapshot briefing zone
 - Secondary fields must never replace or visually outweigh the core orientation blocks.
 
-## Reorientation Placement Rules
-- Snapshot is the one canonical home for the welcome-back briefing in this phase.
-- The card is inline and subordinate.
-- The card appears only when the prepared surface VM marks it `VISIBLE`.
-- Dismissal hides the card through explicit service-owned visibility state.
-- Dismissal may persist across app restarts, but only for the current prepared reorientation cycle.
+## Briefing Zone Rules
+- Snapshot has one canonical subordinate briefing zone only.
+- The zone is inline and subordinate.
+- `services/orientation/createSnapshotBriefingState.ts` decides whether Snapshot receives:
+  - `REORIENTATION`
+  - `SINCE_LAST_CHECKED`
+  - `HIDDEN`
+- Reorientation owns the zone whenever it is available.
+- Since Last Checked may use the zone only when reorientation is not available.
+- A dismissed reorientation cycle does not fall through to a separate Since Last Checked card.
+- Existing reorientation dismissal behavior remains unchanged.
+- Since Last Checked remains non-dismissible in this phase.
 - App foreground return re-checks the same prepared Snapshot VM and stays quiet while the app remains active.
-- A later eligible summary generated from a newer `lastActiveAt` boundary may reappear.
-- Snapshot does not become an inbox, alert center, or notification system.
+- Snapshot does not become an inbox, alert center, feed, or notification system.
 
 ## Profile-Aware Shaping Rules
 - Beginner:

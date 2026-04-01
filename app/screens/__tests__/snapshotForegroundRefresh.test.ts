@@ -86,6 +86,19 @@ const availableSurface = {
       maxItems: 3,
     },
   },
+  briefing: {
+    status: 'VISIBLE',
+    kind: 'REORIENTATION',
+    title: 'Welcome back',
+    subtitle: 'Welcome back. Here is a quick briefing to help you get your bearings.',
+    items: [
+      {
+        label: 'Data context',
+        detail: 'Some recent market context was captured with data quality limits in view.',
+      },
+    ],
+    dismissible: true,
+  },
 } as SnapshotSurfaceVM;
 
 describe('snapshotForegroundRefresh', () => {
@@ -157,6 +170,10 @@ describe('snapshotForegroundRefresh', () => {
         status: 'HIDDEN',
         reason: 'DISMISSED',
       },
+      briefing: {
+        status: 'HIDDEN',
+        reason: 'NO_MEANINGFUL_BRIEFING',
+      },
     } as SnapshotSurfaceVM);
 
     const result = await refreshSnapshotScreenSurface({
@@ -179,13 +196,14 @@ describe('snapshotForegroundRefresh', () => {
       strategyStatusValue: 'Watchful',
       bundleName: undefined,
       portfolioValueText: undefined,
-      reorientation: {
+      briefing: {
         visible: false,
       },
     });
     expect(JSON.stringify(result.surface.reorientation.summary)).not.toMatch(
       /signalsTriggered|budget_blocked_symbols|signalTitle/,
     );
+    expect(JSON.stringify(result.surface.briefing)).not.toMatch(/unread|badge|notification|urgent/);
   });
 
   it('marks stale persisted dismissal for clearing when a newer eligible cycle appears on foreground refresh', async () => {

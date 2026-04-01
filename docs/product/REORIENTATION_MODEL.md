@@ -1,4 +1,4 @@
-# Reorientation Model (P6-R4)
+# Reorientation Model (P6-R5)
 
 ## Purpose
 Reorientation is PocketPilot's calm "welcome back" briefing for users returning after a meaningful inactivity gap.
@@ -16,7 +16,7 @@ This phase does not create a notification framework, inbox, journal, or push sys
 ## Canonical Placement
 P6-R2 gives reorientation one foreground home only: Snapshot.
 
-The briefing appears as a subordinate inline card inside the Snapshot surface.
+The briefing appears through Snapshot's one subordinate inline briefing zone.
 It is not duplicated across Dashboard, Trade Hub, tabs, feeds, badges, or modals in this phase.
 
 Snapshot remains primary.
@@ -76,10 +76,16 @@ Reorientation is built on top of existing interpreted service seams:
 - `OrientationContext`
 - `SnapshotModel`
 
-P6-R2 adds a shared Snapshot-facing surface VM above those seams so app code reads one prepared foreground contract instead of deciding placement locally.
+P6-R5 keeps one shared Snapshot-facing surface VM above those seams so app code reads one prepared foreground contract instead of deciding placement locally.
 
 The app must render prepared contracts only.
 It must not build reorientation copy from raw events or strategy output.
+
+Snapshot now has one canonical subordinate briefing zone:
+- if reorientation is available, it owns the zone
+- if reorientation is not available, Since Last Checked may use the zone
+- if neither is meaningful, the zone stays hidden
+- Snapshot never shows reorientation and Since Last Checked as competing adjacent cards in this phase
 
 ## Visibility And Dismissal
 Visibility remains explicit and lightweight.
@@ -88,6 +94,11 @@ The prepared surface contract decides whether Snapshot receives:
 - `VISIBLE`
 - `HIDDEN` with `NOT_NEEDED`
 - `HIDDEN` with `DISMISSED`
+
+Above that seam, the Snapshot briefing contract decides whether Snapshot renders:
+- `REORIENTATION`
+- `SINCE_LAST_CHECKED`
+- `HIDDEN`
 
 Dismissal hides the card for the current prepared surface state without deleting the underlying summary contract.
 P6-R3 persists that dismissal across app restarts through a minimal `dismissedAt` state.
@@ -99,6 +110,9 @@ The reset rule stays explicit and finite:
 
 This remains surface behavior only.
 It does not introduce an inbox, unread counter, badge system, reminder loop, or notification state machine.
+
+Since Last Checked does not inherit reorientation dismissal in this phase.
+It remains non-dismissible unless a later phase explicitly introduces service-owned rules for that.
 
 ## Foreground-Only Constraint
 P6-R2 keeps reorientation strictly foreground-only.

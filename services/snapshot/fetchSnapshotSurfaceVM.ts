@@ -1,6 +1,7 @@
 import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
+import { createSnapshotBriefingState } from '@/services/orientation/createSnapshotBriefingState';
 import { createReorientationSummaryFromSnapshot } from '@/services/orientation/createReorientationSummaryFromSnapshot';
 import { createReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
@@ -18,6 +19,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 export type SnapshotSurfaceVM = {
   snapshot: SnapshotVM;
   reorientation: ReturnType<typeof createReorientationSurfaceState>;
+  briefing: ReturnType<typeof createSnapshotBriefingState>;
 };
 
 export async function fetchSnapshotSurfaceVM(params: {
@@ -58,12 +60,17 @@ export async function fetchSnapshotSurfaceVM(params: {
       dismissState: params.reorientationDismissState,
       currentSessionDismissState: params.currentSessionDismissState,
     });
+  const reorientation = createReorientationSurfaceState({
+    summary,
+    visibility: reorientationVisibility,
+  });
 
   return {
     snapshot,
-    reorientation: createReorientationSurfaceState({
-      summary,
-      visibility: reorientationVisibility,
+    reorientation,
+    briefing: createSnapshotBriefingState({
+      reorientation,
+      snapshot,
     }),
   };
 }
