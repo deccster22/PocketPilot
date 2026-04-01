@@ -75,10 +75,11 @@ QuoteBroker owns:
 - trust metadata emission
 - instrumentation
 
-PX-API2 hardens this into code contracts:
+PX-API2 and PX-API3 harden this into code contracts:
 - quote-like requests carry an explicit role-tagged runtime context
 - quote-like results carry explicit trust metadata
 - failure policy state is surfaced in result metadata instead of being hidden behavior
+- in-flight coalescing is contract-aware and confined to the provider/service layer
 
 ### Bulk-First Over Per-Symbol Spray
 For reference data, bulk-first is the default rule.
@@ -138,7 +139,7 @@ Examples include:
 
 Last-good and stale labeling are product trust features, not internal trivia.
 
-PX-API2 code-level trust metadata now includes:
+PX-API2 / PX-API3 code-level trust metadata now includes:
 - `role`
 - `providerId`
 - `freshness`
@@ -146,6 +147,10 @@ PX-API2 code-level trust metadata now includes:
 - `lastUpdatedAt`
 - `lastGoodAt`
 - `usedLastGood`
+- `coalescedRequest`
+- per-symbol policy state
+- provider health summary
+- cooldown-skipped providers
 
 Those fields are now part of the runtime contract, not just doctrine.
 
@@ -169,10 +174,16 @@ That is not the same as declaring an always-on runtime.
 ## Observability Expectations
 Runtime observability must exist at the Provider Router and QuoteBroker seams.
 
-At minimum, future implementation should track:
+At minimum, runtime implementation should track:
 - counters
 - provider health
 - request/source logging at the appropriate seam
+
+Current PX-API3 implementation now exposes a thin, explicit subset of that at the quote seam:
+- cumulative broker counters
+- cooldown-skipped providers
+- coalesced-request signaling
+- per-symbol runtime policy state
 
 Observability belongs where routing and failure policy decisions happen, not inside `app/` presentation code.
 
@@ -223,5 +234,6 @@ Future runtime work should consume:
 - `docs/architecture/QUOTE_BROKER.md`
 - this governance document
 - `docs/phases/PX-API2.md`
+- `docs/phases/PX-API3.md`
 
 Those docs are intended to constrain implementation, not merely describe preferences.

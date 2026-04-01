@@ -4,9 +4,11 @@ import type {
   FreshnessState,
   ProviderBudgetClass,
   ProviderRequestContext,
+  QuoteProviderHealthSummary,
   QuoteRequest,
   QuoteResponse,
   QuoteRuntimePolicyState,
+  QuoteSymbolPolicyState,
 } from '@/services/providers/types';
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
@@ -35,6 +37,16 @@ type BudgetWindow = {
 type LastGoodEntry = {
   quote: Quote;
   timestampMs: number;
+};
+
+type InFlightRequest = {
+  consumerCount: number;
+  promise: Promise<QuoteResponse>;
+};
+
+type ReusedQuoteSelection = {
+  quotes: Record<string, Quote>;
+  lastGoodSymbols: string[];
 };
 
 function toOrderedSymbols(symbols: string[]): string[] {
@@ -116,6 +128,54 @@ function getFreshnessThresholdMs(context: ProviderRequestContext): number {
   }
 }
 
+function serializeQuoteForKey(quote: Quote | undefined): [
+  number | null,
+  number | null,
+  boolean | null,
+  number | null,
+  number | null,
+  string | null,
+] | null {
+  if (!quote) {
+    return null;
+  }
+
+  return [
+    quote.price ?? null,
+    getQuoteTimestampMs(quote),
+    quote.estimated ?? null,
+    quote.bid ?? null,
+    quote.ask ?? null,
+    quote.source ?? null,
+  ];
+}
+
+function createRequestKey(request: QuoteRequest): string {
+  return JSON.stringify({
+    accountId: request.accountId,
+    nowMs: request.nowMs,
+    role: request.context.role,
+    budgetClass: resolveBudgetClass(request.context),
+    quoteCurrency: request.context.quoteCurrency ?? null,
+    symbols: request.symbols,
+    cachedQuotes: request.symbols.map((symbol) => [symbol, serializeQuoteForKey(request.cachedQuotes?.[symbol])]),
+  });
+}
+
+function getFetchedSymbolPolicyState(
+  context: ProviderRequestContext,
+  nowMs: number,
+  quote: Quote,
+): QuoteSymbolPolicyState {
+  const timestampMs = getQuoteTimestampMs(quote);
+
+  if (timestampMs === null) {
+    return 'STALE';
+  }
+
+  return nowMs - timestampMs > getFreshnessThresholdMs(context) ? 'STALE' : 'FRESH';
+}
+
 export class QuoteBroker {
   readonly providerId: string;
 
@@ -130,6 +190,8 @@ export class QuoteBroker {
   private instrumentationState: QuoteBrokerInstrumentation;
 
   private readonly lastGoodByKey: Map<string, LastGoodEntry>;
+
+  private readonly inFlightByKey: Map<string, InFlightRequest>;
 
   private cooldownUntilMs: number | null;
 
@@ -151,6 +213,7 @@ export class QuoteBroker {
       symbolsBlocked: 0,
     };
     this.lastGoodByKey = new Map<string, LastGoodEntry>();
+    this.inFlightByKey = new Map<string, InFlightRequest>();
     this.cooldownUntilMs = null;
   }
 
@@ -168,23 +231,54 @@ export class QuoteBroker {
       symbols: requestedSymbols,
       context,
     };
-    const budgetClass = resolveBudgetClass(context);
-    const budgetWindow = this.getBudgetWindow(budgetClass, nowMs);
+    const requestKey = createRequestKey(normalizedRequest);
+
     this.instrumentationState.requests += 1;
     this.instrumentationState.symbolsRequested += requestedSymbols.length;
 
+    const inFlightRequest = this.inFlightByKey.get(requestKey);
+    if (inFlightRequest) {
+      inFlightRequest.consumerCount += 1;
+      return inFlightRequest.promise;
+    }
+
+    const pendingRequest: InFlightRequest = {
+      consumerCount: 1,
+      promise: Promise.resolve(undefined as never),
+    };
+
+    pendingRequest.promise = this.executeRequest(normalizedRequest, pendingRequest).finally(() => {
+      this.inFlightByKey.delete(requestKey);
+    });
+    this.inFlightByKey.set(requestKey, pendingRequest);
+
+    return pendingRequest.promise;
+  }
+
+  private async executeRequest(
+    request: QuoteRequest,
+    inFlightRequest: InFlightRequest,
+  ): Promise<QuoteResponse> {
+    const requestedSymbols = request.symbols;
+    const context = request.context;
+    const nowMs = request.nowMs;
+    const budgetClass = resolveBudgetClass(context);
+    const budgetWindow = this.getBudgetWindow(budgetClass, nowMs);
+
     if (this.isCooldownActive(nowMs)) {
-      const lastGoodQuotes = this.selectLastGoodQuotes(normalizedRequest);
+      const reusedQuotes = this.selectLastGoodQuotes(request);
       this.instrumentationState.symbolsBlocked += requestedSymbols.length;
       return this.buildResponse({
-        request: normalizedRequest,
-        quotes: lastGoodQuotes,
+        request,
+        quotes: reusedQuotes.quotes,
         providersTried: [],
-        fallbackUsed: false,
-        usedLastGood: Object.keys(lastGoodQuotes).length > 0,
         staleIfError:
-          Object.keys(lastGoodQuotes).length > 0 ? 'USED_LAST_GOOD' : 'FAILED_WITHOUT_LAST_GOOD',
+          reusedQuotes.lastGoodSymbols.length > 0
+            ? 'USED_LAST_GOOD'
+            : 'FAILED_WITHOUT_LAST_GOOD',
         cooldown: 'ACTIVE_SKIP',
+        coalescedRequest: inFlightRequest.consumerCount > 1,
+        policyStateBySymbol: this.buildPolicyStateBySymbol(request, {}, reusedQuotes),
       });
     }
 
@@ -197,65 +291,66 @@ export class QuoteBroker {
     this.instrumentationState.symbolsBlocked += requestedSymbols.length - allowedSymbols.length;
 
     if (allowedSymbols.length === 0) {
-      const lastGoodQuotes = this.selectLastGoodQuotes(normalizedRequest);
+      const reusedQuotes = this.selectLastGoodQuotes(request);
       return this.buildResponse({
-        request: normalizedRequest,
-        quotes: lastGoodQuotes,
+        request,
+        quotes: reusedQuotes.quotes,
         providersTried: [],
-        fallbackUsed: false,
-        usedLastGood: Object.keys(lastGoodQuotes).length > 0,
         staleIfError: 'NOT_NEEDED',
         cooldown: 'INACTIVE',
+        coalescedRequest: inFlightRequest.consumerCount > 1,
+        policyStateBySymbol: this.buildPolicyStateBySymbol(request, {}, reusedQuotes),
       });
     }
 
     const providerRequest: QuoteRequest = {
-      ...normalizedRequest,
+      ...request,
       symbols: allowedSymbols,
-      context: normalizeContext(context, normalizedRequest.accountId, allowedSymbols),
+      context: normalizeContext(context, request.accountId, allowedSymbols),
     };
 
     try {
       const fetchedQuotes = await this.fetcher(providerRequest);
       const fetchedRecord = toQuoteRecord(fetchedQuotes);
-      const lastGoodQuotes = this.selectLastGoodQuotes({
-        ...normalizedRequest,
+      const reusedQuotes = this.selectLastGoodQuotes({
+        ...request,
         symbols: requestedSymbols.filter((symbol) => !fetchedRecord[symbol]),
       });
       const quotes = {
         ...fetchedRecord,
-        ...lastGoodQuotes,
+        ...reusedQuotes.quotes,
       };
 
       this.cooldownUntilMs = null;
-      this.storeLastGoodQuotes(context, fetchedRecord);
+      this.storeLastGoodQuotes(context, request.accountId, fetchedRecord);
 
       return this.buildResponse({
-        request: normalizedRequest,
+        request,
         quotes,
         providersTried: [this.providerId],
-        fallbackUsed: false,
-        usedLastGood: Object.keys(lastGoodQuotes).length > 0,
-        staleIfError: Object.keys(lastGoodQuotes).length > 0 ? 'USED_LAST_GOOD' : 'NOT_NEEDED',
+        staleIfError:
+          reusedQuotes.lastGoodSymbols.length > 0 ? 'USED_LAST_GOOD' : 'NOT_NEEDED',
         cooldown: 'INACTIVE',
+        coalescedRequest: inFlightRequest.consumerCount > 1,
+        policyStateBySymbol: this.buildPolicyStateBySymbol(request, fetchedRecord, reusedQuotes),
       });
     } catch {
       if (this.cooldownMs > 0) {
         this.cooldownUntilMs = nowMs + this.cooldownMs;
       }
 
-      const lastGoodQuotes = this.selectLastGoodQuotes(normalizedRequest);
+      const reusedQuotes = this.selectLastGoodQuotes(request);
       return this.buildResponse({
-        request: normalizedRequest,
-        quotes: lastGoodQuotes,
+        request,
+        quotes: reusedQuotes.quotes,
         providersTried: [this.providerId],
-        fallbackUsed: false,
-        usedLastGood: Object.keys(lastGoodQuotes).length > 0,
         staleIfError:
-          Object.keys(lastGoodQuotes).length > 0
+          reusedQuotes.lastGoodSymbols.length > 0
             ? 'USED_LAST_GOOD'
             : 'FAILED_WITHOUT_LAST_GOOD',
         cooldown: 'INACTIVE',
+        coalescedRequest: inFlightRequest.consumerCount > 1,
+        policyStateBySymbol: this.buildPolicyStateBySymbol(request, {}, reusedQuotes),
       });
     }
   }
@@ -276,8 +371,9 @@ export class QuoteBroker {
     return this.cooldownUntilMs !== null && nowMs < this.cooldownUntilMs;
   }
 
-  private selectLastGoodQuotes(request: QuoteRequest): Record<string, Quote> {
+  private selectLastGoodQuotes(request: QuoteRequest): ReusedQuoteSelection {
     const quotes: Record<string, Quote> = {};
+    const lastGoodSymbols: string[] = [];
 
     for (const symbol of request.symbols) {
       const lastGoodEntry = this.getLastGoodEntry(request.context, request.accountId, symbol);
@@ -285,15 +381,44 @@ export class QuoteBroker {
 
       if (lastGoodEntry) {
         quotes[symbol] = lastGoodEntry.quote;
+        lastGoodSymbols.push(symbol);
         continue;
       }
 
       if (cachedQuote) {
         quotes[symbol] = cachedQuote;
+        lastGoodSymbols.push(symbol);
       }
     }
 
-    return quotes;
+    return {
+      quotes,
+      lastGoodSymbols,
+    };
+  }
+
+  private buildPolicyStateBySymbol(
+    request: QuoteRequest,
+    fetchedQuotes: Record<string, Quote>,
+    reusedQuotes: ReusedQuoteSelection,
+  ): Record<string, QuoteSymbolPolicyState> {
+    const reusedSymbolSet = new Set(reusedQuotes.lastGoodSymbols);
+
+    return request.symbols.reduce<Record<string, QuoteSymbolPolicyState>>((acc, symbol) => {
+      if (reusedSymbolSet.has(symbol)) {
+        acc[symbol] = 'LAST_GOOD';
+        return acc;
+      }
+
+      const fetchedQuote = fetchedQuotes[symbol];
+      if (fetchedQuote) {
+        acc[symbol] = getFetchedSymbolPolicyState(request.context, request.nowMs, fetchedQuote);
+        return acc;
+      }
+
+      acc[symbol] = 'UNAVAILABLE';
+      return acc;
+    }, {});
   }
 
   private getLastGoodEntry(
@@ -314,6 +439,7 @@ export class QuoteBroker {
 
   private storeLastGoodQuotes(
     context: ProviderRequestContext,
+    accountId: string,
     quotes: Record<string, Quote>,
   ): void {
     for (const quote of Object.values(quotes)) {
@@ -326,7 +452,7 @@ export class QuoteBroker {
         continue;
       }
 
-      this.lastGoodByKey.set(this.createLastGoodKey(context, context.accountId ?? '', quote.symbol), {
+      this.lastGoodByKey.set(this.createLastGoodKey(context, accountId, quote.symbol), {
         quote,
         timestampMs,
       });
@@ -337,10 +463,10 @@ export class QuoteBroker {
     request: QuoteRequest;
     quotes: Record<string, Quote>;
     providersTried: string[];
-    fallbackUsed: boolean;
-    usedLastGood: boolean;
     staleIfError: QuoteRuntimePolicyState['staleIfError'];
     cooldown: QuoteRuntimePolicyState['cooldown'];
+    coalescedRequest: boolean;
+    policyStateBySymbol: Record<string, QuoteSymbolPolicyState>;
   }): QuoteResponse {
     const requestedSymbols = params.request.symbols;
     const returnedSymbols = requestedSymbols.filter((symbol) => Boolean(params.quotes[symbol]));
@@ -355,59 +481,81 @@ export class QuoteBroker {
       .filter((timestampMs): timestampMs is number => timestampMs !== null);
     const conservativeLastUpdatedMs =
       quoteTimestamps.length > 0 ? Math.min(...quoteTimestamps) : null;
-    const conservativeLastGoodMs = returnedSymbols
-      .map((symbol) => this.getLastGoodEntry(params.request.context, params.request.accountId, symbol)?.timestampMs)
-      .filter((timestampMs): timestampMs is number => typeof timestampMs === 'number');
+    const lastGoodTimestamps = requestedSymbols
+      .filter((symbol) => params.policyStateBySymbol[symbol] === 'LAST_GOOD')
+      .map((symbol) => params.quotes[symbol])
+      .map((quote) => (quote ? getQuoteTimestampMs(quote) : null))
+      .filter((timestampMs): timestampMs is number => timestampMs !== null);
+    const usedLastGood = requestedSymbols.some(
+      (symbol) => params.policyStateBySymbol[symbol] === 'LAST_GOOD',
+    );
 
     return {
       quotes: params.quotes,
       meta: {
         role: params.request.context.role,
         providerId: returnedSymbols.length > 0 || params.providersTried.length > 0 ? this.providerId : null,
-        freshness: this.getFreshness(
-          params.request.context,
-          params.request.nowMs,
-          conservativeLastUpdatedMs,
-          params.usedLastGood,
-          returnedSymbols.length,
-        ),
+        freshness: this.getFreshness(params.policyStateBySymbol, returnedSymbols.length),
         certainty: this.getCertainty(params.quotes, returnedSymbols),
         lastUpdatedAt: toIsoString(conservativeLastUpdatedMs),
-        lastGoodAt:
-          conservativeLastGoodMs.length > 0 ? toIsoString(Math.min(...conservativeLastGoodMs)) : null,
-        usedLastGood: params.usedLastGood,
+        lastGoodAt: lastGoodTimestamps.length > 0 ? toIsoString(Math.min(...lastGoodTimestamps)) : null,
+        usedLastGood,
         requestedSymbols,
         returnedSymbols,
         missingSymbols,
         timestampMs: params.request.nowMs,
         providersTried: params.providersTried,
         sourceBySymbol,
-        fallbackUsed: params.fallbackUsed,
+        fallbackUsed: false,
+        coalescedRequest: params.coalescedRequest,
+        policyStateBySymbol: params.policyStateBySymbol,
+        providerHealthSummary: this.getProviderHealthSummary(params.cooldown),
         policy: {
           staleIfError: params.staleIfError,
           staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
           cooldown: params.cooldown,
+          cooldownSkippedProviders: params.cooldown === 'ACTIVE_SKIP' ? [this.providerId] : [],
         },
       },
     };
   }
 
+  private getProviderHealthSummary(
+    cooldown: QuoteRuntimePolicyState['cooldown'],
+  ): Record<string, QuoteProviderHealthSummary> {
+    const instrumentation = this.instrumentation;
+
+    return {
+      [this.providerId]: {
+        providerId: this.providerId,
+        requests: instrumentation.requests,
+        symbolsRequested: instrumentation.symbolsRequested,
+        symbolsFetched: instrumentation.symbolsFetched,
+        symbolsBlocked: instrumentation.symbolsBlocked,
+        cooldown,
+      },
+    };
+  }
+
   private getFreshness(
-    context: ProviderRequestContext,
-    nowMs: number,
-    lastUpdatedMs: number | null,
-    usedLastGood: boolean,
+    policyStateBySymbol: Record<string, QuoteSymbolPolicyState>,
     returnedSymbolCount: number,
   ): FreshnessState {
-    if (returnedSymbolCount === 0 || lastUpdatedMs === null) {
+    if (returnedSymbolCount === 0) {
       return 'UNAVAILABLE';
     }
 
-    if (usedLastGood) {
+    const states = Object.values(policyStateBySymbol);
+
+    if (states.includes('LAST_GOOD')) {
       return 'LAST_GOOD';
     }
 
-    return nowMs - lastUpdatedMs > getFreshnessThresholdMs(context) ? 'STALE' : 'FRESH';
+    if (states.includes('STALE')) {
+      return 'STALE';
+    }
+
+    return 'FRESH';
   }
 
   private getCertainty(

@@ -34,10 +34,28 @@ describe('fetchQuotes', () => {
           },
           {},
         ),
+        coalescedRequest: false,
+        policyStateBySymbol: Object.keys(quotes).reduce<
+          ProviderRouterResult['meta']['policyStateBySymbol']
+        >((acc, symbol) => {
+          acc[symbol] = 'FRESH';
+          return acc;
+        }, {}),
+        providerHealthSummary: {
+          'broker:primary': {
+            providerId: 'broker:primary',
+            requests: 1,
+            symbolsRequested: Object.keys(quotes).length,
+            symbolsFetched: Object.keys(quotes).length,
+            symbolsBlocked: 0,
+            cooldown: 'INACTIVE',
+          },
+        },
         policy: {
           staleIfError: 'NOT_NEEDED',
           staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
           cooldown: 'INACTIVE',
+          cooldownSkippedProviders: [],
         },
         ...overrides,
       },
@@ -100,8 +118,95 @@ describe('fetchQuotes', () => {
         providerId: 'broker:primary',
         freshness: 'FRESH',
         certainty: 'ESTIMATED',
+        coalescedRequest: false,
+        policyStateBySymbol: {
+          AAPL: 'FRESH',
+          MSFT: 'FRESH',
+        },
       }),
     );
+  });
+
+  it('preserves richer runtime policy metadata without app-side inference', async () => {
+    const accounts: Account[] = [{ id: 'acct-2', portfolioValue: 9_500 }];
+    const getQuotesForSymbols = jest.fn(async (): Promise<ProviderRouterResult> =>
+      createRouterResult(
+        {
+          NVDA: {
+            symbol: 'NVDA',
+            price: 100,
+            source: 'acct-2',
+            timestamp: nowMs,
+            estimated: false,
+          },
+        },
+        {
+          freshness: 'LAST_GOOD',
+          lastGoodAt: nowIso,
+          usedLastGood: true,
+          coalescedRequest: true,
+          policyStateBySymbol: {
+            NVDA: 'LAST_GOOD',
+          },
+          providerHealthSummary: {
+            'broker:primary': {
+              providerId: 'broker:primary',
+              requests: 2,
+              symbolsRequested: 2,
+              symbolsFetched: 1,
+              symbolsBlocked: 1,
+              cooldown: 'ACTIVE_SKIP',
+            },
+          },
+          policy: {
+            staleIfError: 'USED_LAST_GOOD',
+            staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+            cooldown: 'ACTIVE_SKIP',
+            cooldownSkippedProviders: ['broker:primary'],
+          },
+        },
+      ),
+    );
+
+    const result = await fetchQuotes(
+      { getQuotesForSymbols, nowProvider: () => nowMs },
+      {
+        accounts,
+        symbols: ['NVDA'],
+        context: {
+          role: 'execution',
+          budgetClass: 'CALM',
+        },
+      },
+    );
+
+    expect(result.routerMeta).toEqual(
+      expect.objectContaining({
+        freshness: 'LAST_GOOD',
+        lastGoodAt: nowIso,
+        usedLastGood: true,
+        coalescedRequest: true,
+        policyStateBySymbol: {
+          NVDA: 'LAST_GOOD',
+        },
+      }),
+    );
+    expect(result.routerMeta.providerHealthSummary).toEqual({
+      'broker:primary': {
+        providerId: 'broker:primary',
+        requests: 2,
+        symbolsRequested: 2,
+        symbolsFetched: 1,
+        symbolsBlocked: 1,
+        cooldown: 'ACTIVE_SKIP',
+      },
+    });
+    expect(result.routerMeta.policy).toEqual({
+      staleIfError: 'USED_LAST_GOOD',
+      staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+      cooldown: 'ACTIVE_SKIP',
+      cooldownSkippedProviders: ['broker:primary'],
+    });
   });
 
   it('uses the highest-value account when no primary is marked', async () => {

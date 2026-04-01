@@ -45,6 +45,22 @@ export type QuoteRuntimePolicyState = {
   staleIfError: 'NOT_NEEDED' | 'USED_LAST_GOOD' | 'FAILED_WITHOUT_LAST_GOOD';
   staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY';
   cooldown: 'INACTIVE' | 'ACTIVE_SKIP';
+  cooldownSkippedProviders: string[];
+};
+
+export type QuoteSymbolPolicyState =
+  | 'FRESH'
+  | 'STALE'
+  | 'LAST_GOOD'
+  | 'UNAVAILABLE';
+
+export type QuoteProviderHealthSummary = {
+  providerId: string;
+  requests: number;
+  symbolsRequested: number;
+  symbolsFetched: number;
+  symbolsBlocked: number;
+  cooldown: QuoteRuntimePolicyState['cooldown'];
 };
 
 export type QuoteRequest = {
@@ -63,6 +79,9 @@ export type QuoteResponseMetadata = QuoteRuntimeMetadata & {
   providersTried: string[];
   sourceBySymbol: Record<string, string | undefined>;
   fallbackUsed: boolean;
+  coalescedRequest: boolean;
+  policyStateBySymbol: Record<string, QuoteSymbolPolicyState>;
+  providerHealthSummary: Record<string, QuoteProviderHealthSummary>;
   policy: QuoteRuntimePolicyState;
 };
 

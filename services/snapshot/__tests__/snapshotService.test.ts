@@ -66,10 +66,26 @@ describe('snapshotService market event integration', () => {
           AAPL: 'stub',
           MSFT: 'stub',
         },
+        coalescedRequest: false,
+        policyStateBySymbol: {
+          AAPL: 'FRESH',
+          MSFT: 'FRESH',
+        },
+        providerHealthSummary: {
+          'broker:live': {
+            providerId: 'broker:live',
+            requests: 1,
+            symbolsRequested: 2,
+            symbolsFetched: 2,
+            symbolsBlocked: 0,
+            cooldown: 'INACTIVE',
+          },
+        },
         policy: {
           staleIfError: 'NOT_NEEDED',
           staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
           cooldown: 'INACTIVE',
+          cooldownSkippedProviders: [],
         },
       },
     });

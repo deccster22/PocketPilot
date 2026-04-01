@@ -47,10 +47,26 @@ describe('debugObservatoryService', () => {
         BTC: 'primary-feed',
         ETH: 'fallback-feed',
       },
+      coalescedRequest: false,
+      policyStateBySymbol: {
+        BTC: 'FRESH',
+        ETH: 'FRESH',
+      },
+      providerHealthSummary: {
+        'router:primary': {
+          providerId: 'router:primary',
+          requests: 1,
+          symbolsRequested: 2,
+          symbolsFetched: 2,
+          symbolsBlocked: 0,
+          cooldown: 'INACTIVE',
+        },
+      },
       policy: {
         staleIfError: 'NOT_NEEDED',
         staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
         cooldown: 'INACTIVE',
+        cooldownSkippedProviders: [],
       },
       ...overrides,
     };
@@ -82,8 +98,24 @@ describe('debugObservatoryService', () => {
         returnedSymbols: ['BTC', 'ETH'],
         missingSymbols: [],
         providersTried: ['router:primary', 'router:fallback'],
+        coalescedRequest: false,
+        policyStateBySymbol: {
+          BTC: 'FRESH',
+          ETH: 'FRESH',
+        },
       }),
     );
+    expect(result.quoteResult.meta.providerHealthSummary).toEqual({
+      'router:primary': {
+        providerId: 'router:primary',
+        requests: 1,
+        symbolsRequested: 2,
+        symbolsFetched: 2,
+        symbolsBlocked: 0,
+        cooldown: 'INACTIVE',
+      },
+    });
+    expect(result.quoteResult.meta.policy.cooldownSkippedProviders).toEqual([]);
   });
 
   it('includes strategy signals, market events, and snapshot output when present', () => {
@@ -214,13 +246,21 @@ describe('debugObservatoryService', () => {
     expect(result.snapshot).toBeUndefined();
     expect(result.quoteResult.meta.providerId).toBe('router:primary');
     expect(result.quoteResult.meta.fallbackUsed).toBe(false);
+    expect(result.quoteResult.meta.coalescedRequest).toBe(false);
     expect(result.quoteResult.meta.requestedSymbols).toEqual(['BTC', 'ETH']);
     expect(result.quoteResult.meta.returnedSymbols).toEqual(['BTC', 'ETH']);
     expect(result.quoteResult.meta.missingSymbols).toEqual([]);
+    expect(result.quoteResult.meta.policyStateBySymbol).toEqual({
+      BTC: 'FRESH',
+      ETH: 'FRESH',
+    });
     expect(result.quoteResult.meta.sourceBySymbol).toEqual({
       BTC: 'primary-feed',
       ETH: 'fallback-feed',
     });
+    expect(result.quoteResult.meta.policy.staleWhileRevalidate).toBe(
+      'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+    );
   });
 
   it('preserves explicit missing symbol metadata', () => {

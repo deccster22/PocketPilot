@@ -73,10 +73,23 @@ describe('fetchDashboardSurfaceVM', () => {
           timestampMs: 1_700_000_000_000,
           providersTried: ['broker:live'],
           sourceBySymbol: { BTC: 'stub' },
+          coalescedRequest: false,
+          policyStateBySymbol: { BTC: 'FRESH' },
+          providerHealthSummary: {
+            'broker:live': {
+              providerId: 'broker:live',
+              requests: 1,
+              symbolsRequested: 1,
+              symbolsFetched: 1,
+              symbolsBlocked: 0,
+              cooldown: 'INACTIVE',
+            },
+          },
           policy: {
             staleIfError: 'NOT_NEEDED',
             staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
             cooldown: 'INACTIVE',
+            cooldownSkippedProviders: [],
           },
         },
       },

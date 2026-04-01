@@ -4,6 +4,7 @@ import type {
   QuoteRequest,
   QuoteResponse,
   QuoteResponseMetadata,
+  QuoteSymbolPolicyState,
   ProviderRequestRole,
 } from '@/services/providers/types';
 
@@ -47,6 +48,74 @@ function toIsoString(timestampMs: number | null): string | null {
   return timestampMs === null ? null : new Date(timestampMs).toISOString();
 }
 
+function getFreshnessFromPolicyState(
+  policyStateBySymbol: Record<string, QuoteSymbolPolicyState>,
+  returnedSymbolCount: number,
+): QuoteResponseMetadata['freshness'] {
+  if (returnedSymbolCount === 0) {
+    return 'UNAVAILABLE';
+  }
+
+  const states = Object.values(policyStateBySymbol);
+
+  if (states.includes('LAST_GOOD')) {
+    return 'LAST_GOOD';
+  }
+
+  if (states.includes('STALE')) {
+    return 'STALE';
+  }
+
+  return 'FRESH';
+}
+
+function combinePolicyStateBySymbol(params: {
+  request: QuoteRequest;
+  primaryMeta: QuoteResponseMetadata;
+  fallbackMeta?: QuoteResponseMetadata;
+  quotes: Record<string, Quote>;
+}): Record<string, QuoteSymbolPolicyState> {
+  return params.request.symbols.reduce<Record<string, QuoteSymbolPolicyState>>((acc, symbol) => {
+    acc[symbol] =
+      params.fallbackMeta?.policyStateBySymbol[symbol] ??
+      params.primaryMeta.policyStateBySymbol[symbol] ??
+      (params.quotes[symbol] ? 'FRESH' : 'UNAVAILABLE');
+    return acc;
+  }, {});
+}
+
+function combineProviderHealthSummary(
+  primaryMeta: QuoteResponseMetadata,
+  fallbackMeta?: QuoteResponseMetadata,
+): QuoteResponseMetadata['providerHealthSummary'] {
+  const summaries = [
+    ...Object.values(primaryMeta.providerHealthSummary),
+    ...Object.values(fallbackMeta?.providerHealthSummary ?? {}),
+  ];
+
+  return summaries.reduce<QuoteResponseMetadata['providerHealthSummary']>((acc, summary) => {
+    const existing = acc[summary.providerId];
+
+    if (!existing) {
+      acc[summary.providerId] = summary;
+      return acc;
+    }
+
+    acc[summary.providerId] = {
+      providerId: summary.providerId,
+      requests: Math.max(existing.requests, summary.requests),
+      symbolsRequested: Math.max(existing.symbolsRequested, summary.symbolsRequested),
+      symbolsFetched: Math.max(existing.symbolsFetched, summary.symbolsFetched),
+      symbolsBlocked: Math.max(existing.symbolsBlocked, summary.symbolsBlocked),
+      cooldown:
+        existing.cooldown === 'ACTIVE_SKIP' || summary.cooldown === 'ACTIVE_SKIP'
+          ? 'ACTIVE_SKIP'
+          : 'INACTIVE',
+    };
+    return acc;
+  }, {});
+}
+
 function combineMeta(
   params: {
     request: QuoteRequest;
@@ -59,6 +128,7 @@ function combineMeta(
   const requestedSymbols = params.request.symbols;
   const returnedSymbols = requestedSymbols.filter((symbol) => Boolean(params.quotes[symbol]));
   const missingSymbols = requestedSymbols.filter((symbol) => !params.quotes[symbol]);
+  const policyStateBySymbol = combinePolicyStateBySymbol(params);
   const sourceBySymbol = returnedSymbols.reduce<Record<string, string | undefined>>((acc, symbol) => {
     acc[symbol] = params.quotes[symbol]?.source;
     return acc;
@@ -73,20 +143,11 @@ function combineMeta(
     .filter((timestamp): timestamp is string => typeof timestamp === 'string')
     .map((timestamp) => Date.parse(timestamp))
     .filter((timestampMs) => Number.isFinite(timestampMs));
-  const freshnessCandidates = [params.primaryMeta.freshness, params.fallbackMeta?.freshness].filter(
-    (freshness): freshness is QuoteResponseMetadata['freshness'] => typeof freshness === 'string',
-  );
 
   return {
     role: params.request.context.role,
     providerId: params.fallbackUsed ? null : params.primaryMeta.providerId,
-    freshness: freshnessCandidates.includes('LAST_GOOD')
-      ? 'LAST_GOOD'
-      : freshnessCandidates.includes('STALE')
-        ? 'STALE'
-        : freshnessCandidates.includes('UNAVAILABLE') && returnedSymbols.length === 0
-          ? 'UNAVAILABLE'
-          : 'FRESH',
+    freshness: getFreshnessFromPolicyState(policyStateBySymbol, returnedSymbols.length),
     certainty:
       returnedSymbols.length === 0
         ? 'UNAVAILABLE'
@@ -108,6 +169,10 @@ function combineMeta(
     ),
     sourceBySymbol,
     fallbackUsed: params.fallbackUsed,
+    coalescedRequest:
+      params.primaryMeta.coalescedRequest || Boolean(params.fallbackMeta?.coalescedRequest),
+    policyStateBySymbol,
+    providerHealthSummary: combineProviderHealthSummary(params.primaryMeta, params.fallbackMeta),
     policy: {
       staleIfError:
         params.primaryMeta.policy.staleIfError === 'USED_LAST_GOOD' ||
@@ -123,6 +188,12 @@ function combineMeta(
         params.fallbackMeta?.policy.cooldown === 'ACTIVE_SKIP'
           ? 'ACTIVE_SKIP'
           : 'INACTIVE',
+      cooldownSkippedProviders: Array.from(
+        new Set([
+          ...params.primaryMeta.policy.cooldownSkippedProviders,
+          ...(params.fallbackMeta?.policy.cooldownSkippedProviders ?? []),
+        ]),
+      ),
     },
   };
 }
