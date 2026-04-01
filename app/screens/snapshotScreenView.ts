@@ -3,10 +3,7 @@ import {
   shouldClearPersistedReorientationDismissState,
   type ReorientationDismissState,
 } from '@/services/orientation/reorientationPersistence';
-import {
-  createReorientationSummaryViewData,
-  type ReorientationSummaryItemViewData,
-} from '@/app/screens/reorientationSummaryView';
+import type { SnapshotBriefingKind } from '@/services/orientation/types';
 import {
   fetchSnapshotSurfaceVM,
   type SnapshotSurfaceVM,
@@ -21,16 +18,22 @@ export type SnapshotRefreshState = {
 
 type SnapshotAppStateStatus = 'active' | 'background' | 'inactive' | 'unknown' | 'extension';
 
-export type SnapshotScreenReorientationViewData =
+export type SnapshotScreenBriefingItemViewData = {
+  label: string;
+  detail: string;
+};
+
+export type SnapshotScreenBriefingViewData =
   | {
       visible: false;
     }
   | {
       visible: true;
+      kind: SnapshotBriefingKind;
       dismissible: boolean;
-      headline: string;
-      inactiveDaysText: string;
-      summaryItems: ReorientationSummaryItemViewData[];
+      title: string;
+      subtitle?: string | null;
+      items: SnapshotScreenBriefingItemViewData[];
     };
 
 export type SnapshotScreenViewData = {
@@ -42,7 +45,7 @@ export type SnapshotScreenViewData = {
   strategyStatusValue: string;
   bundleName?: string;
   portfolioValueText?: string;
-  reorientation: SnapshotScreenReorientationViewData;
+  briefing: SnapshotScreenBriefingViewData;
 };
 
 export function shouldRefreshSnapshotOnAppForegroundTransition(
@@ -95,25 +98,22 @@ export function createSnapshotScreenViewData(
     return null;
   }
 
-  let reorientation: SnapshotScreenReorientationViewData = {
+  let briefing: SnapshotScreenBriefingViewData = {
     visible: false,
   };
 
-  if (
-    surface.reorientation.status === 'VISIBLE' &&
-    surface.reorientation.summary?.status === 'AVAILABLE'
-  ) {
-    const summaryView = createReorientationSummaryViewData(surface.reorientation.summary);
-
-    if (summaryView.visible) {
-      reorientation = {
-        visible: true,
-        dismissible: surface.reorientation.dismissible,
-        headline: summaryView.headline,
-        inactiveDaysText: summaryView.inactiveDaysText,
-        summaryItems: summaryView.summaryItems,
-      };
-    }
+  if (surface.briefing.status === 'VISIBLE') {
+    briefing = {
+      visible: true,
+      kind: surface.briefing.kind,
+      dismissible: surface.briefing.dismissible,
+      title: surface.briefing.title,
+      subtitle: surface.briefing.subtitle,
+      items: surface.briefing.items.map((item) => ({
+        label: item.label,
+        detail: item.detail,
+      })),
+    };
   }
 
   return {
@@ -128,6 +128,6 @@ export function createSnapshotScreenViewData(
       model.secondary?.portfolioValue === undefined
         ? undefined
         : model.secondary.portfolioValue.toFixed(2),
-    reorientation,
+    briefing,
   };
 }

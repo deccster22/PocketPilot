@@ -1,4 +1,4 @@
-# Reorientation Architecture Model (P6-R4)
+# Reorientation Architecture Model (P6-R5)
 
 ## Purpose
 `ReorientationSummary` is the service-owned seam for preparing an optional return briefing after a meaningful inactivity gap.
@@ -21,7 +21,7 @@ Responsibilities:
 ## Data Flow
 The canonical path is:
 
-`EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> ReorientationSurfaceState -> SnapshotSurfaceVM -> app`
+`EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> ReorientationSurfaceState -> SnapshotBriefingState -> SnapshotSurfaceVM -> app`
 
 This keeps the app on prepared, deterministic contracts and avoids event munging in UI code.
 
@@ -36,6 +36,7 @@ That means:
 
 Snapshot owns display.
 `services/` owns whether Snapshot should display anything at all.
+P6-R5 keeps that rule and adds one explicit service seam for briefing precedence so `app/` does not choose between reorientation and Since Last Checked.
 
 ## Contract Shape
 The seam returns one of two explicit outcomes:
@@ -72,6 +73,33 @@ type ReorientationSurfaceState = {
   dismissible: boolean
 }
 ```
+
+P6-R5 adds the canonical Snapshot briefing seam:
+
+```ts
+type SnapshotBriefingState =
+  | {
+      status: 'HIDDEN'
+      reason: 'NO_REORIENTATION' | 'NO_SINCE_LAST_CHECKED' | 'NO_MEANINGFUL_BRIEFING'
+    }
+  | {
+      status: 'VISIBLE'
+      kind: 'REORIENTATION' | 'SINCE_LAST_CHECKED'
+      title: string
+      subtitle?: string | null
+      items: ReadonlyArray<{
+        label: string
+        detail: string
+      }>
+      dismissible: boolean
+    }
+```
+
+Precedence is intentionally boring and explicit:
+- visible reorientation wins
+- dismissed or otherwise hidden reorientation does not fall through to a second card
+- Since Last Checked may render only when reorientation is not available
+- otherwise the briefing zone stays hidden
 
 `DISMISSED` may retain the underlying prepared summary contract while hiding the card.
 P6-R3 keeps that contract stable and adds only a minimal persistence seam:

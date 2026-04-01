@@ -12,7 +12,7 @@ import {
 
 import { DebugObservatoryPanel } from '@/app/components/debug/DebugObservatoryPanel';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
-import { ReorientationSummaryCard } from '@/app/components/ReorientationSummaryCard';
+import { SnapshotBriefingCard } from '@/app/components/SnapshotBriefingCard';
 import {
   refreshSnapshotScreenSurface,
   createSnapshotScreenViewData,
@@ -164,13 +164,13 @@ export function SnapshotScreen() {
           <Text style={styles.bundleLabel}>
             {screenView?.strategyStatusLabel ?? 'Strategy Status'}: {screenView?.strategyStatusValue ?? '--'}
           </Text>
-          {screenView?.reorientation.visible ? (
+          {screenView?.briefing.visible ? (
             <View style={styles.briefingSection}>
               <Text style={styles.briefingLabel}>Briefing</Text>
-              <ReorientationSummaryCard
-                summary={screenView.reorientation}
+              <SnapshotBriefingCard
+                briefing={screenView.briefing}
                 onDismiss={
-                  screenView.reorientation.dismissible
+                  screenView.briefing.dismissible
                     ? () => {
                         const nextDismissState = createReorientationDismissState(
                           snapshotSurface?.reorientation.summary,

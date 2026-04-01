@@ -277,6 +277,7 @@ Market Providers
 -> SnapshotModel
 -> ReorientationSummary
 -> ReorientationSurfaceState
+-> SnapshotBriefingState
 -> SnapshotSurfaceVM
 -> DashboardModel
 -> Trade Hub Surface
@@ -313,6 +314,7 @@ PocketPilot is easiest to read at two levels.
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
 - `P6-R4` Snapshot foreground-return truth refresh through the shared prepared VM path
+- `P6-R5` Snapshot orientation cohesion through one canonical subordinate briefing zone
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
