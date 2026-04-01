@@ -3,9 +3,11 @@ import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
 import { buildDebugObservatoryPayload } from '@/services/debug/debugObservatoryService';
 import { createEventLedgerService } from '@/services/events/eventLedgerService';
+import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 
 describe('debugObservatoryService', () => {
   const nowMs = 1_700_000_000_000;
+  const nowIso = new Date(nowMs).toISOString();
   const symbols = ['BTC', 'ETH'];
   const quotes: Record<string, Quote> = {
     BTC: {
@@ -24,24 +26,45 @@ describe('debugObservatoryService', () => {
     },
   };
 
+  function createQuoteMeta(
+    overrides: Partial<ProviderRouterResult['meta']> = {},
+  ): ProviderRouterResult['meta'] {
+    return {
+      role: 'execution',
+      providerId: 'router:primary',
+      freshness: 'FRESH',
+      certainty: 'ESTIMATED',
+      lastUpdatedAt: nowIso,
+      lastGoodAt: null,
+      usedLastGood: false,
+      fallbackUsed: false,
+      requestedSymbols: symbols,
+      returnedSymbols: symbols,
+      missingSymbols: [],
+      timestampMs: nowMs,
+      providersTried: ['router:primary'],
+      sourceBySymbol: {
+        BTC: 'primary-feed',
+        ETH: 'fallback-feed',
+      },
+      policy: {
+        staleIfError: 'NOT_NEEDED',
+        staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+        cooldown: 'INACTIVE',
+      },
+      ...overrides,
+    };
+  }
+
   it('returns structured payload and preserves router metadata', () => {
     const result = buildDebugObservatoryPayload({
       timestampMs: nowMs,
       symbols,
       quotes,
-      quoteMeta: {
-        provider: 'router:primary',
+      quoteMeta: createQuoteMeta({
         fallbackUsed: true,
-        requestedSymbols: symbols,
-        returnedSymbols: symbols,
-        missingSymbols: [],
-        timestampMs: nowMs,
         providersTried: ['router:primary', 'router:fallback'],
-        sourceBySymbol: {
-          BTC: 'primary-feed',
-          ETH: 'fallback-feed',
-        },
-      },
+      }),
       deltas: { BTC: 0.1, ETH: -0.05 },
     });
 
@@ -50,7 +73,10 @@ describe('debugObservatoryService', () => {
     expect(result.quoteResult.quotes.BTC?.price).toBe(100_000);
     expect(result.quoteResult.meta).toEqual(
       expect.objectContaining({
-        provider: 'router:primary',
+        providerId: 'router:primary',
+        role: 'execution',
+        freshness: 'FRESH',
+        certainty: 'ESTIMATED',
         fallbackUsed: true,
         requestedSymbols: ['BTC', 'ETH'],
         returnedSymbols: ['BTC', 'ETH'],
@@ -104,6 +130,7 @@ describe('debugObservatoryService', () => {
       timestampMs: nowMs,
       symbols,
       quotes,
+      quoteMeta: createQuoteMeta(),
       strategySignals,
       marketEvents,
       snapshot: {
@@ -156,6 +183,7 @@ describe('debugObservatoryService', () => {
       timestampMs: nowMs,
       symbols,
       quotes,
+      quoteMeta: createQuoteMeta(),
       marketEvents,
       eventLedger: ledger,
       accountId: 'acct-live',
@@ -176,6 +204,7 @@ describe('debugObservatoryService', () => {
       timestampMs: nowMs,
       symbols,
       quotes,
+      quoteMeta: createQuoteMeta(),
     });
 
     expect(result.deltas).toBeUndefined();
@@ -183,7 +212,7 @@ describe('debugObservatoryService', () => {
     expect(result.marketEvents).toBeUndefined();
     expect(result.eventLedger).toBeUndefined();
     expect(result.snapshot).toBeUndefined();
-    expect(result.quoteResult.meta.provider).toBe('unknown');
+    expect(result.quoteResult.meta.providerId).toBe('router:primary');
     expect(result.quoteResult.meta.fallbackUsed).toBe(false);
     expect(result.quoteResult.meta.requestedSymbols).toEqual(['BTC', 'ETH']);
     expect(result.quoteResult.meta.returnedSymbols).toEqual(['BTC', 'ETH']);
@@ -199,16 +228,11 @@ describe('debugObservatoryService', () => {
       timestampMs: nowMs,
       symbols,
       quotes: { BTC: quotes.BTC },
-      quoteMeta: {
-        provider: 'router:primary',
-        fallbackUsed: false,
-        requestedSymbols: symbols,
+      quoteMeta: createQuoteMeta({
         returnedSymbols: ['BTC'],
         missingSymbols: ['ETH'],
-        timestampMs: nowMs,
-        providersTried: ['router:primary'],
         sourceBySymbol: { BTC: 'primary-feed' },
-      },
+      }),
     });
 
     expect(result.quoteResult.meta.returnedSymbols).toEqual(['BTC']);

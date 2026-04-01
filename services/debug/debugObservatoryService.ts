@@ -4,16 +4,7 @@ import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
 import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 
-export type DebugObservatoryQuoteMeta = {
-  provider: string;
-  fallbackUsed: boolean;
-  requestedSymbols: string[];
-  returnedSymbols: string[];
-  missingSymbols: string[];
-  timestampMs: number;
-  providersTried?: string[];
-  sourceBySymbol?: Record<string, string | undefined>;
-};
+export type DebugObservatoryQuoteMeta = ProviderRouterResult['meta'];
 
 export type DebugObservatorySnapshot = {
   portfolioValue: number;
@@ -48,7 +39,7 @@ export type BuildDebugObservatoryPayloadParams = {
   timestampMs: number;
   symbols: string[];
   quotes: Record<string, Quote>;
-  quoteMeta?: ProviderRouterResult['meta'];
+  quoteMeta: ProviderRouterResult['meta'];
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
   marketEvents?: MarketEvent[];
@@ -85,34 +76,9 @@ function buildEventLedgerComparison(params: {
 }
 
 function buildQuoteMeta(
-  timestampMs: number,
-  symbols: string[],
-  quotes: Record<string, Quote>,
-  quoteMeta?: ProviderRouterResult['meta'],
+  quoteMeta: ProviderRouterResult['meta'],
 ): DebugObservatoryQuoteMeta {
-  const requestedSymbols = quoteMeta?.requestedSymbols ?? symbols;
-  const returnedSymbols =
-    quoteMeta?.returnedSymbols ?? requestedSymbols.filter((symbol) => Boolean(quotes[symbol]));
-  const missingSymbols =
-    quoteMeta?.missingSymbols ?? requestedSymbols.filter((symbol) => !quotes[symbol]);
-
-  const sourceBySymbol =
-    quoteMeta?.sourceBySymbol ??
-    returnedSymbols.reduce<Record<string, string | undefined>>((acc, symbol) => {
-      acc[symbol] = quotes[symbol]?.source;
-      return acc;
-    }, {});
-
-  return {
-    provider: quoteMeta?.provider ?? 'unknown',
-    fallbackUsed: quoteMeta?.fallbackUsed ?? false,
-    requestedSymbols,
-    returnedSymbols,
-    missingSymbols,
-    timestampMs: quoteMeta?.timestampMs ?? timestampMs,
-    providersTried: quoteMeta?.providersTried,
-    sourceBySymbol,
-  };
+  return quoteMeta;
 }
 
 export function buildDebugObservatoryPayload(
@@ -123,7 +89,7 @@ export function buildDebugObservatoryPayload(
     symbols: params.symbols,
     quoteResult: {
       quotes: params.quotes,
-      meta: buildQuoteMeta(params.timestampMs, params.symbols, params.quotes, params.quoteMeta),
+      meta: buildQuoteMeta(params.quoteMeta),
     },
     deltas: params.deltas,
     strategySignals: params.strategySignals,

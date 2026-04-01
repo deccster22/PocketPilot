@@ -298,6 +298,7 @@ For runtime/provider work, treat these as the authoritative PX-API1 doctrine set
 - `architecture/QUOTE_BROKER.md`
 - `governance/API_GOVERNANCE.md`
 - `phases/PX-API1.md`
+- `phases/PX-API2.md`
 
 ---
 
@@ -316,6 +317,7 @@ PocketPilot is easiest to read at two levels.
 - `P1` Strategy engine foundations
 - `P2` Snapshot / provider / governance / debug observatory foundation
 - `PX-API1` Provider Router / QuoteBroker / API governance doctrine lock before broader live-data runtime work
+- `PX-API2` Runtime contract hardening for role-tagged requests, quote trust metadata, and explicit last-good semantics
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan

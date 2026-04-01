@@ -75,6 +75,11 @@ QuoteBroker owns:
 - trust metadata emission
 - instrumentation
 
+PX-API2 hardens this into code contracts:
+- quote-like requests carry an explicit role-tagged runtime context
+- quote-like results carry explicit trust metadata
+- failure policy state is surfaced in result metadata instead of being hidden behavior
+
 ### Bulk-First Over Per-Symbol Spray
 For reference data, bulk-first is the default rule.
 
@@ -133,6 +138,21 @@ Examples include:
 
 Last-good and stale labeling are product trust features, not internal trivia.
 
+PX-API2 code-level trust metadata now includes:
+- `role`
+- `providerId`
+- `freshness`
+- `certainty`
+- `lastUpdatedAt`
+- `lastGoodAt`
+- `usedLastGood`
+
+Those fields are now part of the runtime contract, not just doctrine.
+
+Current honest limitation:
+- `staleWhileRevalidate` is surfaced as an explicit contract field
+- current implementation remains foreground-only and reports that the behavior is not yet implemented as a hidden runtime system
+
 ## Foreground-Only Current-Phase Posture
 PX-API1 preserves the current foreground-only phase rules.
 
@@ -167,6 +187,7 @@ Observability belongs where routing and failure policy decisions happen, not ins
 - tracked-set ingestion beats whole-universe pulling
 - bulk-first beats per-symbol spray
 - foreground-only posture remains in force
+- execution requests cannot silently degrade into reference truth because the router contract is role-safe by code, not only by convention
 
 ### Future-Phase Direction Only
 Future docs may define:
@@ -201,5 +222,6 @@ Future runtime work should consume:
 - `docs/architecture/PROVIDER_ROUTER_MODEL.md`
 - `docs/architecture/QUOTE_BROKER.md`
 - this governance document
+- `docs/phases/PX-API2.md`
 
 Those docs are intended to constrain implementation, not merely describe preferences.

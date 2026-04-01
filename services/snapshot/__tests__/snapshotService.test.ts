@@ -49,7 +49,13 @@ describe('snapshotService market event integration', () => {
         symbolsBlocked: 0,
       },
       quoteMeta: {
-        provider: 'broker:live',
+        role: 'execution',
+        providerId: 'broker:live',
+        freshness: 'FRESH',
+        certainty: 'ESTIMATED',
+        lastUpdatedAt: '2023-11-14T22:13:20.000Z',
+        lastGoodAt: null,
+        usedLastGood: false,
         fallbackUsed: false,
         requestedSymbols: ['AAPL', 'MSFT'],
         returnedSymbols: ['AAPL', 'MSFT'],
@@ -59,6 +65,11 @@ describe('snapshotService market event integration', () => {
         sourceBySymbol: {
           AAPL: 'stub',
           MSFT: 'stub',
+        },
+        policy: {
+          staleIfError: 'NOT_NEEDED',
+          staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+          cooldown: 'INACTIVE',
         },
       },
     });

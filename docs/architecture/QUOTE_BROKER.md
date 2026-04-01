@@ -1,4 +1,4 @@
-# QuoteBroker Model (PX-API1)
+# QuoteBroker Model (PX-API1 / PX-API2)
 
 ## Purpose
 QuoteBroker is the single choke point for quote retrieval and quote-related runtime policy in PocketPilot.
@@ -189,6 +189,43 @@ Examples:
 - last-good timestamp
 
 The UI must consume prepared state from services rather than infer trust from raw provider behavior.
+
+## PX-API2 Code Contract
+PX-API2 makes QuoteBroker's quote runtime contract explicit in code.
+
+QuoteBroker now consumes an explicit runtime request context with:
+- `role`
+- `accountId`
+- `symbols`
+- optional budget and quote-currency hints
+
+QuoteBroker now returns structured quote metadata that makes trust inspectable:
+- `role`
+- `providerId`
+- `freshness`
+- `certainty`
+- `lastUpdatedAt`
+- `lastGoodAt`
+- `usedLastGood`
+- requested/returned/missing symbol sets
+- providers tried
+- source-by-symbol provenance
+- explicit failure-policy state
+
+Current implemented semantics in PX-API2:
+- in-process last-good preservation
+- stale-if-error signaling
+- minimal cooldown-active skip behavior
+- budget enforcement through the explicit request context
+
+Current non-goals remain honest in code:
+- no datastore-backed cache/runtime
+- no background polling
+- no hidden refresh worker
+- no real stale-while-revalidate runtime yet
+
+The current stale-while-revalidate field exists to keep the contract explicit.
+In PX-API2 it reports `NOT_IMPLEMENTED_FOREGROUND_ONLY` rather than pretending background machinery already exists.
 
 ## Provider Health And Instrumentation
 QuoteBroker must maintain structured counters and logs for:
