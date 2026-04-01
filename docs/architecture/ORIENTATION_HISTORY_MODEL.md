@@ -78,15 +78,26 @@ The data flow is:
 
 `EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> Snapshot consumers`
 
+In P6-R1, reorientation extends the same spine:
+
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> app`
+
 ## Last-Viewed Ownership
 P3-4 adds a dedicated last-viewed boundary so UI components do not become the long-term owners of history lookup rules.
 
 The current implementation is in-memory only, which is acceptable for this phase.
 Later phases can replace that storage behind the same contract without moving history coordination back into the UI.
 
+## Later Extensions
+P3-4 intentionally stopped before reorientation copy generation.
+P6-R1 adds `ReorientationSummary` above `OrientationContext` and `SnapshotModel` as a calm, optional return briefing seam.
+
+That extension preserves the same rule:
+- services own the prepared history contract
+- app renders prepared contracts only
+
 ## Intentional Non-Goals
-P3-4 does not add:
-- reorientation flows
+P3-4 did not add:
 - journaling persistence
 - narrative copy generation
 - analytics or ranking heuristics
