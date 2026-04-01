@@ -3,9 +3,10 @@ import {
   deriveTrendDirection,
   formatCurrentState,
 } from '@/services/snapshot/createSnapshotModel';
+import type { ForegroundScanResult } from '@/services/types/scan';
 
 describe('createSnapshotModel', () => {
-  const scan = {
+  const scan: ForegroundScanResult = {
     accountId: 'acct-test',
     symbols: ['BTC', 'ETH', 'SOL', 'DOGE'],
     quotes: {
@@ -56,6 +57,32 @@ describe('createSnapshotModel', () => {
       symbolsRequested: 4,
       symbolsFetched: 4,
       symbolsBlocked: 0,
+    },
+    quoteMeta: {
+      role: 'execution',
+      providerId: 'broker:live',
+      freshness: 'FRESH',
+      certainty: 'ESTIMATED',
+      lastUpdatedAt: '1970-01-01T00:00:00.001Z',
+      lastGoodAt: null,
+      usedLastGood: false,
+      fallbackUsed: false,
+      requestedSymbols: ['BTC', 'ETH', 'SOL', 'DOGE'],
+      returnedSymbols: ['BTC', 'ETH', 'SOL', 'DOGE'],
+      missingSymbols: [],
+      timestampMs: 1,
+      providersTried: ['broker:live'],
+      sourceBySymbol: {
+        BTC: 'stub',
+        ETH: 'stub',
+        SOL: 'stub',
+        DOGE: 'stub',
+      },
+      policy: {
+        staleIfError: 'NOT_NEEDED',
+        staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+        cooldown: 'INACTIVE',
+      },
     },
   };
 

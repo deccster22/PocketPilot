@@ -1,10 +1,32 @@
 import { fetchSnapshotVM } from '@/services/snapshot/snapshotService';
 import { fetchSnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
+import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 
 jest.mock('@/services/snapshot/snapshotService');
 
 describe('fetchSnapshotSurfaceVM', () => {
   const mockFetchSnapshotVM = jest.mocked(fetchSnapshotVM);
+  const createQuoteMeta = (): ProviderRouterResult['meta'] => ({
+    role: 'execution',
+    providerId: 'broker:live',
+    freshness: 'UNAVAILABLE',
+    certainty: 'UNAVAILABLE',
+    lastUpdatedAt: null,
+    lastGoodAt: null,
+    usedLastGood: false,
+    fallbackUsed: false,
+    requestedSymbols: [],
+    returnedSymbols: [],
+    missingSymbols: [],
+    timestampMs: Date.parse('2026-04-01T00:00:00.000Z'),
+    providersTried: ['broker:live'],
+    sourceBySymbol: {},
+    policy: {
+      staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
+      staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+      cooldown: 'INACTIVE',
+    },
+  });
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -47,6 +69,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],
@@ -191,6 +214,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],
@@ -308,6 +332,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],
@@ -386,6 +411,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],
@@ -496,6 +522,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],
@@ -611,6 +638,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],
@@ -722,6 +750,7 @@ describe('fetchSnapshotSurfaceVM', () => {
           symbolsFetched: 0,
           symbolsBlocked: 0,
         },
+        quoteMeta: createQuoteMeta(),
       },
       signals: [],
       marketEvents: [],

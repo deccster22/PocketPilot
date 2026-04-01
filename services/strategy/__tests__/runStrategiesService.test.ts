@@ -31,6 +31,30 @@ describe('runStrategies', () => {
       symbolsFetched: 2,
       symbolsBlocked: 0,
     },
+    quoteMeta: {
+      role: 'execution',
+      providerId: 'broker:live',
+      freshness: 'FRESH',
+      certainty: 'ESTIMATED',
+      lastUpdatedAt: '2023-11-14T22:13:20.000Z',
+      lastGoodAt: null,
+      usedLastGood: false,
+      fallbackUsed: false,
+      requestedSymbols: ['AAPL', 'MSFT'],
+      returnedSymbols: ['AAPL', 'MSFT'],
+      missingSymbols: [],
+      timestampMs: 1_700_000_000_000,
+      providersTried: ['broker:live'],
+      sourceBySymbol: {
+        AAPL: 'stub-feed',
+        MSFT: 'stub-feed',
+      },
+      policy: {
+        staleIfError: 'NOT_NEEDED',
+        staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+        cooldown: 'INACTIVE',
+      },
+    },
   };
 
   it('returns empty signals for noop strategy with or without baseline', () => {

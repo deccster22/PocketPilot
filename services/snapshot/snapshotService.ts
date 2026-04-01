@@ -76,7 +76,7 @@ export async function fetchSnapshotVM(params: {
   });
   const debugObservatory = params.includeDebugObservatory
     ? buildDebugObservatoryPayload({
-        timestampMs: upstream.scan.quoteMeta?.timestampMs ?? nowProvider(),
+        timestampMs: upstream.scan.quoteMeta.timestampMs,
         symbols: upstream.scan.symbols,
         quotes: upstream.scan.quotes,
         quoteMeta: upstream.scan.quoteMeta,

@@ -59,7 +59,13 @@ describe('fetchDashboardSurfaceVM', () => {
           symbolsBlocked: 0,
         },
         quoteMeta: {
-          provider: 'broker:live',
+          role: 'execution',
+          providerId: 'broker:live',
+          freshness: 'FRESH',
+          certainty: 'CONFIRMED',
+          lastUpdatedAt: '2023-11-14T22:13:20.000Z',
+          lastGoodAt: null,
+          usedLastGood: false,
           fallbackUsed: false,
           requestedSymbols: ['BTC'],
           returnedSymbols: ['BTC'],
@@ -67,6 +73,11 @@ describe('fetchDashboardSurfaceVM', () => {
           timestampMs: 1_700_000_000_000,
           providersTried: ['broker:live'],
           sourceBySymbol: { BTC: 'stub' },
+          policy: {
+            staleIfError: 'NOT_NEEDED',
+            staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+            cooldown: 'INACTIVE',
+          },
         },
       },
       orientationContext: {

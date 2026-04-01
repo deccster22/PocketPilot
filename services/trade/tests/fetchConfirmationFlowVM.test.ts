@@ -55,7 +55,13 @@ describe('fetchConfirmationFlowVM', () => {
           symbolsBlocked: 0,
         },
         quoteMeta: {
-          provider: 'broker:live',
+          role: 'execution',
+          providerId: 'broker:live',
+          freshness: 'UNAVAILABLE',
+          certainty: 'UNAVAILABLE',
+          lastUpdatedAt: null,
+          lastGoodAt: null,
+          usedLastGood: false,
           fallbackUsed: false,
           requestedSymbols: ['BTC'],
           returnedSymbols: [],
@@ -63,6 +69,11 @@ describe('fetchConfirmationFlowVM', () => {
           timestampMs: 1_700_000_000_000,
           providersTried: ['broker:live'],
           sourceBySymbol: {},
+          policy: {
+            staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
+            staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+            cooldown: 'INACTIVE',
+          },
         },
       },
     });
@@ -142,7 +153,13 @@ describe('fetchConfirmationFlowVM', () => {
           symbolsBlocked: 0,
         },
         quoteMeta: {
-          provider: 'broker:live',
+          role: 'execution',
+          providerId: 'broker:live',
+          freshness: 'UNAVAILABLE',
+          certainty: 'UNAVAILABLE',
+          lastUpdatedAt: null,
+          lastGoodAt: null,
+          usedLastGood: false,
           fallbackUsed: false,
           requestedSymbols: [],
           returnedSymbols: [],
@@ -150,6 +167,11 @@ describe('fetchConfirmationFlowVM', () => {
           timestampMs: 1_700_000_000_000,
           providersTried: ['broker:live'],
           sourceBySymbol: {},
+          policy: {
+            staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
+            staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+            cooldown: 'INACTIVE',
+          },
         },
       },
     });

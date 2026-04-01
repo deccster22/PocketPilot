@@ -86,18 +86,20 @@ export async function fetchSurfaceContext(params: {
     params.eventLedgerQueries ?? createEventLedgerQueries(eventLedger);
   const lastViewedState = params.lastViewedState ?? defaultLastViewedState;
   const broker = new QuoteBroker({
-    mode: 'CALM',
+    providerId: 'broker:live',
     fetcher: fetchLiveQuotes,
     nowProvider,
   });
-  const primaryProvider = createQuoteBrokerProvider(broker, 'broker:live');
+  const primaryProvider = createQuoteBrokerProvider(broker, 'execution');
 
   const scan = await runForegroundScan(
     {
       getQuotesForSymbols: (routerParams) =>
         getQuotesForSymbols(
           {
-            primary: primaryProvider,
+            execution: {
+              primary: primaryProvider,
+            },
           },
           routerParams,
         ),

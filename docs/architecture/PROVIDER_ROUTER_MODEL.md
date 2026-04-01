@@ -1,4 +1,4 @@
-# Provider Router Model (PX-API1)
+# Provider Router Model (PX-API1 / PX-API2)
 
 ## Purpose
 Provider Router is the role-aware routing seam inside `services/` that chooses which provider chain is eligible for a given runtime task.
@@ -175,6 +175,34 @@ QuoteBroker owns:
 - budgets
 - provider health counters
 - quote trust labeling
+
+## PX-API2 Code Contract
+PX-API2 hardens this doctrine into code-level runtime contracts.
+
+Provider Router now expects quote-like requests to arrive with an explicit role-tagged runtime context.
+
+Current code contract highlights:
+- request role is first-class and mandatory
+- provider chains are configured by role, not by generic request soup
+- role-mismatched providers fail fast instead of being silently tolerated
+- router results preserve explicit runtime trust metadata:
+  - `role`
+  - `providerId`
+  - `freshness`
+  - `certainty`
+  - `lastUpdatedAt`
+  - `lastGoodAt`
+  - `usedLastGood`
+  - `providersTried`
+  - `sourceBySymbol`
+  - explicit failure-policy markers
+
+Meaning-preserving rule remains unchanged:
+- fallback may degrade freshness or certainty
+- fallback must not silently change execution meaning into reference meaning
+
+Execution-safe routing is now a code contract, not only a doc rule.
+If an execution request has no execution-eligible chain, the router must keep that miss explicit.
 
 ## Determinism And Boundary Rules
 - `core/` must not know provider routing exists.

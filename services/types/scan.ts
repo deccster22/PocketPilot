@@ -10,5 +10,5 @@ export type ForegroundScanResult = {
   pctChangeBySymbol?: Record<string, number>;
   estimatedFlags: Record<string, boolean>;
   instrumentation: QuoteBrokerInstrumentation;
-  quoteMeta?: ProviderRouterResult['meta'];
+  quoteMeta: ProviderRouterResult['meta'];
 };

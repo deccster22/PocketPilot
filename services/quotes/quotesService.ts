@@ -1,17 +1,16 @@
 import type { Quote } from '@/core/types/quote';
 import type { ProviderRouterResult } from '@/services/providers/providerRouter';
+import type {
+  ProviderRequestContext,
+  QuoteRequest,
+} from '@/services/providers/types';
 import {
   selectExecutionAccount,
   type Account,
 } from '@/services/account/accountSelector';
 
 export type QuotesServiceDeps = {
-  getQuotesForSymbols: (params: {
-    accountId: string;
-    symbols: string[];
-    nowMs: number;
-    cachedQuotes?: Record<string, Quote>;
-  }) => Promise<ProviderRouterResult>;
+  getQuotesForSymbols: (params: QuoteRequest) => Promise<ProviderRouterResult>;
   nowProvider?: () => number;
 };
 
@@ -23,16 +22,28 @@ export type FetchQuotesResult = {
 
 export async function fetchQuotes(
   deps: QuotesServiceDeps,
-  params: { accounts: Account[]; symbols: string[]; cachedQuotes?: Record<string, Quote> },
+  params: {
+    accounts: Account[];
+    symbols: string[];
+    cachedQuotes?: Record<string, Quote>;
+    context: Omit<ProviderRequestContext, 'accountId' | 'symbols'> & {
+      role: ProviderRequestContext['role'];
+    };
+  },
 ): Promise<FetchQuotesResult> {
   const accountId = selectExecutionAccount(params.accounts);
   const nowMs = deps.nowProvider ? deps.nowProvider() : Date.now();
   const routerResult = await deps.getQuotesForSymbols({
-    accountId,
-    symbols: params.symbols,
-    nowMs,
-    cachedQuotes: params.cachedQuotes,
-  });
+      accountId,
+      symbols: params.symbols,
+      nowMs,
+      cachedQuotes: params.cachedQuotes,
+      context: {
+        ...params.context,
+        accountId,
+        symbols: params.symbols,
+      },
+    });
 
   return {
     accountId,
