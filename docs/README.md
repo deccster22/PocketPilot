@@ -315,6 +315,7 @@ PocketPilot is easiest to read at two levels.
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
 - `P6-R4` Snapshot foreground-return truth refresh through the shared prepared VM path
 - `P6-R5` Snapshot orientation cohesion through one canonical subordinate briefing zone
+- `P6-R5A` Retire the legacy reorientation-only app presentation path so Snapshot keeps one canonical briefing surface
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer

@@ -20,6 +20,8 @@ describe('snapshot briefing placement', () => {
     expect(snapshotScreenSource).toMatch(/AppState/);
     expect(snapshotScreenSource).toMatch(/refreshSnapshotScreenSurface/);
     expect(snapshotScreenSource).toMatch(/defaultReorientationDismissStore/);
+    expect(snapshotScreenSource).not.toMatch(/ReorientationSummaryCard/);
+    expect(snapshotScreenSource).not.toMatch(/reorientationSummaryView/);
     expect(snapshotScreenSource).not.toMatch(/useFocusEffect|useIsFocused/);
     expect(snapshotScreenSource).not.toMatch(/reorientation\.status === 'VISIBLE'/);
     expect(snapshotScreenSource).not.toMatch(/sinceLastChecked/);

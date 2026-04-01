@@ -15,6 +15,7 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - P6-R3 keeps dismissal persistence behind that same prepared service path rather than moving visibility rules into `app/`.
 - P6-R4 re-reads that same prepared service path on app foreground return rather than adding a second Snapshot fetch route.
 - P6-R5 keeps reorientation and Since Last Checked on that same path and lets `services/` decide precedence once.
+- P6-R5A removes the retired reorientation-only app presentation helper path so `SnapshotBriefingCard` remains the only active briefing surface in `app/`.
 
 ## Core vs Secondary Discipline
 - Core fields are always present:
