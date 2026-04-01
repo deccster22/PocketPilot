@@ -291,6 +291,14 @@ Key rule: **services own truth, app renders prepared contracts**.
 
 The UI should not be inventing interpretation logic from raw data. If it feels like the UI is "figuring things out," something has probably drifted.
 
+Runtime data-plane rule: Provider Router is the role-aware routing seam, QuoteBroker is the quote-policy choke point, and current-phase runtime remains foreground-only.
+
+For runtime/provider work, treat these as the authoritative PX-API1 doctrine set:
+- `architecture/PROVIDER_ROUTER_MODEL.md`
+- `architecture/QUOTE_BROKER.md`
+- `governance/API_GOVERNANCE.md`
+- `phases/PX-API1.md`
+
 ---
 
 ## Phase Framing
@@ -307,6 +315,7 @@ PocketPilot is easiest to read at two levels.
 - `P0` Vision, doctrine, architecture, repo discipline foundation
 - `P1` Strategy engine foundations
 - `P2` Snapshot / provider / governance / debug observatory foundation
+- `PX-API1` Provider Router / QuoteBroker / API governance doctrine lock before broader live-data runtime work
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan

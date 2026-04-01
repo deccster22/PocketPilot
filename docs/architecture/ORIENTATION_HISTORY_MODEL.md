@@ -13,6 +13,9 @@ This seam exists so Snapshot and future re-entry surfaces consume one prepared o
 
 In P4-1, `OrientationContext` remains the input seam for `SnapshotModel`. Snapshot shaping now happens after orientation assembly rather than inside `app/`.
 
+Quote/runtime doctrine remains below this seam.
+Provider routing, quote freshness policy, and provider failure handling belong to QuoteBroker and Provider Router, not Snapshot-facing UI assembly.
+
 ## Why SnapshotService Should Not Own History Coordination
 `snapshotService` is responsible for snapshot-specific orchestration:
 - run the scan
