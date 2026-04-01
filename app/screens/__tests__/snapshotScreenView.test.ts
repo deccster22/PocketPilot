@@ -1,7 +1,22 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 import { createSnapshotScreenViewData } from '@/app/screens/snapshotScreenView';
 
 describe('createSnapshotScreenViewData', () => {
+  it('keeps the screen helper on the unified Snapshot briefing contract only', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'snapshotScreenView.ts'),
+      'utf8',
+    );
+
+    expect(source).toMatch(/surface\.briefing\.status === 'VISIBLE'/);
+    expect(source).not.toMatch(/createReorientationSummaryViewData/);
+    expect(source).not.toMatch(/inactiveDaysText/);
+    expect(source).not.toMatch(/summaryItems\.map/);
+  });
+
   it('uses the SnapshotModel path instead of legacy bridge fields', () => {
     const surface = {
       snapshot: {

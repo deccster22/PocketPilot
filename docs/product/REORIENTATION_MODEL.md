@@ -77,6 +77,7 @@ Reorientation is built on top of existing interpreted service seams:
 - `SnapshotModel`
 
 P6-R5 keeps one shared Snapshot-facing surface VM above those seams so app code reads one prepared foreground contract instead of deciding placement locally.
+P6-R5A removes the older reorientation-only app presentation helper path so Snapshot keeps one canonical app rendering surface for that prepared contract.
 
 The app must render prepared contracts only.
 It must not build reorientation copy from raw events or strategy output.
