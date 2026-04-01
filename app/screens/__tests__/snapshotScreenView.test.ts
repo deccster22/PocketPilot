@@ -1,49 +1,57 @@
+import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 import { createSnapshotScreenViewData } from '@/app/screens/snapshotScreenView';
-import type { SnapshotVM } from '@/services/snapshot/snapshotService';
 
 describe('createSnapshotScreenViewData', () => {
   it('uses the SnapshotModel path instead of legacy bridge fields', () => {
-    const snapshot = {
-      model: {
-        profile: 'ADVANCED',
-        core: {
-          currentState: {
-            label: 'Current State',
-            value: 'Up',
-            trendDirection: 'UP',
+    const surface = {
+      snapshot: {
+        model: {
+          profile: 'ADVANCED',
+          core: {
+            currentState: {
+              label: 'Current State',
+              value: 'Up',
+              trendDirection: 'UP',
+            },
+            change24h: {
+              label: 'Last 24h Change',
+              value: 0.12,
+            },
+            strategyStatus: {
+              label: 'Strategy Status',
+              value: 'Aligned',
+            },
           },
-          change24h: {
-            label: 'Last 24h Change',
-            value: 0.12,
-          },
-          strategyStatus: {
-            label: 'Strategy Status',
-            value: 'Aligned',
+          secondary: {
+            bundleName: 'Model Bundle',
+            portfolioValue: 321.12,
           },
         },
-        secondary: {
-          bundleName: 'Model Bundle',
-          portfolioValue: 321.12,
+        bundleName: 'Legacy Bundle',
+        portfolioValue: 999,
+        change24h: -0.5,
+        strategyAlignment: 'Needs review',
+        scan: {} as SnapshotSurfaceVM['snapshot']['scan'],
+        signals: [],
+        marketEvents: [],
+        eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
+        orientationContext: {
+          currentState: {} as SnapshotSurfaceVM['snapshot']['orientationContext']['currentState'],
+          historyContext: {
+            eventsSinceLastViewed: [],
+            sinceLastChecked: null,
+          },
         },
       },
-      bundleName: 'Legacy Bundle',
-      portfolioValue: 999,
-      change24h: -0.5,
-      strategyAlignment: 'Needs review',
-      scan: {} as SnapshotVM['scan'],
-      signals: [],
-      marketEvents: [],
-      eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
-      orientationContext: {
-        currentState: {},
-        historyContext: {
-          eventsSinceLastViewed: [],
-          sinceLastChecked: null,
-        },
+      reorientation: {
+        status: 'HIDDEN',
+        reason: 'NOT_NEEDED',
+        summary: null,
+        dismissible: false,
       },
-    } as SnapshotVM;
+    } as SnapshotSurfaceVM;
 
-    expect(createSnapshotScreenViewData(snapshot)).toEqual({
+    expect(createSnapshotScreenViewData(surface)).toEqual({
       currentStateLabel: 'Current State',
       currentStateValue: 'Up',
       change24hLabel: 'Last 24h Change',
@@ -52,6 +60,9 @@ describe('createSnapshotScreenViewData', () => {
       strategyStatusValue: 'Aligned',
       bundleName: 'Model Bundle',
       portfolioValueText: '321.12',
+      reorientation: {
+        visible: false,
+      },
     });
   });
 
@@ -60,43 +71,51 @@ describe('createSnapshotScreenViewData', () => {
   });
 
   it('keeps the canonical core visible for beginner snapshots even without secondary context', () => {
-    const snapshot = {
-      model: {
-        profile: 'BEGINNER',
-        core: {
-          currentState: {
-            label: 'Current State',
-            value: 'Flat',
-            trendDirection: 'FLAT',
+    const surface = {
+      snapshot: {
+        model: {
+          profile: 'BEGINNER',
+          core: {
+            currentState: {
+              label: 'Current State',
+              value: 'Flat',
+              trendDirection: 'FLAT',
+            },
+            change24h: {
+              label: 'Last 24h Change',
+              value: 0,
+            },
+            strategyStatus: {
+              label: 'Strategy Status',
+              value: 'Aligned',
+            },
           },
-          change24h: {
-            label: 'Last 24h Change',
-            value: 0,
-          },
-          strategyStatus: {
-            label: 'Strategy Status',
-            value: 'Aligned',
+        },
+        bundleName: '',
+        portfolioValue: 0,
+        change24h: 0,
+        strategyAlignment: 'Aligned',
+        scan: {} as SnapshotSurfaceVM['snapshot']['scan'],
+        signals: [],
+        marketEvents: [],
+        eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
+        orientationContext: {
+          currentState: {} as SnapshotSurfaceVM['snapshot']['orientationContext']['currentState'],
+          historyContext: {
+            eventsSinceLastViewed: [],
+            sinceLastChecked: null,
           },
         },
       },
-      bundleName: '',
-      portfolioValue: 0,
-      change24h: 0,
-      strategyAlignment: 'Aligned',
-      scan: {} as SnapshotVM['scan'],
-      signals: [],
-      marketEvents: [],
-      eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
-      orientationContext: {
-        currentState: {},
-        historyContext: {
-          eventsSinceLastViewed: [],
-          sinceLastChecked: null,
-        },
+      reorientation: {
+        status: 'HIDDEN',
+        reason: 'NOT_NEEDED',
+        summary: null,
+        dismissible: false,
       },
-    } as SnapshotVM;
+    } as SnapshotSurfaceVM;
 
-    expect(createSnapshotScreenViewData(snapshot)).toEqual({
+    expect(createSnapshotScreenViewData(surface)).toEqual({
       currentStateLabel: 'Current State',
       currentStateValue: 'Flat',
       change24hLabel: 'Last 24h Change',
@@ -105,6 +124,87 @@ describe('createSnapshotScreenViewData', () => {
       strategyStatusValue: 'Aligned',
       bundleName: undefined,
       portfolioValueText: undefined,
+      reorientation: {
+        visible: false,
+      },
+    });
+  });
+
+  it('passes through the prepared reorientation card only when the surface VM marks it visible', () => {
+    const surface = {
+      snapshot: {
+        model: {
+          profile: 'BEGINNER',
+          core: {
+            currentState: {
+              label: 'Current State',
+              value: 'Up',
+              trendDirection: 'UP',
+            },
+            change24h: {
+              label: 'Last 24h Change',
+              value: 0.03,
+            },
+            strategyStatus: {
+              label: 'Strategy Status',
+              value: 'Watchful',
+            },
+          },
+        },
+        bundleName: '',
+        portfolioValue: 0,
+        change24h: 0.03,
+        strategyAlignment: 'Watchful',
+        scan: {} as SnapshotSurfaceVM['snapshot']['scan'],
+        signals: [],
+        marketEvents: [],
+        eventStream: { accountId: 'acct-1', timestamp: 1, events: [] },
+        orientationContext: {
+          currentState: {} as SnapshotSurfaceVM['snapshot']['orientationContext']['currentState'],
+          historyContext: {
+            eventsSinceLastViewed: [],
+            sinceLastChecked: null,
+          },
+        },
+      },
+      reorientation: {
+        status: 'VISIBLE',
+        reason: 'AVAILABLE',
+        dismissible: true,
+        summary: {
+          status: 'AVAILABLE',
+          profileId: 'BEGINNER',
+          inactiveDays: 32,
+          headline: 'A few meaningful shifts were prepared while you were away.',
+          summaryItems: [
+            {
+              kind: 'ACCOUNT_CONTEXT',
+              label: 'Data context',
+              detail: 'Some recent market context was captured with data quality limits in view.',
+            },
+          ],
+          generatedFrom: {
+            lastActiveAt: '2026-02-28T00:00:00.000Z',
+            now: '2026-04-01T00:00:00.000Z',
+          },
+          maxItems: 3,
+        },
+      },
+    } as SnapshotSurfaceVM;
+
+    expect(createSnapshotScreenViewData(surface)).toMatchObject({
+      reorientation: {
+        visible: true,
+        dismissible: true,
+        headline: 'A few meaningful shifts were prepared while you were away.',
+        inactiveDaysText: '32 days since your last active session',
+        summaryItems: [
+          {
+            label: 'Data context',
+            detail: 'Some recent market context was captured with data quality limits in view.',
+          },
+        ],
+      },
     });
   });
 });

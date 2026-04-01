@@ -2,39 +2,55 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import { createReorientationSummaryFromSnapshot } from '@/services/orientation/createReorientationSummaryFromSnapshot';
+import { createReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import type {
-  ReorientationEligibility,
   ReorientationPreference,
+  ReorientationVisibilityInput,
 } from '@/services/orientation/types';
-import { fetchSnapshotVM } from '@/services/snapshot/snapshotService';
+import { fetchSnapshotVM, type SnapshotVM } from '@/services/snapshot/snapshotService';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
-export async function fetchReorientationSummaryVM(params: {
+export type SnapshotSurfaceVM = {
+  snapshot: SnapshotVM;
+  reorientation: ReturnType<typeof createReorientationSurfaceState>;
+};
+
+export async function fetchSnapshotSurfaceVM(params: {
   profile: UserProfile;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
+  includeDebugObservatory?: boolean;
   eventLedger?: EventLedgerService;
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
   preference?: ReorientationPreference;
-}): Promise<ReorientationEligibility> {
+  reorientationVisibility?: ReorientationVisibilityInput;
+}): Promise<SnapshotSurfaceVM> {
   const nowProvider = params.nowProvider ?? Date.now;
   const snapshot = await fetchSnapshotVM({
     profile: params.profile,
     baselineScan: params.baselineScan,
     nowProvider,
+    includeDebugObservatory: params.includeDebugObservatory,
     eventLedger: params.eventLedger,
     eventLedgerQueries: params.eventLedgerQueries,
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-
-  return createReorientationSummaryFromSnapshot({
+  const summary = createReorientationSummaryFromSnapshot({
     snapshot,
     profile: params.profile,
     now: new Date(nowProvider()).toISOString(),
     preference: params.preference,
   });
+
+  return {
+    snapshot,
+    reorientation: createReorientationSurfaceState({
+      summary,
+      visibility: params.reorientationVisibility,
+    }),
+  };
 }

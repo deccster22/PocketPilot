@@ -3,11 +3,15 @@
 ## Purpose
 Snapshot is PocketPilot's calm, zero-scroll orientation surface. It consumes a prepared `SnapshotModel` from `services/snapshot` and does not interpret raw strategy output in `app/`.
 
+P6-R2 adds the reorientation briefing as a subordinate Snapshot-only foreground element.
+It remains optional, quiet, and secondary to the Snapshot core.
+
 ## Canonical Consumption Path
 - `services/snapshot/snapshotService.ts` produces orchestration output and a prepared `model`.
 - `services/snapshot/createSnapshotModel.ts` builds the canonical Snapshot model from deterministic scan output.
 - `services/snapshot/createProfileAwareSnapshotModel.ts` applies profile-aware shaping at the service seam.
-- `app/` reads `snapshot.model` through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
+- `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes Snapshot placement state, including reorientation visibility.
+- `app/` reads the prepared Snapshot surface VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
 
 ## Core vs Secondary Discipline
 - Core fields are always present:
@@ -18,7 +22,15 @@ Snapshot is PocketPilot's calm, zero-scroll orientation surface. It consumes a p
   - bundle name
   - portfolio value
   - history cue
+  - optional reorientation briefing card
 - Secondary fields must never replace or visually outweigh the core orientation blocks.
+
+## Reorientation Placement Rules
+- Snapshot is the one canonical home for the welcome-back briefing in this phase.
+- The card is inline and subordinate.
+- The card appears only when the prepared surface VM marks it `VISIBLE`.
+- Dismissal hides the card through explicit service-owned visibility state.
+- Snapshot does not become an inbox, alert center, or notification system.
 
 ## Profile-Aware Shaping Rules
 - Beginner:

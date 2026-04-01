@@ -3,45 +3,65 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 
 import { DebugObservatoryPanel } from '@/app/components/debug/DebugObservatoryPanel';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
+import { ReorientationSummaryCard } from '@/app/components/ReorientationSummaryCard';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { Config } from '@/core/config/Config';
 import { createSnapshotScreenViewData } from '@/app/screens/snapshotScreenView';
-import { fetchSnapshotVM, type SnapshotVM } from '@/services/snapshot/snapshotService';
+import {
+  fetchSnapshotSurfaceVM,
+  type SnapshotSurfaceVM,
+} from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 export function SnapshotScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
-  const [snapshot, setSnapshot] = useState<SnapshotVM | null>(null);
-  const [baselineScan, setBaselineScan] = useState<SnapshotVM['scan']>();
+  const [snapshotSurface, setSnapshotSurface] = useState<SnapshotSurfaceVM | null>(null);
+  const [baselineScan, setBaselineScan] = useState<SnapshotSurfaceVM['snapshot']['scan']>();
   const [showDebugPanel, setShowDebugPanel] = useState(false);
+  const [currentSessionDismissed, setCurrentSessionDismissed] = useState(false);
 
   const isDebugPanelEnabled = __DEV__ && Config.ENABLE_DEBUG_PANEL;
+
+  function handleProfileChange(nextProfile: UserProfile) {
+    setProfile(nextProfile);
+    setCurrentSessionDismissed(false);
+  }
 
   useEffect(() => {
     let isMounted = true;
 
-    fetchSnapshotVM({ profile, baselineScan, includeDebugObservatory: isDebugPanelEnabled })
-      .then((nextSnapshot) => {
+    fetchSnapshotSurfaceVM({
+      profile,
+      baselineScan,
+      includeDebugObservatory: isDebugPanelEnabled,
+      reorientationVisibility: {
+        currentSessionDismissed,
+      },
+    })
+      .then((nextSurface) => {
         if (!isMounted) {
           return;
         }
 
-        setSnapshot(nextSnapshot);
-        setBaselineScan((currentBaseline) => currentBaseline ?? nextSnapshot.scan);
+        setSnapshotSurface(nextSurface);
+        setBaselineScan((currentBaseline) => currentBaseline ?? nextSurface.snapshot.scan);
       })
       .catch(() => {
         if (!isMounted) {
           return;
         }
 
-        setSnapshot(null);
+        setSnapshotSurface(null);
       });
 
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan, isDebugPanelEnabled]);
+  }, [profile, baselineScan, currentSessionDismissed, isDebugPanelEnabled]);
 
-  const screenView = useMemo(() => createSnapshotScreenViewData(snapshot), [snapshot]);
+  const screenView = useMemo(
+    () => createSnapshotScreenViewData(snapshotSurface),
+    [snapshotSurface],
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -51,7 +71,7 @@ export function SnapshotScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Snapshot</Text>
           <Text style={styles.label}>Profile</Text>
-          <ProfileSelector value={profile} onChange={setProfile} />
+          <ProfileSelector value={profile} onChange={handleProfileChange} />
           <Text style={styles.bundleLabel}>
             {screenView?.currentStateLabel ?? 'Current State'}: {screenView?.currentStateValue ?? '--'}
           </Text>
@@ -61,6 +81,21 @@ export function SnapshotScreen() {
           <Text style={styles.bundleLabel}>
             {screenView?.strategyStatusLabel ?? 'Strategy Status'}: {screenView?.strategyStatusValue ?? '--'}
           </Text>
+          {screenView?.reorientation.visible ? (
+            <View style={styles.briefingSection}>
+              <Text style={styles.briefingLabel}>Briefing</Text>
+              <ReorientationSummaryCard
+                summary={screenView.reorientation}
+                onDismiss={
+                  screenView.reorientation.dismissible
+                    ? () => {
+                        setCurrentSessionDismissed(true);
+                      }
+                    : undefined
+                }
+              />
+            </View>
+          ) : null}
         </View>
 
         {screenView?.bundleName || screenView?.portfolioValueText ? (
@@ -87,8 +122,8 @@ export function SnapshotScreen() {
                 {showDebugPanel ? 'Hide Debug Observatory' : 'Show Debug Observatory'}
               </Text>
             </Pressable>
-            {showDebugPanel && snapshot?.debugObservatory ? (
-              <DebugObservatoryPanel payload={snapshot.debugObservatory} />
+            {showDebugPanel && snapshotSurface?.snapshot.debugObservatory ? (
+              <DebugObservatoryPanel payload={snapshotSurface.snapshot.debugObservatory} />
             ) : null}
           </View>
         ) : null}
@@ -120,6 +155,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#4b5563',
     fontWeight: '500',
+  },
+  briefingSection: {
+    gap: 8,
+    marginTop: 4,
+  },
+  briefingLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
   },
   bundleLabel: {
     fontSize: 14,
