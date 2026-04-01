@@ -20,6 +20,11 @@ export type ReorientationPreference = {
   thresholdDaysOverride?: number | null;
 };
 
+export type ReorientationVisibilityInput = {
+  dismissedAt?: string | null;
+  currentSessionDismissed?: boolean;
+};
+
 export type ReorientationEligibility =
   | {
       status: 'NOT_NEEDED';

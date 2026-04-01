@@ -1,4 +1,20 @@
-import type { SnapshotVM } from '@/services/snapshot/snapshotService';
+import {
+  createReorientationSummaryViewData,
+  type ReorientationSummaryItemViewData,
+} from '@/app/screens/reorientationSummaryView';
+import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
+
+export type SnapshotScreenReorientationViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      dismissible: boolean;
+      headline: string;
+      inactiveDaysText: string;
+      summaryItems: ReorientationSummaryItemViewData[];
+    };
 
 export type SnapshotScreenViewData = {
   currentStateLabel: string;
@@ -9,15 +25,37 @@ export type SnapshotScreenViewData = {
   strategyStatusValue: string;
   bundleName?: string;
   portfolioValueText?: string;
+  reorientation: SnapshotScreenReorientationViewData;
 };
 
 export function createSnapshotScreenViewData(
-  snapshot: SnapshotVM | null,
+  surface: SnapshotSurfaceVM | null,
 ): SnapshotScreenViewData | null {
-  const model = snapshot?.model;
+  const model = surface?.snapshot.model;
 
   if (!model) {
     return null;
+  }
+
+  let reorientation: SnapshotScreenReorientationViewData = {
+    visible: false,
+  };
+
+  if (
+    surface.reorientation.status === 'VISIBLE' &&
+    surface.reorientation.summary?.status === 'AVAILABLE'
+  ) {
+    const summaryView = createReorientationSummaryViewData(surface.reorientation.summary);
+
+    if (summaryView.visible) {
+      reorientation = {
+        visible: true,
+        dismissible: surface.reorientation.dismissible,
+        headline: summaryView.headline,
+        inactiveDaysText: summaryView.inactiveDaysText,
+        summaryItems: summaryView.summaryItems,
+      };
+    }
   }
 
   return {
@@ -32,5 +70,6 @@ export function createSnapshotScreenViewData(
       model.secondary?.portfolioValue === undefined
         ? undefined
         : model.secondary.portfolioValue.toFixed(2),
+    reorientation,
   };
 }

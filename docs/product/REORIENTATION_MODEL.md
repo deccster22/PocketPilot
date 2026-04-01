@@ -1,4 +1,4 @@
-# Reorientation Model (P6-R1)
+# Reorientation Model (P6-R2)
 
 ## Purpose
 Reorientation is PocketPilot's calm "welcome back" briefing for users returning after a meaningful inactivity gap.
@@ -12,6 +12,15 @@ It is:
 - foreground-only
 
 This phase does not create a notification framework, inbox, journal, or push system.
+
+## Canonical Placement
+P6-R2 gives reorientation one foreground home only: Snapshot.
+
+The briefing appears as a subordinate inline card inside the Snapshot surface.
+It is not duplicated across Dashboard, Trade Hub, tabs, feeds, badges, or modals in this phase.
+
+Snapshot remains primary.
+The reorientation card is a quiet supporting note, not the center of gravity.
 
 ## Product Posture
 Reorientation is a briefing card, not a retention widget.
@@ -67,11 +76,31 @@ Reorientation is built on top of existing interpreted service seams:
 - `OrientationContext`
 - `SnapshotModel`
 
+P6-R2 adds a shared Snapshot-facing surface VM above those seams so app code reads one prepared foreground contract instead of deciding placement locally.
+
 The app must render prepared contracts only.
 It must not build reorientation copy from raw events or strategy output.
 
+## Visibility And Dismissal
+Visibility remains explicit and lightweight.
+
+The prepared surface contract decides whether Snapshot receives:
+- `VISIBLE`
+- `HIDDEN` with `NOT_NEEDED`
+- `HIDDEN` with `DISMISSED`
+
+Dismissal hides the card for the current prepared surface state without deleting the underlying summary contract.
+P6-R3 persists that dismissal across app restarts through a minimal `dismissedAt` state.
+
+The reset rule stays explicit and finite:
+- persisted dismissal continues to hide the current prepared reorientation cycle
+- once a later eligible summary is generated from a newer `lastActiveAt` boundary, the old dismissal no longer suppresses it
+
+This remains surface behavior only.
+It does not introduce an inbox, unread counter, badge system, reminder loop, or notification state machine.
+
 ## Foreground-Only Constraint
-P6-R1 keeps reorientation strictly foreground-only.
+P6-R2 keeps reorientation strictly foreground-only.
 
 This phase does not add:
 - background polling
