@@ -31,7 +31,7 @@ export async function fetchSnapshotSurfaceVM(params: {
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
   preference?: ReorientationPreference;
   reorientationDismissState?: ReorientationDismissState;
-  currentSessionDismissed?: boolean;
+  currentSessionDismissState?: ReorientationDismissState;
   reorientationVisibility?: ReorientationVisibilityInput;
 }): Promise<SnapshotSurfaceVM> {
   const nowProvider = params.nowProvider ?? Date.now;
@@ -56,7 +56,7 @@ export async function fetchSnapshotSurfaceVM(params: {
     createReorientationVisibilityInput({
       summary,
       dismissState: params.reorientationDismissState,
-      currentSessionDismissed: params.currentSessionDismissed,
+      currentSessionDismissState: params.currentSessionDismissState,
     });
 
   return {

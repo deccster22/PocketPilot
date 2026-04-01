@@ -1,4 +1,4 @@
-# Reorientation Model (P6-R2)
+# Reorientation Model (P6-R4)
 
 ## Purpose
 Reorientation is PocketPilot's calm "welcome back" briefing for users returning after a meaningful inactivity gap.
@@ -94,6 +94,7 @@ P6-R3 persists that dismissal across app restarts through a minimal `dismissedAt
 
 The reset rule stays explicit and finite:
 - persisted dismissal continues to hide the current prepared reorientation cycle
+- current-session dismissal continues to hide only the current prepared reorientation cycle
 - once a later eligible summary is generated from a newer `lastActiveAt` boundary, the old dismissal no longer suppresses it
 
 This remains surface behavior only.
@@ -109,3 +110,7 @@ This phase does not add:
 - background re-entry processing
 
 Preparation happens only when PocketPilot is already active in the foreground.
+P6-R4 keeps that posture and adds one explicit foreground re-check:
+- Snapshot reads the same prepared `SnapshotSurfaceVM` on initial mount
+- Snapshot reads that same prepared `SnapshotSurfaceVM` again only when app lifecycle returns from `background` or `inactive` to `active`
+- navigation focus churn, rerenders, and local state changes do not become alternate refresh triggers

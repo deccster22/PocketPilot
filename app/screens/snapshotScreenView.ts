@@ -1,8 +1,25 @@
+import type { UserProfile } from '@/core/profile/types';
+import {
+  shouldClearPersistedReorientationDismissState,
+  type ReorientationDismissState,
+} from '@/services/orientation/reorientationPersistence';
 import {
   createReorientationSummaryViewData,
   type ReorientationSummaryItemViewData,
 } from '@/app/screens/reorientationSummaryView';
-import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
+import {
+  fetchSnapshotSurfaceVM,
+  type SnapshotSurfaceVM,
+} from '@/services/snapshot/fetchSnapshotSurfaceVM';
+
+export type SnapshotRefreshSource = 'INITIAL_MOUNT' | 'FOREGROUND_RETURN';
+
+export type SnapshotRefreshState = {
+  lastRefreshSource: SnapshotRefreshSource;
+  isRefreshing: boolean;
+};
+
+type SnapshotAppStateStatus = 'active' | 'background' | 'inactive' | 'unknown' | 'extension';
 
 export type SnapshotScreenReorientationViewData =
   | {
@@ -27,6 +44,47 @@ export type SnapshotScreenViewData = {
   portfolioValueText?: string;
   reorientation: SnapshotScreenReorientationViewData;
 };
+
+export function shouldRefreshSnapshotOnAppForegroundTransition(
+  previousAppState: SnapshotAppStateStatus | null | undefined,
+  nextAppState: SnapshotAppStateStatus,
+): boolean {
+  return (
+    nextAppState === 'active' &&
+    (previousAppState === 'background' || previousAppState === 'inactive')
+  );
+}
+
+export async function refreshSnapshotScreenSurface(params: {
+  profile: UserProfile;
+  baselineScan?: SnapshotSurfaceVM['snapshot']['scan'];
+  includeDebugObservatory?: boolean;
+  reorientationDismissState: ReorientationDismissState;
+  currentSessionDismissState: ReorientationDismissState;
+  fetchSnapshotSurface?: typeof fetchSnapshotSurfaceVM;
+}): Promise<{
+  surface: SnapshotSurfaceVM;
+  nextBaselineScan: SnapshotSurfaceVM['snapshot']['scan'];
+  shouldClearPersistedDismissState: boolean;
+}> {
+  const fetchSnapshotSurface = params.fetchSnapshotSurface ?? fetchSnapshotSurfaceVM;
+  const surface = await fetchSnapshotSurface({
+    profile: params.profile,
+    baselineScan: params.baselineScan,
+    includeDebugObservatory: params.includeDebugObservatory,
+    reorientationDismissState: params.reorientationDismissState,
+    currentSessionDismissState: params.currentSessionDismissState,
+  });
+
+  return {
+    surface,
+    nextBaselineScan: params.baselineScan ?? surface.snapshot.scan,
+    shouldClearPersistedDismissState: shouldClearPersistedReorientationDismissState({
+      summary: surface.reorientation.summary,
+      dismissState: params.reorientationDismissState,
+    }),
+  };
+}
 
 export function createSnapshotScreenViewData(
   surface: SnapshotSurfaceVM | null,

@@ -1,40 +1,53 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  AppState,
+  type AppStateStatus,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { DebugObservatoryPanel } from '@/app/components/debug/DebugObservatoryPanel';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { ReorientationSummaryCard } from '@/app/components/ReorientationSummaryCard';
+import {
+  refreshSnapshotScreenSurface,
+  createSnapshotScreenViewData,
+  shouldRefreshSnapshotOnAppForegroundTransition,
+} from '@/app/screens/snapshotScreenView';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { Config } from '@/core/config/Config';
-import { createSnapshotScreenViewData } from '@/app/screens/snapshotScreenView';
 import { defaultReorientationDismissStore } from '@/providers/reorientationDismissStore';
 import {
   createReorientationDismissState,
   EMPTY_REORIENTATION_DISMISS_STATE,
-  shouldClearPersistedReorientationDismissState,
   type ReorientationDismissState,
 } from '@/services/orientation/reorientationPersistence';
-import {
-  fetchSnapshotSurfaceVM,
-  type SnapshotSurfaceVM,
-} from '@/services/snapshot/fetchSnapshotSurfaceVM';
+import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 export function SnapshotScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [snapshotSurface, setSnapshotSurface] = useState<SnapshotSurfaceVM | null>(null);
-  const [baselineScan, setBaselineScan] = useState<SnapshotSurfaceVM['snapshot']['scan']>();
   const [showDebugPanel, setShowDebugPanel] = useState(false);
-  const [currentSessionDismissed, setCurrentSessionDismissed] = useState(false);
+  const [currentSessionDismissState, setCurrentSessionDismissState] =
+    useState<ReorientationDismissState>(EMPTY_REORIENTATION_DISMISS_STATE);
   const [persistedDismissState, setPersistedDismissState] = useState<ReorientationDismissState>(
     EMPTY_REORIENTATION_DISMISS_STATE,
   );
   const [isDismissStateReady, setIsDismissStateReady] = useState(false);
+  const [foregroundRefreshCount, setForegroundRefreshCount] = useState(0);
+  const baselineScanRef = useRef<SnapshotSurfaceVM['snapshot']['scan']>();
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
   const isDebugPanelEnabled = __DEV__ && Config.ENABLE_DEBUG_PANEL;
 
   function handleProfileChange(nextProfile: UserProfile) {
+    baselineScanRef.current = undefined;
     setProfile(nextProfile);
-    setCurrentSessionDismissed(false);
+    setCurrentSessionDismissState(EMPTY_REORIENTATION_DISMISS_STATE);
   }
 
   useEffect(() => {
@@ -65,6 +78,21 @@ export function SnapshotScreen() {
   }, []);
 
   useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      const previousAppState = appStateRef.current;
+      appStateRef.current = nextAppState;
+
+      if (shouldRefreshSnapshotOnAppForegroundTransition(previousAppState, nextAppState)) {
+        setForegroundRefreshCount((currentCount) => currentCount + 1);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
 
     if (!isDismissStateReady) {
@@ -73,27 +101,22 @@ export function SnapshotScreen() {
       };
     }
 
-    fetchSnapshotSurfaceVM({
+    refreshSnapshotScreenSurface({
       profile,
-      baselineScan,
+      baselineScan: baselineScanRef.current,
       includeDebugObservatory: isDebugPanelEnabled,
       reorientationDismissState: persistedDismissState,
-      currentSessionDismissed,
+      currentSessionDismissState,
     })
-      .then((nextSurface) => {
+      .then((result) => {
         if (!isMounted) {
           return;
         }
 
-        setSnapshotSurface(nextSurface);
-        setBaselineScan((currentBaseline) => currentBaseline ?? nextSurface.snapshot.scan);
+        setSnapshotSurface(result.surface);
+        baselineScanRef.current = result.nextBaselineScan;
 
-        if (
-          shouldClearPersistedReorientationDismissState({
-            summary: nextSurface.reorientation.summary,
-            dismissState: persistedDismissState,
-          })
-        ) {
+        if (result.shouldClearPersistedDismissState) {
           setPersistedDismissState(EMPTY_REORIENTATION_DISMISS_STATE);
           void defaultReorientationDismissStore.clear();
         }
@@ -111,8 +134,8 @@ export function SnapshotScreen() {
     };
   }, [
     profile,
-    baselineScan,
-    currentSessionDismissed,
+    currentSessionDismissState,
+    foregroundRefreshCount,
     isDebugPanelEnabled,
     isDismissStateReady,
     persistedDismissState,
@@ -153,7 +176,7 @@ export function SnapshotScreen() {
                           snapshotSurface?.reorientation.summary,
                         );
 
-                        setCurrentSessionDismissed(true);
+                        setCurrentSessionDismissState(nextDismissState);
                         setPersistedDismissState(nextDismissState);
                         void defaultReorientationDismissStore.save(nextDismissState);
                       }

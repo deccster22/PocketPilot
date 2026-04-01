@@ -66,7 +66,7 @@ export function shouldClearPersistedReorientationDismissState(params: {
 export function createReorientationVisibilityInput(params: {
   summary: ReorientationEligibility;
   dismissState?: ReorientationDismissState | null;
-  currentSessionDismissed?: boolean;
+  currentSessionDismissState?: ReorientationDismissState | null;
 }): ReorientationVisibilityInput | undefined {
   const dismissedAt = shouldHonorPersistedReorientationDismissal({
     summary: params.summary,
@@ -74,13 +74,19 @@ export function createReorientationVisibilityInput(params: {
   })
     ? params.dismissState?.dismissedAt ?? null
     : null;
+  const currentSessionDismissedAt = shouldHonorPersistedReorientationDismissal({
+    summary: params.summary,
+    dismissState: params.currentSessionDismissState,
+  })
+    ? params.currentSessionDismissState?.dismissedAt ?? null
+    : null;
 
-  if (!params.currentSessionDismissed && !dismissedAt) {
+  if (!currentSessionDismissedAt && !dismissedAt) {
     return undefined;
   }
 
   return {
-    currentSessionDismissed: params.currentSessionDismissed,
+    currentSessionDismissedAt,
     dismissedAt,
   };
 }

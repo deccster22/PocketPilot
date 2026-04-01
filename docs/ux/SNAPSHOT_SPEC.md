@@ -13,6 +13,7 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes Snapshot placement state, including reorientation visibility.
 - `app/` reads the prepared Snapshot surface VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
 - P6-R3 keeps dismissal persistence behind that same prepared service path rather than moving visibility rules into `app/`.
+- P6-R4 re-reads that same prepared service path on app foreground return rather than adding a second Snapshot fetch route.
 
 ## Core vs Secondary Discipline
 - Core fields are always present:
@@ -32,6 +33,7 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - The card appears only when the prepared surface VM marks it `VISIBLE`.
 - Dismissal hides the card through explicit service-owned visibility state.
 - Dismissal may persist across app restarts, but only for the current prepared reorientation cycle.
+- App foreground return re-checks the same prepared Snapshot VM and stays quiet while the app remains active.
 - A later eligible summary generated from a newer `lastActiveAt` boundary may reappear.
 - Snapshot does not become an inbox, alert center, or notification system.
 

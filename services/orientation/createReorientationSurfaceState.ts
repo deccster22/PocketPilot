@@ -11,7 +11,7 @@ export type ReorientationSurfaceState = {
 };
 
 function isDismissed(visibility?: ReorientationVisibilityInput): boolean {
-  return Boolean(visibility?.currentSessionDismissed || visibility?.dismissedAt);
+  return Boolean(visibility?.currentSessionDismissedAt || visibility?.dismissedAt);
 }
 
 export function createReorientationSurfaceState(params: {

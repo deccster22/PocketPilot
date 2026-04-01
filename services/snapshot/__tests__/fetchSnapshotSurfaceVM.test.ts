@@ -304,7 +304,9 @@ describe('fetchSnapshotSurfaceVM', () => {
       fetchSnapshotSurfaceVM({
         profile: 'BEGINNER',
         nowProvider: () => Date.parse('2026-04-01T00:00:00.000Z'),
-        currentSessionDismissed: true,
+        currentSessionDismissState: {
+          dismissedAt: '2026-04-01T00:00:00.000Z',
+        },
       }),
     ).resolves.toMatchObject({
       reorientation: {
@@ -531,5 +533,109 @@ describe('fetchSnapshotSurfaceVM', () => {
     expect(JSON.stringify(result.reorientation.summary)).not.toMatch(
       /signalsTriggered|budget_blocked_symbols|signalTitle|unread|badge|reminder|urgent/,
     );
+  });
+
+  it('stops honoring current-session dismissal when a newer eligible cycle appears', async () => {
+    mockFetchSnapshotVM.mockResolvedValue({
+      model: {
+        profile: 'BEGINNER',
+        core: {
+          currentState: {
+            label: 'Current State',
+            value: 'Up',
+            trendDirection: 'UP',
+          },
+          change24h: {
+            label: 'Last 24h Change',
+            value: 0.03,
+          },
+          strategyStatus: {
+            label: 'Strategy Status',
+            value: 'Watchful',
+          },
+        },
+      },
+      portfolioValue: 100,
+      change24h: 0.03,
+      strategyAlignment: 'Watchful',
+      bundleName: 'Beginner Core',
+      scan: {
+        accountId: 'acct-1',
+        symbols: [],
+        quotes: {},
+        baselineQuotes: undefined,
+        pctChangeBySymbol: {},
+        estimatedFlags: {},
+        instrumentation: {
+          requests: 0,
+          symbolsRequested: 0,
+          symbolsFetched: 0,
+          symbolsBlocked: 0,
+        },
+      },
+      signals: [],
+      marketEvents: [],
+      eventStream: {
+        accountId: 'acct-1',
+        timestamp: Date.parse('2026-05-10T00:00:00.000Z'),
+        events: [],
+      },
+      orientationContext: {
+        accountId: 'acct-1',
+        currentState: {
+          latestRelevantEvent: null,
+          strategyAlignment: 'WATCHFUL',
+          certainty: null,
+        },
+        historyContext: {
+          eventsSinceLastViewed: [
+            {
+              eventId: 'acct-1:data_quality:budget_blocked_symbols:BTC:1',
+              timestamp: Date.parse('2026-05-01T00:00:00.000Z'),
+              accountId: 'acct-1',
+              symbol: 'BTC',
+              strategyId: 'data_quality',
+              eventType: 'DATA_QUALITY',
+              alignmentState: 'WATCHFUL',
+              signalsTriggered: ['budget_blocked_symbols'],
+              confidenceScore: 0.9,
+              certainty: 'confirmed',
+              price: 100,
+              pctChange: null,
+              metadata: {
+                signalTitle: 'Scan incomplete',
+              },
+            },
+          ],
+          sinceLastChecked: {
+            sinceTimestamp: Date.parse('2026-04-05T00:00:00.000Z'),
+            accountId: 'acct-1',
+            summaryCount: 1,
+            events: [],
+          },
+        },
+      },
+      eventsSinceLastViewed: [],
+      sinceLastChecked: {
+        sinceTimestamp: Date.parse('2026-04-05T00:00:00.000Z'),
+        accountId: 'acct-1',
+        summaryCount: 1,
+        events: [],
+      },
+    } as Awaited<ReturnType<typeof fetchSnapshotVM>>);
+
+    const result = await fetchSnapshotSurfaceVM({
+      profile: 'BEGINNER',
+      nowProvider: () => Date.parse('2026-05-10T00:00:00.000Z'),
+      currentSessionDismissState: {
+        dismissedAt: '2026-04-01T00:00:00.000Z',
+      },
+    });
+
+    expect(result.reorientation).toMatchObject({
+      status: 'VISIBLE',
+      reason: 'AVAILABLE',
+      dismissible: true,
+    });
   });
 });
