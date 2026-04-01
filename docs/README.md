@@ -275,6 +275,7 @@ Market Providers
 -> Event Queries / Since Last Checked
 -> OrientationContext
 -> SnapshotModel
+-> ReorientationSummary
 -> DashboardModel
 -> Trade Hub Surface
 -> Confirmation Session
@@ -306,7 +307,7 @@ PocketPilot is easiest to read at two levels.
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan
-- `P6` Alerts and message policy
+- `P6` Alerts, message policy, and reorientation briefing seams
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
