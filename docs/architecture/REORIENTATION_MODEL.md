@@ -74,12 +74,33 @@ type ReorientationSurfaceState = {
 ```
 
 `DISMISSED` may retain the underlying prepared summary contract while hiding the card.
-This preserves later persistence options without turning the phase into a notification framework.
+P6-R3 keeps that contract stable and adds only a minimal persistence seam:
+
+```ts
+type ReorientationDismissState = {
+  dismissedAt: string | null
+}
+
+type ReorientationDismissStore = {
+  load(): Promise<ReorientationDismissState>
+  save(state: ReorientationDismissState): Promise<void>
+  clear(): Promise<void>
+}
+```
+
+Persistence remains an edge concern.
+The store only reads and writes dismissal state.
+It does not decide thresholds, build summaries, or own screen placement.
+
+The service path continues to derive visibility from explicit inputs.
+Persisted dismissal is honored only when it still matches the current reorientation cycle.
+When a later eligible summary is built from a newer `lastActiveAt`, the old dismissal becomes stale and may be cleared.
 
 ## Determinism Rules
 - `createReorientationSummary` is pure and deterministic.
 - No `Date.now()` is used inside the pure builder.
 - No storage reads happen inside the pure builder.
+- Persistence adapters stay outside the pure builders and feed explicit inputs into service seams.
 - No network or provider work happens in `app/`.
 - Profile sensitivity changes threshold and wording depth only.
 - Visibility shaping remains explicit input-driven.

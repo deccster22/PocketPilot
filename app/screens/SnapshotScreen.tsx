@@ -7,6 +7,13 @@ import { ReorientationSummaryCard } from '@/app/components/ReorientationSummaryC
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { Config } from '@/core/config/Config';
 import { createSnapshotScreenViewData } from '@/app/screens/snapshotScreenView';
+import { defaultReorientationDismissStore } from '@/providers/reorientationDismissStore';
+import {
+  createReorientationDismissState,
+  EMPTY_REORIENTATION_DISMISS_STATE,
+  shouldClearPersistedReorientationDismissState,
+  type ReorientationDismissState,
+} from '@/services/orientation/reorientationPersistence';
 import {
   fetchSnapshotSurfaceVM,
   type SnapshotSurfaceVM,
@@ -18,6 +25,10 @@ export function SnapshotScreen() {
   const [baselineScan, setBaselineScan] = useState<SnapshotSurfaceVM['snapshot']['scan']>();
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [currentSessionDismissed, setCurrentSessionDismissed] = useState(false);
+  const [persistedDismissState, setPersistedDismissState] = useState<ReorientationDismissState>(
+    EMPTY_REORIENTATION_DISMISS_STATE,
+  );
+  const [isDismissStateReady, setIsDismissStateReady] = useState(false);
 
   const isDebugPanelEnabled = __DEV__ && Config.ENABLE_DEBUG_PANEL;
 
@@ -29,13 +40,45 @@ export function SnapshotScreen() {
   useEffect(() => {
     let isMounted = true;
 
+    defaultReorientationDismissStore
+      .load()
+      .then((loadedDismissState) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setPersistedDismissState(loadedDismissState);
+        setIsDismissStateReady(true);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setPersistedDismissState(EMPTY_REORIENTATION_DISMISS_STATE);
+        setIsDismissStateReady(true);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!isDismissStateReady) {
+      return () => {
+        isMounted = false;
+      };
+    }
+
     fetchSnapshotSurfaceVM({
       profile,
       baselineScan,
       includeDebugObservatory: isDebugPanelEnabled,
-      reorientationVisibility: {
-        currentSessionDismissed,
-      },
+      reorientationDismissState: persistedDismissState,
+      currentSessionDismissed,
     })
       .then((nextSurface) => {
         if (!isMounted) {
@@ -44,6 +87,16 @@ export function SnapshotScreen() {
 
         setSnapshotSurface(nextSurface);
         setBaselineScan((currentBaseline) => currentBaseline ?? nextSurface.snapshot.scan);
+
+        if (
+          shouldClearPersistedReorientationDismissState({
+            summary: nextSurface.reorientation.summary,
+            dismissState: persistedDismissState,
+          })
+        ) {
+          setPersistedDismissState(EMPTY_REORIENTATION_DISMISS_STATE);
+          void defaultReorientationDismissStore.clear();
+        }
       })
       .catch(() => {
         if (!isMounted) {
@@ -56,7 +109,14 @@ export function SnapshotScreen() {
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan, currentSessionDismissed, isDebugPanelEnabled]);
+  }, [
+    profile,
+    baselineScan,
+    currentSessionDismissed,
+    isDebugPanelEnabled,
+    isDismissStateReady,
+    persistedDismissState,
+  ]);
 
   const screenView = useMemo(
     () => createSnapshotScreenViewData(snapshotSurface),
@@ -89,7 +149,13 @@ export function SnapshotScreen() {
                 onDismiss={
                   screenView.reorientation.dismissible
                     ? () => {
+                        const nextDismissState = createReorientationDismissState(
+                          snapshotSurface?.reorientation.summary,
+                        );
+
                         setCurrentSessionDismissed(true);
+                        setPersistedDismissState(nextDismissState);
+                        void defaultReorientationDismissStore.save(nextDismissState);
                       }
                     : undefined
                 }

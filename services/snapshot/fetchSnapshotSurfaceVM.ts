@@ -4,6 +4,10 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import { createReorientationSummaryFromSnapshot } from '@/services/orientation/createReorientationSummaryFromSnapshot';
 import { createReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
+import {
+  createReorientationVisibilityInput,
+  type ReorientationDismissState,
+} from '@/services/orientation/reorientationPersistence';
 import type {
   ReorientationPreference,
   ReorientationVisibilityInput,
@@ -26,6 +30,8 @@ export async function fetchSnapshotSurfaceVM(params: {
   lastViewedTimestamp?: number;
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
   preference?: ReorientationPreference;
+  reorientationDismissState?: ReorientationDismissState;
+  currentSessionDismissed?: boolean;
   reorientationVisibility?: ReorientationVisibilityInput;
 }): Promise<SnapshotSurfaceVM> {
   const nowProvider = params.nowProvider ?? Date.now;
@@ -45,12 +51,19 @@ export async function fetchSnapshotSurfaceVM(params: {
     now: new Date(nowProvider()).toISOString(),
     preference: params.preference,
   });
+  const reorientationVisibility =
+    params.reorientationVisibility ??
+    createReorientationVisibilityInput({
+      summary,
+      dismissState: params.reorientationDismissState,
+      currentSessionDismissed: params.currentSessionDismissed,
+    });
 
   return {
     snapshot,
     reorientation: createReorientationSurfaceState({
       summary,
-      visibility: params.reorientationVisibility,
+      visibility: reorientationVisibility,
     }),
   };
 }

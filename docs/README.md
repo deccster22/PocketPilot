@@ -311,6 +311,7 @@ PocketPilot is easiest to read at two levels.
 - `P5` Trade Hub and ProtectionPlan
 - `P6` Alerts, message policy, and reorientation briefing seams
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
+- `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer

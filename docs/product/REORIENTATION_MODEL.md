@@ -90,7 +90,14 @@ The prepared surface contract decides whether Snapshot receives:
 - `HIDDEN` with `DISMISSED`
 
 Dismissal hides the card for the current prepared surface state without deleting the underlying summary contract.
-P6-R2 keeps dismissal input minimal and explicit rather than introducing an inbox, unread counter, badge system, or notification state machine.
+P6-R3 persists that dismissal across app restarts through a minimal `dismissedAt` state.
+
+The reset rule stays explicit and finite:
+- persisted dismissal continues to hide the current prepared reorientation cycle
+- once a later eligible summary is generated from a newer `lastActiveAt` boundary, the old dismissal no longer suppresses it
+
+This remains surface behavior only.
+It does not introduce an inbox, unread counter, badge system, reminder loop, or notification state machine.
 
 ## Foreground-Only Constraint
 P6-R2 keeps reorientation strictly foreground-only.

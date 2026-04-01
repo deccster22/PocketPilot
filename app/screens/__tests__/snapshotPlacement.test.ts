@@ -18,6 +18,9 @@ describe('reorientation placement', () => {
 
     expect(snapshotScreenSource).toMatch(/ReorientationSummaryCard/);
     expect(snapshotScreenSource).toMatch(/fetchSnapshotSurfaceVM/);
+    expect(snapshotScreenSource).toMatch(/defaultReorientationDismissStore/);
+    expect(snapshotScreenSource).not.toMatch(/reason === 'AVAILABLE'/);
+    expect(snapshotScreenSource).not.toMatch(/status === 'VISIBLE'/);
     expect(dashboardScreenSource).not.toMatch(/ReorientationSummaryCard/);
     expect(dashboardScreenSource).not.toMatch(/fetchSnapshotSurfaceVM/);
     expect(tradeHubScreenSource).not.toMatch(/ReorientationSummaryCard/);
