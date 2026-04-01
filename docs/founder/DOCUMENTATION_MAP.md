@@ -51,6 +51,10 @@ Defines the identity and behaviour of the product.
 - Testing and release mechanics
 - Monitoring and support strategy
 
+PX-API1 runtime doctrine lives primarily in:
+- `docs/architecture/PROVIDER_ROUTER_MODEL.md`
+- `docs/architecture/QUOTE_BROKER.md`
+
 Technical system design.
 
 ### Tier 3 - Governance
@@ -70,6 +74,10 @@ Technical system design.
 - Verification Model
 - Compliance Copy Guide
 - Agent Operating Model
+
+PX-API1 runtime governance lives primarily in:
+- `docs/governance/API_GOVERNANCE.md`
+- `docs/phases/PX-API1.md`
 
 Important Governance Documentation
 
@@ -183,8 +191,8 @@ Historical knowledge.
   - Operational Expansion: Not required
 - `PROVIDER_ROUTER_MODEL.md`
   - Status: Architecture
-  - Maturity: Active
-  - Operational Expansion: as testing assures value
+  - Maturity: Active doctrine
+  - Operational Expansion: future provider runtime work must conform
 - `DEBUG_PANEL_MODEL.md`
   - Status: Architecture
   - Maturity: Active
@@ -204,8 +212,8 @@ Historical knowledge.
   - Operational Expansion: Near Future
 - `QUOTE_BROKER.md`
   - Status: Architecture
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
+  - Maturity: Active doctrine
+  - Operational Expansion: future quote/runtime work must conform
 - `STRATEGY_ENGINE.md`
   - Status: Architecture
   - Maturity: To be developed
@@ -300,8 +308,8 @@ Historical knowledge.
   - Operational Expansion: Updates from vision sweep
 - `API_GOVERNANCE.md`
   - Status: Operational Strategy
-  - Maturity: Draft
-  - Operational Expansion: Before APIs
+  - Maturity: Active doctrine
+  - Operational Expansion: future runtime/provider work must conform
 - `SECRETS_MODEL.md`
   - Status: Constitutional
   - Maturity: Draft
