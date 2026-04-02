@@ -26,7 +26,8 @@ export function DebugObservatoryPanel({ payload }: DebugObservatoryPanelProps) {
       <Text style={styles.metaLine}>Timestamp: {payload.timestampMs}</Text>
       <Text style={styles.metaLine}>Symbols: {payload.symbols.join(', ')}</Text>
 
-      <Section title="Quote Router" content={payload.quoteResult.meta} />
+      <Section title="Runtime Diagnostics" content={payload.runtimeDiagnostics} />
+      <Section title="Quote Router Raw" content={payload.quoteResult.meta} />
       <Section title="Quotes" content={payload.quoteResult.quotes} />
       <Section title="Deltas" content={payload.deltas ?? {}} />
       <Section title="Strategy Signals" content={payload.strategySignals ?? []} />

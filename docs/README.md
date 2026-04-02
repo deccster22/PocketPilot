@@ -1,11 +1,11 @@
 Title: PocketPilot Documentation Index
 Version: v2 markdown source
 Source: docs/source/README_v2.md
-Last Updated: 2026-04-01
+Last Updated: 2026-04-02
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-01  
+**Last updated:** 2026-04-02  
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
 PocketPilot is a **strategy-first, execution-aware, calm-toned decision-support cockpit**. It is not a trading bot, not a signal-spam feed, and not a casino dashboard. The docs in this repo exist to preserve that identity while giving contributors, agents, and future build chats a clean map of what matters, where it lives, and what must not drift.
@@ -94,6 +94,7 @@ Examples:
 - `architecture/CONFIG_MODEL.md`
 - `architecture/PROVIDER_ROUTER_MODEL.md`
 - `architecture/QUOTE_BROKER.md`
+- `architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
 - `architecture/STRATEGY_ENGINE.md`
 - `architecture/MARKET_EVENT_MODEL.md`
 - `architecture/EVENT_STREAM_MODEL.md`
@@ -293,14 +294,18 @@ The UI should not be inventing interpretation logic from raw data. If it feels l
 
 Runtime data-plane rule: Provider Router is the role-aware routing seam, QuoteBroker is the quote-policy choke point, and current-phase runtime remains foreground-only.
 
+Prepared runtime diagnostics rule: `services/debug/` owns the `RuntimeDiagnosticsVM` seam for provider health, quote policy, and per-symbol degradation inspection. `app/` may render that prepared contract only on an existing debug path.
+
 For runtime/provider work, treat these as the authoritative PX-API1 doctrine set:
 - `architecture/PROVIDER_ROUTER_MODEL.md`
 - `architecture/QUOTE_BROKER.md`
+- `architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
 - `governance/API_GOVERNANCE.md`
 - `phases/PX-API1.md`
 - `phases/PX-API2.md`
 - `phases/PX-API3.md`
 - `phases/PX-API4.md`
+- `phases/PX-API5.md`
 
 ---
 
@@ -322,6 +327,7 @@ PocketPilot is easiest to read at two levels.
 - `PX-API2` Runtime contract hardening for role-tagged requests, quote trust metadata, and explicit last-good semantics
 - `PX-API3` Runtime policy hardening for in-flight coalescing, symbol-level degradation state, and explicit provider-policy outputs
 - `PX-API4` Thin recent-window provider health scoring for explicit cooldown/degradation context without adding background runtime complexity
+- `PX-API5` Prepared runtime diagnostics surface for one coherent service-owned inspection seam over provider health, quote policy, and per-symbol degradation state
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan

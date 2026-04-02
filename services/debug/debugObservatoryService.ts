@@ -2,6 +2,8 @@ import type { EventLedger, EventLedgerEntry } from '@/core/types/eventLedger';
 import type { StrategySignal } from '@/core/strategy/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
+import { fetchRuntimeDiagnosticsVM } from '@/services/debug/fetchRuntimeDiagnosticsVM';
+import type { RuntimeDiagnosticsVM } from '@/services/debug/runtimeDiagnosticsTypes';
 import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 
 export type DebugObservatoryQuoteMeta = ProviderRouterResult['meta'];
@@ -21,6 +23,7 @@ export type DebugObservatoryPayload = {
     quotes: Record<string, Quote>;
     meta: DebugObservatoryQuoteMeta;
   };
+  runtimeDiagnostics: RuntimeDiagnosticsVM;
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
   marketEvents?: MarketEvent[];
@@ -84,13 +87,22 @@ function buildQuoteMeta(
 export function buildDebugObservatoryPayload(
   params: BuildDebugObservatoryPayloadParams,
 ): DebugObservatoryPayload {
+  const quoteMeta = buildQuoteMeta(params.quoteMeta);
+
   return {
     timestampMs: params.timestampMs,
     symbols: params.symbols,
     quoteResult: {
       quotes: params.quotes,
-      meta: buildQuoteMeta(params.quoteMeta),
+      meta: quoteMeta,
     },
+    runtimeDiagnostics: fetchRuntimeDiagnosticsVM({
+      quoteResult: {
+        quotes: params.quotes,
+        meta: quoteMeta,
+      },
+      symbols: params.symbols,
+    }),
     deltas: params.deltas,
     strategySignals: params.strategySignals,
     marketEvents: params.marketEvents,
