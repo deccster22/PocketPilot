@@ -3,7 +3,7 @@
 - Title: PocketPilot Documentation Map
 - Version: v2
 - Source file: `docs/source/PocketPilot Documentation Map v3.pdf`
-- Last updated: 2026-03-20
+- Last updated: 2026-04-02
 
 File: `docs/founder/PocketPilot Documentation Map`
 
@@ -118,6 +118,15 @@ Strategy modelling.
 - Phase plan
 - Runbook Execution
 - Milestones
+- Phase taxonomy and audited implementation ledger
+
+Canonical phase taxonomy now lives in:
+- `docs/phases/PHASE_MAP.md`
+
+Use:
+- `P#` for canonical product families
+- `P#-subphase` for scoped work inside one canonical family
+- `PX-*` for cross-cutting/platform/hardening/support phases that do not imply numbered-family completion
 
 Build execution.
 
@@ -493,6 +502,13 @@ Historical knowledge.
   - Status: Strategy
   - Maturity: To be developed
   - Operational Expansion: Near Future
+
+#### `/phases`
+
+- `PHASE_MAP.md`
+  - Status: Taxonomy + Ledger
+  - Maturity: Active
+  - Operational Expansion: canonical phase naming and historical reconciliation
 
 #### `/ux`
 

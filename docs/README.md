@@ -35,9 +35,10 @@ Read these before making architectural or behavioural changes:
 2. `governance/GUARDRAILS.md`
 3. `governance/CONTEXT_SUITE.md`
 4. `governance/ENGINEERING_CONTRACT.md`
-5. Relevant architecture model(s)
-6. Relevant phase/runbook doc(s)
-7. Most recent phase report / forensic handover if available
+5. `phases/PHASE_MAP.md`
+6. Relevant architecture model(s)
+7. Relevant phase/runbook doc(s)
+8. Most recent phase report / forensic handover if available
 
 ### If you are reconciling drift or resuming after a gap
 Start with:
@@ -45,8 +46,9 @@ Start with:
 1. `governance/CANON.md`
 2. `governance/GUARDRAILS.md`
 3. `governance/CONTEXT_SUITE.md`
-4. `product/PRODUCT_SPEC.md`
-5. latest forensic handover / phase ledger / reconciliation pack
+4. `phases/PHASE_MAP.md`
+5. `product/PRODUCT_SPEC.md`
+6. latest forensic handover / phase ledger / reconciliation pack
 
 ---
 
@@ -311,7 +313,7 @@ For runtime/provider work, treat these as the authoritative PX-API1 doctrine set
 
 ## Phase Framing
 
-PocketPilot is easiest to read at two levels.
+PocketPilot is easiest to read at three levels.
 
 ### Macro phases
 - **Macro Phase 1 - Foundation**
@@ -319,29 +321,30 @@ PocketPilot is easiest to read at two levels.
 - **Macro Phase 3 - Intelligence**
 - **Macro Phase 4 - Copilot and Hardening**
 
-### Workstream / delivery phases
+### Canonical product workstream families
 - `P0` Vision, doctrine, architecture, repo discipline foundation
 - `P1` Strategy engine foundations
 - `P2` Snapshot / provider / governance / debug observatory foundation
-- `PX-API1` Provider Router / QuoteBroker / API governance doctrine lock before broader live-data runtime work
-- `PX-API2` Runtime contract hardening for role-tagged requests, quote trust metadata, and explicit last-good semantics
-- `PX-API3` Runtime policy hardening for in-flight coalescing, symbol-level degradation state, and explicit provider-policy outputs
-- `PX-API4` Thin recent-window provider health scoring for explicit cooldown/degradation context without adding background runtime complexity
-- `PX-API5` Prepared runtime diagnostics surface for one coherent service-owned inspection seam over provider health, quote policy, and per-symbol degradation state
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan
-- `P6` Alerts, message policy, and reorientation briefing seams
-- `P6-R2` Snapshot placement for the foreground reorientation briefing
-- `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
-- `P6-R4` Snapshot foreground-return truth refresh through the shared prepared VM path
-- `P6-R5` Snapshot orientation cohesion through one canonical subordinate briefing zone
-- `P6-R5A` Retire the legacy reorientation-only app presentation path so Snapshot keeps one canonical briefing surface
+- `P6` Alerts and message policy
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P10` Beta hardening
 - `P11` Launch prep
+
+### Cross-cutting / support phases
+Use `PX-*` for cross-cutting, platform, runtime, hardening, cleanup, doctrine, audit, or support work that may happen before, after, or alongside numbered product families.
+
+Current examples:
+- `PX-API1` through `PX-API5` for runtime doctrine and hardening
+- `PX-PM1` for this phase-map audit and roadmap alignment pass
+
+Use `P#-subphase` only for scoped work inside one canonical family. Example: `P6-R5A` is cleanup within `P6`; it does not imply completion of `P7`, `P8`, or `P9`.
+
+Canonical taxonomy, source-lens reconciliation, and the audited implementation ledger live in `phases/PHASE_MAP.md`.
 
 If a feature is not scheduled in the runbook / phase model, it should not quietly appear in implementation.
 
@@ -424,7 +427,7 @@ If any of those are fuzzy, stop and reconcile before pushing.
 `ARCHITECTURE_OVERVIEW` -> `ARCHITECTURE_MAP` -> relevant architecture seam doc(s) -> phase/runbook doc
 
 ### Recovery / handover lens
-`CANON` -> `GUARDRAILS` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
+`CANON` -> `GUARDRAILS` -> `PHASE_MAP` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
 
 ---
 

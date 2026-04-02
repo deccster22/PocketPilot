@@ -3,6 +3,8 @@
 ## Purpose
 PX-API5 adds one prepared runtime diagnostics seam in `services/debug/`.
 
+`PX-*` labels are cross-cutting platform and hardening phases. They may land alongside numbered product families and do not imply completion of `P6`, `P7`, `P8`, or `P9`. See `PHASE_MAP.md`.
+
 This phase exists to make the explicit runtime facts from PX-API2, PX-API3, and PX-API4 inspectable in one coherent place without adding new runtime machinery.
 
 This phase does not dispatch orders.
