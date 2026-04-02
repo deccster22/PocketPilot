@@ -1,4 +1,4 @@
-# QuoteBroker Model (PX-API1 / PX-API2 / PX-API3 / PX-API4)
+# QuoteBroker Model (PX-API1 / PX-API2 / PX-API3 / PX-API4 / PX-API5)
 
 ## Purpose
 QuoteBroker is the single choke point for quote retrieval and quote-related runtime policy in PocketPilot.
@@ -190,7 +190,7 @@ Examples:
 
 The UI must consume prepared state from services rather than infer trust from raw provider behavior.
 
-## PX-API2 / PX-API3 Code Contract
+## PX-API2 / PX-API3 / PX-API4 / PX-API5 Code Contract
 PX-API2 made QuoteBroker's quote runtime contract explicit in code.
 PX-API3 hardens the runtime-policy behavior on top of that contract without adding background runtime complexity.
 
@@ -226,6 +226,16 @@ Current implemented semantics in PX-API2 / PX-API3:
 - per-symbol runtime state for fresh, stale, last-good, and unavailable outcomes
 - seam-friendly provider health output for downstream services and debug inspection
 
+PX-API5 builds on that same contract by adding a service-owned prepared runtime diagnostics seam in `services/debug/`.
+
+That prepared seam now consumes QuoteBroker/Provider Router metadata directly and exposes one coherent diagnostics VM for:
+- provider health state, score, counters, and timestamps
+- quote policy facts such as coalescing, cooldown skips, freshness, certainty, and last-good usage
+- per-symbol degradation state and current source attribution when the quote output carries it
+
+PX-API5 does not move any of that policy logic into `app/`.
+It keeps QuoteBroker as the quote-policy choke point and treats diagnostics as a prepared read model over the existing explicit seam.
+
 ### PX-API3 / PX-API4 Runtime Hardening
 PX-API3 and PX-API4 add the next thin runtime-policy layers without turning QuoteBroker into a hidden runtime engine.
 
@@ -254,6 +264,12 @@ What PX-API4 still does not imply:
 - no adaptive chain reordering engine
 - no background health daemon
 - no observability platform beyond the explicit seam metadata
+
+What PX-API5 still does not imply:
+- no telemetry backend
+- no background diagnostics worker
+- no fake runtime status engine beyond the explicit prepared seam
+- no new quote/runtime machinery beyond the existing metadata contracts
 
 Current non-goals remain honest in code:
 - no datastore-backed cache/runtime
@@ -310,4 +326,4 @@ Future phases may add:
 - richer provider scoring and health windows
 
 Those are future-phase extensions only.
-PX-API1 through PX-API4 do not authorize background polling, hidden refresh workers, or backend runtime infrastructure.
+PX-API1 through PX-API5 do not authorize background polling, hidden refresh workers, or backend runtime infrastructure.

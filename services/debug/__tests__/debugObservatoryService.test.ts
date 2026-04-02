@@ -200,6 +200,63 @@ describe('debugObservatoryService', () => {
       'COOLDOWN_ACTIVE',
     );
     expect(result.quoteResult.meta.policy.cooldownSkippedProviders).toEqual([]);
+    expect(result.runtimeDiagnostics).toEqual({
+      generatedAt: nowIso,
+      role: 'execution',
+      providers: [
+        {
+          providerId: 'router:primary',
+          role: 'execution',
+          healthState: 'COOLDOWN_ACTIVE',
+          score: 50,
+          recentAttempts: 2,
+          recentSuccesses: 1,
+          recentFailures: 1,
+          recentCooldownSkips: 1,
+          lastAttemptAt: nowIso,
+          lastSuccessAt: nowIso,
+          lastFailureAt: nowIso,
+        },
+        {
+          providerId: 'router:fallback',
+          role: 'execution',
+          healthState: 'UNKNOWN',
+          score: null,
+          recentAttempts: null,
+          recentSuccesses: null,
+          recentFailures: null,
+          recentCooldownSkips: null,
+          lastAttemptAt: null,
+          lastSuccessAt: null,
+          lastFailureAt: null,
+        },
+      ],
+      quotePolicy: {
+        coalescedRequest: false,
+        providersTried: ['router:primary', 'router:fallback'],
+        cooldownSkippedProviders: [],
+        usedLastGood: false,
+        freshness: 'FRESH',
+        certainty: 'ESTIMATED',
+      },
+      symbols: [
+        {
+          symbol: 'BTC',
+          providerId: 'primary-feed',
+          policyState: 'FRESH',
+          lastUpdatedAt: nowIso,
+          lastGoodAt: null,
+        },
+        {
+          symbol: 'ETH',
+          providerId: 'fallback-feed',
+          policyState: 'FRESH',
+          lastUpdatedAt: nowIso,
+          lastGoodAt: null,
+        },
+      ],
+      notes: ['Foreground-only runtime: stale-while-revalidate is not implemented.'],
+    });
   });
 
   it('includes strategy signals, market events, and snapshot output when present', () => {
@@ -260,6 +317,9 @@ describe('debugObservatoryService', () => {
 
     expect(result.strategySignals).toEqual(strategySignals);
     expect(result.marketEvents).toEqual(marketEvents);
+    expect(JSON.stringify(result.runtimeDiagnostics)).not.toMatch(
+      /momentum_threshold_met|signalsTriggered|confidenceScore/,
+    );
     expect(result.snapshot).toEqual(
       expect.objectContaining({
         portfolioValue: 104_000,

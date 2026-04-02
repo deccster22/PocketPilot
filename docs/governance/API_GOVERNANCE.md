@@ -75,11 +75,12 @@ QuoteBroker owns:
 - trust metadata emission
 - instrumentation
 
-PX-API2 and PX-API3 harden this into code contracts:
+PX-API2 through PX-API5 harden this into code contracts:
 - quote-like requests carry an explicit role-tagged runtime context
 - quote-like results carry explicit trust metadata
 - failure policy state is surfaced in result metadata instead of being hidden behavior
 - in-flight coalescing is contract-aware and confined to the provider/service layer
+- `services/debug/` shapes those explicit runtime facts into one prepared diagnostics VM instead of letting `app/` reverse-engineer them
 
 ### Bulk-First Over Per-Symbol Spray
 For reference data, bulk-first is the default rule.
@@ -154,6 +155,12 @@ PX-API2 / PX-API3 / PX-API4 code-level trust metadata now includes:
 
 Those fields are now part of the runtime contract, not just doctrine.
 
+PX-API5 adds a prepared runtime diagnostics seam on top of those fields:
+- one canonical service-owned diagnostics VM in `services/debug/`
+- provider health, quote policy, and per-symbol degradation facts shaped for inspection and tests
+- no app-side runtime inference
+- no fake expansion into a telemetry platform
+
 Current honest limitation:
 - `staleWhileRevalidate` is surfaced as an explicit contract field
 - current implementation remains foreground-only and reports that the behavior is not yet implemented as a hidden runtime system
@@ -188,6 +195,13 @@ Current PX-API3 / PX-API4 implementation now exposes a thin, explicit subset of 
 - explicit `UNKNOWN` / `HEALTHY` / `DEGRADED` / `COOLDOWN_ACTIVE` provider-health states
 - a simple recent-attempt success-rate score when there is enough recent data
 
+Current PX-API5 implementation adds one prepared service seam over that explicit metadata:
+- `RuntimeDiagnosticsVM` in `services/debug/`
+- provider health entries prepared from explicit health summaries
+- quote policy summary prepared from explicit freshness/certainty/last-good/coalescing/cooldown metadata
+- per-symbol degradation entries prepared from explicit symbol policy state plus current quote source/timestamp data when available
+- sparse factual notes for current foreground-only limitations
+
 Current PX-API4 provider-health doctrine:
 - health windows are bounded recent summaries, not permanent provider reputation
 - the window is count-based and foreground-only
@@ -196,6 +210,7 @@ Current PX-API4 provider-health doctrine:
 - health state does not authorize semantic substitution across roles
 
 Observability belongs where routing and failure policy decisions happen, not inside `app/` presentation code.
+If `app/` renders diagnostics on a debug path, it must render the prepared diagnostics VM from `services/debug/`.
 
 ## Current Doctrine Vs Future Direction
 ### Must Be True Now
@@ -242,8 +257,11 @@ Current implementation must not pretend those answers already exist.
 Future runtime work should consume:
 - `docs/architecture/PROVIDER_ROUTER_MODEL.md`
 - `docs/architecture/QUOTE_BROKER.md`
+- `docs/architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
 - this governance document
 - `docs/phases/PX-API2.md`
 - `docs/phases/PX-API3.md`
+- `docs/phases/PX-API4.md`
+- `docs/phases/PX-API5.md`
 
 Those docs are intended to constrain implementation, not merely describe preferences.

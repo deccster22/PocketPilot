@@ -1,4 +1,4 @@
-# Provider Router Model (PX-API1 / PX-API2 / PX-API3 / PX-API4)
+# Provider Router Model (PX-API1 / PX-API2 / PX-API3 / PX-API4 / PX-API5)
 
 ## Purpose
 Provider Router is the role-aware routing seam inside `services/` that chooses which provider chain is eligible for a given runtime task.
@@ -177,10 +177,11 @@ QuoteBroker owns:
 - provider health counters
 - quote trust labeling
 
-## PX-API2 / PX-API3 / PX-API4 Code Contract
+## PX-API2 / PX-API3 / PX-API4 / PX-API5 Code Contract
 PX-API2 hardens this doctrine into code-level runtime contracts.
 PX-API3 keeps the same role-safe routing doctrine and makes the merged runtime-policy output easier for services to inspect.
 PX-API4 adds thin recent-window provider health summaries on top of those same seams.
+PX-API5 adds a prepared runtime diagnostics seam in `services/debug/` that consumes those merged runtime facts directly.
 
 Provider Router now expects quote-like requests to arrive with an explicit role-tagged runtime context.
 
@@ -219,6 +220,12 @@ PX-API3 / PX-API4-specific merge rules:
 - recent provider health state is carried through as explicit metadata, not inferred inside `app/`
 - degraded execution-provider health does not authorize reference substitution
 - current PX-API4 behavior does not adaptively reorder chains; it surfaces recent health honestly and keeps routing role-safe
+
+PX-API5-specific prepared-diagnostics rule:
+- `services/debug/` consumes router metadata as the canonical merged runtime truth
+- diagnostics must not re-derive provider health from raw counters when the explicit health state already exists
+- diagnostics must not guess symbol degradation or trust semantics from missing values
+- `app/` may render the prepared diagnostics VM, but it must not assemble it itself
 
 ## Determinism And Boundary Rules
 - `core/` must not know provider routing exists.
