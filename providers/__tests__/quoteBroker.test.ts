@@ -89,6 +89,25 @@ describe('QuoteBroker runtime contracts', () => {
         symbolsFetched: 2,
         symbolsBlocked: 0,
         cooldown: 'INACTIVE',
+        windowSize: 6,
+        window: {
+          providerId: 'broker:test',
+          role: 'reference',
+          recentAttempts: 1,
+          recentSuccesses: 1,
+          recentFailures: 0,
+          recentCooldownSkips: 0,
+          lastAttemptAt: baseIso,
+          lastSuccessAt: baseIso,
+          lastFailureAt: null,
+        },
+        score: {
+          providerId: 'broker:test',
+          role: 'reference',
+          state: 'UNKNOWN',
+          score: null,
+          reason: 'Recent data is too thin for a health read: 1 attempt.',
+        },
       },
     });
     expect(result.meta.policy).toEqual({
@@ -124,6 +143,16 @@ describe('QuoteBroker runtime contracts', () => {
         requests: 2,
         symbolsRequested: 2,
         symbolsFetched: 1,
+        window: expect.objectContaining({
+          recentAttempts: 1,
+          recentSuccesses: 1,
+          recentFailures: 0,
+          recentCooldownSkips: 0,
+        }),
+        score: expect.objectContaining({
+          state: 'UNKNOWN',
+          score: null,
+        }),
       }),
     );
   });
@@ -338,6 +367,55 @@ describe('QuoteBroker runtime contracts', () => {
     expect(result.meta.policy.staleIfError).toBe('USED_LAST_GOOD');
   });
 
+  it('ages old failures out of the bounded recent health window', async () => {
+    const fetcher = jest
+      .fn<Promise<Quote[]>, [QuoteRequest]>()
+      .mockResolvedValueOnce([createQuote('BTC')])
+      .mockRejectedValueOnce(new Error('provider down'))
+      .mockResolvedValueOnce([createQuote('BTC', { price: 101 })])
+      .mockResolvedValueOnce([createQuote('BTC', { price: 102 })])
+      .mockResolvedValueOnce([createQuote('BTC', { price: 103 })]);
+
+    const broker = new QuoteBroker({
+      providerId: 'broker:test',
+      fetcher,
+      healthWindowSize: 3,
+    });
+
+    await broker.getQuotes(createRequest({ symbols: ['BTC'], nowMs: baseNowMs }));
+    await broker.getQuotes(createRequest({ symbols: ['BTC'], nowMs: baseNowMs + 1_000 }));
+    await broker.getQuotes(createRequest({ symbols: ['BTC'], nowMs: baseNowMs + 2_000 }));
+    await broker.getQuotes(createRequest({ symbols: ['BTC'], nowMs: baseNowMs + 3_000 }));
+    const result = await broker.getQuotes(
+      createRequest({ symbols: ['BTC'], nowMs: baseNowMs + 4_000 }),
+    );
+
+    expect(result.meta.providerHealthSummary['broker:test']).toEqual(
+      expect.objectContaining({
+        windowSize: 3,
+        window: {
+          providerId: 'broker:test',
+          role: 'reference',
+          recentAttempts: 3,
+          recentSuccesses: 3,
+          recentFailures: 0,
+          recentCooldownSkips: 0,
+          lastAttemptAt: new Date(baseNowMs + 4_000).toISOString(),
+          lastSuccessAt: new Date(baseNowMs + 4_000).toISOString(),
+          lastFailureAt: null,
+        },
+        score: {
+          providerId: 'broker:test',
+          role: 'reference',
+          state: 'HEALTHY',
+          score: 100,
+          reason:
+            'Recent successes dominate the current window: 3 successes, 0 failures, 0 cooldown skips.',
+        },
+      }),
+    );
+  });
+
   it('skips provider calls while cooldown is active and surfaces cooldown state explicitly', async () => {
     const fetcher = jest
       .fn<Promise<Quote[]>, [QuoteRequest]>()
@@ -364,6 +442,19 @@ describe('QuoteBroker runtime contracts', () => {
     expect(result.meta.providerHealthSummary['broker:test']).toEqual(
       expect.objectContaining({
         cooldown: 'ACTIVE_SKIP',
+        window: expect.objectContaining({
+          recentAttempts: 2,
+          recentSuccesses: 1,
+          recentFailures: 1,
+          recentCooldownSkips: 1,
+          lastFailureAt: new Date(baseNowMs + 5_000).toISOString(),
+        }),
+        score: expect.objectContaining({
+          state: 'COOLDOWN_ACTIVE',
+          score: 50,
+          reason:
+            'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+        }),
       }),
     );
   });

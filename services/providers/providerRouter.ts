@@ -1,7 +1,9 @@
 import type { Quote } from '@/core/types/quote';
 import type { QuoteBroker } from '@/providers/quoteBroker';
+import { deriveProviderHealthScore } from '@/services/providers/providerHealth';
 import type {
   QuoteRequest,
+  QuoteProviderHealthSummary,
   QuoteResponse,
   QuoteResponseMetadata,
   QuoteSymbolPolicyState,
@@ -101,19 +103,90 @@ function combineProviderHealthSummary(
       return acc;
     }
 
-    acc[summary.providerId] = {
+    acc[summary.providerId] = mergeProviderHealthEntry(existing, summary);
+    return acc;
+  }, {});
+}
+
+function pickLatestIsoTimestamp(...timestamps: Array<string | null | undefined>): string | null {
+  const parsedTimestamps = timestamps
+    .filter((timestamp): timestamp is string => typeof timestamp === 'string')
+    .map((timestamp) => Date.parse(timestamp))
+    .filter((timestampMs) => Number.isFinite(timestampMs));
+
+  return parsedTimestamps.length > 0
+    ? new Date(Math.max(...parsedTimestamps)).toISOString()
+    : null;
+}
+
+function mergeProviderHealthEntry(
+  existing: QuoteProviderHealthSummary,
+  summary: QuoteProviderHealthSummary,
+): QuoteProviderHealthSummary {
+  const cooldown =
+    existing.cooldown === 'ACTIVE_SKIP' || summary.cooldown === 'ACTIVE_SKIP'
+      ? 'ACTIVE_SKIP'
+      : 'INACTIVE';
+
+  if (
+    existing.windowSize === undefined ||
+    summary.windowSize === undefined ||
+    !existing.window ||
+    !summary.window
+  ) {
+    return {
       providerId: summary.providerId,
       requests: Math.max(existing.requests, summary.requests),
       symbolsRequested: Math.max(existing.symbolsRequested, summary.symbolsRequested),
       symbolsFetched: Math.max(existing.symbolsFetched, summary.symbolsFetched),
       symbolsBlocked: Math.max(existing.symbolsBlocked, summary.symbolsBlocked),
-      cooldown:
-        existing.cooldown === 'ACTIVE_SKIP' || summary.cooldown === 'ACTIVE_SKIP'
-          ? 'ACTIVE_SKIP'
-          : 'INACTIVE',
+      cooldown,
+      windowSize: summary.windowSize ?? existing.windowSize,
+      window: summary.window ?? existing.window,
+      score: summary.score ?? existing.score,
     };
-    return acc;
-  }, {});
+  }
+
+  const role =
+    existing.window.role === summary.window.role ? existing.window.role : 'mixed';
+  const window = {
+    providerId: summary.providerId,
+    role,
+    recentAttempts: Math.max(existing.window.recentAttempts, summary.window.recentAttempts),
+    recentSuccesses: Math.max(existing.window.recentSuccesses, summary.window.recentSuccesses),
+    recentFailures: Math.max(existing.window.recentFailures, summary.window.recentFailures),
+    recentCooldownSkips: Math.max(
+      existing.window.recentCooldownSkips,
+      summary.window.recentCooldownSkips,
+    ),
+    lastAttemptAt: pickLatestIsoTimestamp(
+      existing.window.lastAttemptAt,
+      summary.window.lastAttemptAt,
+    ),
+    lastSuccessAt: pickLatestIsoTimestamp(
+      existing.window.lastSuccessAt,
+      summary.window.lastSuccessAt,
+    ),
+    lastFailureAt: pickLatestIsoTimestamp(
+      existing.window.lastFailureAt,
+      summary.window.lastFailureAt,
+    ),
+  };
+
+  return {
+    providerId: summary.providerId,
+    requests: Math.max(existing.requests, summary.requests),
+    symbolsRequested: Math.max(existing.symbolsRequested, summary.symbolsRequested),
+    symbolsFetched: Math.max(existing.symbolsFetched, summary.symbolsFetched),
+    symbolsBlocked: Math.max(existing.symbolsBlocked, summary.symbolsBlocked),
+    cooldown,
+    windowSize: Math.max(existing.windowSize, summary.windowSize),
+    window,
+    score: deriveProviderHealthScore({
+      window,
+      cooldownActive: cooldown === 'ACTIVE_SKIP',
+    }),
+  };
 }
 
 function combineMeta(

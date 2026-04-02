@@ -139,7 +139,7 @@ Examples include:
 
 Last-good and stale labeling are product trust features, not internal trivia.
 
-PX-API2 / PX-API3 code-level trust metadata now includes:
+PX-API2 / PX-API3 / PX-API4 code-level trust metadata now includes:
 - `role`
 - `providerId`
 - `freshness`
@@ -149,7 +149,7 @@ PX-API2 / PX-API3 code-level trust metadata now includes:
 - `usedLastGood`
 - `coalescedRequest`
 - per-symbol policy state
-- provider health summary
+- provider health summary with recent window/state/score
 - cooldown-skipped providers
 
 Those fields are now part of the runtime contract, not just doctrine.
@@ -179,11 +179,21 @@ At minimum, runtime implementation should track:
 - provider health
 - request/source logging at the appropriate seam
 
-Current PX-API3 implementation now exposes a thin, explicit subset of that at the quote seam:
+Current PX-API3 / PX-API4 implementation now exposes a thin, explicit subset of that at the quote seam:
 - cumulative broker counters
 - cooldown-skipped providers
 - coalesced-request signaling
 - per-symbol runtime policy state
+- bounded recent provider-health windows
+- explicit `UNKNOWN` / `HEALTHY` / `DEGRADED` / `COOLDOWN_ACTIVE` provider-health states
+- a simple recent-attempt success-rate score when there is enough recent data
+
+Current PX-API4 provider-health doctrine:
+- health windows are bounded recent summaries, not permanent provider reputation
+- the window is count-based and foreground-only
+- cooldown skips affect recent health state but are not labeled as request failures
+- health state may inform routing/policy visibility only within the current role-safe doctrine
+- health state does not authorize semantic substitution across roles
 
 Observability belongs where routing and failure policy decisions happen, not inside `app/` presentation code.
 
@@ -213,7 +223,7 @@ They are not implemented, implied, or authorized by PX-API1.
 ## Open Questions For Future Phases
 These are intentionally not settled by PX-API1:
 - whether future datastore-backed prepared state lives in-device, server-side, or both
-- how provider health scoring matures beyond counters, cooldowns, and breaker state
+- how provider health scoring matures beyond simple recent windows, cooldown visibility, and current attempt success rate
 - which catalog or metadata maintenance work merits async handling later
 - whether enrichment ever earns a separate async preparation seam
 

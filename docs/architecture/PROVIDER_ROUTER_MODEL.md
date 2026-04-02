@@ -1,4 +1,4 @@
-# Provider Router Model (PX-API1 / PX-API2 / PX-API3)
+# Provider Router Model (PX-API1 / PX-API2 / PX-API3 / PX-API4)
 
 ## Purpose
 Provider Router is the role-aware routing seam inside `services/` that chooses which provider chain is eligible for a given runtime task.
@@ -99,6 +99,7 @@ Provider Router must:
 - select providers by role and task
 - expose explicit ranking order
 - respect cooldown or breaker state supplied by runtime health tracking
+- preserve inspectable recent-window health summaries from the quote/runtime seam
 - allow only role-safe fallback within the same semantic lane
 - return structured routing metadata for instrumentation and debugging
 
@@ -176,9 +177,10 @@ QuoteBroker owns:
 - provider health counters
 - quote trust labeling
 
-## PX-API2 / PX-API3 Code Contract
+## PX-API2 / PX-API3 / PX-API4 Code Contract
 PX-API2 hardens this doctrine into code-level runtime contracts.
 PX-API3 keeps the same role-safe routing doctrine and makes the merged runtime-policy output easier for services to inspect.
+PX-API4 adds thin recent-window provider health summaries on top of those same seams.
 
 Provider Router now expects quote-like requests to arrive with an explicit role-tagged runtime context.
 
@@ -197,10 +199,10 @@ Current code contract highlights:
   - `providersTried`
   - `sourceBySymbol`
   - explicit failure-policy markers
-  - `coalescedRequest`
-  - `policyStateBySymbol`
-  - `providerHealthSummary`
-  - `cooldownSkippedProviders`
+- `coalescedRequest`
+- `policyStateBySymbol`
+- `providerHealthSummary`
+- `cooldownSkippedProviders`
 
 Meaning-preserving rule remains unchanged:
 - fallback may degrade freshness or certainty
@@ -209,11 +211,14 @@ Meaning-preserving rule remains unchanged:
 Execution-safe routing is now a code contract, not only a doc rule.
 If an execution request has no execution-eligible chain, the router must keep that miss explicit.
 
-PX-API3-specific merge rules:
+PX-API3 / PX-API4-specific merge rules:
 - router-level coalescing state is derived from the underlying provider results rather than guessed
 - router-level symbol policy state is merged symbol-by-symbol so one degraded symbol does not pollute unrelated symbols
 - cooldown-skipped providers remain explicit even when same-role fallback fills the gap
 - provider health summaries stay additive and inspectable without pretending a full observability platform exists
+- recent provider health state is carried through as explicit metadata, not inferred inside `app/`
+- degraded execution-provider health does not authorize reference substitution
+- current PX-API4 behavior does not adaptively reorder chains; it surfaces recent health honestly and keeps routing role-safe
 
 ## Determinism And Boundary Rules
 - `core/` must not know provider routing exists.

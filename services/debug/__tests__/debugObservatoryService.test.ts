@@ -26,6 +26,48 @@ describe('debugObservatoryService', () => {
     },
   };
 
+  function createProviderHealthEntry(
+    providerId: string,
+    overrides: Partial<ProviderRouterResult['meta']['providerHealthSummary'][string]> = {},
+  ): ProviderRouterResult['meta']['providerHealthSummary'][string] {
+    const window = {
+      providerId,
+      role: 'execution' as const,
+      recentAttempts: 1,
+      recentSuccesses: 1,
+      recentFailures: 0,
+      recentCooldownSkips: 0,
+      lastAttemptAt: nowIso,
+      lastSuccessAt: nowIso,
+      lastFailureAt: null,
+      ...(overrides.window ?? {}),
+    };
+    const score = {
+      providerId,
+      role: window.role,
+      state: 'UNKNOWN' as const,
+      score: null,
+      reason: 'Recent data is too thin for a health read: 1 attempt.',
+      ...(overrides.score ?? {}),
+    };
+
+    return {
+      ...overrides,
+      providerId,
+      requests: 1,
+      symbolsRequested: 2,
+      symbolsFetched: 2,
+      symbolsBlocked: 0,
+      cooldown: 'INACTIVE',
+      windowSize: 6,
+      window,
+      score: {
+        ...score,
+        role: window.role,
+      },
+    };
+  }
+
   function createQuoteMeta(
     overrides: Partial<ProviderRouterResult['meta']> = {},
   ): ProviderRouterResult['meta'] {
@@ -53,14 +95,7 @@ describe('debugObservatoryService', () => {
         ETH: 'FRESH',
       },
       providerHealthSummary: {
-        'router:primary': {
-          providerId: 'router:primary',
-          requests: 1,
-          symbolsRequested: 2,
-          symbolsFetched: 2,
-          symbolsBlocked: 0,
-          cooldown: 'INACTIVE',
-        },
+        'router:primary': createProviderHealthEntry('router:primary'),
       },
       policy: {
         staleIfError: 'NOT_NEEDED',
@@ -80,6 +115,34 @@ describe('debugObservatoryService', () => {
       quoteMeta: createQuoteMeta({
         fallbackUsed: true,
         providersTried: ['router:primary', 'router:fallback'],
+        providerHealthSummary: {
+          'router:primary': createProviderHealthEntry('router:primary', {
+            requests: 3,
+            symbolsRequested: 4,
+            symbolsFetched: 2,
+            symbolsBlocked: 2,
+            cooldown: 'ACTIVE_SKIP',
+            window: {
+              providerId: 'router:primary',
+              role: 'execution',
+              recentAttempts: 2,
+              recentSuccesses: 1,
+              recentFailures: 1,
+              recentCooldownSkips: 1,
+              lastAttemptAt: nowIso,
+              lastSuccessAt: nowIso,
+              lastFailureAt: nowIso,
+            },
+            score: {
+              providerId: 'router:primary',
+              role: 'execution',
+              state: 'COOLDOWN_ACTIVE',
+              score: 50,
+              reason:
+                'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+            },
+          }),
+        },
       }),
       deltas: { BTC: 0.1, ETH: -0.05 },
     });
@@ -106,15 +169,36 @@ describe('debugObservatoryService', () => {
       }),
     );
     expect(result.quoteResult.meta.providerHealthSummary).toEqual({
-      'router:primary': {
-        providerId: 'router:primary',
-        requests: 1,
-        symbolsRequested: 2,
+      'router:primary': createProviderHealthEntry('router:primary', {
+        requests: 3,
+        symbolsRequested: 4,
         symbolsFetched: 2,
-        symbolsBlocked: 0,
-        cooldown: 'INACTIVE',
-      },
+        symbolsBlocked: 2,
+        cooldown: 'ACTIVE_SKIP',
+        window: {
+          providerId: 'router:primary',
+          role: 'execution',
+          recentAttempts: 2,
+          recentSuccesses: 1,
+          recentFailures: 1,
+          recentCooldownSkips: 1,
+          lastAttemptAt: nowIso,
+          lastSuccessAt: nowIso,
+          lastFailureAt: nowIso,
+        },
+        score: {
+          providerId: 'router:primary',
+          role: 'execution',
+          state: 'COOLDOWN_ACTIVE',
+          score: 50,
+          reason:
+            'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+        },
+      }),
     });
+    expect(result.quoteResult.meta.providerHealthSummary['router:primary']?.score?.state).toBe(
+      'COOLDOWN_ACTIVE',
+    );
     expect(result.quoteResult.meta.policy.cooldownSkippedProviders).toEqual([]);
   });
 

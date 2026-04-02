@@ -1,4 +1,4 @@
-# QuoteBroker Model (PX-API1 / PX-API2 / PX-API3)
+# QuoteBroker Model (PX-API1 / PX-API2 / PX-API3 / PX-API4)
 
 ## Purpose
 QuoteBroker is the single choke point for quote retrieval and quote-related runtime policy in PocketPilot.
@@ -30,7 +30,7 @@ QuoteBroker must own:
 - stale-if-error behavior
 - stale-while-revalidate behavior where appropriate
 - last-good stamps and preservation
-- provider health counters
+- thin recent-window provider health tracking and scoring
 - structured instrumentation and logging
 - certainty and freshness labeling where trust matters
 
@@ -214,7 +214,7 @@ QuoteBroker now returns structured quote metadata that makes trust inspectable:
 - explicit failure-policy state
 - `coalescedRequest`
 - per-symbol policy state
-- provider health summary
+- provider health summary with recent window/state/score
 - cooldown-skipped providers
 
 Current implemented semantics in PX-API2 / PX-API3:
@@ -226,8 +226,8 @@ Current implemented semantics in PX-API2 / PX-API3:
 - per-symbol runtime state for fresh, stale, last-good, and unavailable outcomes
 - seam-friendly provider health output for downstream services and debug inspection
 
-### PX-API3 Runtime Hardening
-PX-API3 adds the next thin runtime-policy layer without turning QuoteBroker into a hidden runtime engine.
+### PX-API3 / PX-API4 Runtime Hardening
+PX-API3 and PX-API4 add the next thin runtime-policy layers without turning QuoteBroker into a hidden runtime engine.
 
 What is now implemented:
 - identical in-flight requests coalesce onto one underlying fetch path
@@ -236,6 +236,11 @@ What is now implemented:
 - requests with different account scope, quote currency, budget context, time input, or cached fallback inputs do not coalesce together
 - mixed multi-symbol results preserve symbol-level degradation instead of flattening everything into one opaque result mood
 - cooldown skips, coalescing, and provider health counters are explicit in result metadata
+- provider health is also summarized through a bounded recent event window per provider/role
+- recent windows are count-based, foreground-only, and intentionally small
+- health states are explicit: `UNKNOWN`, `HEALTHY`, `DEGRADED`, `COOLDOWN_ACTIVE`
+- the numeric health score is a simple recent success-rate percentage over recent attempts only
+- cooldown skips remain visible in the health window but do not masquerade as request failures
 
 What PX-API3 still does not imply:
 - no background polling
@@ -243,6 +248,12 @@ What PX-API3 still does not imply:
 - no hidden stale-while-revalidate worker
 - no semantic substitution across roles
 - no fake async runtime layer beyond the foreground request path
+
+What PX-API4 still does not imply:
+- no long-memory provider reputation system
+- no adaptive chain reordering engine
+- no background health daemon
+- no observability platform beyond the explicit seam metadata
 
 Current non-goals remain honest in code:
 - no datastore-backed cache/runtime
@@ -254,7 +265,7 @@ The current stale-while-revalidate field exists to keep the contract explicit.
 In PX-API2 it reports `NOT_IMPLEMENTED_FOREGROUND_ONLY` rather than pretending background machinery already exists.
 
 ## Provider Health And Instrumentation
-QuoteBroker must maintain structured counters and logs for:
+QuoteBroker must maintain structured counters and recent-window health summaries for:
 - provider requests
 - provider failures
 - cooldown activations
@@ -265,6 +276,23 @@ QuoteBroker must maintain structured counters and logs for:
 
 Logging belongs at the seam where routing and quote policy decisions are visible.
 That is how future runtime work stays inspectable without leaking provider mood swings into product surfaces.
+
+### PX-API4 Recent Health Window
+PX-API4 keeps provider health intentionally thin:
+- one bounded recent event window per provider/role in-process only
+- current implementation uses a count-based window of the most recent 6 health events
+- tracked event kinds are: attempt success, attempt failure, cooldown skip
+- only success/failure events count as attempts
+- cooldown skips influence state but remain distinct from failures
+
+The current health state rules are intentionally boring:
+- `UNKNOWN` when recent attempt data is too thin to say more
+- `HEALTHY` when recent successes dominate the bounded window and cooldown is not active
+- `DEGRADED` when recent failures and cooldown skips are not outweighed by successes
+- `COOLDOWN_ACTIVE` when the provider is currently cooling down
+
+The score is secondary to the counts and state.
+It is simply the recent success-rate percentage over recent attempts in the bounded window, or `null` when data is too thin.
 
 ## What QuoteBroker Is Protecting
 QuoteBroker protects three things at once:
@@ -282,4 +310,4 @@ Future phases may add:
 - richer provider scoring and health windows
 
 Those are future-phase extensions only.
-PX-API1 does not authorize background polling, hidden refresh workers, or backend runtime infrastructure.
+PX-API1 through PX-API4 do not authorize background polling, hidden refresh workers, or backend runtime infrastructure.

@@ -1,9 +1,16 @@
 import type { Quote } from '@/core/types/quote';
+import {
+  appendProviderHealthEvent,
+  buildProviderHealthSnapshot,
+  DEFAULT_PROVIDER_HEALTH_WINDOW_SIZE,
+  type ProviderHealthEvent,
+} from '@/services/providers/providerHealth';
 import type {
   CertaintyState,
   FreshnessState,
   ProviderBudgetClass,
   ProviderRequestContext,
+  ProviderRequestRole,
   QuoteProviderHealthSummary,
   QuoteRequest,
   QuoteResponse,
@@ -185,6 +192,8 @@ export class QuoteBroker {
 
   private readonly cooldownMs: number;
 
+  private readonly healthWindowSize: number;
+
   private readonly budgetWindows: Partial<Record<ProviderBudgetClass, BudgetWindow>>;
 
   private instrumentationState: QuoteBrokerInstrumentation;
@@ -193,6 +202,10 @@ export class QuoteBroker {
 
   private readonly inFlightByKey: Map<string, InFlightRequest>;
 
+  private readonly recentHealthEventsByRole: Partial<
+    Record<ProviderRequestRole, ReadonlyArray<ProviderHealthEvent>>
+  >;
+
   private cooldownUntilMs: number | null;
 
   constructor(options: {
@@ -200,11 +213,13 @@ export class QuoteBroker {
     fetcher: QuoteFetcher;
     nowProvider?: () => number;
     cooldownMs?: number;
+    healthWindowSize?: number;
   }) {
     this.providerId = options.providerId ?? 'quote-broker';
     this.fetcher = options.fetcher;
     this.nowProvider = options.nowProvider ?? Date.now;
     this.cooldownMs = options.cooldownMs ?? 0;
+    this.healthWindowSize = options.healthWindowSize ?? DEFAULT_PROVIDER_HEALTH_WINDOW_SIZE;
     this.budgetWindows = {};
     this.instrumentationState = {
       requests: 0,
@@ -214,6 +229,7 @@ export class QuoteBroker {
     };
     this.lastGoodByKey = new Map<string, LastGoodEntry>();
     this.inFlightByKey = new Map<string, InFlightRequest>();
+    this.recentHealthEventsByRole = {};
     this.cooldownUntilMs = null;
   }
 
@@ -266,6 +282,7 @@ export class QuoteBroker {
     const budgetWindow = this.getBudgetWindow(budgetClass, nowMs);
 
     if (this.isCooldownActive(nowMs)) {
+      this.recordHealthEvent(context.role, 'COOLDOWN_SKIP', nowMs);
       const reusedQuotes = this.selectLastGoodQuotes(request);
       this.instrumentationState.symbolsBlocked += requestedSymbols.length;
       return this.buildResponse({
@@ -322,6 +339,7 @@ export class QuoteBroker {
       };
 
       this.cooldownUntilMs = null;
+      this.recordHealthEvent(context.role, 'SUCCESS', nowMs);
       this.storeLastGoodQuotes(context, request.accountId, fetchedRecord);
 
       return this.buildResponse({
@@ -335,6 +353,7 @@ export class QuoteBroker {
         policyStateBySymbol: this.buildPolicyStateBySymbol(request, fetchedRecord, reusedQuotes),
       });
     } catch {
+      this.recordHealthEvent(context.role, 'FAILURE', nowMs);
       if (this.cooldownMs > 0) {
         this.cooldownUntilMs = nowMs + this.cooldownMs;
       }
@@ -459,6 +478,23 @@ export class QuoteBroker {
     }
   }
 
+  private recordHealthEvent(
+    role: ProviderRequestRole,
+    kind: ProviderHealthEvent['kind'],
+    timestampMs: number,
+  ): void {
+    const existingEvents = this.recentHealthEventsByRole[role] ?? [];
+
+    this.recentHealthEventsByRole[role] = appendProviderHealthEvent({
+      events: existingEvents,
+      event: {
+        kind,
+        timestampMs,
+      },
+      windowSize: this.healthWindowSize,
+    });
+  }
+
   private buildResponse(params: {
     request: QuoteRequest;
     quotes: Record<string, Quote>;
@@ -509,7 +545,11 @@ export class QuoteBroker {
         fallbackUsed: false,
         coalescedRequest: params.coalescedRequest,
         policyStateBySymbol: params.policyStateBySymbol,
-        providerHealthSummary: this.getProviderHealthSummary(params.cooldown),
+        providerHealthSummary: this.getProviderHealthSummary({
+          role: params.request.context.role,
+          cooldown: params.cooldown,
+          nowMs: params.request.nowMs,
+        }),
         policy: {
           staleIfError: params.staleIfError,
           staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
@@ -520,10 +560,20 @@ export class QuoteBroker {
     };
   }
 
-  private getProviderHealthSummary(
-    cooldown: QuoteRuntimePolicyState['cooldown'],
-  ): Record<string, QuoteProviderHealthSummary> {
+  private getProviderHealthSummary(params: {
+    role: ProviderRequestRole;
+    cooldown: QuoteRuntimePolicyState['cooldown'];
+    nowMs: number;
+  }): Record<string, QuoteProviderHealthSummary> {
     const instrumentation = this.instrumentation;
+    const recentEvents = this.recentHealthEventsByRole[params.role] ?? [];
+    const recentHealth = buildProviderHealthSnapshot({
+      providerId: this.providerId,
+      role: params.role,
+      events: recentEvents,
+      cooldownActive: this.isCooldownActive(params.nowMs),
+      windowSize: this.healthWindowSize,
+    });
 
     return {
       [this.providerId]: {
@@ -532,7 +582,10 @@ export class QuoteBroker {
         symbolsRequested: instrumentation.symbolsRequested,
         symbolsFetched: instrumentation.symbolsFetched,
         symbolsBlocked: instrumentation.symbolsBlocked,
-        cooldown,
+        cooldown: params.cooldown,
+        windowSize: recentHealth.windowSize,
+        window: recentHealth.window,
+        score: recentHealth.score,
       },
     };
   }
