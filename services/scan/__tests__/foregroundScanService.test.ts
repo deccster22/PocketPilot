@@ -71,7 +71,15 @@ describe('runForegroundScan', () => {
         returnedSymbols: ['AAPL', 'MSFT'],
         missingSymbols: [],
         usedLastGood: false,
+        coalescedRequest: false,
+        policyStateBySymbol: {
+          AAPL: 'FRESH',
+          MSFT: 'FRESH',
+        },
       }),
+    );
+    expect(result.quoteMeta.policy.staleWhileRevalidate).toBe(
+      'NOT_IMPLEMENTED_FOREGROUND_ONLY',
     );
   });
 

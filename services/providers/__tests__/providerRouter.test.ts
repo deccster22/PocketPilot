@@ -27,10 +27,23 @@ describe('providerRouter', () => {
       timestampMs: nowMs,
       providersTried: ['provider:test'],
       sourceBySymbol: {},
+      coalescedRequest: false,
+      policyStateBySymbol: {},
+      providerHealthSummary: {
+        'provider:test': {
+          providerId: 'provider:test',
+          requests: 1,
+          symbolsRequested: 0,
+          symbolsFetched: 0,
+          symbolsBlocked: 0,
+          cooldown: 'INACTIVE',
+        },
+      },
       policy: {
         staleIfError: 'NOT_NEEDED',
         staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
         cooldown: 'INACTIVE',
+        cooldownSkippedProviders: [],
       },
       ...overrides,
     };
@@ -66,6 +79,20 @@ describe('providerRouter', () => {
           sourceBySymbol: {
             AAPL: 'primary-feed',
             MSFT: 'primary-feed',
+          },
+          policyStateBySymbol: {
+            AAPL: 'FRESH',
+            MSFT: 'FRESH',
+          },
+          providerHealthSummary: {
+            'reference-primary': {
+              providerId: 'reference-primary',
+              requests: 1,
+              symbolsRequested: 2,
+              symbolsFetched: 2,
+              symbolsBlocked: 0,
+              cooldown: 'INACTIVE',
+            },
           },
         }),
       })),
@@ -110,6 +137,11 @@ describe('providerRouter', () => {
         requestedSymbols: ['AAPL', 'MSFT'],
         returnedSymbols: ['AAPL', 'MSFT'],
         missingSymbols: [],
+        coalescedRequest: false,
+        policyStateBySymbol: {
+          AAPL: 'FRESH',
+          MSFT: 'FRESH',
+        },
       }),
     );
   });
@@ -130,6 +162,19 @@ describe('providerRouter', () => {
           returnedSymbols: [],
           missingSymbols: request.symbols,
           providersTried: ['execution-primary'],
+          policyStateBySymbol: {
+            BTC: 'UNAVAILABLE',
+          },
+          providerHealthSummary: {
+            'execution-primary': {
+              providerId: 'execution-primary',
+              requests: 1,
+              symbolsRequested: 1,
+              symbolsFetched: 0,
+              symbolsBlocked: 1,
+              cooldown: 'INACTIVE',
+            },
+          },
         }),
       })),
     };
@@ -147,6 +192,7 @@ describe('providerRouter', () => {
           returnedSymbols: ['BTC'],
           providersTried: ['reference-primary'],
           sourceBySymbol: { BTC: 'reference-feed' },
+          policyStateBySymbol: { BTC: 'FRESH' },
         }),
       })),
     };
@@ -182,11 +228,12 @@ describe('providerRouter', () => {
         returnedSymbols: [],
         missingSymbols: ['BTC'],
         providersTried: ['execution-primary'],
+        policyStateBySymbol: { BTC: 'UNAVAILABLE' },
       }),
     );
   });
 
-  it('uses same-role fallback when the primary chain misses symbols', async () => {
+  it('uses same-role fallback and preserves inspectable policy state across the seam', async () => {
     const primary: QuoteProvider = {
       id: 'reference-primary',
       role: 'reference',
@@ -202,6 +249,24 @@ describe('providerRouter', () => {
           missingSymbols: ['SOL'],
           providersTried: ['reference-primary'],
           sourceBySymbol: { BTC: 'primary-feed' },
+          coalescedRequest: true,
+          policyStateBySymbol: { BTC: 'FRESH', SOL: 'UNAVAILABLE' },
+          providerHealthSummary: {
+            'reference-primary': {
+              providerId: 'reference-primary',
+              requests: 2,
+              symbolsRequested: 2,
+              symbolsFetched: 1,
+              symbolsBlocked: 1,
+              cooldown: 'ACTIVE_SKIP',
+            },
+          },
+          policy: {
+            staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
+            staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+            cooldown: 'ACTIVE_SKIP',
+            cooldownSkippedProviders: ['reference-primary'],
+          },
         }),
       })),
     };
@@ -224,6 +289,17 @@ describe('providerRouter', () => {
           returnedSymbols: ['SOL'],
           providersTried: ['reference-fallback'],
           sourceBySymbol: { SOL: 'fallback-feed' },
+          policyStateBySymbol: { SOL: 'FRESH' },
+          providerHealthSummary: {
+            'reference-fallback': {
+              providerId: 'reference-fallback',
+              requests: 1,
+              symbolsRequested: 1,
+              symbolsFetched: 1,
+              symbolsBlocked: 0,
+              cooldown: 'INACTIVE',
+            },
+          },
         }),
       })),
     };
@@ -269,8 +345,37 @@ describe('providerRouter', () => {
           BTC: 'primary-feed',
           SOL: 'fallback-feed',
         },
+        coalescedRequest: true,
+        policyStateBySymbol: {
+          BTC: 'FRESH',
+          SOL: 'FRESH',
+        },
       }),
     );
+    expect(result.meta.policy).toEqual({
+      staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
+      staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+      cooldown: 'ACTIVE_SKIP',
+      cooldownSkippedProviders: ['reference-primary'],
+    });
+    expect(result.meta.providerHealthSummary).toEqual({
+      'reference-primary': {
+        providerId: 'reference-primary',
+        requests: 2,
+        symbolsRequested: 2,
+        symbolsFetched: 1,
+        symbolsBlocked: 1,
+        cooldown: 'ACTIVE_SKIP',
+      },
+      'reference-fallback': {
+        providerId: 'reference-fallback',
+        requests: 1,
+        symbolsRequested: 1,
+        symbolsFetched: 1,
+        symbolsBlocked: 0,
+        cooldown: 'INACTIVE',
+      },
+    });
   });
 
   it('fails fast when a provider chain is tagged to the wrong role', async () => {

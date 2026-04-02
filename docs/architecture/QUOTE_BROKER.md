@@ -1,4 +1,4 @@
-# QuoteBroker Model (PX-API1 / PX-API2)
+# QuoteBroker Model (PX-API1 / PX-API2 / PX-API3)
 
 ## Purpose
 QuoteBroker is the single choke point for quote retrieval and quote-related runtime policy in PocketPilot.
@@ -190,8 +190,9 @@ Examples:
 
 The UI must consume prepared state from services rather than infer trust from raw provider behavior.
 
-## PX-API2 Code Contract
-PX-API2 makes QuoteBroker's quote runtime contract explicit in code.
+## PX-API2 / PX-API3 Code Contract
+PX-API2 made QuoteBroker's quote runtime contract explicit in code.
+PX-API3 hardens the runtime-policy behavior on top of that contract without adding background runtime complexity.
 
 QuoteBroker now consumes an explicit runtime request context with:
 - `role`
@@ -211,12 +212,37 @@ QuoteBroker now returns structured quote metadata that makes trust inspectable:
 - providers tried
 - source-by-symbol provenance
 - explicit failure-policy state
+- `coalescedRequest`
+- per-symbol policy state
+- provider health summary
+- cooldown-skipped providers
 
-Current implemented semantics in PX-API2:
+Current implemented semantics in PX-API2 / PX-API3:
 - in-process last-good preservation
 - stale-if-error signaling
 - minimal cooldown-active skip behavior
 - budget enforcement through the explicit request context
+- deterministic in-flight coalescing for contract-identical requests only
+- per-symbol runtime state for fresh, stale, last-good, and unavailable outcomes
+- seam-friendly provider health output for downstream services and debug inspection
+
+### PX-API3 Runtime Hardening
+PX-API3 adds the next thin runtime-policy layer without turning QuoteBroker into a hidden runtime engine.
+
+What is now implemented:
+- identical in-flight requests coalesce onto one underlying fetch path
+- the coalescing key is contract-aware and includes the request fields that change meaning
+- execution and reference requests do not coalesce together
+- requests with different account scope, quote currency, budget context, time input, or cached fallback inputs do not coalesce together
+- mixed multi-symbol results preserve symbol-level degradation instead of flattening everything into one opaque result mood
+- cooldown skips, coalescing, and provider health counters are explicit in result metadata
+
+What PX-API3 still does not imply:
+- no background polling
+- no datastore-backed cache
+- no hidden stale-while-revalidate worker
+- no semantic substitution across roles
+- no fake async runtime layer beyond the foreground request path
 
 Current non-goals remain honest in code:
 - no datastore-backed cache/runtime

@@ -21,10 +21,23 @@ describe('fetchSnapshotSurfaceVM', () => {
     timestampMs: Date.parse('2026-04-01T00:00:00.000Z'),
     providersTried: ['broker:live'],
     sourceBySymbol: {},
+    coalescedRequest: false,
+    policyStateBySymbol: {},
+    providerHealthSummary: {
+      'broker:live': {
+        providerId: 'broker:live',
+        requests: 0,
+        symbolsRequested: 0,
+        symbolsFetched: 0,
+        symbolsBlocked: 0,
+        cooldown: 'INACTIVE',
+      },
+    },
     policy: {
       staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
       staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
       cooldown: 'INACTIVE',
+      cooldownSkippedProviders: [],
     },
   });
 
