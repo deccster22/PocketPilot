@@ -35,9 +35,10 @@ Read these before making architectural or behavioural changes:
 2. `governance/GUARDRAILS.md`
 3. `governance/CONTEXT_SUITE.md`
 4. `governance/ENGINEERING_CONTRACT.md`
-5. Relevant architecture model(s)
-6. Relevant phase/runbook doc(s)
-7. Most recent phase report / forensic handover if available
+5. `docs/phases/PHASE_MAP.md`
+6. Relevant architecture model(s)
+7. Relevant phase/runbook doc(s)
+8. Most recent phase report / forensic handover if available
 
 ### If you are reconciling drift or resuming after a gap
 Start with:
@@ -45,8 +46,9 @@ Start with:
 1. `governance/CANON.md`
 2. `governance/GUARDRAILS.md`
 3. `governance/CONTEXT_SUITE.md`
-4. `product/PRODUCT_SPEC.md`
-5. latest forensic handover / phase ledger / reconciliation pack
+4. `docs/phases/PHASE_MAP.md`
+5. `product/PRODUCT_SPEC.md`
+6. latest forensic handover / phase ledger / reconciliation pack
 
 ---
 
@@ -291,7 +293,7 @@ The UI should not be inventing interpretation logic from raw data. If it feels l
 
 ## Phase Framing
 
-PocketPilot is easiest to read at two levels.
+PocketPilot is easiest to read at three levels.
 
 ### Macro phases
 - **Macro Phase 1 - Foundation**
@@ -299,7 +301,7 @@ PocketPilot is easiest to read at two levels.
 - **Macro Phase 3 - Intelligence**
 - **Macro Phase 4 - Copilot and Hardening**
 
-### Workstream / delivery phases
+### Canonical product workstream families
 - `P0` Vision, doctrine, architecture, repo discipline foundation
 - `P1` Strategy engine foundations
 - `P2` Snapshot / provider / governance / debug observatory foundation
@@ -312,6 +314,13 @@ PocketPilot is easiest to read at two levels.
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P10` Beta hardening
 - `P11` Launch prep
+
+### Cross-cutting / support phases
+Use `PX-*` for cross-cutting, platform, runtime, hardening, cleanup, doctrine, audit, or support work that may happen before, after, or alongside numbered product families.
+
+Use `P#-subphase` only for scoped work inside one canonical family. Example: `P6-R5A` is cleanup within `P6`; it does not imply completion of `P7`, `P8`, or `P9`.
+
+Canonical taxonomy, source-lens reconciliation, and the audited implementation ledger live in `docs/phases/PHASE_MAP.md`.
 
 If a feature is not scheduled in the runbook / phase model, it should not quietly appear in implementation.
 
@@ -394,7 +403,7 @@ If any of those are fuzzy, stop and reconcile before pushing.
 `ARCHITECTURE_OVERVIEW` -> `ARCHITECTURE_MAP` -> relevant architecture seam doc(s) -> phase/runbook doc
 
 ### Recovery / handover lens
-`CANON` -> `GUARDRAILS` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
+`CANON` -> `GUARDRAILS` -> `PHASE_MAP` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
 
 ---
 

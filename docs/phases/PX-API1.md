@@ -3,6 +3,8 @@
 ## Purpose
 PX-API1 locks PocketPilot's runtime data-plane doctrine before live-data and provider complexity grow further.
 
+`PX-*` labels are cross-cutting platform and hardening phases. They may land alongside numbered product families and do not imply completion of `P3` through `P11`. See `PHASE_MAP.md`.
+
 This phase exists so future implementation work has hard architectural rules for:
 - Provider Router
 - QuoteBroker
