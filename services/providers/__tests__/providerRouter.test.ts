@@ -9,6 +9,48 @@ describe('providerRouter', () => {
   const nowMs = 1_700_000_000_000;
   const nowIso = new Date(nowMs).toISOString();
 
+  function createProviderHealthEntry(
+    providerId: string,
+    overrides: Partial<QuoteResponseMetadata['providerHealthSummary'][string]> = {},
+  ): QuoteResponseMetadata['providerHealthSummary'][string] {
+    const window = {
+      providerId,
+      role: 'reference' as const,
+      recentAttempts: 1,
+      recentSuccesses: 1,
+      recentFailures: 0,
+      recentCooldownSkips: 0,
+      lastAttemptAt: nowIso,
+      lastSuccessAt: nowIso,
+      lastFailureAt: null,
+      ...(overrides.window ?? {}),
+    };
+    const score = {
+      providerId,
+      role: window.role,
+      state: 'UNKNOWN' as const,
+      score: null,
+      reason: 'Recent data is too thin for a health read: 1 attempt.',
+      ...(overrides.score ?? {}),
+    };
+
+    return {
+      ...overrides,
+      providerId,
+      requests: 1,
+      symbolsRequested: 0,
+      symbolsFetched: 0,
+      symbolsBlocked: 0,
+      cooldown: 'INACTIVE',
+      windowSize: 6,
+      window,
+      score: {
+        ...score,
+        role: window.role,
+      },
+    };
+  }
+
   function createMeta(
     overrides: Partial<QuoteResponseMetadata> = {},
   ): QuoteResponseMetadata {
@@ -30,14 +72,7 @@ describe('providerRouter', () => {
       coalescedRequest: false,
       policyStateBySymbol: {},
       providerHealthSummary: {
-        'provider:test': {
-          providerId: 'provider:test',
-          requests: 1,
-          symbolsRequested: 0,
-          symbolsFetched: 0,
-          symbolsBlocked: 0,
-          cooldown: 'INACTIVE',
-        },
+        'provider:test': createProviderHealthEntry('provider:test'),
       },
       policy: {
         staleIfError: 'NOT_NEEDED',
@@ -85,14 +120,28 @@ describe('providerRouter', () => {
             MSFT: 'FRESH',
           },
           providerHealthSummary: {
-            'reference-primary': {
-              providerId: 'reference-primary',
-              requests: 1,
+            'reference-primary': createProviderHealthEntry('reference-primary', {
               symbolsRequested: 2,
               symbolsFetched: 2,
-              symbolsBlocked: 0,
-              cooldown: 'INACTIVE',
-            },
+              window: {
+                providerId: 'reference-primary',
+                role: 'reference',
+                recentAttempts: 1,
+                recentSuccesses: 1,
+                recentFailures: 0,
+                recentCooldownSkips: 0,
+                lastAttemptAt: nowIso,
+                lastSuccessAt: nowIso,
+                lastFailureAt: null,
+              },
+              score: {
+                providerId: 'reference-primary',
+                role: 'reference',
+                state: 'UNKNOWN',
+                score: null,
+                reason: 'Recent data is too thin for a health read: 1 attempt.',
+              },
+            }),
           },
         }),
       })),
@@ -166,14 +215,30 @@ describe('providerRouter', () => {
             BTC: 'UNAVAILABLE',
           },
           providerHealthSummary: {
-            'execution-primary': {
-              providerId: 'execution-primary',
-              requests: 1,
+            'execution-primary': createProviderHealthEntry('execution-primary', {
               symbolsRequested: 1,
               symbolsFetched: 0,
               symbolsBlocked: 1,
-              cooldown: 'INACTIVE',
-            },
+              window: {
+                providerId: 'execution-primary',
+                role: 'execution',
+                recentAttempts: 3,
+                recentSuccesses: 1,
+                recentFailures: 2,
+                recentCooldownSkips: 0,
+                lastAttemptAt: nowIso,
+                lastSuccessAt: nowIso,
+                lastFailureAt: nowIso,
+              },
+              score: {
+                providerId: 'execution-primary',
+                role: 'execution',
+                state: 'DEGRADED',
+                score: 33,
+                reason:
+                  'Recent failures or cooldown skips are not outweighed by successes: 1 success, 2 failures, 0 cooldown skips.',
+              },
+            }),
           },
         }),
       })),
@@ -231,6 +296,7 @@ describe('providerRouter', () => {
         policyStateBySymbol: { BTC: 'UNAVAILABLE' },
       }),
     );
+    expect(result.meta.providerHealthSummary['execution-primary']?.score?.state).toBe('DEGRADED');
   });
 
   it('uses same-role fallback and preserves inspectable policy state across the seam', async () => {
@@ -252,14 +318,32 @@ describe('providerRouter', () => {
           coalescedRequest: true,
           policyStateBySymbol: { BTC: 'FRESH', SOL: 'UNAVAILABLE' },
           providerHealthSummary: {
-            'reference-primary': {
-              providerId: 'reference-primary',
+            'reference-primary': createProviderHealthEntry('reference-primary', {
               requests: 2,
               symbolsRequested: 2,
               symbolsFetched: 1,
               symbolsBlocked: 1,
               cooldown: 'ACTIVE_SKIP',
-            },
+              window: {
+                providerId: 'reference-primary',
+                role: 'reference',
+                recentAttempts: 2,
+                recentSuccesses: 1,
+                recentFailures: 1,
+                recentCooldownSkips: 1,
+                lastAttemptAt: nowIso,
+                lastSuccessAt: nowIso,
+                lastFailureAt: nowIso,
+              },
+              score: {
+                providerId: 'reference-primary',
+                role: 'reference',
+                state: 'COOLDOWN_ACTIVE',
+                score: 50,
+                reason:
+                  'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+              },
+            }),
           },
           policy: {
             staleIfError: 'FAILED_WITHOUT_LAST_GOOD',
@@ -291,14 +375,29 @@ describe('providerRouter', () => {
           sourceBySymbol: { SOL: 'fallback-feed' },
           policyStateBySymbol: { SOL: 'FRESH' },
           providerHealthSummary: {
-            'reference-fallback': {
-              providerId: 'reference-fallback',
-              requests: 1,
+            'reference-fallback': createProviderHealthEntry('reference-fallback', {
               symbolsRequested: 1,
               symbolsFetched: 1,
-              symbolsBlocked: 0,
-              cooldown: 'INACTIVE',
-            },
+              window: {
+                providerId: 'reference-fallback',
+                role: 'reference',
+                recentAttempts: 2,
+                recentSuccesses: 2,
+                recentFailures: 0,
+                recentCooldownSkips: 0,
+                lastAttemptAt: nowIso,
+                lastSuccessAt: nowIso,
+                lastFailureAt: null,
+              },
+              score: {
+                providerId: 'reference-fallback',
+                role: 'reference',
+                state: 'HEALTHY',
+                score: 100,
+                reason:
+                  'Recent successes dominate the current window: 2 successes, 0 failures, 0 cooldown skips.',
+              },
+            }),
           },
         }),
       })),
@@ -359,23 +458,60 @@ describe('providerRouter', () => {
       cooldownSkippedProviders: ['reference-primary'],
     });
     expect(result.meta.providerHealthSummary).toEqual({
-      'reference-primary': {
-        providerId: 'reference-primary',
+      'reference-primary': createProviderHealthEntry('reference-primary', {
         requests: 2,
         symbolsRequested: 2,
         symbolsFetched: 1,
         symbolsBlocked: 1,
         cooldown: 'ACTIVE_SKIP',
-      },
-      'reference-fallback': {
-        providerId: 'reference-fallback',
-        requests: 1,
+        window: {
+          providerId: 'reference-primary',
+          role: 'reference',
+          recentAttempts: 2,
+          recentSuccesses: 1,
+          recentFailures: 1,
+          recentCooldownSkips: 1,
+          lastAttemptAt: nowIso,
+          lastSuccessAt: nowIso,
+          lastFailureAt: nowIso,
+        },
+        score: {
+          providerId: 'reference-primary',
+          role: 'reference',
+          state: 'COOLDOWN_ACTIVE',
+          score: 50,
+          reason:
+            'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+        },
+      }),
+      'reference-fallback': createProviderHealthEntry('reference-fallback', {
         symbolsRequested: 1,
         symbolsFetched: 1,
-        symbolsBlocked: 0,
-        cooldown: 'INACTIVE',
-      },
+        window: {
+          providerId: 'reference-fallback',
+          role: 'reference',
+          recentAttempts: 2,
+          recentSuccesses: 2,
+          recentFailures: 0,
+          recentCooldownSkips: 0,
+          lastAttemptAt: nowIso,
+          lastSuccessAt: nowIso,
+          lastFailureAt: null,
+        },
+        score: {
+          providerId: 'reference-fallback',
+          role: 'reference',
+          state: 'HEALTHY',
+          score: 100,
+          reason:
+            'Recent successes dominate the current window: 2 successes, 0 failures, 0 cooldown skips.',
+        },
+      }),
     });
+    expect(result.meta.providerHealthSummary['reference-primary']?.score?.state).toBe(
+      'COOLDOWN_ACTIVE',
+    );
+    expect(result.meta.providerHealthSummary['reference-fallback']?.score?.state).toBe('HEALTHY');
   });
 
   it('fails fast when a provider chain is tagged to the wrong role', async () => {

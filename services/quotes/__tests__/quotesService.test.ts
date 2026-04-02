@@ -7,6 +7,48 @@ describe('fetchQuotes', () => {
   const nowMs = 1_700_000_000_000;
   const nowIso = new Date(nowMs).toISOString();
 
+  function createProviderHealthEntry(
+    providerId: string,
+    overrides: Partial<ProviderRouterResult['meta']['providerHealthSummary'][string]> = {},
+  ): ProviderRouterResult['meta']['providerHealthSummary'][string] {
+    const window = {
+      providerId,
+      role: 'execution' as const,
+      recentAttempts: 1,
+      recentSuccesses: 1,
+      recentFailures: 0,
+      recentCooldownSkips: 0,
+      lastAttemptAt: nowIso,
+      lastSuccessAt: nowIso,
+      lastFailureAt: null,
+      ...(overrides.window ?? {}),
+    };
+    const score = {
+      providerId,
+      role: window.role,
+      state: 'UNKNOWN' as const,
+      score: null,
+      reason: 'Recent data is too thin for a health read: 1 attempt.',
+      ...(overrides.score ?? {}),
+    };
+
+    return {
+      ...overrides,
+      providerId,
+      requests: 1,
+      symbolsRequested: 0,
+      symbolsFetched: 0,
+      symbolsBlocked: 0,
+      cooldown: 'INACTIVE',
+      windowSize: 6,
+      window,
+      score: {
+        ...score,
+        role: window.role,
+      },
+    };
+  }
+
   function createRouterResult(
     quotes: Record<string, Quote>,
     overrides: Partial<ProviderRouterResult['meta']> = {},
@@ -42,14 +84,10 @@ describe('fetchQuotes', () => {
           return acc;
         }, {}),
         providerHealthSummary: {
-          'broker:primary': {
-            providerId: 'broker:primary',
-            requests: 1,
+          'broker:primary': createProviderHealthEntry('broker:primary', {
             symbolsRequested: Object.keys(quotes).length,
             symbolsFetched: Object.keys(quotes).length,
-            symbolsBlocked: 0,
-            cooldown: 'INACTIVE',
-          },
+          }),
         },
         policy: {
           staleIfError: 'NOT_NEEDED',
@@ -149,14 +187,32 @@ describe('fetchQuotes', () => {
             NVDA: 'LAST_GOOD',
           },
           providerHealthSummary: {
-            'broker:primary': {
-              providerId: 'broker:primary',
+            'broker:primary': createProviderHealthEntry('broker:primary', {
               requests: 2,
               symbolsRequested: 2,
               symbolsFetched: 1,
               symbolsBlocked: 1,
               cooldown: 'ACTIVE_SKIP',
-            },
+              window: {
+                providerId: 'broker:primary',
+                role: 'execution',
+                recentAttempts: 2,
+                recentSuccesses: 1,
+                recentFailures: 1,
+                recentCooldownSkips: 1,
+                lastAttemptAt: nowIso,
+                lastSuccessAt: nowIso,
+                lastFailureAt: nowIso,
+              },
+              score: {
+                providerId: 'broker:primary',
+                role: 'execution',
+                state: 'COOLDOWN_ACTIVE',
+                score: 50,
+                reason:
+                  'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+              },
+            }),
           },
           policy: {
             staleIfError: 'USED_LAST_GOOD',
@@ -192,15 +248,36 @@ describe('fetchQuotes', () => {
       }),
     );
     expect(result.routerMeta.providerHealthSummary).toEqual({
-      'broker:primary': {
-        providerId: 'broker:primary',
+      'broker:primary': createProviderHealthEntry('broker:primary', {
         requests: 2,
         symbolsRequested: 2,
         symbolsFetched: 1,
         symbolsBlocked: 1,
         cooldown: 'ACTIVE_SKIP',
-      },
+        window: {
+          providerId: 'broker:primary',
+          role: 'execution',
+          recentAttempts: 2,
+          recentSuccesses: 1,
+          recentFailures: 1,
+          recentCooldownSkips: 1,
+          lastAttemptAt: nowIso,
+          lastSuccessAt: nowIso,
+          lastFailureAt: nowIso,
+        },
+        score: {
+          providerId: 'broker:primary',
+          role: 'execution',
+          state: 'COOLDOWN_ACTIVE',
+          score: 50,
+          reason:
+            'Cooldown is active in the current recent window: 1 success, 1 failure, 1 cooldown skip.',
+        },
+      }),
     });
+    expect(result.routerMeta.providerHealthSummary['broker:primary']?.score?.state).toBe(
+      'COOLDOWN_ACTIVE',
+    );
     expect(result.routerMeta.policy).toEqual({
       staleIfError: 'USED_LAST_GOOD',
       staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',

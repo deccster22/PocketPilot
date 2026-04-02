@@ -48,6 +48,37 @@ export type QuoteRuntimePolicyState = {
   cooldownSkippedProviders: string[];
 };
 
+export type ProviderHealthWindow = {
+  providerId: string;
+  role: ProviderRequestRole | 'mixed';
+  recentAttempts: number;
+  recentSuccesses: number;
+  recentFailures: number;
+  recentCooldownSkips: number;
+  lastAttemptAt: string | null;
+  lastSuccessAt: string | null;
+  lastFailureAt: string | null;
+};
+
+export type ProviderHealthState =
+  | 'HEALTHY'
+  | 'DEGRADED'
+  | 'COOLDOWN_ACTIVE'
+  | 'UNKNOWN';
+
+export type ProviderHealthScore = {
+  providerId: string;
+  role: ProviderRequestRole | 'mixed';
+  state: ProviderHealthState;
+  score: number | null;
+  reason: string;
+};
+
+export type ProviderHealthSummary = {
+  providers: ReadonlyArray<ProviderHealthScore>;
+  windowSize: number;
+};
+
 export type QuoteSymbolPolicyState =
   | 'FRESH'
   | 'STALE'
@@ -61,6 +92,9 @@ export type QuoteProviderHealthSummary = {
   symbolsFetched: number;
   symbolsBlocked: number;
   cooldown: QuoteRuntimePolicyState['cooldown'];
+  windowSize?: number;
+  window?: ProviderHealthWindow;
+  score?: ProviderHealthScore;
 };
 
 export type QuoteRequest = {
