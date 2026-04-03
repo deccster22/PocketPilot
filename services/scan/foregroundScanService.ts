@@ -45,7 +45,10 @@ export async function runForegroundScan(
     {
       accounts: params.accounts,
       symbols: params.symbols,
-
+      context: {
+        role: 'execution',
+        budgetClass: 'CALM',
+      },
     },
   );
 

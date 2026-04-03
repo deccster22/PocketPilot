@@ -1,11 +1,13 @@
 ﻿Title: PocketPilot Documentation Index
 Version: v2 markdown source
 Source: docs/source/README_v2.md
+
 Last Updated: 2026-04-03
 
 # PocketPilot Documentation Index
 
 **Last updated:** 2026-04-03  
+
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
 PocketPilot is a **strategy-first, execution-aware, calm-toned decision-support cockpit**. It is not a trading bot, not a signal-spam feed, and not a casino dashboard. The docs in this repo exist to preserve that identity while giving contributors, agents, and future build chats a clean map of what matters, where it lives, and what must not drift.
@@ -35,9 +37,10 @@ Read these before making architectural or behavioural changes:
 2. `governance/GUARDRAILS.md`
 3. `governance/CONTEXT_SUITE.md`
 4. `governance/ENGINEERING_CONTRACT.md`
-5. Relevant architecture model(s)
-6. Relevant phase/runbook doc(s)
-7. Most recent phase report / forensic handover if available
+5. `phases/PHASE_MAP.md`
+6. Relevant architecture model(s)
+7. Relevant phase/runbook doc(s)
+8. Most recent phase report / forensic handover if available
 
 ### If you are reconciling drift or resuming after a gap
 Start with:
@@ -45,8 +48,9 @@ Start with:
 1. `governance/CANON.md`
 2. `governance/GUARDRAILS.md`
 3. `governance/CONTEXT_SUITE.md`
-4. `product/PRODUCT_SPEC.md`
-5. latest forensic handover / phase ledger / reconciliation pack
+4. `phases/PHASE_MAP.md`
+5. `product/PRODUCT_SPEC.md`
+6. latest forensic handover / phase ledger / reconciliation pack
 
 ---
 
@@ -94,6 +98,7 @@ Examples:
 - `architecture/CONFIG_MODEL.md`
 - `architecture/PROVIDER_ROUTER_MODEL.md`
 - `architecture/QUOTE_BROKER.md`
+- `architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
 - `architecture/STRATEGY_ENGINE.md`
 - `architecture/MARKET_EVENT_MODEL.md`
 - `architecture/EVENT_STREAM_MODEL.md`
@@ -295,6 +300,21 @@ Key rule: **services own truth, app renders prepared contracts**.
 
 The UI should not be inventing interpretation logic from raw data. If it feels like the UI is "figuring things out," something has probably drifted.
 
+Runtime data-plane rule: Provider Router is the role-aware routing seam, QuoteBroker is the quote-policy choke point, and current-phase runtime remains foreground-only.
+
+Prepared runtime diagnostics rule: `services/debug/` owns the `RuntimeDiagnosticsVM` seam for provider health, quote policy, and per-symbol degradation inspection. `app/` may render that prepared contract only on an existing debug path.
+
+For runtime/provider work, treat these as the authoritative PX-API1 doctrine set:
+- `architecture/PROVIDER_ROUTER_MODEL.md`
+- `architecture/QUOTE_BROKER.md`
+- `architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
+- `governance/API_GOVERNANCE.md`
+- `phases/PX-API1.md`
+- `phases/PX-API2.md`
+- `phases/PX-API3.md`
+- `phases/PX-API4.md`
+- `phases/PX-API5.md`
+
 ---
 
 ## Phase Framing
@@ -307,7 +327,7 @@ PocketPilot is easiest to read at three levels.
 - **Macro Phase 3 - Intelligence**
 - **Macro Phase 4 - Copilot and Hardening**
 
-### Workstream / delivery phases
+### Canonical product workstream families
 - `P0` Vision, doctrine, architecture, repo discipline foundation
 - `P1` Strategy engine foundations
 - `P2` Snapshot / provider / governance / debug observatory foundation
@@ -327,9 +347,17 @@ PocketPilot is easiest to read at three levels.
 - `P10` Beta hardening
 - `P11` Launch prep
 
-### Cross-cutting support phases
-- Use `PX-*` for work that hardens a shared substrate or lands enabling seams ahead of the fuller product family.
+### Cross-cutting / support phases
+Use `PX-*` for cross-cutting, platform, runtime, hardening, cleanup, doctrine, audit, or support work that may happen before, after, or alongside numbered product families.
+
+Current examples:
+- `PX-API1` through `PX-API5` for runtime doctrine and hardening
+- `PX-PM1` for this phase-map audit and roadmap alignment pass
 - `PX-E1` is explanation groundwork, not proof that the richer `P9` family is complete.
+
+Use `P#-subphase` only for scoped work inside one canonical family. Example: `P6-R5A` is cleanup within `P6`; it does not imply completion of `P7`, `P8`, or `P9`.
+
+Canonical taxonomy, source-lens reconciliation, and the audited implementation ledger live in `phases/PHASE_MAP.md`.
 
 If a feature is not scheduled in the runbook / phase model, it should not quietly appear in implementation.
 
@@ -412,7 +440,7 @@ If any of those are fuzzy, stop and reconcile before pushing.
 `ARCHITECTURE_OVERVIEW` -> `ARCHITECTURE_MAP` -> relevant architecture seam doc(s) -> phase/runbook doc
 
 ### Recovery / handover lens
-`CANON` -> `GUARDRAILS` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
+`CANON` -> `GUARDRAILS` -> `PHASE_MAP` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
 
 ---
 

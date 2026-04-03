@@ -46,6 +46,14 @@ Responsibilities:
 - source selection
 - fallback logic
 - feed consistency
+- role-aware provider chains only
+- no semantic substitution across source roles
+
+Source-role taxonomy is locked in PX-API1:
+- execution
+- reference
+- macro
+- enrichment
 
 ## QuoteBroker
 
@@ -56,6 +64,13 @@ Responsibilities:
 - quote budgets
 - rate control
 - feed selection
+- stale / last-good quote policy
+- foreground-only quote runtime behavior
+
+For implementation-constraining runtime doctrine, read:
+- `docs/architecture/PROVIDER_ROUTER_MODEL.md`
+- `docs/architecture/QUOTE_BROKER.md`
+- `docs/governance/API_GOVERNANCE.md`
 
 ## Market Event Engine
 

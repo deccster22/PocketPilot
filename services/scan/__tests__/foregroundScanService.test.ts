@@ -3,40 +3,43 @@ import { QuoteBroker } from '@/providers/quoteBroker';
 import { createQuoteBrokerProvider, getQuotesForSymbols } from '@/services/providers/providerRouter';
 import type { Account } from '@/services/account/accountSelector';
 import { runForegroundScan } from '@/services/scan/foregroundScanService';
+import type { QuoteRequest } from '@/services/providers/types';
 
 describe('runForegroundScan', () => {
   const nowMs = 1_700_000_000_000;
 
   function createRouter() {
     const fetcher = jest.fn(
-      async (accountId: string, symbols: string[], timestamp: number): Promise<Quote[]> => {
-        return symbols.map((symbol) => ({
+      async (request: QuoteRequest): Promise<Quote[]> => {
+        return request.symbols.map((symbol) => ({
           symbol,
           price: symbol === 'AAPL' ? 100 : 200,
-          source: accountId,
-          timestamp,
+          source: request.accountId,
+          timestamp: request.nowMs,
           estimated: symbol === 'MSFT',
         }));
       },
     );
 
     const broker = new QuoteBroker({
-      mode: 'CALM',
+      providerId: 'broker:test',
       fetcher,
-      nowProvider: () => nowMs,
     });
 
-    const primaryProvider = createQuoteBrokerProvider(broker, 'broker:test');
+    const primaryProvider = createQuoteBrokerProvider(broker, 'execution');
 
     return {
       broker,
       fetcher,
-      getQuotesForSymbols: (params: {
-        accountId: string;
-        symbols: string[];
-        nowMs: number;
-        cachedQuotes?: Record<string, Quote>;
-      }) => getQuotesForSymbols({ primary: primaryProvider }, params),
+      getQuotesForSymbols: (params: QuoteRequest) =>
+        getQuotesForSymbols(
+          {
+            execution: {
+              primary: primaryProvider,
+            },
+          },
+          params,
+        ),
     };
   }
 
@@ -59,12 +62,24 @@ describe('runForegroundScan', () => {
     expect(result.estimatedFlags).toEqual({ AAPL: false, MSFT: true });
     expect(result.quoteMeta).toEqual(
       expect.objectContaining({
-        provider: 'broker:test',
+        role: 'execution',
+        providerId: 'broker:test',
+        freshness: 'FRESH',
+        certainty: 'ESTIMATED',
         fallbackUsed: false,
         requestedSymbols: ['AAPL', 'MSFT'],
         returnedSymbols: ['AAPL', 'MSFT'],
         missingSymbols: [],
+        usedLastGood: false,
+        coalescedRequest: false,
+        policyStateBySymbol: {
+          AAPL: 'FRESH',
+          MSFT: 'FRESH',
+        },
       }),
+    );
+    expect(result.quoteMeta.policy.staleWhileRevalidate).toBe(
+      'NOT_IMPLEMENTED_FOREGROUND_ONLY',
     );
   });
 

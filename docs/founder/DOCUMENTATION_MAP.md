@@ -3,7 +3,7 @@
 - Title: PocketPilot Documentation Map
 - Version: v2
 - Source file: `docs/source/PocketPilot Documentation Map v3.pdf`
-- Last updated: 2026-03-20
+- Last updated: 2026-04-02
 
 File: `docs/founder/PocketPilot Documentation Map`
 
@@ -51,6 +51,10 @@ Defines the identity and behaviour of the product.
 - Testing and release mechanics
 - Monitoring and support strategy
 
+PX-API1 runtime doctrine lives primarily in:
+- `docs/architecture/PROVIDER_ROUTER_MODEL.md`
+- `docs/architecture/QUOTE_BROKER.md`
+
 Technical system design.
 
 ### Tier 3 - Governance
@@ -70,6 +74,10 @@ Technical system design.
 - Verification Model
 - Compliance Copy Guide
 - Agent Operating Model
+
+PX-API1 runtime governance lives primarily in:
+- `docs/governance/API_GOVERNANCE.md`
+- `docs/phases/PX-API1.md`
 
 Important Governance Documentation
 
@@ -110,6 +118,15 @@ Strategy modelling.
 - Phase plan
 - Runbook Execution
 - Milestones
+- Phase taxonomy and audited implementation ledger
+
+Canonical phase taxonomy now lives in:
+- `docs/phases/PHASE_MAP.md`
+
+Use:
+- `P#` for canonical product families
+- `P#-subphase` for scoped work inside one canonical family
+- `PX-*` for cross-cutting/platform/hardening/support phases that do not imply numbered-family completion
 
 Build execution.
 
@@ -183,8 +200,8 @@ Historical knowledge.
   - Operational Expansion: Not required
 - `PROVIDER_ROUTER_MODEL.md`
   - Status: Architecture
-  - Maturity: Active
-  - Operational Expansion: as testing assures value
+  - Maturity: Active doctrine
+  - Operational Expansion: future provider runtime work must conform
 - `DEBUG_PANEL_MODEL.md`
   - Status: Architecture
   - Maturity: Active
@@ -204,8 +221,8 @@ Historical knowledge.
   - Operational Expansion: Near Future
 - `QUOTE_BROKER.md`
   - Status: Architecture
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
+  - Maturity: Active doctrine
+  - Operational Expansion: future quote/runtime work must conform
 - `STRATEGY_ENGINE.md`
   - Status: Architecture
   - Maturity: To be developed
@@ -300,8 +317,8 @@ Historical knowledge.
   - Operational Expansion: Updates from vision sweep
 - `API_GOVERNANCE.md`
   - Status: Operational Strategy
-  - Maturity: Draft
-  - Operational Expansion: Before APIs
+  - Maturity: Active doctrine
+  - Operational Expansion: future runtime/provider work must conform
 - `SECRETS_MODEL.md`
   - Status: Constitutional
   - Maturity: Draft
@@ -485,6 +502,13 @@ Historical knowledge.
   - Status: Strategy
   - Maturity: To be developed
   - Operational Expansion: Near Future
+
+#### `/phases`
+
+- `PHASE_MAP.md`
+  - Status: Taxonomy + Ledger
+  - Maturity: Active
+  - Operational Expansion: canonical phase naming and historical reconciliation
 
 #### `/ux`
 

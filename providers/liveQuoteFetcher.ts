@@ -1,4 +1,5 @@
 import type { Quote } from '@/core/types/quote';
+import type { QuoteRequest } from '@/services/providers/types';
 
 const BINANCE_TICKER_URL = 'https://api.binance.com/api/v3/ticker/bookTicker';
 
@@ -6,8 +7,8 @@ function toBinanceSymbol(symbol: string): string {
   return `${symbol.toUpperCase()}USDT`;
 }
 
-export async function fetchLiveQuotes(_accountId: string, symbols: string[], nowMs: number): Promise<Quote[]> {
-  const requests = symbols.map(async (symbol): Promise<Quote> => {
+export async function fetchLiveQuotes(request: QuoteRequest): Promise<Quote[]> {
+  const requests = request.symbols.map(async (symbol): Promise<Quote> => {
     const pair = toBinanceSymbol(symbol);
 
     try {
@@ -35,7 +36,7 @@ export async function fetchLiveQuotes(_accountId: string, symbols: string[], now
         bid: Number.isFinite(bid) ? bid : undefined,
         ask: Number.isFinite(ask) ? ask : undefined,
         estimated: false,
-        timestamp: nowMs,
+        timestamp: request.nowMs,
         source: 'binance-book-ticker',
       };
     } catch {
@@ -43,7 +44,7 @@ export async function fetchLiveQuotes(_accountId: string, symbols: string[], now
         symbol,
         price: 0,
         estimated: true,
-        timestamp: nowMs,
+        timestamp: request.nowMs,
         source: 'fallback-estimated',
       };
     }

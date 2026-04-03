@@ -1,40 +1,29 @@
 import type { Quote } from '@/core/types/quote';
 import type { QuoteBroker } from '@/providers/quoteBroker';
+import { deriveProviderHealthScore } from '@/services/providers/providerHealth';
+import type {
+  QuoteRequest,
+  QuoteProviderHealthSummary,
+  QuoteResponse,
+  QuoteResponseMetadata,
+  QuoteSymbolPolicyState,
+  ProviderRequestRole,
+} from '@/services/providers/types';
 
 export type QuoteProvider = {
   id: string;
-  getQuotes: (accountId: string, symbols: string[]) => Promise<Quote[]>;
+  role: ProviderRequestRole;
+  getQuotes: (request: QuoteRequest) => Promise<QuoteResponse>;
 };
 
-export type ProviderRouterResult = {
-  quotes: Record<string, Quote>;
-  meta: {
-    provider: string;
-    fallbackUsed: boolean;
-    requestedSymbols: string[];
-    returnedSymbols: string[];
-    missingSymbols: string[];
-    timestampMs: number;
-    providersTried: string[];
-    sourceBySymbol: Record<string, string | undefined>;
-  };
-};
+export type ProviderRouterResult = QuoteResponse;
 
-export type GetQuotesForSymbolsParams = {
-  accountId: string;
-  symbols: string[];
-  nowMs: number;
-  cachedQuotes?: Record<string, Quote>;
-};
+export type GetQuotesForSymbolsParams = QuoteRequest;
 
-function toQuoteRecord(quotes: Quote[]): Record<string, Quote> {
-  return quotes.reduce<Record<string, Quote>>((acc, quote) => {
-    if (!acc[quote.symbol]) {
-      acc[quote.symbol] = quote;
-    }
-    return acc;
-  }, {});
-}
+export type QuoteProviderChain = {
+  primary: QuoteProvider;
+  fallback?: QuoteProvider;
+};
 
 function toOrderedSymbols(symbols: string[]): string[] {
   const seen = new Set<string>();
@@ -52,77 +41,319 @@ function toOrderedSymbols(symbols: string[]): string[] {
   return ordered;
 }
 
-export function createQuoteBrokerProvider(broker: QuoteBroker, id = 'quote-broker'): QuoteProvider {
+function getQuoteTimestampMs(quote: Quote): number | null {
+  const timestampMs = quote.timestampMs ?? quote.timestamp;
+  return typeof timestampMs === 'number' && Number.isFinite(timestampMs) ? timestampMs : null;
+}
+
+function toIsoString(timestampMs: number | null): string | null {
+  return timestampMs === null ? null : new Date(timestampMs).toISOString();
+}
+
+function getFreshnessFromPolicyState(
+  policyStateBySymbol: Record<string, QuoteSymbolPolicyState>,
+  returnedSymbolCount: number,
+): QuoteResponseMetadata['freshness'] {
+  if (returnedSymbolCount === 0) {
+    return 'UNAVAILABLE';
+  }
+
+  const states = Object.values(policyStateBySymbol);
+
+  if (states.includes('LAST_GOOD')) {
+    return 'LAST_GOOD';
+  }
+
+  if (states.includes('STALE')) {
+    return 'STALE';
+  }
+
+  return 'FRESH';
+}
+
+function combinePolicyStateBySymbol(params: {
+  request: QuoteRequest;
+  primaryMeta: QuoteResponseMetadata;
+  fallbackMeta?: QuoteResponseMetadata;
+  quotes: Record<string, Quote>;
+}): Record<string, QuoteSymbolPolicyState> {
+  return params.request.symbols.reduce<Record<string, QuoteSymbolPolicyState>>((acc, symbol) => {
+    acc[symbol] =
+      params.fallbackMeta?.policyStateBySymbol[symbol] ??
+      params.primaryMeta.policyStateBySymbol[symbol] ??
+      (params.quotes[symbol] ? 'FRESH' : 'UNAVAILABLE');
+    return acc;
+  }, {});
+}
+
+function combineProviderHealthSummary(
+  primaryMeta: QuoteResponseMetadata,
+  fallbackMeta?: QuoteResponseMetadata,
+): QuoteResponseMetadata['providerHealthSummary'] {
+  const summaries = [
+    ...Object.values(primaryMeta.providerHealthSummary),
+    ...Object.values(fallbackMeta?.providerHealthSummary ?? {}),
+  ];
+
+  return summaries.reduce<QuoteResponseMetadata['providerHealthSummary']>((acc, summary) => {
+    const existing = acc[summary.providerId];
+
+    if (!existing) {
+      acc[summary.providerId] = summary;
+      return acc;
+    }
+
+    acc[summary.providerId] = mergeProviderHealthEntry(existing, summary);
+    return acc;
+  }, {});
+}
+
+function pickLatestIsoTimestamp(...timestamps: Array<string | null | undefined>): string | null {
+  const parsedTimestamps = timestamps
+    .filter((timestamp): timestamp is string => typeof timestamp === 'string')
+    .map((timestamp) => Date.parse(timestamp))
+    .filter((timestampMs) => Number.isFinite(timestampMs));
+
+  return parsedTimestamps.length > 0
+    ? new Date(Math.max(...parsedTimestamps)).toISOString()
+    : null;
+}
+
+function mergeProviderHealthEntry(
+  existing: QuoteProviderHealthSummary,
+  summary: QuoteProviderHealthSummary,
+): QuoteProviderHealthSummary {
+  const cooldown =
+    existing.cooldown === 'ACTIVE_SKIP' || summary.cooldown === 'ACTIVE_SKIP'
+      ? 'ACTIVE_SKIP'
+      : 'INACTIVE';
+
+  if (
+    existing.windowSize === undefined ||
+    summary.windowSize === undefined ||
+    !existing.window ||
+    !summary.window
+  ) {
+    return {
+      providerId: summary.providerId,
+      requests: Math.max(existing.requests, summary.requests),
+      symbolsRequested: Math.max(existing.symbolsRequested, summary.symbolsRequested),
+      symbolsFetched: Math.max(existing.symbolsFetched, summary.symbolsFetched),
+      symbolsBlocked: Math.max(existing.symbolsBlocked, summary.symbolsBlocked),
+      cooldown,
+      windowSize: summary.windowSize ?? existing.windowSize,
+      window: summary.window ?? existing.window,
+      score: summary.score ?? existing.score,
+    };
+  }
+
+  const role =
+    existing.window.role === summary.window.role ? existing.window.role : 'mixed';
+  const window = {
+    providerId: summary.providerId,
+    role,
+    recentAttempts: Math.max(existing.window.recentAttempts, summary.window.recentAttempts),
+    recentSuccesses: Math.max(existing.window.recentSuccesses, summary.window.recentSuccesses),
+    recentFailures: Math.max(existing.window.recentFailures, summary.window.recentFailures),
+    recentCooldownSkips: Math.max(
+      existing.window.recentCooldownSkips,
+      summary.window.recentCooldownSkips,
+    ),
+    lastAttemptAt: pickLatestIsoTimestamp(
+      existing.window.lastAttemptAt,
+      summary.window.lastAttemptAt,
+    ),
+    lastSuccessAt: pickLatestIsoTimestamp(
+      existing.window.lastSuccessAt,
+      summary.window.lastSuccessAt,
+    ),
+    lastFailureAt: pickLatestIsoTimestamp(
+      existing.window.lastFailureAt,
+      summary.window.lastFailureAt,
+    ),
+  };
+
   return {
-    id,
-    getQuotes: (accountId: string, symbols: string[]) => broker.getQuotes(accountId, symbols),
+    providerId: summary.providerId,
+    requests: Math.max(existing.requests, summary.requests),
+    symbolsRequested: Math.max(existing.symbolsRequested, summary.symbolsRequested),
+    symbolsFetched: Math.max(existing.symbolsFetched, summary.symbolsFetched),
+    symbolsBlocked: Math.max(existing.symbolsBlocked, summary.symbolsBlocked),
+    cooldown,
+    windowSize: Math.max(existing.windowSize, summary.windowSize),
+    window,
+    score: deriveProviderHealthScore({
+      window,
+      cooldownActive: cooldown === 'ACTIVE_SKIP',
+    }),
+  };
+}
+
+function combineMeta(
+  params: {
+    request: QuoteRequest;
+    primaryMeta: QuoteResponseMetadata;
+    fallbackMeta?: QuoteResponseMetadata;
+    quotes: Record<string, Quote>;
+    fallbackUsed: boolean;
+  },
+): QuoteResponseMetadata {
+  const requestedSymbols = params.request.symbols;
+  const returnedSymbols = requestedSymbols.filter((symbol) => Boolean(params.quotes[symbol]));
+  const missingSymbols = requestedSymbols.filter((symbol) => !params.quotes[symbol]);
+  const policyStateBySymbol = combinePolicyStateBySymbol(params);
+  const sourceBySymbol = returnedSymbols.reduce<Record<string, string | undefined>>((acc, symbol) => {
+    acc[symbol] = params.quotes[symbol]?.source;
+    return acc;
+  }, {});
+  const quoteTimestamps = returnedSymbols
+    .map((symbol) => params.quotes[symbol])
+    .map((quote) => (quote ? getQuoteTimestampMs(quote) : null))
+    .filter((timestampMs): timestampMs is number => timestampMs !== null);
+  const conservativeLastUpdatedMs =
+    quoteTimestamps.length > 0 ? Math.min(...quoteTimestamps) : null;
+  const lastGoodCandidates = [params.primaryMeta.lastGoodAt, params.fallbackMeta?.lastGoodAt]
+    .filter((timestamp): timestamp is string => typeof timestamp === 'string')
+    .map((timestamp) => Date.parse(timestamp))
+    .filter((timestampMs) => Number.isFinite(timestampMs));
+
+  return {
+    role: params.request.context.role,
+    providerId: params.fallbackUsed ? null : params.primaryMeta.providerId,
+    freshness: getFreshnessFromPolicyState(policyStateBySymbol, returnedSymbols.length),
+    certainty:
+      returnedSymbols.length === 0
+        ? 'UNAVAILABLE'
+        : returnedSymbols.some((symbol) => params.quotes[symbol]?.estimated)
+          ? 'ESTIMATED'
+          : 'CONFIRMED',
+    lastUpdatedAt: toIsoString(conservativeLastUpdatedMs),
+    lastGoodAt: lastGoodCandidates.length > 0 ? toIsoString(Math.min(...lastGoodCandidates)) : null,
+    usedLastGood: params.primaryMeta.usedLastGood || Boolean(params.fallbackMeta?.usedLastGood),
+    requestedSymbols,
+    returnedSymbols,
+    missingSymbols,
+    timestampMs: params.request.nowMs,
+    providersTried: Array.from(
+      new Set([
+        ...params.primaryMeta.providersTried,
+        ...(params.fallbackMeta?.providersTried ?? []),
+      ]),
+    ),
+    sourceBySymbol,
+    fallbackUsed: params.fallbackUsed,
+    coalescedRequest:
+      params.primaryMeta.coalescedRequest || Boolean(params.fallbackMeta?.coalescedRequest),
+    policyStateBySymbol,
+    providerHealthSummary: combineProviderHealthSummary(params.primaryMeta, params.fallbackMeta),
+    policy: {
+      staleIfError:
+        params.primaryMeta.policy.staleIfError === 'USED_LAST_GOOD' ||
+        params.fallbackMeta?.policy.staleIfError === 'USED_LAST_GOOD'
+          ? 'USED_LAST_GOOD'
+          : params.primaryMeta.policy.staleIfError === 'FAILED_WITHOUT_LAST_GOOD' ||
+              params.fallbackMeta?.policy.staleIfError === 'FAILED_WITHOUT_LAST_GOOD'
+            ? 'FAILED_WITHOUT_LAST_GOOD'
+            : 'NOT_NEEDED',
+      staleWhileRevalidate: 'NOT_IMPLEMENTED_FOREGROUND_ONLY',
+      cooldown:
+        params.primaryMeta.policy.cooldown === 'ACTIVE_SKIP' ||
+        params.fallbackMeta?.policy.cooldown === 'ACTIVE_SKIP'
+          ? 'ACTIVE_SKIP'
+          : 'INACTIVE',
+      cooldownSkippedProviders: Array.from(
+        new Set([
+          ...params.primaryMeta.policy.cooldownSkippedProviders,
+          ...(params.fallbackMeta?.policy.cooldownSkippedProviders ?? []),
+        ]),
+      ),
+    },
+  };
+}
+
+function assertProviderRole(provider: QuoteProvider, requestedRole: ProviderRequestRole): void {
+  if (provider.role !== requestedRole) {
+    throw new Error(
+      `Provider ${provider.id} is tagged ${provider.role} but request role is ${requestedRole}.`,
+    );
+  }
+}
+
+export function createQuoteBrokerProvider(
+  broker: QuoteBroker,
+  role: ProviderRequestRole,
+): QuoteProvider {
+  return {
+    id: broker.providerId,
+    role,
+    getQuotes: (request: QuoteRequest) => broker.getQuotes(request),
   };
 }
 
 export async function getQuotesForSymbols(
-  providers: {
-    primary: QuoteProvider;
-    fallback?: QuoteProvider;
-  },
+  providers: Partial<Record<ProviderRequestRole, QuoteProviderChain>>,
   params: GetQuotesForSymbolsParams,
 ): Promise<ProviderRouterResult> {
   const requestedSymbols = toOrderedSymbols(params.symbols);
-  const cachedQuotes = params.cachedQuotes ?? {};
-  const quotes: Record<string, Quote> = {};
+  const chain = providers[params.context.role];
 
-  for (const symbol of requestedSymbols) {
-    const cachedQuote = cachedQuotes[symbol];
-    if (cachedQuote) {
-      quotes[symbol] = cachedQuote;
-    }
+  if (!chain) {
+    throw new Error(`No provider chain configured for role ${params.context.role}.`);
   }
 
-  const missingAfterCache = requestedSymbols.filter((symbol) => !quotes[symbol]);
-  const primaryQuotes = await providers.primary.getQuotes(params.accountId, missingAfterCache);
-  const primaryRecord = toQuoteRecord(primaryQuotes);
-
-  for (const symbol of missingAfterCache) {
-    const quote = primaryRecord[symbol];
-    if (quote) {
-      quotes[symbol] = quote;
-    }
+  assertProviderRole(chain.primary, params.context.role);
+  if (chain.fallback) {
+    assertProviderRole(chain.fallback, params.context.role);
   }
 
+  const normalizedParams: QuoteRequest = {
+    ...params,
+    symbols: requestedSymbols,
+    context: {
+      ...params.context,
+      accountId: params.accountId,
+      symbols: requestedSymbols,
+      quoteCurrency: params.context.quoteCurrency ?? null,
+    },
+  };
+
+  const primaryResult = await chain.primary.getQuotes(normalizedParams);
+  const quotes: Record<string, Quote> = {
+    ...primaryResult.quotes,
+  };
+  const missingAfterPrimary = requestedSymbols.filter((symbol) => !quotes[symbol]);
+
+  let fallbackResult: QuoteResponse | undefined;
   let fallbackUsed = false;
-  if (providers.fallback) {
-    const missingAfterPrimary = requestedSymbols.filter((symbol) => !quotes[symbol]);
-    if (missingAfterPrimary.length > 0) {
-      fallbackUsed = true;
-      const fallbackQuotes = await providers.fallback.getQuotes(params.accountId, missingAfterPrimary);
-      const fallbackRecord = toQuoteRecord(fallbackQuotes);
 
-      for (const symbol of missingAfterPrimary) {
-        const quote = fallbackRecord[symbol];
-        if (quote) {
-          quotes[symbol] = quote;
-        }
+  if (chain.fallback && missingAfterPrimary.length > 0) {
+    fallbackUsed = true;
+    fallbackResult = await chain.fallback.getQuotes({
+      ...normalizedParams,
+      symbols: missingAfterPrimary,
+      cachedQuotes: normalizedParams.cachedQuotes,
+      context: {
+        ...normalizedParams.context,
+        symbols: missingAfterPrimary,
+      },
+    });
+
+    for (const symbol of missingAfterPrimary) {
+      const quote = fallbackResult.quotes[symbol];
+      if (quote) {
+        quotes[symbol] = quote;
       }
     }
   }
 
-  const returnedSymbols = requestedSymbols.filter((symbol) => Boolean(quotes[symbol]));
-  const missingSymbols = requestedSymbols.filter((symbol) => !quotes[symbol]);
-  const sourceBySymbol = returnedSymbols.reduce<Record<string, string | undefined>>((acc, symbol) => {
-    acc[symbol] = quotes[symbol]?.source;
-    return acc;
-  }, {});
-
   return {
     quotes,
-    meta: {
-      provider: providers.primary.id,
+    meta: combineMeta({
+      request: normalizedParams,
+      primaryMeta: primaryResult.meta,
+      fallbackMeta: fallbackResult?.meta,
+      quotes,
       fallbackUsed,
-      requestedSymbols,
-      returnedSymbols,
-      missingSymbols,
-      timestampMs: params.nowMs,
-      providersTried: providers.fallback ? [providers.primary.id, providers.fallback.id] : [providers.primary.id],
-      sourceBySymbol,
-    },
+    }),
   };
 }

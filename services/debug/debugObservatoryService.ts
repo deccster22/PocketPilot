@@ -2,18 +2,11 @@ import type { EventLedger, EventLedgerEntry } from '@/core/types/eventLedger';
 import type { StrategySignal } from '@/core/strategy/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
 import type { Quote } from '@/core/types/quote';
+import { fetchRuntimeDiagnosticsVM } from '@/services/debug/fetchRuntimeDiagnosticsVM';
+import type { RuntimeDiagnosticsVM } from '@/services/debug/runtimeDiagnosticsTypes';
 import type { ProviderRouterResult } from '@/services/providers/providerRouter';
 
-export type DebugObservatoryQuoteMeta = {
-  provider: string;
-  fallbackUsed: boolean;
-  requestedSymbols: string[];
-  returnedSymbols: string[];
-  missingSymbols: string[];
-  timestampMs: number;
-  providersTried?: string[];
-  sourceBySymbol?: Record<string, string | undefined>;
-};
+export type DebugObservatoryQuoteMeta = ProviderRouterResult['meta'];
 
 export type DebugObservatorySnapshot = {
   portfolioValue: number;
@@ -30,6 +23,7 @@ export type DebugObservatoryPayload = {
     quotes: Record<string, Quote>;
     meta: DebugObservatoryQuoteMeta;
   };
+  runtimeDiagnostics: RuntimeDiagnosticsVM;
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
   marketEvents?: MarketEvent[];
@@ -48,7 +42,7 @@ export type BuildDebugObservatoryPayloadParams = {
   timestampMs: number;
   symbols: string[];
   quotes: Record<string, Quote>;
-  quoteMeta?: ProviderRouterResult['meta'];
+  quoteMeta: ProviderRouterResult['meta'];
   deltas?: Record<string, number>;
   strategySignals?: StrategySignal[];
   marketEvents?: MarketEvent[];
@@ -85,46 +79,30 @@ function buildEventLedgerComparison(params: {
 }
 
 function buildQuoteMeta(
-  timestampMs: number,
-  symbols: string[],
-  quotes: Record<string, Quote>,
-  quoteMeta?: ProviderRouterResult['meta'],
+  quoteMeta: ProviderRouterResult['meta'],
 ): DebugObservatoryQuoteMeta {
-  const requestedSymbols = quoteMeta?.requestedSymbols ?? symbols;
-  const returnedSymbols =
-    quoteMeta?.returnedSymbols ?? requestedSymbols.filter((symbol) => Boolean(quotes[symbol]));
-  const missingSymbols =
-    quoteMeta?.missingSymbols ?? requestedSymbols.filter((symbol) => !quotes[symbol]);
-
-  const sourceBySymbol =
-    quoteMeta?.sourceBySymbol ??
-    returnedSymbols.reduce<Record<string, string | undefined>>((acc, symbol) => {
-      acc[symbol] = quotes[symbol]?.source;
-      return acc;
-    }, {});
-
-  return {
-    provider: quoteMeta?.provider ?? 'unknown',
-    fallbackUsed: quoteMeta?.fallbackUsed ?? false,
-    requestedSymbols,
-    returnedSymbols,
-    missingSymbols,
-    timestampMs: quoteMeta?.timestampMs ?? timestampMs,
-    providersTried: quoteMeta?.providersTried,
-    sourceBySymbol,
-  };
+  return quoteMeta;
 }
 
 export function buildDebugObservatoryPayload(
   params: BuildDebugObservatoryPayloadParams,
 ): DebugObservatoryPayload {
+  const quoteMeta = buildQuoteMeta(params.quoteMeta);
+
   return {
     timestampMs: params.timestampMs,
     symbols: params.symbols,
     quoteResult: {
       quotes: params.quotes,
-      meta: buildQuoteMeta(params.timestampMs, params.symbols, params.quotes, params.quoteMeta),
+      meta: quoteMeta,
     },
+    runtimeDiagnostics: fetchRuntimeDiagnosticsVM({
+      quoteResult: {
+        quotes: params.quotes,
+        meta: quoteMeta,
+      },
+      symbols: params.symbols,
+    }),
     deltas: params.deltas,
     strategySignals: params.strategySignals,
     marketEvents: params.marketEvents,
