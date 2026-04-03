@@ -99,6 +99,7 @@ Examples:
 - `architecture/PROVIDER_ROUTER_MODEL.md`
 - `architecture/QUOTE_BROKER.md`
 - `architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
+- `architecture/INSIGHTS_HISTORY_MODEL.md`
 - `architecture/STRATEGY_ENGINE.md`
 - `architecture/MARKET_EVENT_MODEL.md`
 - `architecture/EVENT_STREAM_MODEL.md`
@@ -306,6 +307,18 @@ knowledgeCatalog
 -> Knowledge Library tab
 ```
 
+Insights/Event History now uses its own thin reflection seam:
+
+```text
+EventLedger
+-> EventLedgerQueries
+-> Since Last Checked (when available)
+-> OrientationContext
+-> createInsightsHistoryVM
+-> fetchInsightsHistoryVM
+-> Insights tab
+```
+
 Key rule: **services own truth, app renders prepared contracts**.
 
 The UI should not be inventing interpretation logic from raw data. If it feels like the UI is "figuring things out," something has probably drifted.
@@ -355,6 +368,7 @@ PocketPilot is easiest to read at three levels.
 - `P7` Knowledge baseline
 - `P7-K1` Knowledge baseline foundation
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
+- `P8-I1` Insights / Event History foundation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P10` Beta hardening
 - `P11` Launch prep

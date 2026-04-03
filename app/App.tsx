@@ -3,14 +3,19 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import { DashboardScreen } from '@/app/screens/DashboardScreen';
+import { InsightsScreen } from '@/app/screens/InsightsScreen';
 import { KnowledgeLibraryScreen } from '@/app/screens/KnowledgeLibraryScreen';
 
-type AppTab = 'DASHBOARD' | 'KNOWLEDGE_LIBRARY';
+type AppTab = 'DASHBOARD' | 'INSIGHTS' | 'KNOWLEDGE_LIBRARY';
 
 const APP_TABS: ReadonlyArray<{ id: AppTab; label: string }> = [
   {
     id: 'DASHBOARD',
     label: 'Dashboard',
+  },
+  {
+    id: 'INSIGHTS',
+    label: 'Insights',
   },
   {
     id: 'KNOWLEDGE_LIBRARY',
@@ -24,7 +29,13 @@ export default function App() {
   return (
     <View style={styles.appShell}>
       <View style={styles.screenContainer}>
-        {activeTab === 'KNOWLEDGE_LIBRARY' ? <KnowledgeLibraryScreen /> : <DashboardScreen />}
+        {activeTab === 'DASHBOARD' ? (
+          <DashboardScreen />
+        ) : activeTab === 'INSIGHTS' ? (
+          <InsightsScreen />
+        ) : (
+          <KnowledgeLibraryScreen />
+        )}
       </View>
       <View style={styles.tabBar}>
         {APP_TABS.map((tab) => {

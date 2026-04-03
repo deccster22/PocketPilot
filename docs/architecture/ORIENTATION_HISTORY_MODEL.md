@@ -90,6 +90,10 @@ In PX-E2, Dashboard explanation continues the same extension rule:
 
 `EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> ExplanationSummary -> Dashboard why note`
 
+In P8-I1, Insights / Event History now extends the same prepared history seam:
+
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> createInsightsHistoryVM -> fetchInsightsHistoryVM -> InsightsScreen`
+
 P6-R5 keeps Since Last Checked and reorientation on that same prepared history spine and adds one explicit rule:
 - Snapshot receives one subordinate briefing zone only
 - `services/` decides whether that zone shows reorientation, Since Last Checked, or nothing
@@ -100,6 +104,12 @@ PX-E2 keeps the same explanation discipline for Dashboard and deepens it one ste
 - `services/` now also chooses the strongest interpreted lineage mix rather than simply listing the next available candidates
 - `app/` renders the prepared explanation contract only
 - `OrientationContext` remains a non-prose input seam
+
+P8-I1 keeps the same history discipline for Insights/Event History:
+- `services/` decide what counts as meaningful history
+- `services/` compress repetitive interpreted events toward fewer stronger entries
+- `app/` renders prepared history sections and entries only
+- `OrientationContext` remains an assembly seam rather than a UI contract
 
 ## Last-Viewed Ownership
 P3-4 adds a dedicated last-viewed boundary so UI components do not become the long-term owners of history lookup rules.
