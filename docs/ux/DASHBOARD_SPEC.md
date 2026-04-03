@@ -1,10 +1,9 @@
-﻿# Dashboard Spec (P4-5 + PX-E1)
+# Dashboard Spec (P4-5 + PX-E2)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
 
-PX-E1 adds one subordinate why note for the Dashboard prime item only.
-That note answers "Why am I seeing this?" without turning Dashboard into a diagnostics pane or a full Insights product.
+PX-E2 keeps Dashboard as the only explanation surface and deepens the existing PX-E1 why seam slightly. The goal is better meaning, not more surface area.
 
 ## Surface Contract
 
@@ -41,10 +40,10 @@ Dashboard also has a surface VM with one optional explanation seam:
 ```
 
 ## Service Path
-Dashboard now uses its own upstream preparation seam:
+Dashboard continues to use its own upstream preparation seam:
 - `services/upstream/fetchSurfaceContext.ts` assembles shared deterministic truth.
 - `services/dashboard/dashboardDataService.ts` prepares Dashboard-owned upstream inputs from that shared truth.
-- `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and the first Dashboard explanation VM.
+- `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and Dashboard explanation VM.
 - `services/dashboard/fetchDashboardExplanationVM.ts` selects the prime explanation target and calls the canonical explanation builder.
 
 This keeps Dashboard separate from Snapshot service flow while preserving the same app-facing contract.
@@ -55,8 +54,8 @@ This keeps Dashboard separate from Snapshot service flow while preserving the sa
 - Deep Zone contains lower-priority details that belong in a quieter, secondary layer.
 - The surface must stay structured. Dashboard is not a flattened event feed.
 
-## Dashboard Why Note (PX-E1)
-Dashboard is the first explanation consumer surface.
+## Dashboard Why Note (PX-E2)
+Dashboard remains the only explanation consumer surface.
 
 Rules:
 - one surface only in this phase
@@ -68,11 +67,23 @@ Rules:
 The Dashboard why note shows:
 - title
 - calm summary
+- optional `contextNote` when richer state/context phrasing helps
 - confidence note
 - up to 3 lineage items
 - sparse limitations when relevant
 
-It does not show:
+PX-E2 also allows one modest deeper reuse path on Dashboard only:
+- the same prepared explanation can render in a compact state
+- the same prepared explanation can reveal a slightly deeper context view inside the same card
+
+It does not add:
+- a second explanation system
+- a new top-level Dashboard surface
+- Snapshot explanation
+- Trade Hub explanation
+- a modal essay panel
+
+The Dashboard why note still does not show:
 - raw signal arrays
 - event IDs
 - strategy IDs
@@ -80,6 +91,21 @@ It does not show:
 - modal warning theatre
 - urgency language
 - predictive wording
+
+## PX-E2 Lineage And Phrasing Rules
+PX-E2 deepens quality rather than breadth.
+
+Lineage rules:
+- prefer the strongest interpreted event, state, and context combination
+- avoid repetitive lineage items that say the same thing twice
+- use one calm recent-history item when history is repetitive or thin
+- cap lineage at 3 items
+
+Phrasing rules:
+- summary should read like a briefing note
+- confidence remains evidence support only
+- limitations remain factual and sparse
+- richer context phrasing should help the user understand the current interpreted picture without becoming verbose
 
 ## Profile Shaping
 - Beginner receives the sparsest surface with fewer prime items and little to no secondary or deep density.
@@ -100,7 +126,7 @@ Profile shaping changes density only. It does not change the deterministic ranki
 - Dashboard remains the Focus surface and owns Dashboard-specific shaping.
 - Shared upstream truth is allowed.
 - Snapshot service outputs are not the Dashboard upstream seam.
-- PX-E1 explanation does not add a competing Snapshot explanation path.
+- PX-E2 explanation does not add a competing Snapshot explanation path.
 
 ## Intentional Exclusions
 This phase does not add:

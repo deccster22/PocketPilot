@@ -62,6 +62,8 @@ describe('createDashboardScreenViewData', () => {
         explanation: {
           title: 'Why BTC is in focus',
           summary: 'BTC is in focus because momentum is strengthening in the current interpreted picture.',
+          contextNote:
+            'The current state remains watchful, so this stays active without reading as settled.',
           confidence: 'MODERATE',
           confidenceNote:
             'Confidence is moderate because more than one prepared input supports this interpretation. It reflects evidence support, not a guaranteed outcome.',
@@ -117,13 +119,18 @@ describe('createDashboardScreenViewData', () => {
         confidenceText: 'Support: Moderate',
         confidenceNote:
           'Confidence is moderate because more than one prepared input supports this interpretation. It reflects evidence support, not a guaranteed outcome.',
-        lineage: [
-          {
-            label: 'BTC momentum context',
-            detail: 'BTC remains in focus because momentum is strengthening in the current interpreted picture.',
-          },
-        ],
-        limitations: ['This explanation reflects current interpreted conditions only.'],
+        detail: {
+          contextNote:
+            'The current state remains watchful, so this stays active without reading as settled.',
+          lineage: [
+            {
+              label: 'BTC momentum context',
+              detail:
+                'BTC remains in focus because momentum is strengthening in the current interpreted picture.',
+            },
+          ],
+          limitations: ['This explanation reflects current interpreted conditions only.'],
+        },
       },
     });
   });
@@ -135,7 +142,7 @@ describe('createDashboardScreenViewData', () => {
     );
 
     expect(source).toMatch(/surface\.explanation\.status === 'AVAILABLE'/);
-    expect(source).not.toMatch(/signalsTriggered|eventId|providerId|metadata/);
+    expect(source).not.toMatch(/createExplanationSummary|signalsTriggered|eventId|providerId|metadata/);
   });
 
   it('returns null when the prepared surface is unavailable', () => {

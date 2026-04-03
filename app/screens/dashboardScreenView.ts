@@ -28,8 +28,13 @@ export type DashboardScreenViewData = {
         summary: string;
         confidenceText: string;
         confidenceNote: string;
-        lineage: ReadonlyArray<Pick<ExplanationLineageItem, 'label' | 'detail'>>;
-        limitations: ReadonlyArray<string>;
+        detail:
+          | null
+          | {
+              contextNote?: string;
+              lineage: ReadonlyArray<Pick<ExplanationLineageItem, 'label' | 'detail'>>;
+              limitations: ReadonlyArray<string>;
+            };
       };
 };
 
@@ -87,6 +92,24 @@ export function createDashboardScreenViewData(
     return null;
   }
 
+  const explanationDetail =
+    surface.explanation.status === 'AVAILABLE'
+      ? {
+          contextNote: surface.explanation.explanation.contextNote,
+          lineage: surface.explanation.explanation.lineage.map((item) => ({
+            label: item.label,
+            detail: item.detail,
+          })),
+          limitations: surface.explanation.explanation.limitations,
+        }
+      : null;
+  const hasExplanationDetail = Boolean(
+    explanationDetail &&
+      (explanationDetail.contextNote ||
+        explanationDetail.lineage.length > 0 ||
+        explanationDetail.limitations.length > 0),
+  );
+
   return {
     profileLabel: surface.model.meta.profile,
     primeZone: {
@@ -109,11 +132,7 @@ export function createDashboardScreenViewData(
             summary: surface.explanation.explanation.summary,
             confidenceText: formatConfidenceText(surface.explanation.explanation.confidence),
             confidenceNote: surface.explanation.explanation.confidenceNote,
-            lineage: surface.explanation.explanation.lineage.map((item) => ({
-              label: item.label,
-              detail: item.detail,
-            })),
-            limitations: surface.explanation.explanation.limitations,
+            detail: hasExplanationDetail ? explanationDetail : null,
           }
         : {
             visible: false,

@@ -10,6 +10,7 @@ export type ExplanationLineageItem = {
 export type ExplanationSummary = {
   title: string;
   summary: string;
+  contextNote?: string;
   confidence: ExplanationConfidence;
   confidenceNote: string;
   lineage: ReadonlyArray<ExplanationLineageItem>;

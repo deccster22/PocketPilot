@@ -289,6 +289,7 @@ Market Providers
 -> DashboardSurfaceVM
 -> ExplanationSummary
 -> Dashboard why note
+-> Dashboard why detail reuse path
 -> Trade Hub Surface
 -> Confirmation Session
 -> Execution Preview
@@ -341,6 +342,7 @@ PocketPilot is easiest to read at three levels.
 - `P6-R5` Snapshot orientation cohesion through one canonical subordinate briefing zone
 - `P6-R5A` Retire the legacy reorientation-only app presentation path so Snapshot keeps one canonical briefing surface
 - `PX-E1` Early explanation and lineage groundwork for the Dashboard Focus surface
+- `PX-E2` Dashboard explanation deepening on the same canonical seam
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
@@ -353,7 +355,7 @@ Use `PX-*` for cross-cutting, platform, runtime, hardening, cleanup, doctrine, a
 Current examples:
 - `PX-API1` through `PX-API5` for runtime doctrine and hardening
 - `PX-PM1` for this phase-map audit and roadmap alignment pass
-- `PX-E1` is explanation groundwork, not proof that the richer `P9` family is complete.
+- `PX-E1` and `PX-E2` are explanation groundwork, not proof that the richer `P9` family is complete.
 
 Use `P#-subphase` only for scoped work inside one canonical family. Example: `P6-R5A` is cleanup within `P6`; it does not imply completion of `P7`, `P8`, or `P9`.
 

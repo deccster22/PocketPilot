@@ -2,9 +2,17 @@
 import { join } from 'node:path';
 
 describe('dashboard explanation placement', () => {
-  it('anchors one canonical why note on Dashboard only in PX-E1', () => {
+  it('keeps one canonical why note on Dashboard only in PX-E2', () => {
     const dashboardScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'DashboardScreen.tsx'),
+      'utf8',
+    );
+    const dashboardScreenViewSource = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'dashboardScreenView.ts'),
+      'utf8',
+    );
+    const explanationCardSource = readFileSync(
+      join(process.cwd(), 'app', 'components', 'ExplanationCard.tsx'),
       'utf8',
     );
     const snapshotScreenSource = readFileSync(
@@ -18,6 +26,10 @@ describe('dashboard explanation placement', () => {
 
     expect(dashboardScreenSource).toMatch(/ExplanationCard/);
     expect(dashboardScreenSource).toMatch(/screenView\?\.explanation\.visible/);
+    expect(dashboardScreenViewSource).toMatch(/surface\.explanation\.explanation/);
+    expect(dashboardScreenViewSource).not.toMatch(/createExplanationSummary|signalsTriggered|eventId|providerId|metadata/);
+    expect(explanationCardSource).toMatch(/params\.explanation\.detail/);
+    expect(explanationCardSource).not.toMatch(/createExplanationSummary|fetchDashboardExplanationVM|signalsTriggered|eventId|providerId|metadata/);
     expect(snapshotScreenSource).not.toMatch(/ExplanationCard/);
     expect(tradeHubScreenSource).not.toMatch(/ExplanationCard/);
   });
