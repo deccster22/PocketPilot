@@ -1,7 +1,7 @@
 # PocketPilot Phase Map
 
 Phase: `PX-PM1`  
-Last updated: 2026-04-02
+Last updated: 2026-04-03
 
 ## Purpose
 This document reconciles PocketPilot's overlapping phase lenses so future work can name phases honestly without erasing the actual implementation sequence.
@@ -96,7 +96,8 @@ This table records what is actually built or still pending without forcing the h
 | `P6-R5` | canonical product | `P6` | Snapshot orientation cohesion | done | Unifies reorientation and Since Last Checked into one service-owned briefing zone |
 | `P6-R5A` | canonical product | `P6` | Snapshot cleanup and briefing-path hardening | done | Retires the legacy reorientation-only app path; cleanup does not imply `P7` or `P8` completion |
 | `PX-PM1` | PX cross-cutting/platform | supports repo-wide planning clarity | Phase map audit and roadmap alignment | done | Creates the canonical taxonomy and audited ledger in this file |
-| `P7` | canonical product | `P7` | Knowledge baseline | planned | Future product family |
+| `P7` | canonical product | `P7` | Knowledge baseline | partial | Baseline foundation now exists through `P7-K1`, but the broader family remains incomplete |
+| `P7-K1` | canonical product | `P7` | Knowledge baseline foundation | done | Adds the first canonical `KnowledgeNode`, one service-owned library VM seam, and one minimal top-level library surface without contextual rollout |
 | `P8` | canonical product | `P8` | Insights, reflection, and richer context | planned | Enabling seams landed early in `P3` and `P6`, but the family itself is not complete |
 | `P9` | canonical product | `P9` | Strategy Navigator and richer explanation layer | planned | No PX phase or reorientation cleanup should be read as `P9` completion |
 | `P10` | canonical product | `P10` | Beta hardening | planned | Future family |
