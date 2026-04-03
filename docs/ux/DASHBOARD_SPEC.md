@@ -1,7 +1,10 @@
-# Dashboard Spec (P4-5)
+﻿# Dashboard Spec (P4-5 + PX-E1)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
+
+PX-E1 adds one subordinate why note for the Dashboard prime item only.
+That note answers "Why am I seeing this?" without turning Dashboard into a diagnostics pane or a full Insights product.
 
 ## Surface Contract
 
@@ -9,13 +12,13 @@ Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "
 {
   primeZone: {
     items: DashboardItem[]
-  },
+  }
   secondaryZone: {
     items: DashboardItem[]
-  },
+  }
   deepZone: {
     items: DashboardItem[]
-  },
+  }
   meta: {
     profile: UserProfile,
     hasPrimeItems: boolean,
@@ -27,11 +30,22 @@ Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "
 
 `DashboardItem` remains display-safe and intentionally excludes raw signal payloads, scoring internals, metadata blobs, and execution details.
 
+Dashboard also has a surface VM with one optional explanation seam:
+
+```ts
+{
+  model: DashboardSurfaceModel,
+  scan: ForegroundScanResult,
+  explanation: ExplanationAvailability
+}
+```
+
 ## Service Path
 Dashboard now uses its own upstream preparation seam:
 - `services/upstream/fetchSurfaceContext.ts` assembles shared deterministic truth.
 - `services/dashboard/dashboardDataService.ts` prepares Dashboard-owned upstream inputs from that shared truth.
-- `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel`.
+- `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and the first Dashboard explanation VM.
+- `services/dashboard/fetchDashboardExplanationVM.ts` selects the prime explanation target and calls the canonical explanation builder.
 
 This keeps Dashboard separate from Snapshot service flow while preserving the same app-facing contract.
 
@@ -40,6 +54,32 @@ This keeps Dashboard separate from Snapshot service flow while preserving the sa
 - Secondary Zone contains supporting items that remain relevant but are not the top immediate focus.
 - Deep Zone contains lower-priority details that belong in a quieter, secondary layer.
 - The surface must stay structured. Dashboard is not a flattened event feed.
+
+## Dashboard Why Note (PX-E1)
+Dashboard is the first explanation consumer surface.
+
+Rules:
+- one surface only in this phase
+- attached to the prepared prime item only
+- subordinate to the main Dashboard surface
+- absent is better than filler when explanation is unavailable
+- app renders prepared explanation contracts only
+
+The Dashboard why note shows:
+- title
+- calm summary
+- confidence note
+- up to 3 lineage items
+- sparse limitations when relevant
+
+It does not show:
+- raw signal arrays
+- event IDs
+- strategy IDs
+- provider/runtime diagnostics
+- modal warning theatre
+- urgency language
+- predictive wording
 
 ## Profile Shaping
 - Beginner receives the sparsest surface with fewer prime items and little to no secondary or deep density.
@@ -53,12 +93,14 @@ Profile shaping changes density only. It does not change the deterministic ranki
 - `DashboardSurfaceModel` is the presentation-facing contract: `primeZone`, `secondaryZone`, `deepZone`, plus `meta`.
 - The mapping from `background` to `deepZone` happens in `services/dashboard/createDashboardSurfaceModel.ts`.
 - `app/screens/dashboardScreenView.ts` may format prepared items for display text, but it does not reprioritise or re-bucket them.
+- `app/components/ExplanationCard.tsx` renders prepared explanation data only; it does not build lineage or confidence wording locally.
 
 ## Snapshot Separation
 - Snapshot remains the Scan surface and owns Snapshot-specific shaping.
 - Dashboard remains the Focus surface and owns Dashboard-specific shaping.
 - Shared upstream truth is allowed.
 - Snapshot service outputs are not the Dashboard upstream seam.
+- PX-E1 explanation does not add a competing Snapshot explanation path.
 
 ## Intentional Exclusions
 This phase does not add:
@@ -71,3 +113,5 @@ This phase does not add:
 - Trade Hub logic
 - AI explanations
 - persistence changes
+- multiple explanation surfaces
+- a full Insights layer

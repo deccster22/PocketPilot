@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+﻿import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MarketEvent } from '@/core/types/marketEvent';
@@ -35,7 +35,9 @@ describe('fetchDashboardSurfaceVM', () => {
     jest.resetAllMocks();
   });
 
-  it('preserves the dashboard surface contract for app consumers', async () => {
+  it('preserves the dashboard surface contract for app consumers and adds one prepared why note', async () => {
+    const event = createEvent();
+
     mockFetchDashboardData.mockResolvedValue({
       scan: {
         accountId: 'acct-live',
@@ -73,7 +75,26 @@ describe('fetchDashboardSurfaceVM', () => {
         profile: 'ADVANCED',
         assets: [],
       },
-      events: [createEvent()],
+      explanationContext: {
+        accountId: 'acct-live',
+        symbol: 'BTC',
+        strategyId: 'strategy-a',
+        currentState: {
+          latestRelevantEvent: event,
+          strategyAlignment: 'Watchful',
+          certainty: 'confirmed',
+        },
+        historyContext: {
+          eventsSinceLastViewed: [event],
+          sinceLastChecked: {
+            sinceTimestamp: 90,
+            accountId: 'acct-live',
+            summaryCount: 1,
+            events: [event],
+          },
+        },
+      },
+      events: [event],
     });
 
     const result = await fetchDashboardSurfaceVM({ profile: 'ADVANCED' });
@@ -109,6 +130,16 @@ describe('fetchDashboardSurfaceVM', () => {
     });
     expect(result.model.primeZone.items[0]).not.toHaveProperty('signalsTriggered');
     expect(result.model.primeZone.items[0]).not.toHaveProperty('metadata');
+    expect(result.explanation).toMatchObject({
+      status: 'AVAILABLE',
+      explanation: {
+        title: 'Why BTC is in focus',
+      },
+    });
+
+    const serialized = JSON.stringify(result.explanation);
+
+    expect(serialized).not.toMatch(/signalsTriggered|metadata|eventId|providerId/);
   });
 
   it('keeps dashboard decoupled from snapshot service flow', () => {

@@ -1,4 +1,4 @@
-import type { MarketEvent } from '@/core/types/marketEvent';
+﻿import type { MarketEvent } from '@/core/types/marketEvent';
 import { fetchDashboardData } from '@/services/dashboard/dashboardDataService';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
@@ -35,6 +35,30 @@ describe('fetchDashboardData', () => {
 
   it('builds a dedicated dashboard upstream payload from shared surface truth', async () => {
     const upstreamEvent = createEvent();
+    const historyEvent = createEvent({
+      eventId: 'acct-live:strategy-a:signal:BTC:95',
+      timestamp: 95,
+      certainty: 'estimated',
+    });
+    const upstreamOrientationContext = {
+      accountId: 'acct-live',
+      symbol: 'BTC',
+      strategyId: 'strategy-a',
+      currentState: {
+        latestRelevantEvent: upstreamEvent,
+        strategyAlignment: 'Watchful',
+        certainty: 'confirmed' as const,
+      },
+      historyContext: {
+        eventsSinceLastViewed: [historyEvent],
+        sinceLastChecked: {
+          sinceTimestamp: 90,
+          accountId: 'acct-live',
+          summaryCount: 1,
+          events: [historyEvent],
+        },
+      },
+    };
     const nowProvider = () => 1_700_000_000_100;
 
     mockFetchSurfaceContext.mockResolvedValue({
@@ -85,18 +109,7 @@ describe('fetchDashboardData', () => {
         timestamp: 100,
         events: [upstreamEvent],
       },
-      orientationContext: {
-        accountId: 'acct-live',
-        currentState: {
-          latestRelevantEvent: upstreamEvent,
-          strategyAlignment: 'Watchful',
-          certainty: 'confirmed',
-        },
-        historyContext: {
-          eventsSinceLastViewed: [],
-          sinceLastChecked: null,
-        },
-      },
+      orientationContext: upstreamOrientationContext,
       eventsSinceLastViewed: undefined,
       sinceLastChecked: undefined,
     });
@@ -119,5 +132,15 @@ describe('fetchDashboardData', () => {
     expect(result.events[0]).not.toBe(upstreamEvent);
     expect(result.events[0].signalsTriggered).not.toBe(upstreamEvent.signalsTriggered);
     expect(result.events[0].metadata).not.toBe(upstreamEvent.metadata);
+    expect(result.explanationContext.currentState.latestRelevantEvent).toEqual(upstreamEvent);
+    expect(result.explanationContext.currentState.latestRelevantEvent).not.toBe(upstreamEvent);
+    expect(result.explanationContext.historyContext.eventsSinceLastViewed).toEqual([historyEvent]);
+    expect(result.explanationContext.historyContext.eventsSinceLastViewed).not.toBe(
+      upstreamOrientationContext.historyContext.eventsSinceLastViewed,
+    );
+    expect(result.explanationContext.historyContext.sinceLastChecked?.events[0]).toEqual(historyEvent);
+    expect(result.explanationContext.historyContext.sinceLastChecked?.events).not.toBe(
+      upstreamOrientationContext.historyContext.sinceLastChecked.events,
+    );
   });
 });
