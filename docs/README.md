@@ -2,7 +2,7 @@
 Version: v2 markdown source
 Source: docs/source/README_v2.md
 
-Last Updated: 2026-04-03
+Last Updated: 2026-04-04
 
 # PocketPilot Documentation Index
 
@@ -315,8 +315,24 @@ EventLedger
 -> Since Last Checked (when available)
 -> OrientationContext
 -> createInsightsHistoryVM
+-> createInsightsContinuity
 -> fetchInsightsHistoryVM
 -> Insights tab
+-> markInsightsHistoryViewed
+```
+
+P8-I3 adds one subordinate deeper shelf on that same seam:
+
+```text
+EventLedger
+-> EventLedgerQueries
+-> Since Last Checked (when available)
+-> OrientationContext
+-> createInsightsHistoryVM
+-> createInsightsContinuity
+-> createInsightsArchiveVM
+-> fetchInsightsArchiveVM
+-> Insights detail/archive shelf
 ```
 
 Key rule: **services own truth, app renders prepared contracts**.
@@ -369,6 +385,8 @@ PocketPilot is easiest to read at three levels.
 - `P7-K1` Knowledge baseline foundation
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P8-I1` Insights / Event History foundation
+- `P8-I2` Insights last-viewed continuity
+- `P8-I3` Insights detail / archive navigation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P10` Beta hardening
 - `P11` Launch prep

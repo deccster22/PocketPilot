@@ -90,9 +90,13 @@ In PX-E2, Dashboard explanation continues the same extension rule:
 
 `EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> ExplanationSummary -> Dashboard why note`
 
-In P8-I1, Insights / Event History now extends the same prepared history seam:
+In P8-I2, Insights / Event History continuity extends the same prepared history seam:
 
-`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> createInsightsHistoryVM -> fetchInsightsHistoryVM -> InsightsScreen`
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> createInsightsHistoryVM -> createInsightsContinuity -> fetchInsightsHistoryVM -> InsightsScreen`
+
+In P8-I3, deeper Insights archive/detail navigation extends that same seam one step further without creating a second history system:
+
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> createInsightsHistoryVM -> createInsightsContinuity -> createInsightsArchiveVM -> fetchInsightsArchiveVM -> InsightsDetailScreen`
 
 P6-R5 keeps Since Last Checked and reorientation on that same prepared history spine and adds one explicit rule:
 - Snapshot receives one subordinate briefing zone only
@@ -105,17 +109,31 @@ PX-E2 keeps the same explanation discipline for Dashboard and deepens it one ste
 - `app/` renders the prepared explanation contract only
 - `OrientationContext` remains a non-prose input seam
 
-P8-I1 keeps the same history discipline for Insights/Event History:
+P8-I2 keeps the same history discipline for Insights/Event History:
 - `services/` decide what counts as meaningful history
 - `services/` compress repetitive interpreted events toward fewer stronger entries
-- `app/` renders prepared history sections and entries only
+- `services/` also decide whether newer interpreted history exists for Insights specifically
+- `app/` renders prepared history sections and the prepared continuity note only
 - `OrientationContext` remains an assembly seam rather than a UI contract
+
+P8-I3 keeps the same discipline for deeper Insights archive/detail navigation:
+- `services/` decide whether a deeper archive exists at all
+- `services/` shape richer interpreted archive notes rather than exposing raw ledger payloads
+- `services/` own archive grouping, ordering, and selection fallback
+- `app/` renders prepared archive sections and prepared detail entries only
+- `OrientationContext` still remains an assembly seam rather than a UI contract
 
 ## Last-Viewed Ownership
 P3-4 adds a dedicated last-viewed boundary so UI components do not become the long-term owners of history lookup rules.
 
 The current implementation is in-memory only, which is acceptable for this phase.
 Later phases can replace that storage behind the same contract without moving history coordination back into the UI.
+
+Snapshot and Insights now use separate surface-scoped boundaries on that same seam.
+That does not create a global unread system:
+- Snapshot still uses the boundary for orientation and Since Last Checked preparation
+- Insights now uses its own boundary for interpreted continuity only
+- `app/` does not compare event timestamps, invent unread state, or decide what counts as new
 
 ## Later Extensions
 P3-4 intentionally stopped before reorientation copy generation.

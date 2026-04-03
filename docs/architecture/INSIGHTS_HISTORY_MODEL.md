@@ -1,69 +1,102 @@
-# Insights History Model (P8-I1)
+# Insights History Model (P8-I3)
 
 ## Purpose
-`InsightsHistoryVM` is PocketPilot's first canonical Insights / Event History contract.
+PocketPilot now has one canonical Insights history family with two prepared shelves:
+- `InsightsHistoryWithContinuityVM` for the top-level Insights shelf
+- `InsightsArchiveVM` for the optional deeper detail/archive shelf
 
-It exists to give `P8` one calm, optional home for meaningful interpreted history without:
+Together they let Insights answer two calm product questions:
+
+`What meaningful interpreted history is new since I last viewed Insights?`
+
+`If I go one layer deeper, what slightly richer interpreted archive is available?`
+
+It does that without:
 - turning `EventLedger` into a raw log dump
-- pushing history assembly into `app/`
-- inventing journaling, exports, or behaviour analytics too early
+- pushing boundary comparison into `app/`
+- inventing unread badges, inbox state, or notification theatre
+- broadening into journaling, exports, compare-period tooling, or a raw archive browser
 
-This phase is a thin foundation only.
+## Service Paths
+Top-level read path:
 
-## Service Path
-The first history surface stays on the existing interpreted seam:
+`EventLedger -> EventLedgerQueries -> Since Last Checked (when available) -> OrientationContext -> createInsightsHistoryVM -> createInsightsContinuity -> fetchInsightsHistoryVM -> InsightsScreen`
 
-`EventLedger -> EventLedgerQueries -> Since Last Checked (when available) -> OrientationContext -> createInsightsHistoryVM -> fetchInsightsHistoryVM -> InsightsScreen`
+Deeper archive read path:
 
-If no `Since Last Checked` boundary exists, the same history contract still builds from the ledger and query seam without inventing a second UI-owned path.
+`EventLedger -> EventLedgerQueries -> Since Last Checked (when available) -> OrientationContext -> createInsightsHistoryVM -> createInsightsContinuity -> createInsightsArchiveVM -> fetchInsightsArchiveVM -> InsightsDetailScreen`
+
+Write path:
+
+`InsightsScreen -> markInsightsHistoryViewed -> lastViewedState`
+
+The backing timestamp store is still the shared `lastViewedState` seam, but Insights now consumes it only through explicit service-owned read/write helpers.
 
 ## Why It Consumes Interpreted Seams
-PocketPilot already has the right early ingredients:
+PocketPilot already had the right ingredients:
 - `MarketEvent` as the canonical interpreted unit
-- `EventLedger` as append-only history memory
+- `EventLedger` as append-only interpreted history
 - `EventLedgerQueries` as deterministic retrieval
-- `Since Last Checked` as the first recency boundary seam
-- `OrientationContext` as the prepared history assembly seam above those layers
+- `Since Last Checked` as the first recency groundwork
+- `OrientationContext` as the prepared history assembly seam
+- P8-I1's `createInsightsHistoryVM` as the first Insights history shaper
 
-P8-I1 builds on those seams instead of bypassing them.
+P8-I2 builds above those seams rather than bypassing them.
+P8-I3 continues the same rule and reuses the same interpreted spine rather than creating a second history system.
 
-That preserves three important rules:
+That preserves four rules:
 - history stays interpretation-first
-- `services/` own meaning, grouping, and compression
-- `app/` renders prepared sections and items only
+- continuity is based on meaningful interpreted items, not raw event rows
+- `services/` own boundary lookup, comparison, and summary wording
+- `services/` also own deeper archive grouping, ordering, and selection fallback
+- `app/` renders prepared contracts and records visits through one narrow service seam
 
 ## Contract Summary
-The first contract is intentionally small:
+P8-I3 keeps the contracts explicit and minimal:
 
 ```ts
-type EventHistoryEntry = {
+type InsightsContinuityState =
+  | 'NO_HISTORY'
+  | 'NO_NEW_HISTORY'
+  | 'NEW_HISTORY_AVAILABLE';
+
+type InsightsLastViewedBoundary = {
+  viewedAt: string | null;
+};
+
+type InsightsContinuitySummary = {
+  state: InsightsContinuityState;
+  viewedAt: string | null;
+  newestEventAt: string | null;
+  newItemCount: number;
+  summary: string | null;
+};
+
+type InsightsHistoryWithContinuityVM = {
+  generatedAt: string | null;
+  availability: InsightsHistoryAvailability;
+  continuity: InsightsContinuitySummary;
+};
+
+type InsightsDetailEntry = {
   title: string;
   summary: string;
   timestamp: string | null;
   symbol: string | null;
   eventKind: 'ALIGNMENT' | 'VOLATILITY' | 'STATE_CHANGE' | 'CONTEXT' | 'OTHER';
+  detailNote: string | null;
 };
 
-type EventHistorySection = {
+type InsightsArchiveSection = {
   id: string;
   title: string;
-  items: ReadonlyArray<EventHistoryEntry>;
+  items: ReadonlyArray<InsightsDetailEntry>;
 };
 
-type InsightsHistoryVM = {
+type InsightsArchiveVM = {
   generatedAt: string | null;
-  availability:
-    | {
-        status: 'UNAVAILABLE';
-        reason:
-          | 'NO_EVENT_HISTORY'
-          | 'NOT_ENABLED_FOR_SURFACE'
-          | 'INSUFFICIENT_INTERPRETED_HISTORY';
-      }
-    | {
-        status: 'AVAILABLE';
-        sections: ReadonlyArray<EventHistorySection>;
-      };
+  availability: InsightsArchiveAvailability;
+  selectedSectionId: string | null;
 };
 ```
 
@@ -72,36 +105,52 @@ The contract intentionally excludes:
 - event IDs
 - strategy IDs
 - provider/runtime diagnostics
-- behaviour scores
+- unread metadata
+- engagement nudges
 - moral framing
 
-## Meaningful-History Rules
-P8-I1 keeps the first surface narrow and honest.
+## Continuity Rules
+P8-I2 continuity rules still apply unchanged:
 
 Rules:
-- fewer stronger entries are better than exhaustive completeness
-- repetitive events should compress toward one clearer history note
-- history should read like calm briefing notes, not developer logs
-- if interpreted history is too thin, the surface should be unavailable rather than padded
-- a top-level Insights/Event History screen is the only first consumer in this phase
+- `NEW_HISTORY_AVAILABLE` means newer interpreted history exists relative to the Insights boundary only
+- `NO_NEW_HISTORY` is preferred over fake novelty when there is no useful distinction to make
+- `NO_HISTORY` means meaningful interpreted history is not available yet on this surface
+- `newItemCount` counts prepared interpreted items, not raw ledger events
+- continuity copy stays factual and brief, not notification-like
+- app never compares timestamps or decides what counts as new
+
+## Archive Rules
+P8-I3 adds one calm deeper shelf and keeps it narrow.
+
+Rules:
+- one canonical archive/detail contract only
+- deeper means richer interpretation context, not raw ledger exhaust
+- `detailNote` adds slightly more meaning, not technical payload
+- fewer stronger sections are better than noisy completeness
+- `services/` own archive grouping, ordering, and `selectedSectionId` fallback
+- `app/` does not query ledger rows, group archive sections, or decide which section is valid
+- archive can honestly be unavailable when interpreted history is too thin
 
 ## Relationship To Other Surfaces
 - Snapshot keeps its current-state and briefing role.
 - Dashboard keeps its focus and explanation role.
 - Trade Hub remains execution-aware and non-dispatching.
-- Insights becomes the first dedicated reflection/history shelf.
+- Insights keeps its top-level reflective shelf and now adds one subordinate deeper shelf.
 
-That separation matters because Event History is deeper and more reflective than Snapshot, but it should still stay thinner and calmer than a full archive browser.
+That separation matters because Insights history is more reflective than Snapshot, but it should still stay thinner and calmer than an archive browser, inbox, or diagnostics console.
 
 ## Intentional Non-Goals
-P8-I1 does not add:
+P8-I3 still does not add:
 - journaling
 - exports
-- year-in-review summaries
-- compare-period tooling
+- compare-period summaries
+- archive search complexity
+- year-in-review tooling
 - behaviour scoring
 - push notifications
 - background polling
 - AI-generated reflection
 - raw diagnostic history
-- a generic infinite ledger browser
+- a generic ledger browser
+- unread badges or inbox metaphors

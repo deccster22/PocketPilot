@@ -1,7 +1,7 @@
 # PocketPilot Phase Map
 
 Phase: `PX-PM1`  
-Last updated: 2026-04-03
+Last updated: 2026-04-04
 
 ## Purpose
 This document reconciles PocketPilot's overlapping phase lenses so future work can name phases honestly without erasing the actual implementation sequence.
@@ -98,8 +98,10 @@ This table records what is actually built or still pending without forcing the h
 | `PX-PM1` | PX cross-cutting/platform | supports repo-wide planning clarity | Phase map audit and roadmap alignment | done | Creates the canonical taxonomy and audited ledger in this file |
 | `P7` | canonical product | `P7` | Knowledge baseline | partial | Baseline foundation now exists through `P7-K1`, but the broader family remains incomplete |
 | `P7-K1` | canonical product | `P7` | Knowledge baseline foundation | done | Adds the first canonical `KnowledgeNode`, one service-owned library VM seam, and one minimal top-level library surface without contextual rollout |
-| `P8` | canonical product | `P8` | Insights, reflection, and richer context | partial | `P8-I1` lands the first thin Event History surface, but the broader family remains incomplete |
+| `P8` | canonical product | `P8` | Insights, reflection, and richer context | partial | `P8-I1` lands the first thin Event History surface, `P8-I2` adds calm last-viewed continuity, and `P8-I3` adds one deeper archive/detail shelf, but the broader family remains incomplete |
 | `P8-I1` | canonical product | `P8` | Insights / Event History foundation | done | Adds one service-owned history VM seam, one minimal top-level Insights surface, and meaningful-history shaping over the existing event spine |
+| `P8-I2` | canonical product | `P8` | Insights last-viewed continuity | done | Adds one canonical continuity contract, one combined history-plus-continuity fetch seam, and one explicit Insights-specific last-viewed boundary without turning Insights into an inbox |
+| `P8-I3` | canonical product | `P8` | Insights detail / archive navigation | done | Adds one canonical archive/detail contract, one service-owned deeper archive fetch seam, and one subordinate interpreted detail shelf without turning Insights into a ledger browser |
 | `P9` | canonical product | `P9` | Strategy Navigator and richer explanation layer | planned | No PX phase or reorientation cleanup should be read as `P9` completion |
 | `P10` | canonical product | `P10` | Beta hardening | planned | Future family |
 | `P11` | canonical product | `P11` | Launch prep | planned | Future family |
