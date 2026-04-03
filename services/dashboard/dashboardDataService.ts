@@ -1,5 +1,7 @@
+﻿import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import type { UserProfile } from '@/core/profile/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
+import type { OrientationContext as ExplanationContext } from '@/services/orientation/createOrientationContext';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
@@ -9,6 +11,7 @@ export type DashboardData = {
   scan: ForegroundScanResult;
   events: MarketEvent[];
   orientationContext: OrientationContext;
+  explanationContext: ExplanationContext;
 };
 
 function cloneDashboardEvents(events: ReadonlyArray<MarketEvent>): MarketEvent[] {
@@ -17,6 +20,43 @@ function cloneDashboardEvents(events: ReadonlyArray<MarketEvent>): MarketEvent[]
     signalsTriggered: [...event.signalsTriggered],
     metadata: { ...event.metadata },
   }));
+}
+
+function cloneEventLedgerEntry(entry: EventLedgerEntry): EventLedgerEntry {
+  if ('strategyId' in entry && 'eventType' in entry && 'signalsTriggered' in entry) {
+    return {
+      ...entry,
+      signalsTriggered: [...entry.signalsTriggered],
+      metadata: { ...entry.metadata },
+    };
+  }
+
+  return {
+    ...entry,
+    metadata: { ...entry.metadata },
+  };
+}
+
+function cloneExplanationContext(context: ExplanationContext): ExplanationContext {
+  return {
+    ...context,
+    currentState: {
+      latestRelevantEvent: context.currentState.latestRelevantEvent
+        ? cloneEventLedgerEntry(context.currentState.latestRelevantEvent)
+        : context.currentState.latestRelevantEvent,
+      strategyAlignment: context.currentState.strategyAlignment,
+      certainty: context.currentState.certainty,
+    },
+    historyContext: {
+      eventsSinceLastViewed: context.historyContext.eventsSinceLastViewed.map(cloneEventLedgerEntry),
+      sinceLastChecked: context.historyContext.sinceLastChecked
+        ? {
+            ...context.historyContext.sinceLastChecked,
+            events: context.historyContext.sinceLastChecked.events.map(cloneEventLedgerEntry),
+          }
+        : context.historyContext.sinceLastChecked,
+    },
+  };
 }
 
 export async function fetchDashboardData(params: {
@@ -33,5 +73,6 @@ export async function fetchDashboardData(params: {
       profile: params.profile,
       assets: [],
     },
+    explanationContext: cloneExplanationContext(upstream.orientationContext),
   };
 }

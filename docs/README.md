@@ -1,11 +1,13 @@
-Title: PocketPilot Documentation Index
+﻿Title: PocketPilot Documentation Index
 Version: v2 markdown source
 Source: docs/source/README_v2.md
-Last Updated: 2026-04-02
+
+Last Updated: 2026-04-03
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-02  
+**Last updated:** 2026-04-03  
+
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
 PocketPilot is a **strategy-first, execution-aware, calm-toned decision-support cockpit**. It is not a trading bot, not a signal-spam feed, and not a casino dashboard. The docs in this repo exist to preserve that identity while giving contributors, agents, and future build chats a clean map of what matters, where it lives, and what must not drift.
@@ -100,6 +102,7 @@ Examples:
 - `architecture/STRATEGY_ENGINE.md`
 - `architecture/MARKET_EVENT_MODEL.md`
 - `architecture/EVENT_STREAM_MODEL.md`
+- `architecture/EXPLANATION_MODEL.md`
 - `architecture/SNAPSHOT_SYSTEM.md`
 - `architecture/TRADE_HUB_MODEL.md`
 - `architecture/RISK_LAYER_MODEL.md`
@@ -283,6 +286,9 @@ Market Providers
 -> SnapshotBriefingState
 -> SnapshotSurfaceVM
 -> DashboardModel
+-> DashboardSurfaceVM
+-> ExplanationSummary
+-> Dashboard why note
 -> Trade Hub Surface
 -> Confirmation Session
 -> Execution Preview
@@ -328,7 +334,13 @@ PocketPilot is easiest to read at three levels.
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan
-- `P6` Alerts and message policy
+- `P6` Alerts, message policy, and reorientation briefing seams
+- `P6-R2` Snapshot placement for the foreground reorientation briefing
+- `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
+- `P6-R4` Snapshot foreground-return truth refresh through the shared prepared VM path
+- `P6-R5` Snapshot orientation cohesion through one canonical subordinate briefing zone
+- `P6-R5A` Retire the legacy reorientation-only app presentation path so Snapshot keeps one canonical briefing surface
+- `PX-E1` Early explanation and lineage groundwork for the Dashboard Focus surface
 - `P7` Knowledge baseline
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
@@ -341,6 +353,7 @@ Use `PX-*` for cross-cutting, platform, runtime, hardening, cleanup, doctrine, a
 Current examples:
 - `PX-API1` through `PX-API5` for runtime doctrine and hardening
 - `PX-PM1` for this phase-map audit and roadmap alignment pass
+- `PX-E1` is explanation groundwork, not proof that the richer `P9` family is complete.
 
 Use `P#-subphase` only for scoped work inside one canonical family. Example: `P6-R5A` is cleanup within `P6`; it does not imply completion of `P7`, `P8`, or `P9`.
 
@@ -464,3 +477,5 @@ Replaced prior section headings from the older index:
 - `Phases`
 - `Source Artifacts`
 - `Incoming`
+
+

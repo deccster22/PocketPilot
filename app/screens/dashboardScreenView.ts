@@ -1,4 +1,6 @@
-import type { DashboardItem, DashboardSurfaceModel } from '@/services/dashboard/types';
+﻿import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { DashboardItem } from '@/services/dashboard/types';
+import type { ExplanationConfidence, ExplanationLineageItem } from '@/services/explanation/types';
 
 export type DashboardScreenZoneItemViewData = {
   title: string;
@@ -16,6 +18,19 @@ export type DashboardScreenViewData = {
   primeZone: DashboardScreenZoneViewData;
   secondaryZone: DashboardScreenZoneViewData;
   deepZone: DashboardScreenZoneViewData;
+  explanation:
+    | {
+        visible: false;
+      }
+    | {
+        visible: true;
+        title: string;
+        summary: string;
+        confidenceText: string;
+        confidenceNote: string;
+        lineage: ReadonlyArray<Pick<ExplanationLineageItem, 'label' | 'detail'>>;
+        limitations: ReadonlyArray<string>;
+      };
 };
 
 function formatEventTypeLabel(item: DashboardItem): string {
@@ -54,26 +69,54 @@ function formatZoneItems(items: DashboardItem[]): DashboardScreenZoneItemViewDat
   }));
 }
 
+function formatConfidenceText(confidence: ExplanationConfidence): string {
+  switch (confidence) {
+    case 'HIGH':
+      return 'Support: High';
+    case 'MODERATE':
+      return 'Support: Moderate';
+    default:
+      return 'Support: Low';
+  }
+}
+
 export function createDashboardScreenViewData(
-  surface: DashboardSurfaceModel | null,
+  surface: DashboardSurfaceVM | null,
 ): DashboardScreenViewData | null {
   if (!surface) {
     return null;
   }
 
   return {
-    profileLabel: surface.meta.profile,
+    profileLabel: surface.model.meta.profile,
     primeZone: {
       title: 'Prime Zone',
-      items: formatZoneItems(surface.primeZone.items),
+      items: formatZoneItems(surface.model.primeZone.items),
     },
     secondaryZone: {
       title: 'Secondary Zone',
-      items: formatZoneItems(surface.secondaryZone.items),
+      items: formatZoneItems(surface.model.secondaryZone.items),
     },
     deepZone: {
       title: 'Deep Zone',
-      items: formatZoneItems(surface.deepZone.items),
+      items: formatZoneItems(surface.model.deepZone.items),
     },
+    explanation:
+      surface.explanation.status === 'AVAILABLE'
+        ? {
+            visible: true,
+            title: surface.explanation.explanation.title,
+            summary: surface.explanation.explanation.summary,
+            confidenceText: formatConfidenceText(surface.explanation.explanation.confidence),
+            confidenceNote: surface.explanation.explanation.confidenceNote,
+            lineage: surface.explanation.explanation.lineage.map((item) => ({
+              label: item.label,
+              detail: item.detail,
+            })),
+            limitations: surface.explanation.explanation.limitations,
+          }
+        : {
+            visible: false,
+          },
   };
 }

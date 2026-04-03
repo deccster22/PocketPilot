@@ -1,4 +1,4 @@
-# Orientation History Model (P3-4)
+﻿# Orientation History Model (P3-4)
 
 ## Purpose
 `OrientationContext` is the structured assembly seam for Snapshot-facing orientation data.
@@ -70,6 +70,7 @@ The seam produces a structured object with two concerns:
 ```
 
 The seam does not generate prose, explanations, analytics, or narrative summaries.
+Any explanation layer must sit above `OrientationContext`, not inside it.
 
 ## Relationship To EventLedger And Queries
 - `EventLedger` remains append-only and immutable.
@@ -85,10 +86,19 @@ In P6-R1 through P6-R5, reorientation and Snapshot briefing continue to extend t
 
 `EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> SnapshotBriefingState -> app`
 
+In PX-E1, Dashboard explanation continues the same extension rule:
+
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> ExplanationSummary -> Dashboard why note`
+
 P6-R5 keeps Since Last Checked and reorientation on that same prepared history spine and adds one explicit rule:
 - Snapshot receives one subordinate briefing zone only
 - `services/` decides whether that zone shows reorientation, Since Last Checked, or nothing
 - `app/` does not rebuild history summaries or choose between candidates
+
+PX-E1 adds the same explanation discipline for Dashboard:
+- `services/` selects lineage and shapes confidence
+- `app/` renders the prepared explanation contract only
+- `OrientationContext` remains a non-prose input seam
 
 ## Last-Viewed Ownership
 P3-4 adds a dedicated last-viewed boundary so UI components do not become the long-term owners of history lookup rules.
@@ -99,10 +109,12 @@ Later phases can replace that storage behind the same contract without moving hi
 ## Later Extensions
 P3-4 intentionally stopped before reorientation copy generation.
 P6-R1 adds `ReorientationSummary` above `OrientationContext` and `SnapshotModel` as a calm, optional return briefing seam.
+PX-E1 adds `ExplanationSummary` above `OrientationContext` for Dashboard Focus only.
 
-That extension preserves the same rule:
+Those extensions preserve the same rule:
 - services own the prepared history contract
 - app renders prepared contracts only
+- interpretation remains above `OrientationContext`, not embedded inside it
 
 ## Intentional Non-Goals
 P3-4 did not add:

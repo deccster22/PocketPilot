@@ -1,11 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { ExplanationCard } from '@/app/components/ExplanationCard';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
-import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { createDashboardScreenViewData } from '@/app/screens/dashboardScreenView';
-import { fetchDashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
-import type { DashboardSurfaceModel } from '@/services/dashboard/types';
+import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import {
+  fetchDashboardSurfaceVM,
+  type DashboardSurfaceVM,
+} from '@/services/dashboard/dashboardSurfaceService';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 function DashboardZone(props: {
@@ -33,7 +36,7 @@ function DashboardZone(props: {
 
 export function DashboardScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
-  const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceModel | null>(null);
+  const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceVM | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export function DashboardScreen() {
           return;
         }
 
-        setSurfaceModel(dashboard.model);
+        setSurfaceModel(dashboard);
         setBaselineScan((currentBaseline) => currentBaseline ?? dashboard.scan);
       })
       .catch(() => {
@@ -80,6 +83,12 @@ export function DashboardScreen() {
           title={screenView?.primeZone.title ?? 'Prime Zone'}
           items={screenView?.primeZone.items ?? []}
         />
+        {screenView?.explanation.visible ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Why</Text>
+            <ExplanationCard explanation={screenView.explanation} />
+          </View>
+        ) : null}
         <DashboardZone
           title={screenView?.secondaryZone.title ?? 'Secondary Zone'}
           items={screenView?.secondaryZone.items ?? []}
