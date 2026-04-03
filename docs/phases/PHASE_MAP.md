@@ -98,7 +98,8 @@ This table records what is actually built or still pending without forcing the h
 | `PX-PM1` | PX cross-cutting/platform | supports repo-wide planning clarity | Phase map audit and roadmap alignment | done | Creates the canonical taxonomy and audited ledger in this file |
 | `P7` | canonical product | `P7` | Knowledge baseline | partial | Baseline foundation now exists through `P7-K1`, but the broader family remains incomplete |
 | `P7-K1` | canonical product | `P7` | Knowledge baseline foundation | done | Adds the first canonical `KnowledgeNode`, one service-owned library VM seam, and one minimal top-level library surface without contextual rollout |
-| `P8` | canonical product | `P8` | Insights, reflection, and richer context | planned | Enabling seams landed early in `P3` and `P6`, but the family itself is not complete |
+| `P8` | canonical product | `P8` | Insights, reflection, and richer context | partial | `P8-I1` lands the first thin Event History surface, but the broader family remains incomplete |
+| `P8-I1` | canonical product | `P8` | Insights / Event History foundation | done | Adds one service-owned history VM seam, one minimal top-level Insights surface, and meaningful-history shaping over the existing event spine |
 | `P9` | canonical product | `P9` | Strategy Navigator and richer explanation layer | planned | No PX phase or reorientation cleanup should be read as `P9` completion |
 | `P10` | canonical product | `P10` | Beta hardening | planned | Future family |
 | `P11` | canonical product | `P11` | Launch prep | planned | Future family |

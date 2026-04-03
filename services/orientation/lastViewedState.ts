@@ -1,4 +1,5 @@
 export const SNAPSHOT_LAST_VIEWED_SURFACE_ID = 'snapshot';
+export const INSIGHTS_LAST_VIEWED_SURFACE_ID = 'insights';
 
 export type LastViewedStateScope = {
   surfaceId: string;
