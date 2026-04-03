@@ -92,8 +92,17 @@ describe('fetchDashboardExplanationVM', () => {
       status: 'AVAILABLE',
       explanation: {
         title: 'Why BTC is in focus',
+        contextNote: expect.stringContaining('watchful'),
       },
     });
+
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected explanation to be available.');
+    }
+
+    expect(JSON.stringify(result.explanation)).not.toMatch(
+      /signal-breakout|eventId|providerId|momentum_basics/,
+    );
   });
 
   it('returns unavailable instead of inventing a secondary-surface explanation', () => {

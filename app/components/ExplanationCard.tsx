@@ -1,4 +1,5 @@
-﻿import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { DashboardScreenViewData } from '@/app/screens/dashboardScreenView';
 
@@ -7,6 +8,14 @@ type ExplanationCardViewData = Extract<DashboardScreenViewData['explanation'], {
 export function ExplanationCard(params: {
   explanation: ExplanationCardViewData;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [params.explanation.title, params.explanation.summary, params.explanation.confidenceNote]);
+
+  const hasDetail = Boolean(params.explanation.detail);
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -20,27 +29,48 @@ export function ExplanationCard(params: {
         <Text style={styles.sectionDetail}>{params.explanation.confidenceNote}</Text>
       </View>
 
-      {params.explanation.lineage.length > 0 ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Lineage</Text>
-          {params.explanation.lineage.map((item) => (
-            <View key={`${item.label}:${item.detail}`} style={styles.item}>
-              <Text style={styles.itemLabel}>{item.label}</Text>
-              <Text style={styles.itemDetail}>{item.detail}</Text>
-            </View>
-          ))}
-        </View>
+      {hasDetail ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setIsExpanded((current) => !current)}
+          style={styles.toggle}
+        >
+          <Text style={styles.toggleText}>{isExpanded ? 'Less context' : 'More context'}</Text>
+        </Pressable>
       ) : null}
 
-      {params.explanation.limitations.length > 0 ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Limitations</Text>
-          {params.explanation.limitations.map((item) => (
-            <Text key={item} style={styles.limitation}>
-              - {item}
-            </Text>
-          ))}
-        </View>
+      {isExpanded && params.explanation.detail ? (
+        <>
+          {params.explanation.detail.contextNote ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Context</Text>
+              <Text style={styles.sectionDetail}>{params.explanation.detail.contextNote}</Text>
+            </View>
+          ) : null}
+
+          {params.explanation.detail.lineage.length > 0 ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Lineage</Text>
+              {params.explanation.detail.lineage.map((item) => (
+                <View key={`${item.label}:${item.detail}`} style={styles.item}>
+                  <Text style={styles.itemLabel}>{item.label}</Text>
+                  <Text style={styles.itemDetail}>{item.detail}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+
+          {params.explanation.detail.limitations.length > 0 ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Limitations</Text>
+              {params.explanation.detail.limitations.map((item) => (
+                <Text key={item} style={styles.limitation}>
+                  - {item}
+                </Text>
+              ))}
+            </View>
+          ) : null}
+        </>
       ) : null}
     </View>
   );
@@ -87,6 +117,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: '#374151',
+  },
+  toggle: {
+    alignSelf: 'flex-start',
+    paddingVertical: 2,
+  },
+  toggleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1d4ed8',
   },
   item: {
     gap: 2,
