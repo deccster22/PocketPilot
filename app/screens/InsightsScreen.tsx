@@ -1,18 +1,61 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
+import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
 import { createInsightsScreenViewData } from '@/app/screens/insightsScreenView';
+import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
+import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
+
+type InsightsRoute = 'HOME' | 'DETAIL';
 
 export function InsightsScreen() {
-  const screenView = createInsightsScreenViewData(
+  const [screenNowMs] = useState(() => Date.now());
+  const nowProvider = () => screenNowMs;
+  const [route, setRoute] = useState<InsightsRoute>('HOME');
+  const [historyVM] = useState(() =>
     fetchInsightsHistoryVM({
       surface: 'INSIGHTS_SCREEN',
+      nowProvider,
     }),
   );
+  const [archiveVM, setArchiveVM] = useState(() =>
+    fetchInsightsArchiveVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+    }),
+  );
+  const screenView = createInsightsScreenViewData(historyVM, {
+    hasArchive: archiveVM.availability.status === 'AVAILABLE',
+  });
+
+  useEffect(() => {
+    markInsightsHistoryViewed({
+      viewedAt: historyVM.generatedAt,
+    });
+  }, [historyVM.generatedAt]);
 
   if (!screenView) {
     return null;
+  }
+
+  if (route === 'DETAIL') {
+    return (
+      <InsightsDetailScreen
+        archiveVM={archiveVM}
+        onBack={() => setRoute('HOME')}
+        onSelectSection={(selectedSectionId) =>
+          setArchiveVM(
+            fetchInsightsArchiveVM({
+              surface: 'INSIGHTS_SCREEN',
+              nowProvider,
+              selectedSectionId,
+            }),
+          )
+        }
+      />
+    );
   }
 
   return (
@@ -22,6 +65,12 @@ export function InsightsScreen() {
           <Text style={styles.header}>{screenView.title}</Text>
           <Text style={styles.summary}>{screenView.summary}</Text>
         </View>
+
+        {screenView.continuityNote ? (
+          <View style={styles.continuityCard}>
+            <Text style={styles.continuityText}>{screenView.continuityNote}</Text>
+          </View>
+        ) : null}
 
         {screenView.availabilityMessage ? (
           <View style={styles.unavailableCard}>
@@ -40,6 +89,19 @@ export function InsightsScreen() {
             ))}
           </View>
         ))}
+
+        {screenView.archiveActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setRoute('DETAIL')}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.archiveActionLabel}</Text>
+            {screenView.archiveActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>{screenView.archiveActionSummary}</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -75,6 +137,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111827',
   },
+  continuityCard: {
+    borderRadius: 12,
+    backgroundColor: '#eef2ff',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  continuityText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#334155',
+  },
   unavailableCard: {
     borderWidth: 1,
     borderColor: '#d1d5db',
@@ -86,5 +159,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: '#4b5563',
+  },
+  archiveButton: {
+    gap: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    padding: 14,
+  },
+  archiveButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  archiveButtonSummary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
   },
 });

@@ -1,4 +1,9 @@
-import type { EventHistoryEntry, InsightsHistoryVM } from '@/services/insights/types';
+import type {
+  InsightsHistoryVM,
+  InsightsHistoryWithContinuityVM,
+} from '@/services/insights/types';
+
+import { formatInsightsEventKind, formatInsightsTimestamp } from './insightsViewFormatting';
 
 export type EventHistoryCardViewData = {
   title: string;
@@ -17,7 +22,10 @@ export type InsightsHistorySectionViewData = {
 export type InsightsScreenViewData = {
   title: string;
   summary: string;
+  continuityNote: string | null;
   availabilityMessage: string | null;
+  archiveActionLabel: string | null;
+  archiveActionSummary: string | null;
   sections: InsightsHistorySectionViewData[];
 };
 
@@ -35,31 +43,11 @@ function formatAvailabilityMessage(reason: Extract<
   }
 }
 
-function formatEventKind(eventKind: EventHistoryEntry['eventKind']): string {
-  switch (eventKind) {
-    case 'ALIGNMENT':
-      return 'Alignment';
-    case 'VOLATILITY':
-      return 'Volatility';
-    case 'STATE_CHANGE':
-      return 'State change';
-    case 'CONTEXT':
-      return 'Context';
-    default:
-      return 'History';
-  }
-}
-
-function formatTimestamp(timestamp: string | null): string | null {
-  if (!timestamp || timestamp.length < 16) {
-    return timestamp;
-  }
-
-  return `${timestamp.slice(0, 10)} ${timestamp.slice(11, 16)} UTC`;
-}
-
 export function createInsightsScreenViewData(
-  vm: InsightsHistoryVM | null,
+  vm: InsightsHistoryWithContinuityVM | null,
+  params?: {
+    hasArchive?: boolean;
+  },
 ): InsightsScreenViewData | null {
   if (!vm) {
     return null;
@@ -70,7 +58,10 @@ export function createInsightsScreenViewData(
       title: 'Insights',
       summary:
         'A quiet shelf of meaningful interpreted changes. It stays selective, factual, and optional.',
+      continuityNote: vm.continuity.summary,
       availabilityMessage: formatAvailabilityMessage(vm.availability.reason),
+      archiveActionLabel: null,
+      archiveActionSummary: null,
       sections: [],
     };
   }
@@ -79,16 +70,21 @@ export function createInsightsScreenViewData(
     title: 'Insights',
     summary:
       'A quiet shelf of meaningful interpreted changes. It stays selective, factual, and optional.',
+    continuityNote: vm.continuity.summary,
     availabilityMessage: null,
+    archiveActionLabel: params?.hasArchive ? 'View deeper history' : null,
+    archiveActionSummary: params?.hasArchive
+      ? 'Open a slightly deeper interpreted archive when you want a little more context.'
+      : null,
     sections: vm.availability.sections.map((section) => ({
       id: section.id,
       title: section.title,
       items: section.items.map((item) => ({
         title: item.title,
         summary: item.summary,
-        timestampText: formatTimestamp(item.timestamp),
+        timestampText: formatInsightsTimestamp(item.timestamp),
         symbolText: item.symbol,
-        eventKindText: formatEventKind(item.eventKind),
+        eventKindText: formatInsightsEventKind(item.eventKind),
       })),
     })),
   };

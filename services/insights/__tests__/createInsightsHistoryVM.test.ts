@@ -3,6 +3,7 @@ import { createSinceLastChecked } from '@/services/events/createSinceLastChecked
 import { createEventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import { createEventLedgerService } from '@/services/events/eventLedgerService';
 import { createInsightsHistoryVM } from '@/services/insights/createInsightsHistoryVM';
+import { INSIGHTS_LAST_VIEWED_SECTION_ID } from '@/services/insights/types';
 import { createOrientationContext } from '@/services/orientation/createOrientationContext';
 
 function createMarketEvent(overrides: Partial<MarketEvent> & Pick<MarketEvent, 'eventId'>): MarketEvent {
@@ -81,8 +82,8 @@ describe('createInsightsHistoryVM', () => {
         status: 'AVAILABLE',
         sections: [
           {
-            id: 'since-last-checked',
-            title: 'Since last checked',
+            id: INSIGHTS_LAST_VIEWED_SECTION_ID,
+            title: 'Since you last viewed Insights',
             items: [
               {
                 title: 'SOL price context stayed estimated',

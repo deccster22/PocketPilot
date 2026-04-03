@@ -2,6 +2,7 @@ import type { MarketEvent } from '@/core/types/marketEvent';
 import { createEventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import { createEventLedgerService } from '@/services/events/eventLedgerService';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
+import { INSIGHTS_LAST_VIEWED_SECTION_ID } from '@/services/insights/types';
 import {
   createInMemoryLastViewedState,
   INSIGHTS_LAST_VIEWED_SURFACE_ID,
@@ -86,8 +87,8 @@ describe('fetchInsightsHistoryVM', () => {
       status: 'AVAILABLE',
       sections: [
         {
-          id: 'since-last-checked',
-          title: 'Since last checked',
+          id: INSIGHTS_LAST_VIEWED_SECTION_ID,
+          title: 'Since you last viewed Insights',
           items: [
             {
               title: 'SOL price context stayed estimated',
@@ -111,12 +112,19 @@ describe('fetchInsightsHistoryVM', () => {
         },
       ],
     });
+    expect(result.continuity).toEqual({
+      state: 'NEW_HISTORY_AVAILABLE',
+      viewedAt: '2026-03-22T12:00:00.000Z',
+      newestEventAt: '2026-03-23T00:00:00.000Z',
+      newItemCount: 1,
+      summary: 'Since you last viewed Insights, 1 newer interpreted history note is available.',
+    });
 
     if (result.availability.status !== 'AVAILABLE') {
       throw new Error('Expected available insights history.');
     }
 
-    expect(JSON.stringify(result.availability.sections)).not.toMatch(/acct-2|broker:live|strategy-alpha/);
+    expect(JSON.stringify(result)).not.toMatch(/acct-2|broker:live|strategy-alpha|raw_signal_code/);
   });
 
   it('returns unavailable instead of enabling the history contract on other surfaces', () => {
@@ -146,6 +154,61 @@ describe('fetchInsightsHistoryVM', () => {
         status: 'UNAVAILABLE',
         reason: 'NOT_ENABLED_FOR_SURFACE',
       },
+      continuity: {
+        state: 'NO_HISTORY',
+        viewedAt: null,
+        newestEventAt: null,
+        newItemCount: 0,
+        summary: null,
+      },
+    });
+  });
+
+  it('can honestly return NO_NEW_HISTORY when interpreted history exists but nothing is newer than the Insights boundary', () => {
+    const ledger = createEventLedgerService([
+      createMarketEvent({
+        eventId: 'acct-1:strategy-alpha:price-a:BTC:100',
+        timestamp: Date.parse('2026-03-20T00:00:00.000Z'),
+      }),
+      createMarketEvent({
+        eventId: 'acct-1:strategy-alpha:momentum-a:ETH:101',
+        timestamp: Date.parse('2026-03-21T00:00:00.000Z'),
+        symbol: 'ETH',
+        eventType: 'MOMENTUM_BUILDING',
+      }),
+    ]);
+    const lastViewedState = createInMemoryLastViewedState([
+      {
+        surfaceId: INSIGHTS_LAST_VIEWED_SURFACE_ID,
+        accountId: 'acct-1',
+        timestamp: Date.parse('2026-03-22T12:00:00.000Z'),
+      },
+    ]);
+
+    const result = fetchInsightsHistoryVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider: () => Date.parse('2026-04-03T00:00:00.000Z'),
+      accountId: 'acct-1',
+      eventLedger: ledger,
+      eventLedgerQueries: createEventLedgerQueries(ledger),
+      lastViewedState,
+    });
+
+    expect(result.availability).toMatchObject({
+      status: 'AVAILABLE',
+      sections: [
+        {
+          id: 'recent-history',
+          title: 'Recent history',
+        },
+      ],
+    });
+    expect(result.continuity).toEqual({
+      state: 'NO_NEW_HISTORY',
+      viewedAt: '2026-03-22T12:00:00.000Z',
+      newestEventAt: '2026-03-21T00:00:00.000Z',
+      newItemCount: 0,
+      summary: 'Since you last viewed Insights, no newer interpreted history is available.',
     });
   });
 
