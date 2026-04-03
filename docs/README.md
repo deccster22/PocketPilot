@@ -212,10 +212,10 @@ Question answered: **What should the product feel like to use, and why?**
 Learning library structure, content types, and media support.
 
 Examples:
-- `knowledge/CRYPTOCURRENCY_HISTORY.md`
-- `knowledge/STRATEGY_GUIDES.md`
-- `knowledge/MARKET_EXAMPLES.md`
-- `knowledge/MEDIA_SPECS.md`
+- `ux/KNOWLEDGE_LIBRARY_SPEC.md`
+- `product/KNOWLEDGE_LAYER.md`
+- `architecture/KNOWLEDGE_MODEL.md`
+- `phases/P7-K1.md`
 
 Question answered: **What does the learning layer look like?**
 
@@ -260,7 +260,7 @@ docs/
 - `strategies/` = strategy-specific models and launch strategy definitions
 - `roadmap/` = phases, runbooks, and phase reporting
 - `ux/` = surface-level UX specs and experience design intent
-- `knowledge/` = learning content framework and media specs
+- `knowledge/` = broader learning content framework and media specs as the corpus expands
 - `research/` = historical exploration and supporting synthesis
 - `incoming/` = temporary staging area for fresh imports awaiting triage
 - `source/` = milestone PDFs and provenance artifacts only
@@ -295,6 +295,15 @@ Market Providers
 -> Execution Preview
 -> Readiness Gate
 -> Submission Intent
+```
+
+Knowledge baseline uses its own thin product seam:
+
+```text
+knowledgeCatalog
+-> createKnowledgeLibraryVM
+-> fetchKnowledgeLibraryVM
+-> Knowledge Library tab
 ```
 
 Key rule: **services own truth, app renders prepared contracts**.
@@ -344,6 +353,7 @@ PocketPilot is easiest to read at three levels.
 - `PX-E1` Early explanation and lineage groundwork for the Dashboard Focus surface
 - `PX-E2` Dashboard explanation deepening on the same canonical seam
 - `P7` Knowledge baseline
+- `P7-K1` Knowledge baseline foundation
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P10` Beta hardening
