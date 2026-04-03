@@ -31,3 +31,4 @@ Thumbs.db
 # temp file
 docs/incoming
 docs/governance/*.pdf
+.codex-worktrees/
