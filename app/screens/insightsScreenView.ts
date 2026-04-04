@@ -26,6 +26,8 @@ export type InsightsScreenViewData = {
   availabilityMessage: string | null;
   archiveActionLabel: string | null;
   archiveActionSummary: string | null;
+  reflectionActionLabel: string | null;
+  reflectionActionSummary: string | null;
   sections: InsightsHistorySectionViewData[];
 };
 
@@ -47,6 +49,7 @@ export function createInsightsScreenViewData(
   vm: InsightsHistoryWithContinuityVM | null,
   params?: {
     hasArchive?: boolean;
+    hasReflection?: boolean;
   },
 ): InsightsScreenViewData | null {
   if (!vm) {
@@ -62,6 +65,8 @@ export function createInsightsScreenViewData(
       availabilityMessage: formatAvailabilityMessage(vm.availability.reason),
       archiveActionLabel: null,
       archiveActionSummary: null,
+      reflectionActionLabel: null,
+      reflectionActionSummary: null,
       sections: [],
     };
   }
@@ -75,6 +80,10 @@ export function createInsightsScreenViewData(
     archiveActionLabel: params?.hasArchive ? 'View deeper history' : null,
     archiveActionSummary: params?.hasArchive
       ? 'Open a slightly deeper interpreted archive when you want a little more context.'
+      : null,
+    reflectionActionLabel: params?.hasReflection ? 'Compare recent history' : null,
+    reflectionActionSummary: params?.hasReflection
+      ? 'Place two interpreted slices side by side when you want a brief sense of what changed.'
       : null,
     sections: vm.availability.sections.map((section) => ({
       id: section.id,

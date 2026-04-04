@@ -6,7 +6,7 @@ Last Updated: 2026-04-04
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-03  
+**Last updated:** 2026-04-04  
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -335,6 +335,19 @@ EventLedger
 -> Insights detail/archive shelf
 ```
 
+P8-I4 adds one thin compare-period reflection path on that same interpreted spine:
+
+```text
+EventLedger
+-> EventLedgerQueries
+-> Since Last Checked (when available)
+-> OrientationContext
+-> createInsightsHistoryVM
+-> createReflectionComparisonVM
+-> fetchReflectionComparisonVM
+-> Insights recent-comparison shelf
+```
+
 Key rule: **services own truth, app renders prepared contracts**.
 
 The UI should not be inventing interpretation logic from raw data. If it feels like the UI is "figuring things out," something has probably drifted.
@@ -387,6 +400,7 @@ PocketPilot is easiest to read at three levels.
 - `P8-I1` Insights / Event History foundation
 - `P8-I2` Insights last-viewed continuity
 - `P8-I3` Insights detail / archive navigation
+- `P8-I4` Compare-period / reflection summary foundation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P10` Beta hardening
 - `P11` Launch prep
