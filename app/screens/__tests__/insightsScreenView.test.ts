@@ -38,6 +38,7 @@ describe('createInsightsScreenViewData', () => {
         },
         {
           hasArchive: true,
+          hasReflection: true,
         },
       ),
     ).toEqual({
@@ -49,6 +50,9 @@ describe('createInsightsScreenViewData', () => {
       archiveActionLabel: 'View deeper history',
       archiveActionSummary:
         'Open a slightly deeper interpreted archive when you want a little more context.',
+      reflectionActionLabel: 'Compare recent history',
+      reflectionActionSummary:
+        'Place two interpreted slices side by side when you want a brief sense of what changed.',
       sections: [
         {
           id: 'recent-history',
@@ -91,6 +95,8 @@ describe('createInsightsScreenViewData', () => {
       availabilityMessage: 'Insights will appear once there is a little more interpreted history to review.',
       archiveActionLabel: null,
       archiveActionSummary: null,
+      reflectionActionLabel: null,
+      reflectionActionSummary: null,
       sections: [],
     });
   });
@@ -104,8 +110,9 @@ describe('createInsightsScreenViewData', () => {
     expect(source).toMatch(/vm\.availability\.status === 'UNAVAILABLE'/);
     expect(source).toMatch(/vm\.continuity\.summary/);
     expect(source).toMatch(/hasArchive/);
+    expect(source).toMatch(/hasReflection/);
     expect(source).not.toMatch(
-      /createInsightsHistoryVM|fetchInsightsHistoryVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|unread|inbox|badge/,
+      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchReflectionComparisonVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
     );
   });
 

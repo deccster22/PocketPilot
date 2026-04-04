@@ -98,6 +98,10 @@ In P8-I3, deeper Insights archive/detail navigation extends that same seam one s
 
 `EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> createInsightsHistoryVM -> createInsightsContinuity -> createInsightsArchiveVM -> fetchInsightsArchiveVM -> InsightsDetailScreen`
 
+In P8-I4, compare-period reflection extends that same seam one step further without moving comparison wording into `app/`:
+
+`EventStream -> EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> createInsightsHistoryVM -> createReflectionComparisonVM -> fetchReflectionComparisonVM -> InsightsReflectionScreen`
+
 P6-R5 keeps Since Last Checked and reorientation on that same prepared history spine and adds one explicit rule:
 - Snapshot receives one subordinate briefing zone only
 - `services/` decides whether that zone shows reorientation, Since Last Checked, or nothing
@@ -121,6 +125,13 @@ P8-I3 keeps the same discipline for deeper Insights archive/detail navigation:
 - `services/` shape richer interpreted archive notes rather than exposing raw ledger payloads
 - `services/` own archive grouping, ordering, and selection fallback
 - `app/` renders prepared archive sections and prepared detail entries only
+- `OrientationContext` still remains an assembly seam rather than a UI contract
+
+P8-I4 keeps the same discipline for compare-period reflection:
+- `services/` choose the two interpreted windows or slices that are worth comparing
+- `services/` write the calm reflection summary wording
+- `services/` keep raw signal detail, IDs, provider metadata, and scoring language out of user-facing comparison copy
+- `app/` renders prepared windows, summary items, and limitations only
 - `OrientationContext` still remains an assembly seam rather than a UI contract
 
 ## Last-Viewed Ownership

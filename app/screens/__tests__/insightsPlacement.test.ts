@@ -12,6 +12,10 @@ describe('insights placement', () => {
       join(process.cwd(), 'app', 'screens', 'InsightsDetailScreen.tsx'),
       'utf8',
     );
+    const insightsReflectionScreenSource = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'InsightsReflectionScreen.tsx'),
+      'utf8',
+    );
     const dashboardScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'DashboardScreen.tsx'),
       'utf8',
@@ -30,16 +34,23 @@ describe('insights placement', () => {
     expect(appSource).toMatch(/activeTab/);
     expect(insightsScreenSource).toMatch(/fetchInsightsHistoryVM/);
     expect(insightsScreenSource).toMatch(/fetchInsightsArchiveVM/);
+    expect(insightsScreenSource).toMatch(/fetchReflectionComparisonVM/);
     expect(insightsScreenSource).toMatch(/markInsightsHistoryViewed/);
     expect(insightsScreenSource).toMatch(/InsightsDetailScreen/);
+    expect(insightsScreenSource).toMatch(/InsightsReflectionScreen/);
     expect(insightsScreenSource).toMatch(/EventHistoryCard/);
     expect(insightsScreenSource).not.toMatch(
-      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createSinceLastChecked|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|unread|inbox|badge/,
+      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createReflectionComparisonVM|createSinceLastChecked|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(insightsDetailScreenSource).toMatch(/createInsightsDetailScreenViewData/);
     expect(insightsDetailScreenSource).toMatch(/InsightsDetailCard/);
     expect(insightsDetailScreenSource).not.toMatch(
       /fetchInsightsArchiveVM|createInsightsArchiveVM|eventLedger|eventId|strategyId|providerId|metadata|unread|inbox|badge/,
+    );
+    expect(insightsReflectionScreenSource).toMatch(/createInsightsReflectionScreenViewData/);
+    expect(insightsReflectionScreenSource).toMatch(/ReflectionSummaryCard/);
+    expect(insightsReflectionScreenSource).not.toMatch(
+      /fetchReflectionComparisonVM|createReflectionComparisonVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(dashboardScreenSource).not.toMatch(/EventHistoryCard|fetchInsightsHistoryVM/);
     expect(snapshotScreenSource).not.toMatch(/EventHistoryCard|fetchInsightsHistoryVM/);

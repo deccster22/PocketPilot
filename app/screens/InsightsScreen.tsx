@@ -3,12 +3,14 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
+import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
 import { createInsightsScreenViewData } from '@/app/screens/insightsScreenView';
 import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
+import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
 
-type InsightsRoute = 'HOME' | 'DETAIL';
+type InsightsRoute = 'HOME' | 'DETAIL' | 'REFLECTION';
 
 export function InsightsScreen() {
   const [screenNowMs] = useState(() => Date.now());
@@ -26,8 +28,15 @@ export function InsightsScreen() {
       nowProvider,
     }),
   );
+  const [reflectionVM] = useState(() =>
+    fetchReflectionComparisonVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+    }),
+  );
   const screenView = createInsightsScreenViewData(historyVM, {
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
+    hasReflection: historyVM.availability.status === 'AVAILABLE',
   });
 
   useEffect(() => {
@@ -56,6 +65,10 @@ export function InsightsScreen() {
         }
       />
     );
+  }
+
+  if (route === 'REFLECTION') {
+    return <InsightsReflectionScreen reflectionVM={reflectionVM} onBack={() => setRoute('HOME')} />;
   }
 
   return (
@@ -99,6 +112,19 @@ export function InsightsScreen() {
             <Text style={styles.archiveButtonText}>{screenView.archiveActionLabel}</Text>
             {screenView.archiveActionSummary ? (
               <Text style={styles.archiveButtonSummary}>{screenView.archiveActionSummary}</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
+
+        {screenView.reflectionActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setRoute('REFLECTION')}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.reflectionActionLabel}</Text>
+            {screenView.reflectionActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>{screenView.reflectionActionSummary}</Text>
             ) : null}
           </Pressable>
         ) : null}

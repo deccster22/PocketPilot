@@ -94,6 +94,40 @@ export type InsightsArchiveVM = {
   selectedSectionId: string | null;
 };
 
+export type ReflectionComparisonWindow = {
+  id: string;
+  title: string;
+  startAt: string | null;
+  endAt: string | null;
+};
+
+export type ReflectionSummaryItem = {
+  title: string;
+  summary: string;
+  emphasis: 'SHIFT' | 'STABLE' | 'CONTEXT';
+};
+
+export type ReflectionComparisonAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_COMPARABLE_HISTORY'
+        | 'INSUFFICIENT_INTERPRETED_HISTORY'
+        | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      leftWindow: ReflectionComparisonWindow;
+      rightWindow: ReflectionComparisonWindow;
+      items: ReadonlyArray<ReflectionSummaryItem>;
+      limitations: ReadonlyArray<string>;
+    };
+
+export type ReflectionComparisonVM = {
+  generatedAt: string | null;
+  availability: ReflectionComparisonAvailability;
+};
+
 export type InsightsHistorySurface =
   | 'INSIGHTS_SCREEN'
   | 'SNAPSHOT'
