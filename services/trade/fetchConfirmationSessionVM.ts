@@ -4,6 +4,7 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createConfirmationFlow } from '@/services/trade/createConfirmationFlow';
 import { createConfirmationFlowActions } from '@/services/trade/createConfirmationFlowActions';
+import { normalisePreparedRiskReferences } from '@/services/trade/createPreparedRiskReferences';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
@@ -13,7 +14,6 @@ import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradeP
 import type {
   ConfirmationSession,
   ConfirmationSessionActions,
-  PreparedTradePlanRiskReferences,
   ProtectionPlan,
 } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -149,32 +149,6 @@ function resolveSessionPlan(params: {
   });
 }
 
-function normalisePositiveNumber(value: number | null | undefined): number | null {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
-    return null;
-  }
-
-  return value;
-}
-
-function resolvePreparedRiskReferences(
-  plan: ProtectionPlan,
-): PreparedTradePlanRiskReferences | null {
-  const entryPrice = normalisePositiveNumber(plan.preparedRiskReferences?.entryPrice);
-  const stopPrice = normalisePositiveNumber(plan.preparedRiskReferences?.stopPrice);
-  const targetPrice = normalisePositiveNumber(plan.preparedRiskReferences?.targetPrice);
-
-  if (entryPrice === null && stopPrice === null && targetPrice === null) {
-    return null;
-  }
-
-  return {
-    entryPrice,
-    stopPrice,
-    targetPrice,
-  };
-}
-
 async function buildConfirmationSession(params: {
   plan: ProtectionPlan | null;
   capabilityCache: Map<string, Awaited<ReturnType<typeof getAccountCapabilities>>>;
@@ -208,7 +182,7 @@ async function buildConfirmationSession(params: {
     planId: params.plan.planId,
     accountId: params.plan.accountId,
     executionCapability,
-    preparedRiskReferences: resolvePreparedRiskReferences(params.plan),
+    preparedRiskReferences: normalisePreparedRiskReferences(params.plan.preparedRiskReferences),
     preview,
     shell,
     flow: createConfirmationFlow({ shell }),
