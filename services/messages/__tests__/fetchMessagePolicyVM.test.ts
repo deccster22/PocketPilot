@@ -134,6 +134,18 @@ function createSnapshotSurface(): SnapshotSurfaceVM {
       status: 'HIDDEN',
       reason: 'NO_REORIENTATION',
     },
+    thirtyThousandFoot: {
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      fit: {
+        state: 'MIXED',
+        summary:
+          'Conditions look mixed for this strategy while recent movement stays more elevated than calm.',
+      },
+      availability: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_MEANINGFUL_CONTEXT',
+      },
+    },
   };
 }
 

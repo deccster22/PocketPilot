@@ -187,7 +187,21 @@ describe('fetchSnapshotSurfaceVM', () => {
       ],
       dismissible: true,
     });
-    expect(JSON.stringify(result.reorientation.summary)).not.toMatch(/signalsTriggered|budget_blocked_symbols|signalTitle/);
+    expect(result.thirtyThousandFoot).toEqual({
+      generatedAt: '2026-04-01T00:00:00.000Z',
+      fit: {
+        state: 'UNKNOWN',
+        summary:
+          'There is not enough richer interpreted context yet to describe strategy fit clearly.',
+      },
+      availability: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+      },
+    });
+    expect(JSON.stringify(result.reorientation.summary)).not.toMatch(
+      /signalsTriggered|budget_blocked_symbols|signalTitle/,
+    );
   });
 
   it('uses Since Last Checked when reorientation is not available', async () => {
@@ -306,6 +320,10 @@ describe('fetchSnapshotSurfaceVM', () => {
       ],
       dismissible: false,
     });
+    expect(result.thirtyThousandFoot.availability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+    });
   });
 
   it('hides the card when no meaningful reorientation summary is needed', async () => {
@@ -383,6 +401,12 @@ describe('fetchSnapshotSurfaceVM', () => {
         reason: 'NOT_NEEDED',
         summary: null,
         dismissible: false,
+      },
+      thirtyThousandFoot: {
+        availability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_MEANINGFUL_CONTEXT',
+        },
       },
     });
   });
