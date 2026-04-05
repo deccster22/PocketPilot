@@ -5,13 +5,18 @@ import { StatusBar } from 'expo-status-bar';
 import { DashboardScreen } from '@/app/screens/DashboardScreen';
 import { InsightsScreen } from '@/app/screens/InsightsScreen';
 import { KnowledgeLibraryScreen } from '@/app/screens/KnowledgeLibraryScreen';
+import { TradeHubScreen } from '@/app/screens/TradeHubScreen';
 
-type AppTab = 'DASHBOARD' | 'INSIGHTS' | 'KNOWLEDGE_LIBRARY';
+type AppTab = 'DASHBOARD' | 'TRADE_HUB' | 'INSIGHTS' | 'KNOWLEDGE_LIBRARY';
 
 const APP_TABS: ReadonlyArray<{ id: AppTab; label: string }> = [
   {
     id: 'DASHBOARD',
     label: 'Dashboard',
+  },
+  {
+    id: 'TRADE_HUB',
+    label: 'Trade Hub',
   },
   {
     id: 'INSIGHTS',
@@ -31,6 +36,8 @@ export default function App() {
       <View style={styles.screenContainer}>
         {activeTab === 'DASHBOARD' ? (
           <DashboardScreen />
+        ) : activeTab === 'TRADE_HUB' ? (
+          <TradeHubScreen />
         ) : activeTab === 'INSIGHTS' ? (
           <InsightsScreen />
         ) : (

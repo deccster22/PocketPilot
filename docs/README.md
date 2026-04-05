@@ -2,11 +2,11 @@
 Version: v2 markdown source
 Source: docs/source/README_v2.md
 
-Last Updated: 2026-04-04
+Last Updated: 2026-04-05
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-04  
+**Last updated:** 2026-04-05  
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -105,8 +105,8 @@ Examples:
 - `architecture/EVENT_STREAM_MODEL.md`
 - `architecture/EXPLANATION_MODEL.md`
 - `architecture/SNAPSHOT_SYSTEM.md`
-- `architecture/TRADE_HUB_MODEL.md`
-- `architecture/RISK_LAYER_MODEL.md`
+- `architecture/TRADE_INTENT_MODEL.md`
+- `architecture/RISK_TOOL_MODEL.md`
 - `architecture/MULTI_ACCOUNT_MODEL.md`
 - `architecture/PROFILE_SYSTEM.md`
 - `architecture/KNOWLEDGE_NODE_MODEL.md`
@@ -293,6 +293,7 @@ Market Providers
 -> Dashboard why detail reuse path
 -> Trade Hub Surface
 -> Confirmation Session
+-> Risk Tool VM
 -> Execution Preview
 -> Readiness Gate
 -> Submission Intent
@@ -386,6 +387,7 @@ PocketPilot is easiest to read at three levels.
 - `P3` Event system and orientation layer
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan
+- `P5-R1` Risk tool / position sizing foundation
 - `P6` Alerts, message policy, and reorientation briefing seams
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing

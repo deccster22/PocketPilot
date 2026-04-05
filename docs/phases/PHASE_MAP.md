@@ -1,7 +1,7 @@
 # PocketPilot Phase Map
 
 Phase: `PX-PM1`  
-Last updated: 2026-04-04
+Last updated: 2026-04-05
 
 ## Purpose
 This document reconciles PocketPilot's overlapping phase lenses so future work can name phases honestly without erasing the actual implementation sequence.
@@ -83,6 +83,7 @@ This table records what is actually built or still pending without forcing the h
 | `P4` | canonical product | `P4` | Snapshot and Dashboard shaping | done | Implemented through `P4-1` to `P4-5`; `P4-2` landed in parts during Snapshot-core realignment |
 | `P5` | canonical product | `P5` | Trade Hub, confirmation, readiness, and submission-intent spine | done | Implemented through `P5-1` to `P5-11` plus `P5-13`; repo remains non-dispatching |
 | `P5-X` | canonical product | `P5` | Execution-boundary hardening and invariants | done | Post-`P5-13` hardening family; does not authorize live order dispatch |
+| `P5-R1` | canonical product | `P5` | Risk tool / position sizing foundation | done | Adds one service-owned, non-dispatching sizing seam and one calm Trade Hub support surface without introducing order-entry behavior |
 | `PX-API1` | PX cross-cutting/platform | supports `P2` to `P5` and later runtime work | Provider Router, QuoteBroker, and API-governance doctrine lock | done | Valid side phase; not evidence that `P3` or later numbered families were complete when it landed |
 | `PX-API2` | PX cross-cutting/platform | supports runtime work across families | Runtime contract hardening | done | Hardens request/result and quote-trust seams |
 | `PX-API3` | PX cross-cutting/platform | supports runtime work across families | Runtime policy hardening | done | Adds explicit coalescing, degradation state, and policy metadata |
@@ -115,6 +116,7 @@ What makes sense:
 - `P3` before broader `P4` and `P5` work was strong sequencing because event interpretation, ledger access, Since Last Checked, and `OrientationContext` create reusable service seams that multiple surfaces can share.
 - `P4` before the deeper `P5` action layer was also sensible because it kept PocketPilot read-first and let the team prove prepared-surface patterns before building confirmation and execution-boundary seams.
 - `P5` staying non-dispatching through `P5-X` was good engineering discipline; it let the contract stack mature before any future live-execution risk.
+- `P5-R1` is sensible as a follow-on inside that same family because it adds disciplined planning support without weakening the non-dispatching boundary.
 - `PX-API1` through `PX-API5` are logically timed side phases because runtime doctrine and inspection seams are cheaper to lock before more provider complexity accumulates.
 - `P6-R1` through `P6-R5A` landing early is reasonable because they are low-blast-radius extensions of the existing `P3` plus Snapshot spine rather than evidence that the whole alerts family is finished.
 - 'Early enabling seams for P8 and explanation work should be read as dependency preparation, not family completion.'
