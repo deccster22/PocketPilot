@@ -94,6 +94,7 @@ P5-10 adds `SubmissionIntentResult` as the final non-dispatching placeholder sea
 P5-11 adds `ExecutionAdapterAttemptResult` as the first post-intent execution-adapter seam, returning either explicit blocked passthrough or a deterministic simulated adapter response.
 P5-13 adds `ExecutionCapabilityResolution` plus `resolveExecutionCapability` as the single canonical capability seam that resolves execution-path truth once in `services/trade/` before shell, preview, readiness, submission intent, and later adapter-facing shaping.
 P5-R1 adds `RiskToolVM` as a sibling support seam that combines one selected Trade Hub context with explicit user inputs for calm position sizing and reward/risk framing without creating execution semantics.
+P5-R2 adds source-tagged prepared references plus optional prepared quote entry assistance to that same `RiskToolVM` seam while keeping explicit user values authoritative.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:
@@ -130,6 +131,7 @@ Trade plan previews expose only the fields needed for safe detail:
 Risk-tool contracts expose only the fields needed for calm position framing:
 
 - explicit user-supplied entry, stop, target, and risk-basis inputs after service shaping
+- source-tagged entry, stop, and target references that distinguish user input from prepared assistance
 - optional carried-forward symbol context
 - stop distance, risk amount, risk percent, position size, and optional reward/risk
 - sparse factual notes for incomplete or unavailable fields
@@ -255,7 +257,8 @@ Execution-adapter seams intentionally remain small and deterministic. They only:
 
 Risk-tool seams intentionally remain small and deterministic. They only:
 
-- consume explicit user inputs plus selected-plan context
+- consume explicit user inputs plus selected-plan and prepared quote context
+- choose user-versus-prepared reference precedence once in services
 - calculate stop distance, risk amount, position size, and optional reward/risk
 - return honest `UNAVAILABLE`, `INCOMPLETE`, or `READY` state
 - remain support-only even when the summary is `READY`
@@ -275,6 +278,7 @@ They do not:
 - recompute readiness
 - rebuild submission intent
 - construct orders
+- invent stop or target references from thin quote context
 - dispatch anything
 
 They intentionally do not expose:

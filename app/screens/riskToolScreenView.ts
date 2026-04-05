@@ -3,6 +3,7 @@ import type { RiskToolVM } from '@/services/risk/types';
 export type RiskToolDetailRow = {
   label: string;
   value: string;
+  supportingText?: string;
 };
 
 export type RiskToolScreenViewData = {
@@ -35,6 +36,19 @@ function formatRewardRisk(value: number | null): string {
   return value === null ? 'Not available' : `${formatNumber(value)} to 1`;
 }
 
+function formatReferenceSource(source: RiskToolVM['summary']['entryReference']['source']): string {
+  switch (source) {
+    case 'USER_INPUT':
+      return 'Source: your input';
+    case 'PREPARED_QUOTE':
+      return 'Source: current reference';
+    case 'PREPARED_PLAN':
+      return 'Source: prepared plan';
+    default:
+      return 'Source: unavailable';
+  }
+}
+
 function formatStateText(state: RiskToolVM['summary']['state']): string {
   switch (state) {
     case 'READY':
@@ -49,9 +63,9 @@ function formatStateText(state: RiskToolVM['summary']['state']): string {
 function formatStatusText(state: RiskToolVM['summary']['state']): string {
   switch (state) {
     case 'READY':
-      return 'Position size is based on the supplied entry, stop, and risk basis.';
+      return 'Position size is based on the current entry, stop, and risk basis in this summary.';
     case 'INCOMPLETE':
-      return 'Add the missing price or risk inputs to complete this summary.';
+      return 'Add or adjust the missing price or risk inputs to complete this summary.';
     default:
       return 'Select a prepared plan or add pricing context before using this tool.';
   }
@@ -75,14 +89,17 @@ export function createRiskToolScreenViewData(
       {
         label: 'Entry reference',
         value: formatValue(riskTool.summary.entryPrice, 'Not set'),
+        supportingText: formatReferenceSource(riskTool.summary.entryReference.source),
       },
       {
         label: 'Stop reference',
         value: formatValue(riskTool.summary.stopPrice, 'Not set'),
+        supportingText: formatReferenceSource(riskTool.summary.stopReference.source),
       },
       {
         label: 'Target reference',
         value: formatValue(riskTool.summary.targetPrice, 'Not set'),
+        supportingText: formatReferenceSource(riskTool.summary.targetReference.source),
       },
       {
         label: 'Stop distance',

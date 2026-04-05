@@ -1,7 +1,26 @@
 import { createRiskToolVM } from '@/services/risk/createRiskToolVM';
+import type { RiskToolReferences } from '@/services/risk/types';
+
+function createReferences(overrides: Partial<RiskToolReferences> = {}): RiskToolReferences {
+  return {
+    entryReference: {
+      value: null,
+      source: 'UNAVAILABLE',
+    },
+    stopReference: {
+      value: null,
+      source: 'UNAVAILABLE',
+    },
+    targetReference: {
+      value: null,
+      source: 'UNAVAILABLE',
+    },
+    ...overrides,
+  };
+}
 
 describe('createRiskToolVM', () => {
-  it('builds one calm ready summary from explicit risk, entry, and stop inputs', () => {
+  it('builds one calm ready summary from explicit risk inputs and source-tagged references', () => {
     const nowMs = 1_700_000_000_000;
 
     const result = createRiskToolVM({
@@ -13,7 +32,22 @@ describe('createRiskToolVM', () => {
         stopPrice: 45,
         targetPrice: 60,
         symbol: 'BTC',
+        allowPreparedReferences: true,
       },
+      references: createReferences({
+        entryReference: {
+          value: 50,
+          source: 'USER_INPUT',
+        },
+        stopReference: {
+          value: 45,
+          source: 'USER_INPUT',
+        },
+        targetReference: {
+          value: 60,
+          source: 'USER_INPUT',
+        },
+      }),
       generatedAtMs: nowMs,
     });
 
@@ -25,6 +59,18 @@ describe('createRiskToolVM', () => {
         entryPrice: 50,
         stopPrice: 45,
         targetPrice: 60,
+        entryReference: {
+          value: 50,
+          source: 'USER_INPUT',
+        },
+        stopReference: {
+          value: 45,
+          source: 'USER_INPUT',
+        },
+        targetReference: {
+          value: 60,
+          source: 'USER_INPUT',
+        },
         stopDistance: 5,
         riskAmount: 150,
         riskPercent: 1.5,
@@ -35,17 +81,32 @@ describe('createRiskToolVM', () => {
     });
   });
 
-  it('derives risk amount from account size and risk percent when explicit risk is absent', () => {
+  it('uses prepared quote and plan references when explicit prices are absent', () => {
     const result = createRiskToolVM({
       input: {
         accountSize: 5_000,
         riskAmount: null,
         riskPercent: 1,
-        entryPrice: 100,
-        stopPrice: 95,
-        targetPrice: 98,
+        entryPrice: null,
+        stopPrice: null,
+        targetPrice: null,
         symbol: null,
+        allowPreparedReferences: true,
       },
+      references: createReferences({
+        entryReference: {
+          value: 100,
+          source: 'PREPARED_QUOTE',
+        },
+        stopReference: {
+          value: 95,
+          source: 'PREPARED_PLAN',
+        },
+        targetReference: {
+          value: 98,
+          source: 'PREPARED_PLAN',
+        },
+      }),
       context: {
         symbol: 'ETH',
         hasPreparedContext: true,
@@ -58,6 +119,18 @@ describe('createRiskToolVM', () => {
       entryPrice: 100,
       stopPrice: 95,
       targetPrice: 98,
+      entryReference: {
+        value: 100,
+        source: 'PREPARED_QUOTE',
+      },
+      stopReference: {
+        value: 95,
+        source: 'PREPARED_PLAN',
+      },
+      targetReference: {
+        value: 98,
+        source: 'PREPARED_PLAN',
+      },
       stopDistance: 5,
       riskAmount: 50,
       riskPercent: 1,
@@ -67,7 +140,7 @@ describe('createRiskToolVM', () => {
     });
   });
 
-  it('stays incomplete and avoids fake precision when required inputs are missing', () => {
+  it('stays incomplete and avoids fake precision when required references are missing', () => {
     const result = createRiskToolVM({
       input: {
         accountSize: null,
@@ -77,7 +150,14 @@ describe('createRiskToolVM', () => {
         stopPrice: null,
         targetPrice: null,
         symbol: 'BTC',
+        allowPreparedReferences: true,
       },
+      references: createReferences({
+        entryReference: {
+          value: 100,
+          source: 'USER_INPUT',
+        },
+      }),
     });
 
     expect(result.summary).toEqual({
@@ -86,6 +166,18 @@ describe('createRiskToolVM', () => {
       entryPrice: 100,
       stopPrice: null,
       targetPrice: null,
+      entryReference: {
+        value: 100,
+        source: 'USER_INPUT',
+      },
+      stopReference: {
+        value: null,
+        source: 'UNAVAILABLE',
+      },
+      targetReference: {
+        value: null,
+        source: 'UNAVAILABLE',
+      },
       stopDistance: null,
       riskAmount: null,
       riskPercent: 1,
@@ -108,7 +200,9 @@ describe('createRiskToolVM', () => {
         stopPrice: null,
         targetPrice: null,
         symbol: null,
+        allowPreparedReferences: true,
       },
+      references: createReferences(),
     });
 
     expect(result).toEqual({
@@ -119,6 +213,18 @@ describe('createRiskToolVM', () => {
         entryPrice: null,
         stopPrice: null,
         targetPrice: null,
+        entryReference: {
+          value: null,
+          source: 'UNAVAILABLE',
+        },
+        stopReference: {
+          value: null,
+          source: 'UNAVAILABLE',
+        },
+        targetReference: {
+          value: null,
+          source: 'UNAVAILABLE',
+        },
         stopDistance: null,
         riskAmount: null,
         riskPercent: null,
@@ -139,7 +245,22 @@ describe('createRiskToolVM', () => {
         stopPrice: 24,
         targetPrice: 28,
         symbol: 'SOL',
+        allowPreparedReferences: true,
       },
+      references: createReferences({
+        entryReference: {
+          value: 25,
+          source: 'USER_INPUT',
+        },
+        stopReference: {
+          value: 24,
+          source: 'USER_INPUT',
+        },
+        targetReference: {
+          value: 28,
+          source: 'USER_INPUT',
+        },
+      }),
       context: {
         symbol: 'SOL',
         hasPreparedContext: true,

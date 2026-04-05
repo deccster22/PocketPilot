@@ -91,6 +91,18 @@ The risk-tool contract shape is:
     entryPrice: number | null,
     stopPrice: number | null,
     targetPrice: number | null,
+    entryReference: {
+      value: number | null,
+      source: 'USER_INPUT' | 'PREPARED_QUOTE' | 'PREPARED_PLAN' | 'UNAVAILABLE'
+    },
+    stopReference: {
+      value: number | null,
+      source: 'USER_INPUT' | 'PREPARED_QUOTE' | 'PREPARED_PLAN' | 'UNAVAILABLE'
+    },
+    targetReference: {
+      value: number | null,
+      source: 'USER_INPUT' | 'PREPARED_QUOTE' | 'PREPARED_PLAN' | 'UNAVAILABLE'
+    },
     stopDistance: number | null,
     riskAmount: number | null,
     riskPercent: number | null,
@@ -101,7 +113,7 @@ The risk-tool contract shape is:
 }
 ```
 
-The risk-tool seam is support-only. It consumes prepared confirmation-session context plus explicit user inputs and returns a calm sizing summary without constructing orders, implying execution readiness, or leaking provider/runtime detail.
+The risk-tool seam is support-only. It consumes prepared confirmation-session context, optional prepared quote context, and explicit user inputs and returns a calm sizing summary without constructing orders, implying execution readiness, or leaking provider/runtime detail.
 
 `ExecutionCapabilityResolution` is:
 
@@ -426,7 +438,8 @@ The execution-adapter seams live after submission intent and shape deterministic
 
 The screen may format labels for readability, but it must not reprioritise plans or derive new action logic.
 The screen may format preview labels for readability, but it must not construct rationale, readiness, or constraints on its own.
-The screen may collect explicit risk-tool inputs and render prepared risk-tool values, but it must not calculate stop distance, position size, or reward/risk on its own.
+The screen may collect explicit risk-tool inputs and render prepared risk-tool values plus calm source labels, but it must not calculate stop distance, position size, reward/risk, or local reference precedence on its own.
+Prepared risk references should read like optional support context, not as auto-filled execution intent, and explicit user values remain authoritative when entered.
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.
 The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.
@@ -456,7 +469,7 @@ In P5-11:
 - risk-tool output remains support-only and does not upgrade a plan into execution readiness
 - acknowledgement remains explicit and reversible
 - no execution guarantee is implied by a capability-aware path
-In P5-3:
+  In P5-3:
 - no trade execution exists
 - no one-tap action exists
 - no hidden automation exists
@@ -491,7 +504,7 @@ P5-8 does not add:
 - `ProtectionPlan` remains the canonical action-framing object.
 - `TradeHubSurfaceModel` remains the list/card contract for primary and alternative plans.
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
-- `RiskToolVM` expands one selected Trade Hub context plus explicit user inputs into a calm, non-dispatching sizing summary.
+- `RiskToolVM` expands one selected Trade Hub context plus explicit user inputs and optional prepared references into a calm, non-dispatching sizing summary.
 - `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
 - `ExecutionCapabilityResolution` is the canonical capability seam that resolves internal execution path and confirmation-facing path once for downstream consumers.
 - `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract with explicit acknowledgement state.

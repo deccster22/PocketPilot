@@ -1,5 +1,6 @@
 import { fetchRiskToolVM } from '@/services/risk/fetchRiskToolVM';
 import type { ConfirmationSession } from '@/services/trade/types';
+import type { ForegroundScanResult } from '@/services/types/scan';
 
 function createConfirmationSession(
   overrides: Partial<ConfirmationSession> = {},
@@ -22,7 +23,8 @@ function createConfirmationSession(
         actionState: 'READY',
       },
       rationale: {
-        summary: 'Accumulation setup is supported by confirmed momentum building. Focus symbol: BTC.',
+        summary:
+          'Accumulation setup is supported by confirmed momentum building. Focus symbol: BTC.',
         primaryEventId: 'event-1',
         supportingEventIds: ['event-1'],
         supportingEventCount: 1,
@@ -67,10 +69,28 @@ function createConfirmationSession(
   };
 }
 
+function createPreparedQuoteScan(
+  overrides: Partial<ForegroundScanResult> = {},
+): Pick<ForegroundScanResult, 'quotes'> {
+  return {
+    quotes: {
+      BTC: {
+        symbol: 'BTC',
+        price: 21.5,
+        estimated: false,
+        source: 'execution-feed',
+        timestampMs: 1_700_000_000_000,
+      },
+    },
+    ...overrides,
+  };
+}
+
 describe('fetchRiskToolVM', () => {
-  it('combines prepared confirmation context with explicit user inputs', async () => {
+  it('keeps explicit user prices authoritative over prepared quote references', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession(),
+      preparedQuoteScan: createPreparedQuoteScan(),
       input: {
         accountSize: 10_000,
         riskAmount: 100,
@@ -79,6 +99,7 @@ describe('fetchRiskToolVM', () => {
         stopPrice: 18,
         targetPrice: 26,
         symbol: null,
+        allowPreparedReferences: true,
       },
       nowProvider: () => 1_700_000_000_000,
     });
@@ -91,6 +112,18 @@ describe('fetchRiskToolVM', () => {
         entryPrice: 20,
         stopPrice: 18,
         targetPrice: 26,
+        entryReference: {
+          value: 20,
+          source: 'USER_INPUT',
+        },
+        stopReference: {
+          value: 18,
+          source: 'USER_INPUT',
+        },
+        targetReference: {
+          value: 26,
+          source: 'USER_INPUT',
+        },
         stopDistance: 2,
         riskAmount: 100,
         riskPercent: 1,
@@ -99,8 +132,55 @@ describe('fetchRiskToolVM', () => {
         notes: [],
       },
     });
-    expect(JSON.stringify(result)).not.toContain('acct-live');
+    expect(JSON.stringify(result)).not.toContain('execution-feed');
     expect(JSON.stringify(result)).not.toContain('BRACKET');
+    expect(JSON.stringify(result)).not.toContain('acct-live');
+  });
+
+  it('uses a prepared quote entry reference when user entry is absent', async () => {
+    const result = await fetchRiskToolVM({
+      confirmationSession: createConfirmationSession(),
+      preparedQuoteScan: createPreparedQuoteScan(),
+      input: {
+        accountSize: null,
+        riskAmount: 100,
+        riskPercent: null,
+        entryPrice: null,
+        stopPrice: 19,
+        targetPrice: null,
+        symbol: null,
+        allowPreparedReferences: true,
+      },
+    });
+
+    expect(result.summary).toEqual({
+      state: 'READY',
+      symbol: 'BTC',
+      entryPrice: 21.5,
+      stopPrice: 19,
+      targetPrice: null,
+      entryReference: {
+        value: 21.5,
+        source: 'PREPARED_QUOTE',
+      },
+      stopReference: {
+        value: 19,
+        source: 'USER_INPUT',
+      },
+      targetReference: {
+        value: null,
+        source: 'UNAVAILABLE',
+      },
+      stopDistance: 2.5,
+      riskAmount: 100,
+      riskPercent: null,
+      positionSize: 40,
+      rewardRiskRatio: null,
+      notes: [],
+    });
+    expect(JSON.stringify(result)).not.toContain('timestampMs');
+    expect(JSON.stringify(result)).not.toContain('execution-feed');
+    expect(JSON.stringify(result)).not.toContain('estimated');
   });
 
   it('returns a calm non-result when neither prepared context nor explicit inputs exist', async () => {
@@ -114,6 +194,7 @@ describe('fetchRiskToolVM', () => {
         stopPrice: null,
         targetPrice: null,
         symbol: null,
+        allowPreparedReferences: true,
       },
     });
 
@@ -122,19 +203,20 @@ describe('fetchRiskToolVM', () => {
   });
 
   it('treats selected-plan context as enough to show an incomplete but honest result', async () => {
+    const seedSession = createConfirmationSession();
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession({
         preview: {
-          ...createConfirmationSession().preview!,
+          ...seedSession.preview!,
           headline: {
-            ...createConfirmationSession().preview!.headline,
+            ...seedSession.preview!.headline,
             symbol: null,
           },
         },
         shell: {
-          ...createConfirmationSession().shell!,
+          ...seedSession.shell!,
           headline: {
-            ...createConfirmationSession().shell!.headline,
+            ...seedSession.shell!.headline,
             symbol: null,
           },
         },
@@ -147,6 +229,7 @@ describe('fetchRiskToolVM', () => {
         stopPrice: null,
         targetPrice: null,
         symbol: null,
+        allowPreparedReferences: true,
       },
     });
 
@@ -155,5 +238,17 @@ describe('fetchRiskToolVM', () => {
       'Add distinct entry and stop prices to frame stop distance.',
       'Add a risk amount, or combine account size with risk percent.',
     ]);
+    expect(result.summary.entryReference).toEqual({
+      value: null,
+      source: 'UNAVAILABLE',
+    });
+    expect(result.summary.stopReference).toEqual({
+      value: null,
+      source: 'UNAVAILABLE',
+    });
+    expect(result.summary.targetReference).toEqual({
+      value: null,
+      source: 'UNAVAILABLE',
+    });
   });
 });
