@@ -93,11 +93,12 @@ P5-9 adds `ExecutionReadiness` as the deterministic submission-eligibility seam 
 P5-10 adds `SubmissionIntentResult` as the final non-dispatching placeholder seam between readiness and any future live execution adapter.
 P5-11 adds `ExecutionAdapterAttemptResult` as the first post-intent execution-adapter seam, returning either explicit blocked passthrough or a deterministic simulated adapter response.
 P5-13 adds `ExecutionCapabilityResolution` plus `resolveExecutionCapability` as the single canonical capability seam that resolves execution-path truth once in `services/trade/` before shell, preview, readiness, submission intent, and later adapter-facing shaping.
+P5-R1 adds `RiskToolVM` as a sibling support seam that combines one selected Trade Hub context with explicit user inputs for calm position sizing and reward/risk framing without creating execution semantics.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:
 
-`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / ExecutionCapabilityResolution / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> ExecutionAdapterAttemptResult -> app`
+`MarketEvent -> OrientationContext -> ProtectionPlan -> TradeHubSurfaceModel -> ConfirmationSession { TradePlanPreview / RiskToolVM / ExecutionCapabilityResolution / TradePlanConfirmationShell / ConfirmationFlow } -> ExecutionPreviewVM -> ExecutionReadiness -> SubmissionIntentResult -> ExecutionAdapterAttemptResult -> app`
 
 This keeps:
 
@@ -125,6 +126,13 @@ Trade plan previews expose only the fields needed for safe detail:
 - explicit readiness state
 - explicit constraints including required confirmation
 - placeholder availability for later order and execution expansion
+
+Risk-tool contracts expose only the fields needed for calm position framing:
+
+- explicit user-supplied entry, stop, target, and risk-basis inputs after service shaping
+- optional carried-forward symbol context
+- stop distance, risk amount, risk percent, position size, and optional reward/risk
+- sparse factual notes for incomplete or unavailable fields
 
 Trade plan confirmation shells expose only the fields needed for safe confirmation framing:
 
@@ -245,6 +253,13 @@ Execution-adapter seams intentionally remain small and deterministic. They only:
 - preserve warnings from the submission-intent seam
 - remain simulated-only even when the internal mock outcome is `SIMULATED_ACCEPTABLE`
 
+Risk-tool seams intentionally remain small and deterministic. They only:
+
+- consume explicit user inputs plus selected-plan context
+- calculate stop distance, risk amount, position size, and optional reward/risk
+- return honest `UNAVAILABLE`, `INCOMPLETE`, or `READY` state
+- remain support-only even when the summary is `READY`
+
 They do not:
 
 - auto-complete steps
@@ -259,6 +274,7 @@ They do not:
 - recompute confirmation rules independently of the prepared session
 - recompute readiness
 - rebuild submission intent
+- construct orders
 - dispatch anything
 
 They intentionally do not expose:

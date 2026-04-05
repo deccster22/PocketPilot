@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
@@ -7,9 +15,11 @@ import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirma
 import { createTradeExecutionAdapterViewData } from '@/app/screens/tradeExecutionAdapterView';
 import { createTradeExecutionReadinessViewData } from '@/app/screens/tradeExecutionReadinessView';
 import { createTradeExecutionPreviewViewData } from '@/app/screens/tradeExecutionPreviewView';
+import { createRiskToolScreenViewData } from '@/app/screens/riskToolScreenView';
 import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeSubmissionIntentViewData } from '@/app/screens/tradeSubmissionIntentView';
+import { fetchRiskToolVM } from '@/services/risk/fetchRiskToolVM';
 import { fetchExecutionAdapterResponseVM } from '@/services/trade/fetchExecutionAdapterResponseVM';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
@@ -18,6 +28,7 @@ import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewV
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
+import type { RiskToolVM } from '@/services/risk/types';
 import type {
   ExecutionAdapterAttemptResult,
   ExecutionPreviewVM,
@@ -76,6 +87,48 @@ function TradeHubPlanCard(props: {
   );
 }
 
+type RiskToolInputFormState = {
+  entryPrice: string;
+  stopPrice: string;
+  targetPrice: string;
+  accountSize: string;
+  riskAmount: string;
+  riskPercent: string;
+};
+
+function RiskToolInputField(props: {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChangeText(value: string): void;
+}) {
+  return (
+    <View style={styles.inputField}>
+      <Text style={styles.label}>{props.label}</Text>
+      <TextInput
+        accessibilityLabel={props.label}
+        keyboardType="decimal-pad"
+        onChangeText={props.onChangeText}
+        placeholder={props.placeholder}
+        placeholderTextColor="#9ca3af"
+        style={styles.input}
+        value={props.value}
+      />
+    </View>
+  );
+}
+
+function parseNumericInput(value: string): number | null {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue.length) {
+    return null;
+  }
+
+  const parsedValue = Number(trimmedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
@@ -88,7 +141,16 @@ export function TradeHubScreen() {
   const [executionAdapterVm, setExecutionAdapterVm] = useState<ExecutionAdapterAttemptResult | null>(
     null,
   );
+  const [riskToolVm, setRiskToolVm] = useState<RiskToolVM | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
+  const [riskToolInput, setRiskToolInput] = useState<RiskToolInputFormState>({
+    entryPrice: '',
+    stopPrice: '',
+    targetPrice: '',
+    accountSize: '',
+    riskAmount: '',
+    riskPercent: '',
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -141,6 +203,19 @@ export function TradeHubScreen() {
     () => (submissionIntentVm ? createTradeSubmissionIntentViewData(submissionIntentVm) : null),
     [submissionIntentVm],
   );
+  const parsedRiskToolInput = useMemo(
+    () => ({
+      accountSize: parseNumericInput(riskToolInput.accountSize),
+      riskAmount: parseNumericInput(riskToolInput.riskAmount),
+      riskPercent: parseNumericInput(riskToolInput.riskPercent),
+      entryPrice: parseNumericInput(riskToolInput.entryPrice),
+      stopPrice: parseNumericInput(riskToolInput.stopPrice),
+      targetPrice: parseNumericInput(riskToolInput.targetPrice),
+      symbol: null,
+    }),
+    [riskToolInput],
+  );
+  const riskToolView = useMemo(() => createRiskToolScreenViewData(riskToolVm), [riskToolVm]);
   const executionAdapterView = useMemo(
     () =>
       executionAdapterVm ? createTradeExecutionAdapterViewData(executionAdapterVm) : null,
@@ -197,6 +272,33 @@ export function TradeHubScreen() {
       isMounted = false;
     };
   }, [confirmationSessionVm]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchRiskToolVM({
+      confirmationSession: confirmationSessionVm?.session ?? null,
+      input: parsedRiskToolInput,
+    })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setRiskToolVm(result);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setRiskToolVm(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [confirmationSessionVm, parsedRiskToolInput]);
 
   useEffect(() => {
     let isMounted = true;
@@ -341,6 +443,16 @@ export function TradeHubScreen() {
       });
   }
 
+  function handleRiskToolInputChange(
+    field: keyof RiskToolInputFormState,
+    value: string,
+  ) {
+    setRiskToolInput((currentInput) => ({
+      ...currentInput,
+      [field]: value,
+    }));
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -409,6 +521,76 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>No plan preview is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Risk Tool</Text>
+          <Text style={styles.supportText}>
+            {riskToolView?.boundaryText ??
+              'Risk framing stays support-only. It does not create an order or imply execution readiness.'}
+          </Text>
+          <Text style={styles.supportText}>
+            Use the selected plan as context, then add only the entry, stop, and risk inputs you want to frame.
+          </Text>
+          <View style={styles.inputGrid}>
+            <RiskToolInputField
+              label="Entry reference"
+              onChangeText={(value) => handleRiskToolInputChange('entryPrice', value)}
+              placeholder="e.g. 100"
+              value={riskToolInput.entryPrice}
+            />
+            <RiskToolInputField
+              label="Stop reference"
+              onChangeText={(value) => handleRiskToolInputChange('stopPrice', value)}
+              placeholder="e.g. 95"
+              value={riskToolInput.stopPrice}
+            />
+            <RiskToolInputField
+              label="Target reference"
+              onChangeText={(value) => handleRiskToolInputChange('targetPrice', value)}
+              placeholder="optional"
+              value={riskToolInput.targetPrice}
+            />
+            <RiskToolInputField
+              label="Account size"
+              onChangeText={(value) => handleRiskToolInputChange('accountSize', value)}
+              placeholder="optional"
+              value={riskToolInput.accountSize}
+            />
+            <RiskToolInputField
+              label="Risk amount"
+              onChangeText={(value) => handleRiskToolInputChange('riskAmount', value)}
+              placeholder="optional"
+              value={riskToolInput.riskAmount}
+            />
+            <RiskToolInputField
+              label="Risk percent"
+              onChangeText={(value) => handleRiskToolInputChange('riskPercent', value)}
+              placeholder="optional"
+              value={riskToolInput.riskPercent}
+            />
+          </View>
+          {riskToolView ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Service-owned sizing summary</Text>
+              <Text style={styles.cardTitle}>{riskToolView.stateText}</Text>
+              <Text style={styles.cardMeta}>{riskToolView.statusText}</Text>
+              <Text style={styles.cardMeta}>{riskToolView.symbolText}</Text>
+              {riskToolView.generatedAtText ? (
+                <Text style={styles.cardMeta}>{riskToolView.generatedAtText}</Text>
+              ) : null}
+              {riskToolView.detailRows.map((row) => (
+                <Text key={row.label} style={styles.cardMeta}>
+                  {row.label}: {row.value}
+                </Text>
+              ))}
+              <Text style={styles.cardMeta}>
+                Notes: {riskToolView.notes.length ? riskToolView.notes.join(' | ') : 'None'}
+              </Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No risk summary is prepared right now.</Text>
           )}
         </View>
 
@@ -628,6 +810,26 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: 8,
+  },
+  inputGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  inputField: {
+    flexGrow: 1,
+    flexBasis: 160,
+    gap: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 13,
+    color: '#111827',
   },
   sectionTitle: {
     fontSize: 16,
