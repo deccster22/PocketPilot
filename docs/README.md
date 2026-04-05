@@ -113,6 +113,7 @@ Examples:
 - `architecture/EXPLANATION_MODEL.md`
 - `architecture/STRATEGY_FIT_MODEL.md`
 - `architecture/THIRTY_THOUSAND_FOOT_MODEL.md`
+- `architecture/STRATEGY_NAVIGATOR_MODEL.md`
 - `architecture/SNAPSHOT_SYSTEM.md`
 - `architecture/TRADE_INTENT_MODEL.md`
 - `architecture/RISK_TOOL_MODEL.md`
@@ -158,6 +159,7 @@ Examples:
 - `product/PRODUCT_SPEC.md`
 - `product/SNAPSHOT_VISION.md`
 - `product/THIRTY_THOUSAND_FOOT_VIEW.md`
+- `product/STRATEGY_PREVIEW.md`
 - `product/PROFILE_EXPLANATION_MODEL.md`
 - `product/LOG_AND_JOURNAL_MODEL.md`
 - `product/ASSET_NARRATIVE_MODEL.md`
@@ -227,6 +229,7 @@ Examples:
 - `ux/SNAPSHOT_SPEC.md`
 - `ux/THIRTY_THOUSAND_FOOT_SPEC.md`
 - `ux/DASHBOARD_SPEC.md`
+- `ux/STRATEGY_NAVIGATOR_SPEC.md`
 - `ux/STRATEGY_AWARE_UI.md`
 - `ux/PROFILE_EXPERIENCE.md`
 
@@ -382,6 +385,16 @@ EventLedger
 -> Insights recent-comparison shelf
 ```
 
+P9-S1 adds the first thin Strategy Navigator / Preview path:
+
+```text
+core strategy catalog
+-> strategyPreviewScenarios
+-> createStrategyNavigatorVM
+-> fetchStrategyNavigatorVM
+-> Strategy Preview tab
+```
+
 Key rule: **services own truth, app renders prepared contracts**.
 
 The UI should not be inventing interpretation logic from raw data. If it feels like the UI is "figuring things out," something has probably drifted.
@@ -450,6 +463,7 @@ PocketPilot is easiest to read at three levels.
 - `P8-I3` Insights detail / archive navigation
 - `P8-I4` Compare-period / reflection summary foundation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
+- `P9-S1` Strategy Navigator / Preview foundation
 - `P10` Beta hardening
 - `P11` Launch prep
 
