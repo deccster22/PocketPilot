@@ -11,7 +11,8 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - `services/snapshot/createSnapshotModel.ts` builds the canonical Snapshot model from deterministic scan output.
 - `services/snapshot/createProfileAwareSnapshotModel.ts` applies profile-aware shaping at the service seam.
 - `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes one prepared Snapshot surface VM, including the canonical briefing state.
-- `app/` reads the prepared Snapshot surface VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
+- `services/messages/fetchMessagePolicyVM.ts` classifies prepared Snapshot message output for one requested surface.
+- `app/` reads the prepared Snapshot surface VM and prepared message-policy VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
 - P6-R3 keeps dismissal persistence behind that same prepared service path rather than moving visibility rules into `app/`.
 - P6-R4 re-reads that same prepared service path on app foreground return rather than adding a second Snapshot fetch route.
 - P6-R5 keeps reorientation and Since Last Checked on that same path and lets `services/` decide precedence once.
@@ -36,11 +37,13 @@ It remains optional, quiet, and secondary to the Snapshot core.
   - `REORIENTATION`
   - `SINCE_LAST_CHECKED`
   - `HIDDEN`
+- `services/messages/createMessagePolicyVM.ts` then classifies that prepared result into a Snapshot-facing `REORIENTATION` or `BRIEFING` message, or stays quiet when no message is justified.
 - Reorientation owns the zone whenever it is available.
 - Since Last Checked may use the zone only when reorientation is not available.
 - A dismissed reorientation cycle does not fall through to a separate Since Last Checked card.
 - Existing reorientation dismissal behavior remains unchanged.
 - Since Last Checked remains non-dismissible in this phase.
+- A thin Snapshot `ALERT` may appear only when no briefing already owns the zone and interpreted context is strong enough.
 - App foreground return re-checks the same prepared Snapshot VM and stays quiet while the app remains active.
 - Snapshot does not become an inbox, alert center, feed, or notification system.
 
@@ -64,6 +67,7 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - raw indicators
 - charts
 - notification delivery
+- notification-center behavior
 - dashboard shaping
 - prose generation beyond fixed UI labels
 - top movers and top dips as primary Snapshot content

@@ -21,7 +21,7 @@ Responsibilities:
 ## Data Flow
 The canonical path is:
 
-`EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> ReorientationSurfaceState -> SnapshotBriefingState -> SnapshotSurfaceVM -> app`
+`EventLedger -> EventLedgerQueries -> Since Last Checked -> OrientationContext -> SnapshotModel -> ReorientationSummary -> ReorientationSurfaceState -> SnapshotBriefingState -> MessagePolicyAvailability -> SnapshotSurfaceVM -> app`
 
 This keeps the app on prepared, deterministic contracts and avoids event munging in UI code.
 
@@ -95,6 +95,23 @@ type SnapshotBriefingState =
     }
 ```
 
+P6-A1 adds the next seam above that briefing state:
+
+```ts
+type MessagePolicyAvailability =
+  | {
+      status: 'UNAVAILABLE'
+      reason: 'NO_MESSAGE' | 'NOT_ENABLED_FOR_SURFACE' | 'INSUFFICIENT_INTERPRETED_CONTEXT'
+    }
+  | {
+      status: 'AVAILABLE'
+      messages: readonly PreparedMessage[]
+    }
+```
+
+`services/messages` owns whether the prepared Snapshot briefing should remain a quiet `BRIEFING`, become a `REORIENTATION` note, or give way to a thin inline `ALERT`.
+`app/` still renders prepared output only.
+
 Precedence is intentionally boring and explicit:
 - visible reorientation wins
 - dismissed or otherwise hidden reorientation does not fall through to a second card
@@ -140,6 +157,7 @@ This does not add background processing or a second fetch seam.
 - No network or provider work happens in `app/`.
 - Profile sensitivity changes threshold and wording depth only.
 - Visibility shaping remains explicit input-driven.
+- Message classification remains in `services/`, not `app/`.
 - Identical inputs must produce identical outputs.
 - Foreground refresh is lifecycle-driven only and does not hinge on screen-focus churn.
 
