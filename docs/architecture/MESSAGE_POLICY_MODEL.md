@@ -1,25 +1,21 @@
-# Message Policy Model (P6-A1 + P6-A2 + P6-A3)
+# Message Policy Model (P6-A1 + P6-A2 + P6-A3 + P6-A4)
 
 ## Purpose
-P6-A1 added PocketPilot's first canonical message-policy seam.
-P6-A2 reused that same seam for Dashboard `REFERRAL` and Trade Hub `GUARDED_STOP`.
-P6-A3 keeps the same seam and adds explicit threshold and profile-sensitivity tuning so Snapshot can stay calmer and more consistent about when interpreted change should become:
-- a quiet `BRIEFING`
-- a narrower `ALERT`
-- a `REORIENTATION`
-- a `REFERRAL`
-- a `GUARDED_STOP`
+P6-A1 added PocketPilot's canonical message-policy seam.
+P6-A2 reused that seam for Dashboard `REFERRAL` and Trade Hub `GUARDED_STOP`.
+P6-A3 added explicit profile-sensitivity and keep, downgrade, or suppress tuning.
+P6-A4 keeps the same seam and improves the interpreted alert-input quality available to it.
 
-This remains a policy seam, not a notification platform.
+The result is still one policy seam, not a notification platform.
 
-The goal is to:
+Goals:
 - keep product messaging service-owned
 - keep semantic message families explicit
-- tune alert intensity without collapsing meaning into one generic severity scale
+- improve alert-versus-briefing truth with richer interpreted context
 - preserve calm posture and foreground-only behavior
 - keep `app/` on prepared contracts only
 
-P6-A1 through P6-A3 do not add push, inbox, unread state, badges, background jobs, popup choreography, or urgency ladders.
+P6-A1 through P6-A4 do not add push, inbox, unread state, badges, background jobs, popup choreography, or urgency ladders.
 
 ## Canonical Contract
 The canonical message-policy contract lives in `services/messages/types.ts`.
@@ -32,8 +28,6 @@ type MessagePolicyKind =
   | 'REFERRAL'
   | 'GUARDED_STOP'
 
-type MessagePriority = 'LOW' | 'MEDIUM' | 'HIGH'
-
 type MessageSensitivityProfile = 'GUIDED' | 'BALANCED' | 'DIRECT'
 
 type AlertThresholdDecision =
@@ -41,30 +35,34 @@ type AlertThresholdDecision =
   | 'DOWNGRADE_TO_BRIEFING'
   | 'SUPPRESS'
 
-type PreparedMessage = {
-  kind: MessagePolicyKind
-  title: string
-  summary: string
-  priority: MessagePriority
-  surface: MessageSurfaceEligibility
-  dismissible: boolean
+type PreparedMessageInputContext = {
+  subjectLabel: string | null
+  subjectScope: 'SINGLE_SYMBOL' | 'MULTI_SYMBOL' | 'PORTFOLIO'
+  isSingleSymbolScope: boolean
+  eventFamily: 'PRICE_CHANGE' | 'MOMENTUM' | 'PULLBACK' | 'NON_ALERTABLE'
+  confirmationSupport:
+    | 'ESTIMATED_OR_THIN'
+    | 'CONFIRMED_EVENT'
+    | 'CONFIRMED_WITH_HISTORY'
+  changeStrength: 'THIN' | 'MODEST' | 'MEANINGFUL' | 'STRONG'
+  hasSinceLastCheckedContext: boolean
+  hasReorientationContext: boolean
 }
 ```
 
 Rules:
-- `kind` is explicit and never inferred by `app/`
-- `surface` is explicit and service-owned
-- `summary` is calm product copy, not raw event metadata
-- `MessageSensitivityProfile` is a service-owned tuning profile, not a user-facing setting
-- `AlertThresholdDecision` is narrow and explicit: keep, downgrade, or suppress
+- `kind` remains explicit and never inferred by `app/`
+- `surface` remains explicit and service-owned
+- `PreparedMessageInputContext` is internal policy input, not a UI contract
+- richer inputs stay compact and interpreted rather than becoming a bag of raw event payloads
 - no push-delivery metadata exists here
 - no unread, badge, inbox, engagement, or reminder fields exist here
-- no raw IDs, provider diagnostics, or strategy implementation details leak here
+- no raw IDs, provider diagnostics, runtime metadata, or signal arrays leak here
 
 ## Data Flow
 The message-policy seam still sits above interpreted service-owned inputs rather than app-owned heuristics.
 
-Snapshot uses the existing orientation and briefing spine, then applies profile tuning only inside `services/messages`:
+Snapshot now uses the existing orientation and briefing spine plus one prepared-input helper:
 
 ```text
 EventLedger
@@ -74,13 +72,14 @@ EventLedger
 -> SnapshotModel
 -> ReorientationSurfaceState
 -> SnapshotBriefingState
+-> createPreparedMessageInputs
 -> createMessagePolicyVM
 -> applyMessageProfileTuning
 -> MessagePolicyAvailability
 -> Snapshot message zone
 ```
 
-The canonical fetch path still has three narrow consumer routes:
+The canonical fetch path remains unchanged in shape:
 
 ```text
 fetchSnapshotSurfaceVM
@@ -101,12 +100,28 @@ fetchConfirmationSessionVM
 
 `app/` renders the prepared contract only.
 It does not decide whether something is a briefing, alert, reorientation prompt, referral, or guarded stop.
-It also does not apply threshold tuning locally.
+It also does not derive richer alert inputs locally.
+
+## Prepared Alert Inputs
+P6-A4 adds one explicit helper: `services/messages/createPreparedMessageInputs.ts`.
+
+It derives compact interpreted alert context from existing service-owned seams:
+- latest relevant interpreted event
+- Since Last Checked summary count
+- Snapshot briefing state
+- reorientation summary availability
+
+The helper intentionally focuses on a few high-trust inputs:
+- `subjectScope`: whether the interpreted change is one symbol, a small symbol cluster, or portfolio-level
+- `eventFamily`: compact grouping for price change, momentum, pullback, or non-alertable context
+- `confirmationSupport`: whether the change is estimated/thin, confirmed standalone, or confirmed with interpreted continuity support
+- `changeStrength`: one interpreted scale from thin to strong
+
+This is meant to clarify meaning, not amplify noise.
+It does not create a second interpretation engine and does not turn multiple weak hints into automatic alert escalation.
 
 ## Threshold And Sensitivity Rules
-P6-A3 adds one explicit helper: `services/messages/applyMessageProfileTuning.ts`.
-
-It tunes only prepared alert candidates and does not rewrite the broader family model.
+`services/messages/applyMessageProfileTuning.ts` still tunes only prepared alert candidates and does not rewrite the broader family model.
 
 Sensitivity mapping stays explicit:
 - `BEGINNER` -> `GUIDED`
@@ -115,62 +130,53 @@ Sensitivity mapping stays explicit:
 
 Alert threshold decisions stay explicit:
 - `KEEP_AS_ALERT`: the interpreted change is strong enough for Snapshot's narrow alert posture
-- `DOWNGRADE_TO_BRIEFING`: the change is meaningful enough for a calm inline note, but not for alert treatment on that profile
-- `SUPPRESS`: interpreted context is too thin or too middling to justify a message
+- `DOWNGRADE_TO_BRIEFING`: the change deserves a calm inline note but not alert treatment
+- `SUPPRESS`: interpreted context is too thin, too broad, or too middling to justify a message
 
-Current tuning posture:
-- Beginner keeps strong event-only change as a calm `BRIEFING` rather than a louder `ALERT`
-- Middle may keep strong change as `ALERT`, but middling change de-escalates to `BRIEFING`
-- Advanced keeps compact, less explanatory `ALERT` copy only when stronger interpreted thresholds are met
-- Advanced does not bypass thresholds; middling change still suppresses to no message
-- Thin interpreted alert context stays `UNAVAILABLE` honestly through suppression rather than filler copy
+P6-A4 tuning posture:
+- strong, single-symbol, confirmed change can remain an `ALERT`
+- meaningful but not fully strong change needs clearer support before advanced profile keeps it as an alert
+- multi-symbol scope stays conservative and does not become a louder alert by default
+- beginner still prefers quieter treatment
+- thin or estimated context still resolves to no message rather than filler copy
 
-The helper uses interpreted event fields already available at the message seam, including:
-- event type
-- certainty
-- confidence score
-- percentage change
-- presence of a clear subject symbol
-
-It does not consume raw signal arrays, provider diagnostics, or app-owned heuristics.
+The richer inputs can confirm suppression just as easily as they can preserve an alert.
 
 ## Classification Rules
-P6-A1 through P6-A3 keep the semantic families primary.
+P6-A1 through P6-A4 keep semantic families primary.
 
 ### Reorientation
 - Snapshot-visible reorientation becomes a `REORIENTATION` message
 - existing dismissal behavior stays intact
 - dismissed reorientation does not fall through to a noisier replacement message
-- profile tuning does not rewrite reorientation into another family
+- richer alert inputs do not rewrite reorientation into another family
 
 ### Briefing
 - `SINCE_LAST_CHECKED` stays a `BRIEFING`
-- P6-A3 also allows downgraded alert-worthy change to remain a calm `BRIEFING` when that better fits the profile threshold
+- downgraded alert-worthy change may remain a calm `BRIEFING` when richer context says alert treatment would be too loud
 - briefing remains quieter than alerting
 - briefing is still derived from interpreted history or interpreted change, not raw event arrays
 
 ### Alert
-- only confirmed, interpreted meaningful-change events are eligible
 - alerting stays stricter than "anything changed"
-- P6-A3 adds explicit confidence and magnitude thresholds on top of the existing event-type filter
-- alerting stays inline and foreground-only
-- current Snapshot alerts use `MEDIUM` priority to stay calm and surface-specific
+- only interpreted meaningful-change families are eligible
+- single-symbol scope remains the preferred subject shape for inline alert treatment
+- richer confirmation support can preserve an alert for history-backed borderline change
+- broader or thinner context still suppresses or downgrades rather than inflating alert volume
 
 ### Referral
 - referral remains a separate family for better-handled-elsewhere guidance
 - referral is not a guarded stop and not a missing-data error
-- Dashboard referral still appears only when Dashboard has supporting interpreted context but no prime focus item
-- P6-A3 does not let profile tuning blur referral into alerting or stop language
+- richer Snapshot alert inputs do not blur Dashboard referral into alerting
 
 ### Guarded Stop
 - guarded stop remains the strongest stop-style family
-- it expresses that PocketPilot should not continue a path with the current context
+- it still expresses that PocketPilot should not continue a path with the current context
 - it is not framed as punishment, urgency, or outage theatre
-- Trade Hub guarded stop still appears only when the selected confirmation session has no protected execution path
-- P6-A3 does not let profile tuning weaken or rename this boundary
+- richer Snapshot alert inputs do not weaken or rename this boundary
 
 ## Surface Discipline
-P6-A3 keeps rollout deliberately narrow.
+P6-A4 keeps rollout deliberately narrow.
 
 That means:
 - Snapshot may show `REORIENTATION`, `BRIEFING`, or a tuned inline `ALERT`
@@ -185,7 +191,7 @@ Availability rules stay explicit:
 - `INSUFFICIENT_INTERPRETED_CONTEXT` when service-owned context is too thin to classify
 
 ## Non-Goals Preserved
-P6-A1 through P6-A3 do not add:
+P6-A1 through P6-A4 do not add:
 - push notifications
 - notification-center plumbing
 - inbox or unread state

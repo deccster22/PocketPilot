@@ -112,6 +112,7 @@ function createSnapshotSurface(): SnapshotSurfaceVM {
             pctChange: 0.08,
             metadata: {
               signalTitle: 'Momentum spike',
+              relatedSymbols: ['ETH'],
             },
           },
           strategyAlignment: 'WATCHFUL',
@@ -278,6 +279,55 @@ describe('fetchMessagePolicyVM', () => {
           kind: 'ALERT',
           priority: 'MEDIUM',
           surface: 'SNAPSHOT',
+        },
+      ],
+    });
+  });
+
+  it('uses the canonical fetch seam to supply richer interpreted history support for borderline advanced change', async () => {
+    const snapshotSurface = createSnapshotSurface();
+    snapshotSurface.snapshot.orientationContext.currentState.latestRelevantEvent = {
+      eventId: 'evt-price-move-history-backed',
+      timestamp: Date.parse('2026-04-05T00:00:00.000Z'),
+      accountId: 'acct-1',
+      symbol: 'ETH',
+      strategyId: 'momentum_basics',
+      eventType: 'PRICE_MOVEMENT',
+      alignmentState: 'WATCHFUL',
+      signalsTriggered: ['momentum_signal'],
+      confidenceScore: 0.89,
+      certainty: 'confirmed',
+      price: 120,
+      pctChange: 0.05,
+      metadata: {
+        signalTitle: 'Momentum spike',
+        relatedSymbols: ['ETH'],
+      },
+    };
+    snapshotSurface.snapshot.orientationContext.historyContext.sinceLastChecked = {
+      sinceTimestamp: Date.parse('2026-04-04T00:00:00.000Z'),
+      accountId: 'acct-1',
+      events: [],
+      summaryCount: 2,
+    };
+
+    const result = await fetchMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      profile: 'ADVANCED',
+      snapshotSurface,
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'ALERT',
+          title: 'Meaningful change noticed',
+          summary:
+            'ETH is standing out in recent interpreted context. Recent interpreted history supports keeping it in view. Review Snapshot if it changes your plan.',
+          priority: 'MEDIUM',
+          surface: 'SNAPSHOT',
+          dismissible: false,
         },
       ],
     });

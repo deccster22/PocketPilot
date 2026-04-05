@@ -81,6 +81,7 @@ describe('createSnapshotScreenViewData', () => {
     expect(source).not.toMatch(/kind === 'ALERT'/);
     expect(source).not.toMatch(/kind === 'REORIENTATION'/);
     expect(source).not.toMatch(/kind === 'BRIEFING'/);
+    expect(source).not.toMatch(/createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/);
   });
 
   it('uses the SnapshotModel path instead of legacy bridge fields', () => {

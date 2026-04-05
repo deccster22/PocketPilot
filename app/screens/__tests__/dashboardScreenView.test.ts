@@ -157,6 +157,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
+    expect(source).not.toMatch(/createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/);
     expect(source).not.toMatch(/createExplanationSummary|signalsTriggered|eventId|providerId|metadata/);
   });
 

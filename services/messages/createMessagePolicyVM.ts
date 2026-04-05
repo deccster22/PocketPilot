@@ -1,5 +1,5 @@
-import type { EventType, MarketEvent } from '@/core/types/marketEvent';
 import { applyMessageProfileTuning } from '@/services/messages/applyMessageProfileTuning';
+import { createPreparedMessageInputs } from '@/services/messages/createPreparedMessageInputs';
 import type {
   MessagePolicyAvailability,
   MessagePolicyDashboardContext,
@@ -7,6 +7,7 @@ import type {
   MessageSurfaceEligibility,
   MessagePolicySnapshotContext,
   MessagePolicyTradeHubContext,
+  PreparedMessageInputContext,
   PreparedMessage,
 } from '@/services/messages/types';
 
@@ -77,25 +78,23 @@ function createBriefingMessage(
   });
 }
 
-function isAlertEligibleEvent(event: MarketEvent | null | undefined): boolean {
-  if (!event || event.certainty !== 'confirmed') {
+function isAlertEligibleInput(
+  inputContext: PreparedMessageInputContext | null,
+): inputContext is PreparedMessageInputContext {
+  if (!inputContext) {
     return false;
   }
 
-  return (
-    event.eventType === 'PRICE_MOVEMENT' ||
-    event.eventType === 'MOMENTUM_BUILDING' ||
-    event.eventType === 'DIP_DETECTED'
-  );
+  return inputContext.eventFamily !== 'NON_ALERTABLE';
 }
 
-function createAlertTitle(eventType: EventType): string {
-  switch (eventType) {
-    case 'PRICE_MOVEMENT':
+function createAlertTitle(inputContext: PreparedMessageInputContext): string {
+  switch (inputContext.eventFamily) {
+    case 'PRICE_CHANGE':
       return 'Meaningful change noticed';
-    case 'MOMENTUM_BUILDING':
+    case 'MOMENTUM':
       return 'Momentum is building';
-    case 'DIP_DETECTED':
+    case 'PULLBACK':
       return 'A dip is standing out';
     default:
       return 'A meaningful change was noticed';
@@ -104,16 +103,15 @@ function createAlertTitle(eventType: EventType): string {
 
 function createAlertMessage(
   snapshot: NonNullable<CreateMessagePolicyVMParams['snapshot']>,
+  inputContext: PreparedMessageInputContext | null,
 ): PreparedMessage | null {
-  const latestRelevantEvent = snapshot.latestRelevantEvent;
-
-  if (!latestRelevantEvent || !isAlertEligibleEvent(latestRelevantEvent)) {
+  if (!snapshot.latestRelevantEvent || !isAlertEligibleInput(inputContext)) {
     return null;
   }
 
   return createPreparedMessage({
     kind: 'ALERT',
-    title: createAlertTitle(latestRelevantEvent.eventType),
+    title: createAlertTitle(inputContext),
     summary: 'A prepared alert is available for calm review in Snapshot.',
     priority: 'MEDIUM',
     surface: 'SNAPSHOT',
@@ -197,11 +195,13 @@ function createCandidates(params: CreateMessagePolicyVMParams): PreparedMessage[
     return candidates;
   }
 
-  const alertMessage = createAlertMessage(params.snapshot);
+  const preparedInputContext = createPreparedMessageInputs(params.snapshot);
+  const alertMessage = createAlertMessage(params.snapshot, preparedInputContext);
   if (alertMessage) {
     const tunedAlert = applyMessageProfileTuning({
       candidate: alertMessage,
       snapshot: params.snapshot,
+      inputContext: preparedInputContext,
     });
 
     if (tunedAlert.message) {

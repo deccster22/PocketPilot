@@ -40,11 +40,14 @@ function isMarketEvent(entry: unknown): entry is MarketEvent {
 
 function createSnapshotContext(surface: SnapshotSurfaceVM): MessagePolicySnapshotContext {
   const latestRelevantEvent = surface.snapshot.orientationContext.currentState.latestRelevantEvent;
+  const sinceLastChecked =
+    surface.snapshot.orientationContext.historyContext.sinceLastChecked;
 
   return {
     profile: surface.snapshot.model.profile,
     briefing: surface.briefing,
     reorientation: surface.reorientation,
+    sinceLastCheckedSummaryCount: sinceLastChecked?.summaryCount ?? 0,
     latestRelevantEvent: isMarketEvent(latestRelevantEvent) ? latestRelevantEvent : null,
   };
 }

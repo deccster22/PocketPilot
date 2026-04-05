@@ -1,5 +1,9 @@
 import type { MarketEvent } from '@/core/types/marketEvent';
-import { applyMessageProfileTuning, resolveMessageSensitivityProfile } from '@/services/messages/applyMessageProfileTuning';
+import {
+  applyMessageProfileTuning,
+  resolveMessageSensitivityProfile,
+} from '@/services/messages/applyMessageProfileTuning';
+import { createPreparedMessageInputs } from '@/services/messages/createPreparedMessageInputs';
 import type { MessagePolicySnapshotContext, PreparedMessage } from '@/services/messages/types';
 
 function createMarketEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
@@ -18,6 +22,7 @@ function createMarketEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
     pctChange: 0.08,
     metadata: {
       signalTitle: 'Momentum spike',
+      relatedSymbols: ['ETH'],
     },
     ...overrides,
   };
@@ -38,6 +43,7 @@ function createSnapshotContext(
       summary: null,
       dismissible: false,
     },
+    sinceLastCheckedSummaryCount: 0,
     latestRelevantEvent: createMarketEvent(),
     ...overrides,
   };
@@ -62,11 +68,13 @@ describe('applyMessageProfileTuning', () => {
   });
 
   it('downgrades strong beginner alert candidates to calmer briefings', () => {
+    const snapshot = createSnapshotContext({
+      profile: 'BEGINNER',
+    });
     const result = applyMessageProfileTuning({
       candidate: createAlertCandidate(),
-      snapshot: createSnapshotContext({
-        profile: 'BEGINNER',
-      }),
+      snapshot,
+      inputContext: createPreparedMessageInputs(snapshot),
     });
 
     expect(result).toEqual({
@@ -84,16 +92,18 @@ describe('applyMessageProfileTuning', () => {
     });
   });
 
-  it('downgrades middle-profile alert candidates when context deserves a calm check-in but not an alert', () => {
+  it('downgrades middle-profile meaningful change to a briefing instead of elevating it to an alert', () => {
+    const snapshot = createSnapshotContext({
+      profile: 'MIDDLE',
+      latestRelevantEvent: createMarketEvent({
+        confidenceScore: 0.85,
+        pctChange: 0.04,
+      }),
+    });
     const result = applyMessageProfileTuning({
       candidate: createAlertCandidate(),
-      snapshot: createSnapshotContext({
-        profile: 'MIDDLE',
-        latestRelevantEvent: createMarketEvent({
-          confidenceScore: 0.85,
-          pctChange: 0.04,
-        }),
-      }),
+      snapshot,
+      inputContext: createPreparedMessageInputs(snapshot),
     });
 
     expect(result).toEqual({
@@ -111,15 +121,78 @@ describe('applyMessageProfileTuning', () => {
     });
   });
 
-  it('suppresses advanced alert candidates when interpreted context stays middling', () => {
+  it('keeps advanced history-backed meaningful change as an alert when the subject scope stays clear', () => {
+    const snapshot = createSnapshotContext({
+      sinceLastCheckedSummaryCount: 2,
+      latestRelevantEvent: createMarketEvent({
+        confidenceScore: 0.89,
+        pctChange: 0.05,
+      }),
+    });
     const result = applyMessageProfileTuning({
       candidate: createAlertCandidate(),
-      snapshot: createSnapshotContext({
-        latestRelevantEvent: createMarketEvent({
-          confidenceScore: 0.85,
-          pctChange: 0.04,
-        }),
+      snapshot,
+      inputContext: createPreparedMessageInputs(snapshot),
+    });
+
+    expect(result).toEqual({
+      decision: 'KEEP_AS_ALERT',
+      sensitivity: 'DIRECT',
+      message: {
+        kind: 'ALERT',
+        title: 'Meaningful change noticed',
+        summary:
+          'ETH is standing out in recent interpreted context. Recent interpreted history supports keeping it in view. Review Snapshot if it changes your plan.',
+        priority: 'MEDIUM',
+        surface: 'SNAPSHOT',
+        dismissible: false,
+      },
+    });
+  });
+
+  it('keeps multi-symbol context conservative by downgrading it to a briefing even when the change is strong', () => {
+    const snapshot = createSnapshotContext({
+      sinceLastCheckedSummaryCount: 2,
+      latestRelevantEvent: createMarketEvent({
+        symbol: 'ETH',
+        metadata: {
+          signalTitle: 'Cluster move',
+          relatedSymbols: ['ETH', 'BTC'],
+        },
       }),
+    });
+    const result = applyMessageProfileTuning({
+      candidate: createAlertCandidate(),
+      snapshot,
+      inputContext: createPreparedMessageInputs(snapshot),
+    });
+
+    expect(result).toEqual({
+      decision: 'DOWNGRADE_TO_BRIEFING',
+      sensitivity: 'DIRECT',
+      message: {
+        kind: 'BRIEFING',
+        title: 'A change is worth a calm look',
+        summary:
+          'A small group of symbols is standing out in recent interpreted context. Recent interpreted history supports keeping it in view. Snapshot can help you judge whether it changes your current setup.',
+        priority: 'LOW',
+        surface: 'SNAPSHOT',
+        dismissible: false,
+      },
+    });
+  });
+
+  it('suppresses advanced alert candidates when meaningful change lacks supporting interpreted history', () => {
+    const snapshot = createSnapshotContext({
+      latestRelevantEvent: createMarketEvent({
+        confidenceScore: 0.89,
+        pctChange: 0.05,
+      }),
+    });
+    const result = applyMessageProfileTuning({
+      candidate: createAlertCandidate(),
+      snapshot,
+      inputContext: createPreparedMessageInputs(snapshot),
     });
 
     expect(result).toEqual({
@@ -129,34 +202,16 @@ describe('applyMessageProfileTuning', () => {
     });
   });
 
-  it('keeps strong advanced alert candidates as compact medium-priority alerts', () => {
-    const result = applyMessageProfileTuning({
-      candidate: createAlertCandidate(),
-      snapshot: createSnapshotContext(),
-    });
-
-    expect(result).toEqual({
-      decision: 'KEEP_AS_ALERT',
-      sensitivity: 'DIRECT',
-      message: {
-        kind: 'ALERT',
-        title: 'Meaningful change noticed',
-        summary: 'ETH is standing out in recent interpreted context. Review Snapshot if it changes your plan.',
-        priority: 'MEDIUM',
-        surface: 'SNAPSHOT',
-        dismissible: false,
-      },
-    });
-  });
-
   it('suppresses alert candidates when interpreted metrics are too thin for honest tuning', () => {
+    const snapshot = createSnapshotContext({
+      latestRelevantEvent: createMarketEvent({
+        pctChange: null,
+      }),
+    });
     const result = applyMessageProfileTuning({
       candidate: createAlertCandidate(),
-      snapshot: createSnapshotContext({
-        latestRelevantEvent: createMarketEvent({
-          pctChange: null,
-        }),
-      }),
+      snapshot,
+      inputContext: createPreparedMessageInputs(snapshot),
     });
 
     expect(result).toEqual({
