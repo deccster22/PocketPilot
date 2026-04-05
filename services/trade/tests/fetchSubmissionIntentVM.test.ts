@@ -23,6 +23,7 @@ function createSession(pathType: 'BRACKET' | 'GUIDED_SEQUENCE', acknowledged = t
     planId: 'plan-btc',
     accountId: 'acct-live',
     executionCapability: executionCapability as ExecutionCapabilityResolution,
+    preparedRiskReferences: null,
     preview: {
       planId: 'plan-btc',
       headline: {

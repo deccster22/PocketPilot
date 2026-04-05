@@ -18,6 +18,7 @@ function createSession(): ConfirmationSession {
     planId: 'plan-btc',
     accountId: 'acct-live',
     executionCapability,
+    preparedRiskReferences: null,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -155,6 +156,7 @@ describe('fetchExecutionReadinessVM', () => {
           planId: null,
           accountId: null,
           executionCapability: null,
+          preparedRiskReferences: null,
           preview: null,
           shell: null,
           flow: null,

@@ -15,6 +15,7 @@ function createConfirmationSession(
       supported: true,
       unavailableReason: null,
     },
+    preparedRiskReferences: null,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -89,7 +90,13 @@ function createPreparedQuoteScan(
 describe('fetchRiskToolVM', () => {
   it('keeps explicit user prices authoritative over prepared quote references', async () => {
     const result = await fetchRiskToolVM({
-      confirmationSession: createConfirmationSession(),
+      confirmationSession: createConfirmationSession({
+        preparedRiskReferences: {
+          entryPrice: 21,
+          stopPrice: 17,
+          targetPrice: 30,
+        },
+      }),
       preparedQuoteScan: createPreparedQuoteScan(),
       input: {
         accountSize: 10_000,
@@ -135,6 +142,59 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('execution-feed');
     expect(JSON.stringify(result)).not.toContain('BRACKET');
     expect(JSON.stringify(result)).not.toContain('acct-live');
+  });
+
+  it('uses prepared plan references from the selected trade context when user values are absent', async () => {
+    const result = await fetchRiskToolVM({
+      confirmationSession: createConfirmationSession({
+        preparedRiskReferences: {
+          entryPrice: 20.5,
+          stopPrice: 19,
+          targetPrice: 24.5,
+        },
+      }),
+      preparedQuoteScan: createPreparedQuoteScan(),
+      input: {
+        accountSize: null,
+        riskAmount: 100,
+        riskPercent: null,
+        entryPrice: null,
+        stopPrice: null,
+        targetPrice: null,
+        symbol: null,
+        allowPreparedReferences: true,
+      },
+    });
+
+    expect(result.summary).toEqual({
+      state: 'READY',
+      symbol: 'BTC',
+      entryPrice: 20.5,
+      stopPrice: 19,
+      targetPrice: 24.5,
+      entryReference: {
+        value: 20.5,
+        source: 'PREPARED_PLAN',
+      },
+      stopReference: {
+        value: 19,
+        source: 'PREPARED_PLAN',
+      },
+      targetReference: {
+        value: 24.5,
+        source: 'PREPARED_PLAN',
+      },
+      stopDistance: 1.5,
+      riskAmount: 100,
+      riskPercent: null,
+      positionSize: 66.66666666666667,
+      rewardRiskRatio: 2.6666666666666665,
+      notes: [],
+    });
+    expect(JSON.stringify(result)).not.toContain('executionAvailable');
+    expect(JSON.stringify(result)).not.toContain('payloadPreview');
+    expect(JSON.stringify(result)).not.toContain('execution-feed');
+    expect(JSON.stringify(result)).not.toContain('timestampMs');
   });
 
   it('uses a prepared quote entry reference when user entry is absent', async () => {

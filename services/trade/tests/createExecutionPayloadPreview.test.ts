@@ -45,6 +45,7 @@ function createSession(
     planId: 'plan-btc',
     accountId: 'acct-live',
     executionCapability,
+    preparedRiskReferences: null,
     preview: {
       planId: 'plan-btc',
       headline: {
@@ -166,6 +167,7 @@ describe('createExecutionPayloadPreview', () => {
           planId: null,
           accountId: null,
           executionCapability: null,
+          preparedRiskReferences: null,
           preview: null,
           shell: null,
           flow: null,

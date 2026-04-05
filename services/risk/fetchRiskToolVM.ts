@@ -1,6 +1,10 @@
 import { createRiskToolVM } from '@/services/risk/createRiskToolVM';
 import { selectRiskReferences } from '@/services/risk/selectRiskReferences';
-import type { RiskToolInput, RiskToolVM } from '@/services/risk/types';
+import type {
+  PreparedRiskPlanContext,
+  RiskToolInput,
+  RiskToolVM,
+} from '@/services/risk/types';
 import type { ConfirmationSession } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
@@ -44,6 +48,22 @@ function resolvePreparedQuoteContext(params: {
   };
 }
 
+function resolvePreparedPlanContext(params: {
+  confirmationSession: ConfirmationSession | null;
+}): PreparedRiskPlanContext | null {
+  const preparedRiskReferences = params.confirmationSession?.preparedRiskReferences;
+
+  if (!preparedRiskReferences) {
+    return null;
+  }
+
+  return {
+    entryPrice: preparedRiskReferences.entryPrice,
+    stopPrice: preparedRiskReferences.stopPrice,
+    targetPrice: preparedRiskReferences.targetPrice,
+  };
+}
+
 export async function fetchRiskToolVM(params: {
   confirmationSession: ConfirmationSession | null;
   preparedQuoteScan?: Pick<ForegroundScanResult, 'quotes'> | null;
@@ -59,9 +79,13 @@ export async function fetchRiskToolVM(params: {
     preparedQuoteScan: params.preparedQuoteScan,
     symbol,
   });
+  const preparedPlanContext = resolvePreparedPlanContext({
+    confirmationSession: params.confirmationSession,
+  });
   const references = selectRiskReferences({
     input: params.input,
     preparedQuoteContext,
+    preparedPlanContext,
   });
 
   return createRiskToolVM({
@@ -70,6 +94,7 @@ export async function fetchRiskToolVM(params: {
     context: {
       symbol,
       hasPreparedContext:
+        preparedPlanContext !== null ||
         (params.confirmationSession !== null && params.confirmationSession.planId !== null) ||
         preparedQuoteContext !== null,
     },

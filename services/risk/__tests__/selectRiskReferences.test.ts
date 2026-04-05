@@ -1,15 +1,15 @@
 import { selectRiskReferences } from '@/services/risk/selectRiskReferences';
 
 describe('selectRiskReferences', () => {
-  it('keeps explicit user values authoritative over prepared references', () => {
+  it('keeps explicit user stop and target values authoritative while prepared plan entry still outranks quote help', () => {
     const result = selectRiskReferences({
       input: {
         accountSize: null,
         riskAmount: null,
         riskPercent: null,
-        entryPrice: 101,
-        stopPrice: null,
-        targetPrice: null,
+        entryPrice: null,
+        stopPrice: 97,
+        targetPrice: 113,
         symbol: 'BTC',
         allowPreparedReferences: true,
       },
@@ -25,16 +25,16 @@ describe('selectRiskReferences', () => {
 
     expect(result).toEqual({
       entryReference: {
-        value: 101,
-        source: 'USER_INPUT',
+        value: 98,
+        source: 'PREPARED_PLAN',
       },
       stopReference: {
-        value: 94,
-        source: 'PREPARED_PLAN',
+        value: 97,
+        source: 'USER_INPUT',
       },
       targetReference: {
-        value: 110,
-        source: 'PREPARED_PLAN',
+        value: 113,
+        source: 'USER_INPUT',
       },
     });
   });

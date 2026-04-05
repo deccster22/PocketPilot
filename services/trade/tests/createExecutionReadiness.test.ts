@@ -22,6 +22,7 @@ function createSession(params?: {
     planId: params?.planId ?? 'plan-btc',
     accountId: params?.planId === null ? null : 'acct-live',
     executionCapability: params?.planId === null ? null : executionCapability,
+    preparedRiskReferences: null,
     preview: {
       planId: params?.planId ?? 'plan-btc',
       headline: {
@@ -317,6 +318,7 @@ describe('createExecutionReadiness', () => {
         planId: null,
         accountId: null,
         executionCapability: null,
+        preparedRiskReferences: null,
         preview: null,
         shell: null,
         flow: null,

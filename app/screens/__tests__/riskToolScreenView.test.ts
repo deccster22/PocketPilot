@@ -83,4 +83,50 @@ describe('createRiskToolScreenViewData', () => {
   it('returns null when no prepared risk VM is available', () => {
     expect(createRiskToolScreenViewData(null)).toBeNull();
   });
+
+  it('keeps unavailable references quiet while still showing not-set values', () => {
+    const view = createRiskToolScreenViewData({
+      generatedAt: null,
+      summary: {
+        state: 'INCOMPLETE',
+        symbol: 'ETH',
+        entryPrice: null,
+        stopPrice: null,
+        targetPrice: null,
+        entryReference: {
+          value: null,
+          source: 'UNAVAILABLE',
+        },
+        stopReference: {
+          value: null,
+          source: 'UNAVAILABLE',
+        },
+        targetReference: {
+          value: null,
+          source: 'UNAVAILABLE',
+        },
+        stopDistance: null,
+        riskAmount: null,
+        riskPercent: null,
+        positionSize: null,
+        rewardRiskRatio: null,
+        notes: ['Add a stop reference when you want sizing support.'],
+      },
+    });
+
+    expect(view?.detailRows.slice(0, 3)).toEqual([
+      {
+        label: 'Entry reference',
+        value: 'Not set',
+      },
+      {
+        label: 'Stop reference',
+        value: 'Not set',
+      },
+      {
+        label: 'Target reference',
+        value: 'Not set',
+      },
+    ]);
+  });
 });

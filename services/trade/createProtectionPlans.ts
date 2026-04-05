@@ -280,6 +280,7 @@ export function createProtectionPlans(params: {
         alignment,
       },
       constraints: resolveConstraints(intentType, certainty),
+      preparedRiskReferences: null,
       createdAt,
     };
   });
