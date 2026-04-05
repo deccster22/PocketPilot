@@ -1,4 +1,5 @@
 import type { EventType, MarketEvent } from '@/core/types/marketEvent';
+import { applyMessageProfileTuning } from '@/services/messages/applyMessageProfileTuning';
 import type {
   MessagePolicyAvailability,
   MessagePolicyDashboardContext,
@@ -101,31 +102,10 @@ function createAlertTitle(eventType: EventType): string {
   }
 }
 
-function createAlertSummary(event: MarketEvent): string {
-  const subject = event.symbol
-    ? `${event.symbol} is standing out in recent interpreted context.`
-    : 'Recent interpreted context is standing out.';
-
-  switch (event.eventType) {
-    case 'PRICE_MOVEMENT':
-      return `${subject} Review Snapshot before deciding whether it changes your plan.`;
-    case 'MOMENTUM_BUILDING':
-      return `${subject} Snapshot can help you judge whether momentum matters without rushing.`;
-    case 'DIP_DETECTED':
-      return `${subject} Snapshot can help you decide whether the dip belongs in view.`;
-    default:
-      return `${subject} Snapshot is the right place for a calm review.`;
-  }
-}
-
 function createAlertMessage(
   snapshot: NonNullable<CreateMessagePolicyVMParams['snapshot']>,
 ): PreparedMessage | null {
   const latestRelevantEvent = snapshot.latestRelevantEvent;
-
-  if (snapshot.profile === 'BEGINNER') {
-    return null;
-  }
 
   if (!latestRelevantEvent || !isAlertEligibleEvent(latestRelevantEvent)) {
     return null;
@@ -134,8 +114,8 @@ function createAlertMessage(
   return createPreparedMessage({
     kind: 'ALERT',
     title: createAlertTitle(latestRelevantEvent.eventType),
-    summary: createAlertSummary(latestRelevantEvent),
-    priority: 'HIGH',
+    summary: 'A prepared alert is available for calm review in Snapshot.',
+    priority: 'MEDIUM',
     surface: 'SNAPSHOT',
   });
 }
@@ -219,7 +199,14 @@ function createCandidates(params: CreateMessagePolicyVMParams): PreparedMessage[
 
   const alertMessage = createAlertMessage(params.snapshot);
   if (alertMessage) {
-    candidates.push(alertMessage);
+    const tunedAlert = applyMessageProfileTuning({
+      candidate: alertMessage,
+      snapshot: params.snapshot,
+    });
+
+    if (tunedAlert.message) {
+      candidates.push(tunedAlert.message);
+    }
   }
 
   return candidates;

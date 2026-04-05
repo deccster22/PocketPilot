@@ -137,7 +137,7 @@ describe('createMessagePolicyVM', () => {
     );
   });
 
-  it('creates a calm alert only from confirmed interpreted change when no briefing already owns Snapshot', () => {
+  it('creates a narrower advanced alert only from strong confirmed interpreted change when no briefing already owns Snapshot', () => {
     const result = createMessagePolicyVM({
       surface: 'SNAPSHOT',
       snapshot: createSnapshotContext({
@@ -156,14 +156,44 @@ describe('createMessagePolicyVM', () => {
           kind: 'ALERT',
           title: 'Meaningful change noticed',
           summary:
-            'ETH is standing out in recent interpreted context. Review Snapshot before deciding whether it changes your plan.',
-          priority: 'HIGH',
+            'ETH is standing out in recent interpreted context. Review Snapshot if it changes your plan.',
+          priority: 'MEDIUM',
           surface: 'SNAPSHOT',
           dismissible: false,
         },
       ],
     });
     expect(JSON.stringify(result)).not.toMatch(/evt-price-move-2|dip_buying|dip_signal/);
+  });
+
+  it('keeps strong beginner event context as a calm briefing instead of a louder alert', () => {
+    const result = createMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      snapshot: createSnapshotContext({
+        profile: 'BEGINNER',
+        latestRelevantEvent: createMarketEvent({
+          eventId: 'evt-price-move-beginner',
+          strategyId: 'momentum_basics',
+          signalsTriggered: ['raw_signal_should_not_leak'],
+        }),
+      }),
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'BRIEFING',
+          title: 'A change is worth a calm look',
+          summary:
+            'ETH is standing out in recent interpreted context. Snapshot can help you decide whether it changes your plan without rushing.',
+          priority: 'LOW',
+          surface: 'SNAPSHOT',
+          dismissible: false,
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toMatch(/evt-price-move-beginner|raw_signal_should_not_leak/);
   });
 
   it('keeps Dashboard referral and Trade Hub guarded stop as separate message families', () => {
@@ -263,13 +293,60 @@ describe('createMessagePolicyVM', () => {
     });
   });
 
-  it('returns NO_MESSAGE when interpreted Snapshot context is present but not strong enough for a message', () => {
+  it('keeps middling Snapshot change as a briefing for middle profile instead of elevating it to an alert', () => {
     expect(
       createMessagePolicyVM({
         surface: 'SNAPSHOT',
         snapshot: createSnapshotContext({
-          profile: 'BEGINNER',
-          latestRelevantEvent: createMarketEvent(),
+          profile: 'MIDDLE',
+          latestRelevantEvent: createMarketEvent({
+            confidenceScore: 0.85,
+            pctChange: 0.04,
+          }),
+        }),
+      }),
+    ).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'BRIEFING',
+          title: 'A change is worth a calm look',
+          summary:
+            'ETH is standing out in recent interpreted context. Snapshot can help you judge whether it changes your current setup.',
+          priority: 'LOW',
+          surface: 'SNAPSHOT',
+          dismissible: false,
+        },
+      ],
+    });
+  });
+
+  it('returns NO_MESSAGE when interpreted Snapshot context is present but the tuned alert metrics are too thin', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'SNAPSHOT',
+        snapshot: createSnapshotContext({
+          latestRelevantEvent: createMarketEvent({
+            pctChange: null,
+          }),
+        }),
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
+    });
+  });
+
+  it('does not let advanced profile bypass alert thresholds when context stays middling', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'SNAPSHOT',
+        snapshot: createSnapshotContext({
+          profile: 'ADVANCED',
+          latestRelevantEvent: createMarketEvent({
+            confidenceScore: 0.85,
+            pctChange: 0.04,
+          }),
         }),
       }),
     ).toEqual({

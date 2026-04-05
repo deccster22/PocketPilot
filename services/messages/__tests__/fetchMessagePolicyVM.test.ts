@@ -228,8 +228,8 @@ describe('fetchMessagePolicyVM', () => {
           kind: 'ALERT',
           title: 'Meaningful change noticed',
           summary:
-            'ETH is standing out in recent interpreted context. Review Snapshot before deciding whether it changes your plan.',
-          priority: 'HIGH',
+            'ETH is standing out in recent interpreted context. Review Snapshot if it changes your plan.',
+          priority: 'MEDIUM',
           surface: 'SNAPSHOT',
           dismissible: false,
         },
@@ -276,7 +276,35 @@ describe('fetchMessagePolicyVM', () => {
       messages: [
         {
           kind: 'ALERT',
+          priority: 'MEDIUM',
           surface: 'SNAPSHOT',
+        },
+      ],
+    });
+  });
+
+  it('keeps beginner Snapshot policy service-owned by downgrading strong interpreted change to a briefing', async () => {
+    const snapshotSurface = createSnapshotSurface();
+    snapshotSurface.snapshot.model.profile = 'BEGINNER';
+
+    const result = await fetchMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      profile: 'BEGINNER',
+      snapshotSurface,
+    });
+
+    expect(mockFetchSnapshotSurfaceVM).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'BRIEFING',
+          title: 'A change is worth a calm look',
+          summary:
+            'ETH is standing out in recent interpreted context. Snapshot can help you decide whether it changes your plan without rushing.',
+          priority: 'LOW',
+          surface: 'SNAPSHOT',
+          dismissible: false,
         },
       ],
     });

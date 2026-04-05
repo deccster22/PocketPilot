@@ -12,6 +12,10 @@ export type MessagePolicyKind =
 
 export type MessagePriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
+export type MessageSensitivityProfile = 'GUIDED' | 'BALANCED' | 'DIRECT';
+
+export type AlertThresholdDecision = 'KEEP_AS_ALERT' | 'DOWNGRADE_TO_BRIEFING' | 'SUPPRESS';
+
 export type MessageSurfaceEligibility = 'SNAPSHOT' | 'DASHBOARD' | 'TRADE_HUB' | 'NONE';
 
 export type PreparedMessage = {

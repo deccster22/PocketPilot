@@ -12,6 +12,7 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - `services/snapshot/createProfileAwareSnapshotModel.ts` applies profile-aware shaping at the service seam.
 - `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes one prepared Snapshot surface VM, including the canonical briefing state.
 - `services/messages/fetchMessagePolicyVM.ts` classifies prepared Snapshot message output for one requested surface.
+- `services/messages/applyMessageProfileTuning.ts` keeps alert threshold and profile sensitivity inside that same message-policy seam.
 - `app/` reads the prepared Snapshot surface VM and prepared message-policy VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
 - P6-R3 keeps dismissal persistence behind that same prepared service path rather than moving visibility rules into `app/`.
 - P6-R4 re-reads that same prepared service path on app foreground return rather than adding a second Snapshot fetch route.
@@ -43,7 +44,9 @@ It remains optional, quiet, and secondary to the Snapshot core.
 - A dismissed reorientation cycle does not fall through to a separate Since Last Checked card.
 - Existing reorientation dismissal behavior remains unchanged.
 - Since Last Checked remains non-dismissible in this phase.
-- A thin Snapshot `ALERT` may appear only when no briefing already owns the zone and interpreted context is strong enough.
+- A thin Snapshot `ALERT` may appear only when no briefing already owns the zone and interpreted context is strong enough after service-owned threshold tuning.
+- Beginner may keep strong interpreted change as a calm `BRIEFING` instead of `ALERT`.
+- Advanced may receive a tighter `ALERT`, but middling change still suppresses to no message.
 - App foreground return re-checks the same prepared Snapshot VM and stays quiet while the app remains active.
 - Snapshot does not become an inbox, alert center, feed, or notification system.
 
