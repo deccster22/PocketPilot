@@ -56,3 +56,14 @@ export type MessagePolicySnapshotContext = {
   reorientation: ReorientationSurfaceState;
   latestRelevantEvent?: MarketEvent | null;
 };
+
+export type MessagePolicyDashboardContext = {
+  hasPrimeItems: boolean;
+  hasSupportingItems: boolean;
+};
+
+export type MessagePolicyTradeHubContext = {
+  hasSelectedPlan: boolean;
+  executionPathSupported: boolean | null;
+  executionPathUnavailableReason: string | null;
+};

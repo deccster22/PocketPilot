@@ -21,6 +21,11 @@ In P5-11 it presents:
 
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
 
+P6-A2 adds one optional message-policy note above the same prepared surface:
+- one inline `MessagePolicyAvailability` result from `services/messages/fetchMessagePolicyVM`
+- it remains separate from the `TradeHubSurfaceModel` contract and from confirmation/readiness/execution seams
+- it does not add notification mechanics or order behavior
+
 ## Surface Contract
 
 Trade Hub consumes a prepared `TradeHubSurfaceModel` from `services/trade/`.
@@ -446,6 +451,7 @@ The execution-adapter seams live after submission intent and shape deterministic
   - `UNAVAILABLE`
 
 The screen may format labels for readability, but it must not reprioritise plans or derive new action logic.
+The screen may render a prepared message-policy note, but it must not decide whether a Trade Hub state is a guarded stop on its own.
 The screen may format preview labels for readability, but it must not construct rationale, readiness, or constraints on its own.
 The screen may collect explicit risk-tool inputs and render prepared risk-tool values plus calm source labels, but it must not calculate stop distance, position size, reward/risk, or local reference precedence on its own.
 Prepared risk references should read like optional support context, not as auto-filled execution intent, and explicit user values remain authoritative when entered.
@@ -467,6 +473,23 @@ P5-X also requires the following execution-boundary wording rules:
 - do not describe blocked or unavailable states like system failures unless that is actually the seam truth
 - do not present simulated states as confirmed execution outcomes
 - keep confirmation wording clearly upstream of dispatch
+
+## Trade Hub Guarded Stop Note (P6-A2)
+Trade Hub now has one optional message-policy note only:
+- `GUARDED_STOP`
+
+Rules:
+- render it only when the canonical message-policy seam returns an eligible `GUARDED_STOP`
+- reserve it for product-boundary conditions, not routine acknowledgement or readiness states
+- keep it calm, explicit, and inline
+- do not restyle it like a punitive warning, outage banner, or execution CTA
+- keep it distinct from confirmation-shell, readiness, submission-intent, and adapter-result wording
+
+The current rollout uses guarded stop only when the selected confirmation session has no protected execution path.
+That preserves the line between:
+- boundary stop
+- readiness blocker
+- simulated adapter result
 
 ## Safety Posture
 

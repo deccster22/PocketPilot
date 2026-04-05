@@ -1,7 +1,8 @@
-# Message Policy Model (P6-A1)
+# Message Policy Model (P6-A1 + P6-A2)
 
 ## Purpose
 P6-A1 adds PocketPilot's first canonical alert and message policy foundation.
+P6-A2 keeps that same seam and rolls two already-modeled families onto their first additional product surfaces.
 
 This is a policy seam, not a notification platform.
 
@@ -10,8 +11,9 @@ The goal is to:
 - classify a small set of message families explicitly
 - preserve the line between briefing, alerting, reorientation, referral, and guarded-stop messaging
 - keep Snapshot calm while broader `P6` work remains out of scope
+- extend rollout only where the product already has a natural inline home
 
-P6-A1 does not add push, inbox, unread state, badges, modals, background jobs, or urgency escalation.
+P6-A1 and P6-A2 do not add push, inbox, unread state, badges, modals, background jobs, or urgency escalation.
 
 ## Canonical Contract
 The canonical message-policy contract lives in `services/messages/types.ts`.
@@ -60,7 +62,9 @@ Rules:
 - no raw IDs, provider diagnostics, or strategy implementation details leak here
 
 ## Data Flow
-P6-A1 sits above the existing interpreted Snapshot and reorientation seams:
+The message-policy seam continues to sit above interpreted service-owned inputs rather than app-owned heuristics.
+
+Snapshot still uses the existing orientation and briefing spine:
 
 ```text
 EventLedger
@@ -75,20 +79,30 @@ EventLedger
 -> Snapshot message zone
 ```
 
-The canonical fetch path is:
+The canonical fetch path now has three narrow consumer routes:
 
 ```text
 fetchSnapshotSurfaceVM
--> fetchMessagePolicyVM
+-> fetchMessagePolicyVM(surface: 'SNAPSHOT')
 -> app/screens/snapshotScreenView.ts
 -> SnapshotScreen
+
+fetchDashboardSurfaceVM
+-> fetchMessagePolicyVM(surface: 'DASHBOARD')
+-> app/screens/dashboardScreenView.ts
+-> DashboardScreen
+
+fetchConfirmationSessionVM
+-> fetchMessagePolicyVM(surface: 'TRADE_HUB')
+-> app/screens/tradeHubScreenView.ts
+-> TradeHubScreen
 ```
 
 `app/` renders the prepared contract only.
 It does not decide whether something is a briefing, alert, reorientation prompt, referral, or guarded stop.
 
 ## Classification Rules
-P6-A1 keeps the rules intentionally narrow.
+P6-A1 and P6-A2 keep the rules intentionally narrow.
 
 ### Reorientation
 - Snapshot-visible reorientation becomes a `REORIENTATION` message
@@ -109,19 +123,24 @@ P6-A1 keeps the rules intentionally narrow.
 ### Referral
 - referral remains a separate family for out-of-scope or better-handled-elsewhere guidance
 - referral is not a guarded stop and not a missing-data error
+- P6-A2 uses Dashboard referral only when Dashboard has supporting interpreted context but no prime focus item
+- the current referral copy routes the user toward Snapshot as the steadier fit; it does not read like a hard failure
 
 ### Guarded Stop
 - guarded stop remains the strongest stop-style family
 - it expresses that PocketPilot should not continue a path with the current context
 - it is not framed as punishment, urgency, or system failure theatre
+- P6-A2 uses Trade Hub guarded stop only when the selected confirmation session has no protected execution path
+- guarded stop is not a synonym for readiness blockers, acknowledgement state, or generic execution warnings
 
 ## Surface Discipline
-P6-A1 adds only one consumer path: Snapshot.
+P6-A1 and P6-A2 still keep rollout deliberately narrow.
 
 That means:
 - Snapshot may show `REORIENTATION`, `BRIEFING`, or a thin `ALERT`
-- referral and guarded-stop families are modeled explicitly but not broadly rolled out yet
-- Dashboard and Trade Hub do not gain message-center behavior in this phase
+- Dashboard may show a quiet `REFERRAL` note only
+- Trade Hub may show a calm `GUARDED_STOP` note only
+- no other surfaces gain message-center behavior in this phase
 
 Availability rules stay explicit:
 - `AVAILABLE` when a prepared message is eligible for the requested surface
@@ -130,13 +149,13 @@ Availability rules stay explicit:
 - `INSUFFICIENT_INTERPRETED_CONTEXT` when service-owned context is too thin
 
 ## Non-Goals Preserved
-P6-A1 does not add:
+P6-A1 and P6-A2 do not add:
 - push notifications
 - notification-center plumbing
 - inbox or unread state
 - background scanning
 - badge counts
 - urgency ladders
-- per-surface message rollouts
+- broad per-surface message rollouts
 - AI-generated messaging
 - app-owned copy assembly

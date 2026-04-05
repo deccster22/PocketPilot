@@ -39,12 +39,18 @@ Dashboard also has a surface VM with one optional explanation seam:
 }
 ```
 
+P6-A2 adds one additional prepared input on the same screen helper path:
+- one optional `MessagePolicyAvailability` result from `services/messages/fetchMessagePolicyVM`
+- it is still rendered inline and only through prepared service output
+- it does not change the Dashboard surface model contract itself
+
 ## Service Path
 Dashboard continues to use its own upstream preparation seam:
 - `services/upstream/fetchSurfaceContext.ts` assembles shared deterministic truth.
 - `services/dashboard/dashboardDataService.ts` prepares Dashboard-owned upstream inputs from that shared truth.
 - `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and Dashboard explanation VM.
 - `services/dashboard/fetchDashboardExplanationVM.ts` selects the prime explanation target and calls the canonical explanation builder.
+- `services/messages/fetchMessagePolicyVM.ts` consumes the prepared Dashboard surface and decides whether a Dashboard-only `REFERRAL` note is eligible.
 
 This keeps Dashboard separate from Snapshot service flow while preserving the same app-facing contract.
 
@@ -91,6 +97,24 @@ The Dashboard why note still does not show:
 - modal warning theatre
 - urgency language
 - predictive wording
+
+## Dashboard Referral Note (P6-A2)
+Dashboard now has one optional message-policy note only:
+- `REFERRAL`
+
+Rules:
+- render it only when the prepared message-policy seam says it is `AVAILABLE`
+- keep it visually subordinate to the Focus zones
+- do not turn it into an alert wall, popup, badge, or contextual knowledge rail
+- use it only as a calm routing or fit note
+- keep missing or empty Dashboard context distinct from referral-worthy context
+
+The app path remains:
+- `services/messages/fetchMessagePolicyVM`
+- `app/screens/dashboardScreenView.ts`
+- `DashboardScreen`
+
+`app/` does not decide whether Dashboard should show referral copy.
 
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.
