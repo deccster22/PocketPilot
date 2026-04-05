@@ -1,0 +1,61 @@
+import type { StrategyArchetype } from '@/core/strategy/catalogTypes';
+import type { StrategyId } from '@/core/strategy/types';
+
+export type StrategyNavigatorSurface =
+  | 'STRATEGY_NAVIGATOR'
+  | 'DASHBOARD'
+  | 'SNAPSHOT'
+  | 'TRADE_HUB'
+  | 'KNOWLEDGE_LIBRARY';
+
+export type StrategyPreviewScenarioId =
+  | 'DIP_VOLATILITY'
+  | 'TREND_CONTINUATION'
+  | 'MIXED_REVERSAL'
+  | 'RANGE_COMPRESSION';
+
+export type StrategyPreviewScenario = {
+  scenarioId: StrategyPreviewScenarioId;
+  title: string;
+  summary: string;
+};
+
+export type StrategyPreviewStrategyOption = {
+  strategyId: StrategyId;
+  title: string;
+  summary: string;
+  archetype: StrategyArchetype;
+};
+
+export type StrategyPreviewFocus = {
+  snapshotHeadline: string;
+  dashboardFocus: ReadonlyArray<string>;
+  eventHighlights: ReadonlyArray<string>;
+  alertPosture: string;
+};
+
+export type StrategyPreviewAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_STRATEGY_SELECTED'
+        | 'NO_SCENARIO_AVAILABLE'
+        | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      strategyId: StrategyId;
+      scenario: StrategyPreviewScenario;
+      focus: StrategyPreviewFocus;
+    };
+
+export type StrategyNavigatorVM = {
+  title: string;
+  summary: string;
+  generatedAt: string | null;
+  selectedStrategyId: StrategyId | null;
+  selectedScenarioId: StrategyPreviewScenarioId | null;
+  strategyOptions: ReadonlyArray<StrategyPreviewStrategyOption>;
+  scenarios: ReadonlyArray<StrategyPreviewScenario>;
+  availability: StrategyPreviewAvailability;
+};

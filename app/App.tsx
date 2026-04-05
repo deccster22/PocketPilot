@@ -5,14 +5,24 @@ import { StatusBar } from 'expo-status-bar';
 import { DashboardScreen } from '@/app/screens/DashboardScreen';
 import { InsightsScreen } from '@/app/screens/InsightsScreen';
 import { KnowledgeLibraryScreen } from '@/app/screens/KnowledgeLibraryScreen';
+import { StrategyNavigatorScreen } from '@/app/screens/StrategyNavigatorScreen';
 import { TradeHubScreen } from '@/app/screens/TradeHubScreen';
 
-type AppTab = 'DASHBOARD' | 'TRADE_HUB' | 'INSIGHTS' | 'KNOWLEDGE_LIBRARY';
+type AppTab =
+  | 'DASHBOARD'
+  | 'STRATEGY_NAVIGATOR'
+  | 'TRADE_HUB'
+  | 'INSIGHTS'
+  | 'KNOWLEDGE_LIBRARY';
 
 const APP_TABS: ReadonlyArray<{ id: AppTab; label: string }> = [
   {
     id: 'DASHBOARD',
     label: 'Dashboard',
+  },
+  {
+    id: 'STRATEGY_NAVIGATOR',
+    label: 'Preview',
   },
   {
     id: 'TRADE_HUB',
@@ -36,6 +46,8 @@ export default function App() {
       <View style={styles.screenContainer}>
         {activeTab === 'DASHBOARD' ? (
           <DashboardScreen />
+        ) : activeTab === 'STRATEGY_NAVIGATOR' ? (
+          <StrategyNavigatorScreen />
         ) : activeTab === 'TRADE_HUB' ? (
           <TradeHubScreen />
         ) : activeTab === 'INSIGHTS' ? (
@@ -80,8 +92,8 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 16,
+    gap: 8,
+    paddingHorizontal: 12,
     paddingTop: 12,
     paddingBottom: 20,
     borderTopWidth: 1,
@@ -102,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eff6ff',
   },
   tabText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: '#4b5563',
   },
