@@ -177,6 +177,7 @@ describe('fetchConfirmationSessionVM', () => {
         supported: true,
         unavailableReason: null,
       },
+      preparedRiskReferences: null,
       preview: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
         headline: {
@@ -349,6 +350,7 @@ describe('fetchConfirmationSessionVM', () => {
       planId: null,
       accountId: null,
       executionCapability: null,
+      preparedRiskReferences: null,
       preview: null,
       shell: null,
       flow: null,

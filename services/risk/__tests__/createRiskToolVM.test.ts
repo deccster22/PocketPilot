@@ -138,6 +138,9 @@ describe('createRiskToolVM', () => {
       rewardRiskRatio: null,
       notes: ['Reward/risk is left empty until the target sits on the reward side of the entry.'],
     });
+    expect(JSON.stringify(result)).not.toContain('executionCapability');
+    expect(JSON.stringify(result)).not.toContain('payloadPreview');
+    expect(JSON.stringify(result)).not.toContain('dispatch');
   });
 
   it('stays incomplete and avoids fake precision when required references are missing', () => {

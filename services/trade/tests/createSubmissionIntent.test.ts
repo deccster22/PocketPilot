@@ -19,6 +19,7 @@ function createSession(): ConfirmationSession {
     planId: 'plan-btc',
     accountId: 'acct-live',
     executionCapability,
+    preparedRiskReferences: null,
     preview: {
       planId: 'plan-btc',
       headline: {

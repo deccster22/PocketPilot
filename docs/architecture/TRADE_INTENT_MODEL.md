@@ -95,6 +95,7 @@ P5-11 adds `ExecutionAdapterAttemptResult` as the first post-intent execution-ad
 P5-13 adds `ExecutionCapabilityResolution` plus `resolveExecutionCapability` as the single canonical capability seam that resolves execution-path truth once in `services/trade/` before shell, preview, readiness, submission intent, and later adapter-facing shaping.
 P5-R1 adds `RiskToolVM` as a sibling support seam that combines one selected Trade Hub context with explicit user inputs for calm position sizing and reward/risk framing without creating execution semantics.
 P5-R2 adds source-tagged prepared references plus optional prepared quote entry assistance to that same `RiskToolVM` seam while keeping explicit user values authoritative.
+P5-R3 adds `preparedRiskReferences` to the selected-plan ownership seam so honest prepared plan entry, stop, and target references can reach that same risk tool without becoming execution-prefill behavior.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:
@@ -159,6 +160,7 @@ Confirmation sessions expose only the fields needed for safe selected-plan owner
 - one selected `planId` or `null`
 - one selected `accountId` or `null`
 - one canonical execution-capability resolution or `null`
+- one optional prepared plan risk-reference object or `null`
 - one prepared preview
 - one prepared confirmation shell
 - one prepared confirmation flow
@@ -258,6 +260,7 @@ Execution-adapter seams intentionally remain small and deterministic. They only:
 Risk-tool seams intentionally remain small and deterministic. They only:
 
 - consume explicit user inputs plus selected-plan and prepared quote context
+- consume prepared plan entry, stop, and target references only when the selected session honestly carries them
 - choose user-versus-prepared reference precedence once in services
 - calculate stop distance, risk amount, position size, and optional reward/risk
 - return honest `UNAVAILABLE`, `INCOMPLETE`, or `READY` state
@@ -278,6 +281,7 @@ They do not:
 - recompute readiness
 - rebuild submission intent
 - construct orders
+- infer prepared stop or target values from quote data alone
 - invent stop or target references from thin quote context
 - dispatch anything
 

@@ -22,6 +22,7 @@ function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
       maxPositionSize: 0.1,
       cooldownActive: false,
     },
+    preparedRiskReferences: null,
     createdAt: 100,
     ...overrides,
   };

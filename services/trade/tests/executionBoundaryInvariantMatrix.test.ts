@@ -70,6 +70,7 @@ function createPlan(path: ExecutionCapabilityPath): ProtectionPlan {
       certainty: path === 'SEPARATE_ORDERS' ? 'LOW' : 'HIGH',
     },
     constraints: {},
+    preparedRiskReferences: null,
     createdAt: 100,
   };
 
@@ -92,6 +93,7 @@ function createSession(params: {
     planId: plan.planId,
     accountId: plan.accountId,
     executionCapability,
+    preparedRiskReferences: null,
     preview: {
       planId: plan.planId,
       headline: {

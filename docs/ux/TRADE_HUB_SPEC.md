@@ -62,6 +62,11 @@ The confirmation-session contract shape is:
     planId: string | null,
     accountId: string | null,
     executionCapability: ExecutionCapabilityResolution | null,
+    preparedRiskReferences: {
+      entryPrice: number | null,
+      stopPrice: number | null,
+      targetPrice: number | null
+    } | null,
     preview: TradePlanPreview | null,
     shell: TradePlanConfirmationShell | null,
     flow: ConfirmationFlow | null
@@ -76,7 +81,7 @@ The confirmation-session contract shape is:
 }
 ```
 
-The confirmation session is an in-memory service seam, not persistence and not a global store. It owns one selected plan plus its prepared preview, shell, flow, and explicit session actions so `app/` can consume a single prepared contract.
+The confirmation session is an in-memory service seam, not persistence and not a global store. It owns one selected plan plus its optional prepared risk references, prepared preview, shell, flow, and explicit session actions so `app/` can consume a single prepared contract.
 
 Trade Hub risk-tool consumers also consume a prepared `RiskToolVM` from `services/risk/`.
 
@@ -114,6 +119,8 @@ The risk-tool contract shape is:
 ```
 
 The risk-tool seam is support-only. It consumes prepared confirmation-session context, optional prepared quote context, and explicit user inputs and returns a calm sizing summary without constructing orders, implying execution readiness, or leaking provider/runtime detail.
+Prepared plan references may supply entry, stop, or target values when the selected confirmation session honestly carries them.
+Explicit user values still win, prepared plan references outrank prepared quote help for the same field, and quote help still does not invent exits.
 
 `ExecutionCapabilityResolution` is:
 
@@ -440,6 +447,7 @@ The screen may format labels for readability, but it must not reprioritise plans
 The screen may format preview labels for readability, but it must not construct rationale, readiness, or constraints on its own.
 The screen may collect explicit risk-tool inputs and render prepared risk-tool values plus calm source labels, but it must not calculate stop distance, position size, reward/risk, or local reference precedence on its own.
 Prepared risk references should read like optional support context, not as auto-filled execution intent, and explicit user values remain authoritative when entered.
+Unavailable references should stay visually quiet; "Not set" is enough when the prepared plan has nothing honest to contribute.
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.
 The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.
@@ -505,10 +513,10 @@ P5-8 does not add:
 - `TradeHubSurfaceModel` remains the list/card contract for primary and alternative plans.
 - `TradePlanPreview` expands one selected `ProtectionPlan` into confirmation-safe detail for the Trade Hub detail layer.
 - `RiskToolVM` expands one selected Trade Hub context plus explicit user inputs and optional prepared references into a calm, non-dispatching sizing summary.
+- `ConfirmationSession` owns one selected plan plus optional prepared plan risk references, prepared preview, shell, flow, and action closures for the Trade Hub confirmation seam.
 - `TradePlanConfirmationShell` combines a selected `ProtectionPlan` with deterministic account capability context so the app can show a confirmation-safe path without containing capability logic.
 - `ExecutionCapabilityResolution` is the canonical capability seam that resolves internal execution path and confirmation-facing path once for downstream consumers.
 - `ConfirmationFlow` turns the selected `TradePlanConfirmationShell` into a step-based, user-driven confirmation contract with explicit acknowledgement state.
-- `ConfirmationSession` owns one selected plan plus its prepared preview, shell, flow, and action closures for the Trade Hub confirmation seam.
 - `ExecutionPreviewVM` consumes the selected confirmation session plus canonical execution capability and produces adapter capability plus non-executing payload placeholders for future adapter work.
 - `ExecutionReadiness` consumes the selected confirmation session plus prepared execution preview and uses canonical capability to produce explicit eligibility, blockers, warnings, and summary state without dispatch.
 - `SubmissionIntentResult` consumes the selected confirmation session, prepared execution preview, and prepared execution readiness to produce an explicit blocked-or-ready placeholder submission contract without dispatch or path re-derivation.

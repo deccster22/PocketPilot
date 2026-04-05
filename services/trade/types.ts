@@ -6,6 +6,12 @@ export type ProtectionPlanRiskCertainty = 'HIGH' | 'MEDIUM' | 'LOW';
 
 export type ProtectionPlanRiskAlignment = 'ALIGNED' | 'NEUTRAL' | 'MISALIGNED';
 
+export type PreparedTradePlanRiskReferences = {
+  entryPrice: number | null;
+  stopPrice: number | null;
+  targetPrice: number | null;
+};
+
 export type ProtectionPlan = {
   planId: string;
   accountId: string;
@@ -25,6 +31,7 @@ export type ProtectionPlan = {
     maxPositionSize?: number;
     cooldownActive?: boolean;
   };
+  preparedRiskReferences: PreparedTradePlanRiskReferences | null;
   createdAt: number;
 };
 
@@ -169,6 +176,7 @@ export type ConfirmationSession = {
   planId: string | null;
   accountId: string | null;
   executionCapability: ExecutionCapabilityResolution | null;
+  preparedRiskReferences: PreparedTradePlanRiskReferences | null;
   preview: TradePlanPreview | null;
   shell: TradePlanConfirmationShell | null;
   flow: ConfirmationFlow | null;

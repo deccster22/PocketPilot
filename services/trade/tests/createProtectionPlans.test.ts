@@ -71,6 +71,7 @@ describe('createProtectionPlans', () => {
         constraints: {
           maxPositionSize: 0.05,
         },
+        preparedRiskReferences: null,
         createdAt: 110,
       },
       {
@@ -93,6 +94,7 @@ describe('createProtectionPlans', () => {
         constraints: {
           maxPositionSize: 0.1,
         },
+        preparedRiskReferences: null,
         createdAt: 100,
       },
     ]);

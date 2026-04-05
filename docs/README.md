@@ -415,6 +415,7 @@ PocketPilot is easiest to read at three levels.
 - `P5` Trade Hub and ProtectionPlan
 - `P5-R1` Risk tool / position sizing foundation
 - `P5-R2` Quote-assisted risk references
+- `P5-R3` Prepared plan stop/target references
 - `P6` Alerts, message policy, and reorientation briefing seams
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing

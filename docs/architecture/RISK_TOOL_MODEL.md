@@ -1,17 +1,18 @@
-# Risk Tool Model (P5-R2)
+# Risk Tool Model (P5-R3)
 
 ## Purpose
 
 `RiskToolVM` is the canonical risk-tool seam for PocketPilot's Trade Hub family.
 
 P5-R1 established the first deterministic sizing lane.
-P5-R2 deepens that same lane by allowing service-owned prepared references to assist entry, stop, and target framing when they are honestly available.
+P5-R2 added source-tagged prepared references plus quote-assisted entry help.
+P5-R3 keeps that same contract small and adds one honest service-owned prepared plan path through the selected Trade Hub session.
 
 It gives the user a calm, deterministic sizing summary from:
 
 - one prepared action context when available
 - explicit user-supplied entry, stop, target, and risk inputs
-- optional prepared quote and plan references selected in services
+- optional prepared quote and prepared plan references selected in services
 - service-owned calculations only
 
 It does not create an order ticket, build a broker payload, or imply execution readiness.
@@ -66,7 +67,7 @@ type RiskToolVM = {
 };
 ```
 
-The contract stays intentionally small:
+The source-tagged risk contract stays intentionally small:
 
 - no broker-specific fields
 - no execution-path fields
@@ -74,15 +75,43 @@ The contract stays intentionally small:
 - no raw provider, signal, or runtime metadata
 - no motivational scoring or judgmental copy
 
+P5-R3 does not widen the risk contract with broker payload or settings fields.
+Instead, it relies on one sibling trade-context handoff:
+
+```ts
+type PreparedTradePlanRiskReferences = {
+  entryPrice: number | null;
+  stopPrice: number | null;
+  targetPrice: number | null;
+};
+
+type ConfirmationSession = {
+  planId: string | null;
+  accountId: string | null;
+  executionCapability: ExecutionCapabilityResolution | null;
+  preparedRiskReferences: PreparedTradePlanRiskReferences | null;
+  preview: TradePlanPreview | null;
+  shell: TradePlanConfirmationShell | null;
+  flow: ConfirmationFlow | null;
+};
+```
+
+That handoff stays explicit:
+
+- the selected plan may carry honest prepared entry, stop, and target references
+- absent or invalid values stay `null`
+- the risk seam still decides final precedence once, in services
+
 ## Reference Selection Rules
 
-P5-R2 adds one canonical selector in `services/risk/selectRiskReferences.ts`.
+P5-R2 introduced and P5-R3 continues to rely on one canonical selector in `services/risk/selectRiskReferences.ts`.
 
 That selector keeps the reference rules explicit:
 
 - explicit user values always win
 - prepared references are only used when `allowPreparedReferences !== false`
 - prepared plan references outrank prepared quote references when both exist for the same field
+- prepared plan references now arrive through `ConfirmationSession.preparedRiskReferences`
 - prepared quote assistance is currently limited to the current price as an entry reference
 - stop and target references are only taken from prepared plan context when that context honestly provides them
 - unavailable values stay `UNAVAILABLE`; the seam does not invent stop or target numbers
@@ -97,7 +126,7 @@ The user should be able to see whether a value came from:
 
 ## Calculation Rules
 
-P5-R2 keeps formulas explainable:
+P5-R3 keeps formulas explainable:
 
 - `stopDistance = abs(entryPrice - stopPrice)` when both prices are valid and distinct
 - `riskAmount = explicit riskAmount` when supplied
@@ -107,7 +136,7 @@ P5-R2 keeps formulas explainable:
 
 If a required value is missing or invalid, the tool returns honest nulls.
 Prepared references do not change the math.
-They only change which service-owned reference values are available for the same deterministic formulas.
+They only change which honest service-owned reference values are available for the same deterministic formulas.
 
 ## State Rules
 
@@ -133,7 +162,7 @@ The risk tool is a sibling seam inside the existing Trade Hub family:
 That placement matters:
 
 - `ProtectionPlan` remains the canonical action-framing object
-- `ConfirmationSession` remains the selected-plan ownership seam
+- `ConfirmationSession` remains the selected-plan ownership seam and now carries optional prepared plan risk references
 - `RiskToolVM` complements those seams with disciplined sizing support
 - execution-preview and readiness seams remain separate and authoritative for execution-bound language
 
@@ -158,7 +187,7 @@ That placement matters:
 
 ## Intentional Exclusions
 
-P5-R2 does not add:
+P5-R3 does not add:
 
 - broker APIs
 - order dispatch
@@ -169,4 +198,4 @@ P5-R2 does not add:
 - hidden defaults or automation
 - stop or target invention from quote data alone
 
-This phase is the second rung of the risk-tool lane, not the full ladder.
+This phase is the third rung of the risk-tool lane, not the full ladder.

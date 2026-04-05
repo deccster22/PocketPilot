@@ -13,6 +13,7 @@ import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradeP
 import type {
   ConfirmationSession,
   ConfirmationSessionActions,
+  PreparedTradePlanRiskReferences,
   ProtectionPlan,
 } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -148,6 +149,32 @@ function resolveSessionPlan(params: {
   });
 }
 
+function normalisePositiveNumber(value: number | null | undefined): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+    return null;
+  }
+
+  return value;
+}
+
+function resolvePreparedRiskReferences(
+  plan: ProtectionPlan,
+): PreparedTradePlanRiskReferences | null {
+  const entryPrice = normalisePositiveNumber(plan.preparedRiskReferences?.entryPrice);
+  const stopPrice = normalisePositiveNumber(plan.preparedRiskReferences?.stopPrice);
+  const targetPrice = normalisePositiveNumber(plan.preparedRiskReferences?.targetPrice);
+
+  if (entryPrice === null && stopPrice === null && targetPrice === null) {
+    return null;
+  }
+
+  return {
+    entryPrice,
+    stopPrice,
+    targetPrice,
+  };
+}
+
 async function buildConfirmationSession(params: {
   plan: ProtectionPlan | null;
   capabilityCache: Map<string, Awaited<ReturnType<typeof getAccountCapabilities>>>;
@@ -157,6 +184,7 @@ async function buildConfirmationSession(params: {
       planId: null,
       accountId: null,
       executionCapability: null,
+      preparedRiskReferences: null,
       preview: null,
       shell: null,
       flow: null,
@@ -180,6 +208,7 @@ async function buildConfirmationSession(params: {
     planId: params.plan.planId,
     accountId: params.plan.accountId,
     executionCapability,
+    preparedRiskReferences: resolvePreparedRiskReferences(params.plan),
     preview,
     shell,
     flow: createConfirmationFlow({ shell }),

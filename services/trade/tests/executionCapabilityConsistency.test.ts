@@ -33,6 +33,7 @@ function createPlan(): ProtectionPlan {
       alignment: 'NEUTRAL',
     },
     constraints: {},
+    preparedRiskReferences: null,
     createdAt: 100,
   };
 }
@@ -47,6 +48,7 @@ function createSession(): ConfirmationSession {
     planId: 'plan-eth',
     accountId: 'acct-basic',
     executionCapability: guidedSequenceCapability,
+    preparedRiskReferences: null,
     preview: {
       planId: 'plan-eth',
       headline: {

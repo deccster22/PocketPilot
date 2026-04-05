@@ -36,7 +36,9 @@ function formatRewardRisk(value: number | null): string {
   return value === null ? 'Not available' : `${formatNumber(value)} to 1`;
 }
 
-function formatReferenceSource(source: RiskToolVM['summary']['entryReference']['source']): string {
+function formatReferenceSource(
+  source: RiskToolVM['summary']['entryReference']['source'],
+): string | undefined {
   switch (source) {
     case 'USER_INPUT':
       return 'Source: your input';
@@ -45,7 +47,7 @@ function formatReferenceSource(source: RiskToolVM['summary']['entryReference']['
     case 'PREPARED_PLAN':
       return 'Source: prepared plan';
     default:
-      return 'Source: unavailable';
+      return undefined;
   }
 }
 
