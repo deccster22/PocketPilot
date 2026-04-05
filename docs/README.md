@@ -6,7 +6,7 @@ Last Updated: 2026-04-05
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-05  
+**Last updated:** 2026-04-05
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -19,6 +19,7 @@ This README replaces the older five-bucket index with the current multi-tier doc
 ## Read This First
 
 ### If you are new to PocketPilot
+
 Start here, in this order:
 
 1. `founder/POCKETPILOT_DOCTRINE.md`
@@ -31,6 +32,7 @@ Start here, in this order:
 8. `founder/POCKETPILOT_DOC_MAP.md`
 
 ### If you are about to build or change code
+
 Read these before making architectural or behavioural changes:
 
 1. `governance/CANON.md`
@@ -43,6 +45,7 @@ Read these before making architectural or behavioural changes:
 8. Most recent phase report / forensic handover if available
 
 ### If you are reconciling drift or resuming after a gap
+
 Start with:
 
 1. `governance/CANON.md`
@@ -78,9 +81,11 @@ If a proposed change weakens any of the above, stop and resolve it before procee
 PocketPilot docs now map to **ten tiers**. This is the current mental model for the repo.
 
 ### 1. Founder
+
 Identity, philosophy, and top-level orientation.
 
 Examples:
+
 - `founder/POCKETPILOT_DOCTRINE.md`
 - `founder/PRODUCT_COMPASS.md`
 - `founder/POCKETPILOT_PRODUCT_IDENTITY.md`
@@ -90,9 +95,11 @@ Examples:
 Question answered: **What is PocketPilot?**
 
 ### 2. Architecture
+
 System shape, models, seams, contracts, and extension rules.
 
 Examples:
+
 - `architecture/ARCHITECTURE_MAP.md`
 - `architecture/FOLDER_SCAFFOLDING.md`
 - `architecture/CONFIG_MODEL.md`
@@ -116,9 +123,11 @@ Examples:
 Question answered: **How should PocketPilot be structured so future work remains coherent?**
 
 ### 3. Governance
+
 Non-negotiable truth, safety rails, delivery discipline, and release integrity.
 
 Examples:
+
 - `governance/CANON.md`
 - `governance/ENGINEERING_CONTRACT.md`
 - `governance/GUARDRAILS.md`
@@ -138,9 +147,11 @@ Examples:
 Question answered: **What must always be true about PocketPilot?**
 
 ### 4. Product
+
 User-facing behaviour, feature philosophy, explanation posture, and scope.
 
 Examples:
+
 - `product/FOUNDER_ONE_PAGER.md`
 - `product/PRODUCT_SPEC.md`
 - `product/SNAPSHOT_VISION.md`
@@ -157,9 +168,11 @@ Examples:
 Question answered: **How should PocketPilot behave as a product?**
 
 ### 5. Behaviours
+
 Cross-feature behavioural rules and messaging discipline.
 
 Examples:
+
 - `behaviours/SIGNAL_EXPOSURE.md`
 - `behaviours/CONFIDENCE_LANGUAGE.md`
 - `behaviours/NOTIFICATION_SYSTEM.md`
@@ -168,9 +181,11 @@ Examples:
 Question answered: **How do features behave safely and consistently in the real product?**
 
 ### 6. Strategies
+
 Per-strategy definitions, signal priorities, and alignment logic.
 
 Examples:
+
 - `strategies/DIP_BUYING.md`
 - `strategies/RANGE_TRADER.md`
 - `strategies/REVERSION_BOUNCE.md`
@@ -185,9 +200,11 @@ Examples:
 Question answered: **How do PocketPilot strategies present and interpret market conditions?**
 
 ### 7. Roadmap
+
 Phase planning, runbook discipline, execution sequencing, and reporting.
 
 Examples:
+
 - `roadmap/DEV_ROUTINE.md`
 - `roadmap/RUNBOOK_EXECUTION.md`
 - `roadmap/PHASE_REPORTS.md`
@@ -198,9 +215,11 @@ Examples:
 Question answered: **What is the delivery plan, and where are we now?**
 
 ### 8. UX
+
 Surface-specific UX intent and interaction philosophy.
 
 Examples:
+
 - `ux/ORIENTATION_LAYER.md`
 - `ux/SNAPSHOT_SPEC.md`
 - `ux/DASHBOARD_SPEC.md`
@@ -210,9 +229,11 @@ Examples:
 Question answered: **What should the product feel like to use, and why?**
 
 ### 9. Knowledge
+
 Learning library structure, content types, and media support.
 
 Examples:
+
 - `ux/KNOWLEDGE_LIBRARY_SPEC.md`
 - `product/KNOWLEDGE_LAYER.md`
 - `architecture/KNOWLEDGE_MODEL.md`
@@ -221,9 +242,11 @@ Examples:
 Question answered: **What does the learning layer look like?**
 
 ### 10. Research
+
 Exploration, synthesis, historical context, and upstream thinking.
 
 Examples:
+
 - `research/EARLY_RESEARCH.md`
 - `research/REVIEW_MERGES.md`
 - `research/FEATURE_EXPLORATION.md`
@@ -358,6 +381,7 @@ Runtime data-plane rule: Provider Router is the role-aware routing seam, QuoteBr
 Prepared runtime diagnostics rule: `services/debug/` owns the `RuntimeDiagnosticsVM` seam for provider health, quote policy, and per-symbol degradation inspection. `app/` may render that prepared contract only on an existing debug path.
 
 For runtime/provider work, treat these as the authoritative PX-API1 doctrine set:
+
 - `architecture/PROVIDER_ROUTER_MODEL.md`
 - `architecture/QUOTE_BROKER.md`
 - `architecture/RUNTIME_DIAGNOSTICS_MODEL.md`
@@ -375,12 +399,14 @@ For runtime/provider work, treat these as the authoritative PX-API1 doctrine set
 PocketPilot is easiest to read at three levels.
 
 ### Macro phases
+
 - **Macro Phase 1 - Foundation**
 - **Macro Phase 2 - Context and Reflection**
 - **Macro Phase 3 - Intelligence**
 - **Macro Phase 4 - Copilot and Hardening**
 
 ### Canonical product workstream families
+
 - `P0` Vision, doctrine, architecture, repo discipline foundation
 - `P1` Strategy engine foundations
 - `P2` Snapshot / provider / governance / debug observatory foundation
@@ -388,6 +414,7 @@ PocketPilot is easiest to read at three levels.
 - `P4` Snapshot + Dashboard UX shaping
 - `P5` Trade Hub and ProtectionPlan
 - `P5-R1` Risk tool / position sizing foundation
+- `P5-R2` Quote-assisted risk references
 - `P6` Alerts, message policy, and reorientation briefing seams
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
@@ -408,9 +435,11 @@ PocketPilot is easiest to read at three levels.
 - `P11` Launch prep
 
 ### Cross-cutting / support phases
+
 Use `PX-*` for cross-cutting, platform, runtime, hardening, cleanup, doctrine, audit, or support work that may happen before, after, or alongside numbered product families.
 
 Current examples:
+
 - `PX-API1` through `PX-API5` for runtime doctrine and hardening
 - `PX-PM1` for this phase-map audit and roadmap alignment pass
 - `PX-E1` and `PX-E2` are explanation groundwork, not proof that the richer `P9` family is complete.
@@ -452,17 +481,21 @@ When in doubt, resolve naming at the governance layer, then let downstream docs 
 ## Incoming and Source Handling
 
 ### `incoming/`
+
 Use for fresh imports from Google Docs, exported PDFs, or working-source artifacts that have not yet been triaged.
 
 Files in `incoming/` should quickly become one of three things:
+
 - converted into canonical Markdown
 - moved into `source/` for provenance
 - removed once no longer needed
 
 ### `source/`
+
 Use for milestone snapshots and provenance artifacts only.
 
 Keep:
+
 - milestone governance versions
 - high-value architecture snapshots
 - founder-level source artifacts
@@ -491,15 +524,19 @@ If any of those are fuzzy, stop and reconcile before pushing.
 ## Practical Reading Paths
 
 ### Product / founder lens
+
 `DOCTRINE` -> `COMPASS` -> `FOUNDER_ONE_PAGER` -> `PRODUCT_SPEC`
 
 ### Governance / engineering lens
+
 `CANON` -> `GUARDRAILS` -> `CONTEXT_SUITE` -> `ENGINEERING_CONTRACT`
 
 ### Architecture / build lens
+
 `ARCHITECTURE_OVERVIEW` -> `ARCHITECTURE_MAP` -> relevant architecture seam doc(s) -> phase/runbook doc
 
 ### Recovery / handover lens
+
 `CANON` -> `GUARDRAILS` -> `PHASE_MAP` -> `PRODUCT_SPEC` -> latest forensic handover -> phase reports
 
 ---
@@ -529,6 +566,7 @@ The repo exists to keep PocketPilot coherent as it moves from strategy-first int
 ## Conversion Notes
 
 Replaced prior section headings from the older index:
+
 - `Documentation Principles`
 - `Folder Structure`
 - `Governance`
@@ -537,5 +575,3 @@ Replaced prior section headings from the older index:
 - `Phases`
 - `Source Artifacts`
 - `Incoming`
-
-

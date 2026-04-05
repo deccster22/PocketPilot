@@ -138,9 +138,8 @@ export function TradeHubScreen() {
   const [executionPreviewVm, setExecutionPreviewVm] = useState<ExecutionPreviewVM | null>(null);
   const [executionReadinessVm, setExecutionReadinessVm] = useState<ExecutionReadiness | null>(null);
   const [submissionIntentVm, setSubmissionIntentVm] = useState<SubmissionIntentResult | null>(null);
-  const [executionAdapterVm, setExecutionAdapterVm] = useState<ExecutionAdapterAttemptResult | null>(
-    null,
-  );
+  const [executionAdapterVm, setExecutionAdapterVm] =
+    useState<ExecutionAdapterAttemptResult | null>(null);
   const [riskToolVm, setRiskToolVm] = useState<RiskToolVM | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
   const [riskToolInput, setRiskToolInput] = useState<RiskToolInputFormState>({
@@ -206,6 +205,7 @@ export function TradeHubScreen() {
   const parsedRiskToolInput = useMemo(
     () => ({
       accountSize: parseNumericInput(riskToolInput.accountSize),
+      allowPreparedReferences: true,
       riskAmount: parseNumericInput(riskToolInput.riskAmount),
       riskPercent: parseNumericInput(riskToolInput.riskPercent),
       entryPrice: parseNumericInput(riskToolInput.entryPrice),
@@ -217,8 +217,7 @@ export function TradeHubScreen() {
   );
   const riskToolView = useMemo(() => createRiskToolScreenViewData(riskToolVm), [riskToolVm]);
   const executionAdapterView = useMemo(
-    () =>
-      executionAdapterVm ? createTradeExecutionAdapterViewData(executionAdapterVm) : null,
+    () => (executionAdapterVm ? createTradeExecutionAdapterViewData(executionAdapterVm) : null),
     [executionAdapterVm],
   );
 
@@ -278,6 +277,7 @@ export function TradeHubScreen() {
 
     fetchRiskToolVM({
       confirmationSession: confirmationSessionVm?.session ?? null,
+      preparedQuoteScan: confirmationSessionVm?.scan ?? baselineScan,
       input: parsedRiskToolInput,
     })
       .then((result) => {
@@ -443,10 +443,7 @@ export function TradeHubScreen() {
       });
   }
 
-  function handleRiskToolInputChange(
-    field: keyof RiskToolInputFormState,
-    value: string,
-  ) {
+  function handleRiskToolInputChange(field: keyof RiskToolInputFormState, value: string) {
     setRiskToolInput((currentInput) => ({
       ...currentInput,
       [field]: value,
@@ -531,7 +528,12 @@ export function TradeHubScreen() {
               'Risk framing stays support-only. It does not create an order or imply execution readiness.'}
           </Text>
           <Text style={styles.supportText}>
-            Use the selected plan as context, then add only the entry, stop, and risk inputs you want to frame.
+            Use the selected plan as context, then add only the entry, stop, and risk inputs you
+            want to frame.
+          </Text>
+          <Text style={styles.supportText}>
+            Prepared references stay optional starting points. Your own values remain authoritative
+            whenever you enter them.
           </Text>
           <View style={styles.inputGrid}>
             <RiskToolInputField
@@ -581,9 +583,14 @@ export function TradeHubScreen() {
                 <Text style={styles.cardMeta}>{riskToolView.generatedAtText}</Text>
               ) : null}
               {riskToolView.detailRows.map((row) => (
-                <Text key={row.label} style={styles.cardMeta}>
-                  {row.label}: {row.value}
-                </Text>
+                <View key={row.label} style={styles.detailRow}>
+                  <Text style={styles.cardMeta}>
+                    {row.label}: {row.value}
+                  </Text>
+                  {row.supportingText ? (
+                    <Text style={styles.cardId}>{row.supportingText}</Text>
+                  ) : null}
+                </View>
               ))}
               <Text style={styles.cardMeta}>
                 Notes: {riskToolView.notes.length ? riskToolView.notes.join(' | ') : 'None'}
@@ -786,7 +793,9 @@ export function TradeHubScreen() {
               </Text>
             </View>
           ) : (
-            <Text style={styles.emptyState}>No execution adapter response is prepared right now.</Text>
+            <Text style={styles.emptyState}>
+              No execution adapter response is prepared right now.
+            </Text>
           )}
         </View>
       </ScrollView>
@@ -878,6 +887,9 @@ const styles = StyleSheet.create({
   cardId: {
     fontSize: 11,
     color: '#6b7280',
+  },
+  detailRow: {
+    gap: 2,
   },
   stepRow: {
     gap: 6,

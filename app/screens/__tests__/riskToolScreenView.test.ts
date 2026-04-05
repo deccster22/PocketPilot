@@ -10,6 +10,18 @@ describe('createRiskToolScreenViewData', () => {
         entryPrice: 100,
         stopPrice: 95,
         targetPrice: 108,
+        entryReference: {
+          value: 100,
+          source: 'PREPARED_QUOTE',
+        },
+        stopReference: {
+          value: 95,
+          source: 'USER_INPUT',
+        },
+        targetReference: {
+          value: 108,
+          source: 'PREPARED_PLAN',
+        },
         stopDistance: 5,
         riskAmount: 12.5,
         riskPercent: 0.125,
@@ -21,7 +33,8 @@ describe('createRiskToolScreenViewData', () => {
 
     expect(view).toEqual({
       stateText: 'Risk framing ready',
-      statusText: 'Position size is based on the supplied entry, stop, and risk basis.',
+      statusText:
+        'Position size is based on the current entry, stop, and risk basis in this summary.',
       boundaryText:
         'Risk framing stays support-only. It does not create an order or imply execution readiness.',
       symbolText: 'Reference symbol: BTC',
@@ -30,14 +43,17 @@ describe('createRiskToolScreenViewData', () => {
         {
           label: 'Entry reference',
           value: '100',
+          supportingText: 'Source: current reference',
         },
         {
           label: 'Stop reference',
           value: '95',
+          supportingText: 'Source: your input',
         },
         {
           label: 'Target reference',
           value: '108',
+          supportingText: 'Source: prepared plan',
         },
         {
           label: 'Stop distance',

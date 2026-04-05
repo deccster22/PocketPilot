@@ -1,4 +1,10 @@
-import type { RiskToolInput, RiskToolState, RiskToolVM } from '@/services/risk/types';
+import type {
+  RiskReferenceValue,
+  RiskToolInput,
+  RiskToolReferences,
+  RiskToolState,
+  RiskToolVM,
+} from '@/services/risk/types';
 
 type RiskToolContext = {
   symbol: string | null;
@@ -7,6 +13,7 @@ type RiskToolContext = {
 
 export type CreateRiskToolVMParams = {
   input: RiskToolInput;
+  references?: RiskToolReferences | null;
   context?: RiskToolContext | null;
   generatedAt?: string | null;
   generatedAtMs?: number | null;
@@ -35,6 +42,34 @@ function normaliseSymbol(value: string | null | undefined): string | null {
 
   const trimmed = value.trim();
   return trimmed.length ? trimmed : null;
+}
+
+function createUnavailableReference(): RiskReferenceValue {
+  return {
+    value: null,
+    source: 'UNAVAILABLE',
+  };
+}
+
+function normaliseReference(reference: RiskReferenceValue | null | undefined): RiskReferenceValue {
+  const value = normalisePositiveNumber(reference?.value);
+
+  if (value === null) {
+    return createUnavailableReference();
+  }
+
+  if (!reference || reference.source === 'UNAVAILABLE') {
+    return createUnavailableReference();
+  }
+
+  return {
+    value,
+    source: reference.source,
+  };
+}
+
+function hasAvailableReference(reference: RiskReferenceValue): boolean {
+  return reference.value !== null && reference.source !== 'UNAVAILABLE';
 }
 
 function hasExplicitInput(input: RiskToolInput): boolean {
@@ -141,11 +176,7 @@ function resolveState(params: {
     return 'UNAVAILABLE';
   }
 
-  if (
-    params.stopDistance !== null &&
-    params.riskAmount !== null &&
-    params.positionSize !== null
-  ) {
+  if (params.stopDistance !== null && params.riskAmount !== null && params.positionSize !== null) {
     return 'READY';
   }
 
@@ -190,9 +221,12 @@ export function createRiskToolVM(params: CreateRiskToolVMParams): RiskToolVM {
   const accountSize = normalisePositiveNumber(params.input.accountSize);
   const explicitRiskAmount = normalisePositiveNumber(params.input.riskAmount);
   const riskPercent = normalisePositiveNumber(params.input.riskPercent);
-  const entryPrice = normalisePositiveNumber(params.input.entryPrice);
-  const stopPrice = normalisePositiveNumber(params.input.stopPrice);
-  const targetPrice = normalisePositiveNumber(params.input.targetPrice);
+  const entryReference = normaliseReference(params.references?.entryReference);
+  const stopReference = normaliseReference(params.references?.stopReference);
+  const targetReference = normaliseReference(params.references?.targetReference);
+  const entryPrice = entryReference.value;
+  const stopPrice = stopReference.value;
+  const targetPrice = targetReference.value;
   const symbol = normaliseSymbol(params.input.symbol) ?? normaliseSymbol(params.context?.symbol);
   const riskAmount = resolveRiskAmount({
     explicitRiskAmount,
@@ -214,8 +248,16 @@ export function createRiskToolVM(params: CreateRiskToolVMParams): RiskToolVM {
     targetPrice,
     stopDistance,
   });
+  const hasReferenceContext =
+    hasAvailableReference(entryReference) ||
+    hasAvailableReference(stopReference) ||
+    hasAvailableReference(targetReference);
   const state = resolveState({
-    hasContext: params.context?.hasPreparedContext === true || symbol !== null || hasExplicitInput(params.input),
+    hasContext:
+      params.context?.hasPreparedContext === true ||
+      symbol !== null ||
+      hasExplicitInput(params.input) ||
+      hasReferenceContext,
     stopDistance,
     riskAmount,
     positionSize,
@@ -229,6 +271,9 @@ export function createRiskToolVM(params: CreateRiskToolVMParams): RiskToolVM {
       entryPrice,
       stopPrice,
       targetPrice,
+      entryReference,
+      stopReference,
+      targetReference,
       stopDistance,
       riskAmount,
       riskPercent: resolvedRiskPercent,
