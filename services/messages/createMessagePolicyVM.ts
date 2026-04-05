@@ -1,19 +1,19 @@
 import type { EventType, MarketEvent } from '@/core/types/marketEvent';
 import type {
   MessagePolicyAvailability,
-  MessagePolicyGuardedStopInput,
-  MessagePolicyReferralInput,
+  MessagePolicyDashboardContext,
   MessagePriority,
   MessageSurfaceEligibility,
   MessagePolicySnapshotContext,
+  MessagePolicyTradeHubContext,
   PreparedMessage,
 } from '@/services/messages/types';
 
 type CreateMessagePolicyVMParams = {
   surface: MessageSurfaceEligibility;
   snapshot?: MessagePolicySnapshotContext | null;
-  referral?: MessagePolicyReferralInput | null;
-  guardedStop?: MessagePolicyGuardedStopInput | null;
+  dashboard?: MessagePolicyDashboardContext | null;
+  tradeHub?: MessagePolicyTradeHubContext | null;
 };
 
 const SURFACELESS_MESSAGE: MessageSurfaceEligibility = 'NONE';
@@ -140,45 +140,60 @@ function createAlertMessage(
   });
 }
 
-function createReferralMessage(referral?: MessagePolicyReferralInput | null): PreparedMessage | null {
-  if (!referral) {
+function createReferralMessage(
+  dashboard?: MessagePolicyDashboardContext | null,
+): PreparedMessage | null {
+  if (!dashboard) {
+    return null;
+  }
+
+  if (dashboard.hasPrimeItems || !dashboard.hasSupportingItems) {
     return null;
   }
 
   return createPreparedMessage({
     kind: 'REFERRAL',
-    title: referral.title,
-    summary: referral.summary,
-    priority: referral.priority ?? 'MEDIUM',
-    surface: referral.surface ?? 'DASHBOARD',
+    title: 'Snapshot is the steadier fit',
+    summary:
+      'Dashboard has supporting context but not a strong top-focus item right now. Snapshot is the better place for a calm first read.',
+    priority: 'LOW',
+    surface: 'DASHBOARD',
   });
 }
 
 function createGuardedStopMessage(
-  guardedStop?: MessagePolicyGuardedStopInput | null,
+  tradeHub?: MessagePolicyTradeHubContext | null,
 ): PreparedMessage | null {
-  if (!guardedStop) {
+  if (!tradeHub) {
+    return null;
+  }
+
+  if (!tradeHub.hasSelectedPlan || tradeHub.executionPathSupported !== false) {
     return null;
   }
 
   return createPreparedMessage({
     kind: 'GUARDED_STOP',
-    title: guardedStop.title,
-    summary: guardedStop.summary,
-    priority: guardedStop.priority ?? 'HIGH',
-    surface: guardedStop.surface ?? 'TRADE_HUB',
+    title: 'Protected path unavailable',
+    summary: compactCopy([
+      tradeHub.executionPathUnavailableReason ??
+        'A protected execution path is not available for this plan.',
+      'Trade Hub will keep the plan visible as a read-only framing note instead of carrying the action path further.',
+    ]),
+    priority: 'HIGH',
+    surface: 'TRADE_HUB',
   });
 }
 
 function createCandidates(params: CreateMessagePolicyVMParams): PreparedMessage[] {
   const candidates: PreparedMessage[] = [];
 
-  const guardedStop = createGuardedStopMessage(params.guardedStop);
+  const guardedStop = createGuardedStopMessage(params.tradeHub);
   if (guardedStop) {
     candidates.push(guardedStop);
   }
 
-  const referral = createReferralMessage(params.referral);
+  const referral = createReferralMessage(params.dashboard);
   if (referral) {
     candidates.push(referral);
   }
@@ -211,7 +226,7 @@ function createCandidates(params: CreateMessagePolicyVMParams): PreparedMessage[
 }
 
 function hasInterpretedContext(params: CreateMessagePolicyVMParams): boolean {
-  return Boolean(params.snapshot || params.referral || params.guardedStop);
+  return Boolean(params.snapshot || params.dashboard || params.tradeHub);
 }
 
 function filterCandidatesForSurface(

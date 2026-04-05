@@ -1,6 +1,10 @@
 import type { MarketEvent } from '@/core/types/marketEvent';
 import { createMessagePolicyVM } from '@/services/messages/createMessagePolicyVM';
-import type { MessagePolicySnapshotContext } from '@/services/messages/types';
+import type {
+  MessagePolicyDashboardContext,
+  MessagePolicySnapshotContext,
+  MessagePolicyTradeHubContext,
+} from '@/services/messages/types';
 
 function createMarketEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
   return {
@@ -39,6 +43,28 @@ function createSnapshotContext(
       dismissible: false,
     },
     latestRelevantEvent: null,
+    ...overrides,
+  };
+}
+
+function createDashboardContext(
+  overrides: Partial<MessagePolicyDashboardContext> = {},
+): MessagePolicyDashboardContext {
+  return {
+    hasPrimeItems: false,
+    hasSupportingItems: true,
+    ...overrides,
+  };
+}
+
+function createTradeHubContext(
+  overrides: Partial<MessagePolicyTradeHubContext> = {},
+): MessagePolicyTradeHubContext {
+  return {
+    hasSelectedPlan: true,
+    executionPathSupported: false,
+    executionPathUnavailableReason:
+      'Account capabilities do not support a protected execution path for this plan.',
     ...overrides,
   };
 }
@@ -140,20 +166,14 @@ describe('createMessagePolicyVM', () => {
     expect(JSON.stringify(result)).not.toMatch(/evt-price-move-2|dip_buying|dip_signal/);
   });
 
-  it('keeps referral and guarded stop as separate message families', () => {
+  it('keeps Dashboard referral and Trade Hub guarded stop as separate message families', () => {
     const referralResult = createMessagePolicyVM({
       surface: 'DASHBOARD',
-      referral: {
-        title: 'Better handled elsewhere',
-        summary: 'This topic is outside PocketPilot scope and should be handled through a trusted reference.',
-      },
+      dashboard: createDashboardContext(),
     });
     const guardedStopResult = createMessagePolicyVM({
       surface: 'TRADE_HUB',
-      guardedStop: {
-        title: 'Pause here',
-        summary: 'PocketPilot cannot continue this path safely with the current context.',
-      },
+      tradeHub: createTradeHubContext(),
     });
 
     expect(referralResult).toEqual({
@@ -161,10 +181,10 @@ describe('createMessagePolicyVM', () => {
       messages: [
         {
           kind: 'REFERRAL',
-          title: 'Better handled elsewhere',
+          title: 'Snapshot is the steadier fit',
           summary:
-            'This topic is outside PocketPilot scope and should be handled through a trusted reference.',
-          priority: 'MEDIUM',
+            'Dashboard has supporting context but not a strong top-focus item right now. Snapshot is the better place for a calm first read.',
+          priority: 'LOW',
           surface: 'DASHBOARD',
           dismissible: false,
         },
@@ -175,13 +195,59 @@ describe('createMessagePolicyVM', () => {
       messages: [
         {
           kind: 'GUARDED_STOP',
-          title: 'Pause here',
-          summary: 'PocketPilot cannot continue this path safely with the current context.',
+          title: 'Protected path unavailable',
+          summary:
+            'Account capabilities do not support a protected execution path for this plan. Trade Hub will keep the plan visible as a read-only framing note instead of carrying the action path further.',
           priority: 'HIGH',
           surface: 'TRADE_HUB',
           dismissible: false,
         },
       ],
+    });
+    expect(JSON.stringify({ referralResult, guardedStopResult })).not.toMatch(
+      /notification|badge|unread|urgent|toast|popup/,
+    );
+  });
+
+  it('keeps missing or invalid context distinct from a Dashboard referral note', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'DASHBOARD',
+        dashboard: createDashboardContext({
+          hasSupportingItems: false,
+        }),
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
+    });
+  });
+
+  it('does not turn normal confirmation-safe Trade Hub states into guarded stops', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'TRADE_HUB',
+        tradeHub: createTradeHubContext({
+          executionPathSupported: true,
+          executionPathUnavailableReason: null,
+        }),
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
+    });
+    expect(
+      createMessagePolicyVM({
+        surface: 'TRADE_HUB',
+        tradeHub: createTradeHubContext({
+          hasSelectedPlan: false,
+          executionPathSupported: null,
+          executionPathUnavailableReason: null,
+        }),
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
     });
   });
 
@@ -189,10 +255,7 @@ describe('createMessagePolicyVM', () => {
     expect(
       createMessagePolicyVM({
         surface: 'SNAPSHOT',
-        guardedStop: {
-          title: 'Pause here',
-          summary: 'PocketPilot cannot continue this path safely with the current context.',
-        },
+        dashboard: createDashboardContext(),
       }),
     ).toEqual({
       status: 'UNAVAILABLE',
@@ -200,7 +263,7 @@ describe('createMessagePolicyVM', () => {
     });
   });
 
-  it('returns NO_MESSAGE when interpreted context is present but not strong enough for a message', () => {
+  it('returns NO_MESSAGE when interpreted Snapshot context is present but not strong enough for a message', () => {
     expect(
       createMessagePolicyVM({
         surface: 'SNAPSHOT',
@@ -228,22 +291,8 @@ describe('createMessagePolicyVM', () => {
 
   it('is deterministic for identical inputs', () => {
     const input = {
-      surface: 'SNAPSHOT' as const,
-      snapshot: createSnapshotContext({
-        briefing: {
-          status: 'VISIBLE' as const,
-          kind: 'SINCE_LAST_CHECKED' as const,
-          title: 'Since last checked',
-          subtitle: 'A calm read on the most meaningful interpreted changes since your last visit.',
-          items: [
-            {
-              label: 'Current orientation',
-              detail: 'Snapshot reads down with strategy status at watchful.',
-            },
-          ],
-          dismissible: false,
-        },
-      }),
+      surface: 'DASHBOARD' as const,
+      dashboard: createDashboardContext(),
     };
 
     expect(createMessagePolicyVM(input)).toEqual(createMessagePolicyVM(input));

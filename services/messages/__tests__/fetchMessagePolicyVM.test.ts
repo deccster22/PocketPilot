@@ -1,8 +1,18 @@
+import {
+  fetchDashboardSurfaceVM,
+  type DashboardSurfaceVM,
+} from '@/services/dashboard/dashboardSurfaceService';
 import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import { fetchSnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
+import {
+  fetchConfirmationSessionVM,
+  type ConfirmationSessionVM,
+} from '@/services/trade/fetchConfirmationSessionVM';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
+jest.mock('@/services/dashboard/dashboardSurfaceService');
 jest.mock('@/services/snapshot/fetchSnapshotSurfaceVM');
+jest.mock('@/services/trade/fetchConfirmationSessionVM');
 
 function createSnapshotSurface(): SnapshotSurfaceVM {
   return {
@@ -126,8 +136,76 @@ function createSnapshotSurface(): SnapshotSurfaceVM {
   };
 }
 
+function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): DashboardSurfaceVM {
+  return {
+    model: {
+      primeZone: { items: [] },
+      secondaryZone: {
+        items: [
+          {
+            symbol: 'ETH',
+            accountId: 'acct-1',
+            strategyId: 'strategy-b',
+            eventType: 'ESTIMATED_PRICE',
+            alignmentState: 'NEEDS_REVIEW',
+            trendDirection: 'neutral',
+            certainty: 'estimated',
+            timestamp: 490,
+          },
+        ],
+      },
+      deepZone: { items: [] },
+      meta: {
+        profile: 'BEGINNER',
+        hasPrimeItems: false,
+        hasSecondaryItems: true,
+        hasDeepItems: false,
+      },
+    },
+    scan: {} as never,
+    explanation: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_EXPLANATION_TARGET',
+    },
+    ...overrides,
+  };
+}
+
+function createConfirmationSessionVm(
+  overrides: Partial<ConfirmationSessionVM['session']> = {},
+): ConfirmationSessionVM {
+  return {
+    session: {
+      planId: 'plan-1',
+      accountId: 'acct-live',
+      executionCapability: {
+        accountId: 'acct-live',
+        path: 'UNAVAILABLE',
+        confirmationPath: 'UNAVAILABLE',
+        supported: false,
+        unavailableReason:
+          'Account capabilities do not support a protected execution path for this plan.',
+      },
+      preparedRiskReferences: null,
+      preview: null,
+      shell: null,
+      flow: null,
+      ...overrides,
+    },
+    actions: {
+      acknowledgeStep: jest.fn(),
+      unacknowledgeStep: jest.fn(),
+      resetFlow: jest.fn(),
+      selectPlan: jest.fn(),
+    },
+    scan: {} as never,
+  };
+}
+
 describe('fetchMessagePolicyVM', () => {
+  const mockFetchDashboardSurfaceVM = jest.mocked(fetchDashboardSurfaceVM);
   const mockFetchSnapshotSurfaceVM = jest.mocked(fetchSnapshotSurfaceVM);
+  const mockFetchConfirmationSessionVM = jest.mocked(fetchConfirmationSessionVM);
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -204,30 +282,111 @@ describe('fetchMessagePolicyVM', () => {
     });
   });
 
-  it('returns surface filtering decisions through the canonical fetch seam', async () => {
-    const snapshotSurface = createSnapshotSurface();
+  it('uses a provided Dashboard surface for referral eligibility without fetching Snapshot logic', async () => {
+    const dashboardSurface = createDashboardSurface();
 
-    await expect(
-      fetchMessagePolicyVM({
-        surface: 'SNAPSHOT',
-        profile: 'ADVANCED',
-        snapshotSurface,
-        guardedStop: {
-          title: 'Pause here',
-          summary: 'PocketPilot cannot continue this path safely with the current context.',
-        },
-      }),
-    ).resolves.toEqual({
+    const result = await fetchMessagePolicyVM({
+      surface: 'DASHBOARD',
+      profile: 'BEGINNER',
+      dashboardSurface,
+    });
+
+    expect(mockFetchDashboardSurfaceVM).not.toHaveBeenCalled();
+    expect(mockFetchSnapshotSurfaceVM).not.toHaveBeenCalled();
+    expect(result).toEqual({
       status: 'AVAILABLE',
       messages: [
         {
-          kind: 'ALERT',
-          title: 'Meaningful change noticed',
+          kind: 'REFERRAL',
+          title: 'Snapshot is the steadier fit',
           summary:
-            'ETH is standing out in recent interpreted context. Review Snapshot before deciding whether it changes your plan.',
-          priority: 'HIGH',
-          surface: 'SNAPSHOT',
+            'Dashboard has supporting context but not a strong top-focus item right now. Snapshot is the better place for a calm first read.',
+          priority: 'LOW',
+          surface: 'DASHBOARD',
           dismissible: false,
+        },
+      ],
+    });
+  });
+
+  it('fetches the Dashboard surface through the canonical seam when one is not supplied', async () => {
+    const dashboardSurface = createDashboardSurface();
+    mockFetchDashboardSurfaceVM.mockResolvedValue(dashboardSurface);
+
+    const result = await fetchMessagePolicyVM({
+      surface: 'DASHBOARD',
+      profile: 'BEGINNER',
+      baselineScan: dashboardSurface.scan,
+    });
+
+    expect(mockFetchDashboardSurfaceVM).toHaveBeenCalledWith({
+      profile: 'BEGINNER',
+      baselineScan: dashboardSurface.scan,
+      nowProvider: undefined,
+    });
+    expect(result).toMatchObject({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'REFERRAL',
+          surface: 'DASHBOARD',
+        },
+      ],
+    });
+  });
+
+  it('uses a provided Trade Hub confirmation session for guarded-stop eligibility', async () => {
+    const confirmationSession = createConfirmationSessionVm().session;
+
+    const result = await fetchMessagePolicyVM({
+      surface: 'TRADE_HUB',
+      profile: 'ADVANCED',
+      confirmationSession,
+    });
+
+    expect(mockFetchConfirmationSessionVM).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'GUARDED_STOP',
+          title: 'Protected path unavailable',
+          summary:
+            'Account capabilities do not support a protected execution path for this plan. Trade Hub will keep the plan visible as a read-only framing note instead of carrying the action path further.',
+          priority: 'HIGH',
+          surface: 'TRADE_HUB',
+          dismissible: false,
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toMatch(/providerId|eventId|strategyId|unread|badge|urgent/);
+  });
+
+  it('fetches the Trade Hub confirmation session when one is not supplied', async () => {
+    const confirmationSessionVm = createConfirmationSessionVm();
+    mockFetchConfirmationSessionVM.mockResolvedValue(confirmationSessionVm);
+
+    const result = await fetchMessagePolicyVM({
+      surface: 'TRADE_HUB',
+      profile: 'ADVANCED',
+      baselineScan: confirmationSessionVm.scan,
+    });
+
+    expect(mockFetchConfirmationSessionVM).toHaveBeenCalledWith({
+      profile: 'ADVANCED',
+      baselineScan: confirmationSessionVm.scan,
+      nowProvider: undefined,
+      eventLedger: undefined,
+      eventLedgerQueries: undefined,
+      lastViewedTimestamp: undefined,
+      lastViewedState: undefined,
+    });
+    expect(result).toMatchObject({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'GUARDED_STOP',
+          surface: 'TRADE_HUB',
         },
       ],
     });

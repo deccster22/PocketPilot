@@ -1,4 +1,9 @@
 import type {
+  MessagePolicyAvailability,
+  MessagePolicyKind,
+  MessagePriority,
+} from '@/services/messages/types';
+import type {
   TradeHubActionState,
   TradeHubPlanCard,
   TradeHubSurfaceModel,
@@ -19,6 +24,17 @@ export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
   confirmationText: string;
+  message:
+    | {
+        visible: false;
+      }
+    | {
+        visible: true;
+        kind: MessagePolicyKind;
+        priority: MessagePriority;
+        title: string;
+        summary: string;
+      };
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
@@ -62,8 +78,27 @@ function formatPlanCard(plan: TradeHubPlanCard): TradeHubScreenPlanViewData {
   };
 }
 
+function createTradeHubMessageViewData(
+  messagePolicy?: MessagePolicyAvailability | null,
+): TradeHubScreenViewData['message'] {
+  if (messagePolicy?.status === 'AVAILABLE' && messagePolicy.messages[0]) {
+    return {
+      visible: true,
+      kind: messagePolicy.messages[0].kind,
+      priority: messagePolicy.messages[0].priority,
+      title: messagePolicy.messages[0].title,
+      summary: messagePolicy.messages[0].summary,
+    };
+  }
+
+  return {
+    visible: false,
+  };
+}
+
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
+  messagePolicy?: MessagePolicyAvailability | null,
 ): TradeHubScreenViewData | null {
   if (!surface) {
     return null;
@@ -75,6 +110,7 @@ export function createTradeHubScreenViewData(
     confirmationText: surface.meta.requiresConfirmation
       ? 'Every action remains confirmation-safe and non-executing in this phase.'
       : 'Confirmation rules are not required.',
+    message: createTradeHubMessageViewData(messagePolicy),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),
   };

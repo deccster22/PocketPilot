@@ -19,6 +19,7 @@ import { createRiskToolScreenViewData } from '@/app/screens/riskToolScreenView';
 import { createTradePlanConfirmationViewData } from '@/app/screens/tradePlanConfirmationView';
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 import { createTradeSubmissionIntentViewData } from '@/app/screens/tradeSubmissionIntentView';
+import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import { fetchRiskToolVM } from '@/services/risk/fetchRiskToolVM';
 import { fetchExecutionAdapterResponseVM } from '@/services/trade/fetchExecutionAdapterResponseVM';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
@@ -27,6 +28,7 @@ import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadin
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
+import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type { RiskToolVM } from '@/services/risk/types';
 import type {
@@ -132,6 +134,7 @@ function parseNumericInput(value: string): number | null {
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
+  const [messagePolicy, setMessagePolicy] = useState<MessagePolicyAvailability | null>(null);
   const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
     null,
   );
@@ -176,7 +179,10 @@ export function TradeHubScreen() {
     };
   }, [profile, baselineScan]);
 
-  const screenView = useMemo(() => createTradeHubScreenViewData(surfaceModel), [surfaceModel]);
+  const screenView = useMemo(
+    () => createTradeHubScreenViewData(surfaceModel, messagePolicy),
+    [messagePolicy, surfaceModel],
+  );
   const previewView = useMemo(
     () => createTradePlanPreviewViewData(confirmationSessionVm?.session.preview ?? null),
     [confirmationSessionVm],
@@ -245,6 +251,41 @@ export function TradeHubScreen() {
       isMounted = false;
     };
   }, [profile, baselineScan]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!confirmationSessionVm) {
+      setMessagePolicy(null);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    fetchMessagePolicyVM({
+      surface: 'TRADE_HUB',
+      profile,
+      confirmationSession: confirmationSessionVm.session,
+    })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setMessagePolicy(result);
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setMessagePolicy(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [confirmationSessionVm, profile]);
 
   useEffect(() => {
     let isMounted = true;
@@ -465,6 +506,12 @@ export function TradeHubScreen() {
             {screenView?.confirmationText ?? 'Trade actions remain read-only in this phase.'}
           </Text>
         </View>
+        {screenView?.message.visible ? (
+          <View style={styles.noteCard}>
+            <Text style={styles.noteTitle}>{screenView.message.title}</Text>
+            <Text style={styles.noteSummary}>{screenView.message.summary}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.section}>
           <Text style={styles.label}>
@@ -882,6 +929,23 @@ const styles = StyleSheet.create({
   },
   cardMeta: {
     fontSize: 12,
+    color: '#4b5563',
+  },
+  noteCard: {
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#dbe4ea',
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    padding: 12,
+  },
+  noteTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  noteSummary: {
+    fontSize: 13,
     color: '#4b5563',
   },
   cardId: {

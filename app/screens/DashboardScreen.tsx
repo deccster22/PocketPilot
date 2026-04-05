@@ -3,12 +3,13 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ExplanationCard } from '@/app/components/ExplanationCard';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
-import { createDashboardScreenViewData } from '@/app/screens/dashboardScreenView';
-import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import {
-  fetchDashboardSurfaceVM,
-  type DashboardSurfaceVM,
-} from '@/services/dashboard/dashboardSurfaceService';
+  createDashboardScreenViewData,
+  refreshDashboardScreenSurface,
+} from '@/app/screens/dashboardScreenView';
+import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 function DashboardZone(props: {
@@ -37,19 +38,21 @@ function DashboardZone(props: {
 export function DashboardScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceVM | null>(null);
+  const [messagePolicy, setMessagePolicy] = useState<MessagePolicyAvailability | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
 
   useEffect(() => {
     let isMounted = true;
 
-    fetchDashboardSurfaceVM({ profile, baselineScan })
-      .then((dashboard) => {
+    refreshDashboardScreenSurface({ profile, baselineScan })
+      .then((result) => {
         if (!isMounted) {
           return;
         }
 
-        setSurfaceModel(dashboard);
-        setBaselineScan((currentBaseline) => currentBaseline ?? dashboard.scan);
+        setSurfaceModel(result.surface);
+        setMessagePolicy(result.messagePolicy);
+        setBaselineScan((currentBaseline) => currentBaseline ?? result.nextBaselineScan);
       })
       .catch(() => {
         if (!isMounted) {
@@ -57,6 +60,7 @@ export function DashboardScreen() {
         }
 
         setSurfaceModel(null);
+        setMessagePolicy(null);
       });
 
     return () => {
@@ -65,8 +69,8 @@ export function DashboardScreen() {
   }, [profile, baselineScan]);
 
   const screenView = useMemo(
-    () => createDashboardScreenViewData(surfaceModel),
-    [surfaceModel],
+    () => createDashboardScreenViewData(surfaceModel, messagePolicy),
+    [messagePolicy, surfaceModel],
   );
 
   return (
@@ -79,6 +83,12 @@ export function DashboardScreen() {
           <ProfileSelector value={profile} onChange={setProfile} />
           <Text style={styles.label}>Prepared surface for {screenView?.profileLabel ?? profile}</Text>
         </View>
+        {screenView?.message.visible ? (
+          <View style={styles.noteCard}>
+            <Text style={styles.noteTitle}>{screenView.message.title}</Text>
+            <Text style={styles.noteSummary}>{screenView.message.summary}</Text>
+          </View>
+        ) : null}
         <DashboardZone
           title={screenView?.primeZone.title ?? 'Prime Zone'}
           items={screenView?.primeZone.items ?? []}
@@ -149,6 +159,23 @@ const styles = StyleSheet.create({
   cardMeta: {
     fontSize: 12,
     color: '#6b7280',
+  },
+  noteCard: {
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#dbe4ea',
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    padding: 12,
+  },
+  noteTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  noteSummary: {
+    fontSize: 13,
+    color: '#4b5563',
   },
   emptyState: {
     fontSize: 13,

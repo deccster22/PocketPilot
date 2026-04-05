@@ -1,6 +1,17 @@
-﻿import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { UserProfile } from '@/core/profile/types';
+import {
+  fetchDashboardSurfaceVM,
+  type DashboardSurfaceVM,
+} from '@/services/dashboard/dashboardSurfaceService';
 import type { DashboardItem } from '@/services/dashboard/types';
 import type { ExplanationConfidence, ExplanationLineageItem } from '@/services/explanation/types';
+import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
+import type {
+  MessagePolicyAvailability,
+  MessagePolicyKind,
+  MessagePriority,
+} from '@/services/messages/types';
+import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type DashboardScreenZoneItemViewData = {
   title: string;
@@ -13,8 +24,21 @@ export type DashboardScreenZoneViewData = {
   items: DashboardScreenZoneItemViewData[];
 };
 
+export type DashboardScreenMessageViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      kind: MessagePolicyKind;
+      priority: MessagePriority;
+      title: string;
+      summary: string;
+    };
+
 export type DashboardScreenViewData = {
   profileLabel: string;
+  message: DashboardScreenMessageViewData;
   primeZone: DashboardScreenZoneViewData;
   secondaryZone: DashboardScreenZoneViewData;
   deepZone: DashboardScreenZoneViewData;
@@ -66,7 +90,9 @@ function formatTrendLabel(item: DashboardItem): string {
 
 function formatZoneItems(items: DashboardItem[]): DashboardScreenZoneItemViewData[] {
   return items.map((item) => ({
-    title: item.symbol ? `${item.symbol} - ${formatEventTypeLabel(item)}` : formatEventTypeLabel(item),
+    title: item.symbol
+      ? `${item.symbol} - ${formatEventTypeLabel(item)}`
+      : formatEventTypeLabel(item),
     subtitle: [formatTrendLabel(item), item.alignmentState?.replace('_', ' ').toLowerCase()]
       .filter(Boolean)
       .join(' | '),
@@ -85,8 +111,56 @@ function formatConfidenceText(confidence: ExplanationConfidence): string {
   }
 }
 
+function createDashboardMessageViewData(
+  messagePolicy?: MessagePolicyAvailability | null,
+): DashboardScreenMessageViewData {
+  if (messagePolicy?.status === 'AVAILABLE' && messagePolicy.messages[0]) {
+    return {
+      visible: true,
+      kind: messagePolicy.messages[0].kind,
+      priority: messagePolicy.messages[0].priority,
+      title: messagePolicy.messages[0].title,
+      summary: messagePolicy.messages[0].summary,
+    };
+  }
+
+  return {
+    visible: false,
+  };
+}
+
+export async function refreshDashboardScreenSurface(params: {
+  profile: UserProfile;
+  baselineScan?: ForegroundScanResult;
+  fetchDashboardSurface?: typeof fetchDashboardSurfaceVM;
+  fetchMessagePolicy?: typeof fetchMessagePolicyVM;
+}): Promise<{
+  surface: DashboardSurfaceVM;
+  messagePolicy: MessagePolicyAvailability;
+  nextBaselineScan: ForegroundScanResult;
+}> {
+  const fetchDashboardSurface = params.fetchDashboardSurface ?? fetchDashboardSurfaceVM;
+  const fetchMessagePolicy = params.fetchMessagePolicy ?? fetchMessagePolicyVM;
+  const surface = await fetchDashboardSurface({
+    profile: params.profile,
+    baselineScan: params.baselineScan,
+  });
+  const messagePolicy = await fetchMessagePolicy({
+    surface: 'DASHBOARD',
+    profile: params.profile,
+    dashboardSurface: surface,
+  });
+
+  return {
+    surface,
+    messagePolicy,
+    nextBaselineScan: params.baselineScan ?? surface.scan,
+  };
+}
+
 export function createDashboardScreenViewData(
   surface: DashboardSurfaceVM | null,
+  messagePolicy?: MessagePolicyAvailability | null,
 ): DashboardScreenViewData | null {
   if (!surface) {
     return null;
@@ -112,6 +186,7 @@ export function createDashboardScreenViewData(
 
   return {
     profileLabel: surface.model.meta.profile,
+    message: createDashboardMessageViewData(messagePolicy),
     primeZone: {
       title: 'Prime Zone',
       items: formatZoneItems(surface.model.primeZone.items),

@@ -1,9 +1,10 @@
-# Alert And Message Policy (P6-A1)
+# Alert And Message Policy (P6-A1 + P6-A2)
 
 ## Why This Exists
 PocketPilot already had calm briefing and reorientation groundwork, but `P6` was still underrepresented compared with the product roadmap.
 
-P6-A1 happens now to give the product one explicit policy spine for messaging before any broader alert family work is attempted.
+P6-A1 happens first to give the product one explicit policy spine for messaging before any broader alert family work is attempted.
+P6-A2 then uses that same spine for two narrow inline rollouts instead of building a second message system.
 
 The point is not to make PocketPilot louder.
 The point is to make its message types clearer and safer.
@@ -33,7 +34,7 @@ PocketPilot messaging must preserve:
 - user control over automation theatre
 - knowledge that empowers without gatekeeping
 
-That means P6-A1 still rejects:
+That means P6-A1 and P6-A2 still reject:
 - push mechanics
 - unread counters
 - badge count theatre
@@ -41,8 +42,8 @@ That means P6-A1 still rejects:
 - guilt framing
 - "toast everything" behavior
 
-## First Consumer Only
-Snapshot is the first thin consumer path.
+## Current Consumer Surfaces
+Snapshot remains the first thin consumer path.
 
 Why Snapshot:
 - it already has one calm subordinate message zone
@@ -55,11 +56,25 @@ In P6-A1, Snapshot stays:
 - foreground-only
 - service-owned
 
+P6-A2 adds only two more explicit inline homes:
+- Dashboard may show `REFERRAL` when the Focus surface has supporting context but no prime top-focus item
+- Trade Hub may show `GUARDED_STOP` when a selected plan has no protected execution path
+
+Those rollouts stay:
+- inline
+- surface-owned
+- calm and factual
+- separate from push, inbox, badge, and popup mechanics
+
+Important rollout distinctions:
+- Dashboard referral is a routing or fit note, not a hard-failure banner
+- Trade Hub guarded stop is a product-boundary note, not a readiness warning or outage message
+- Snapshot behavior from P6-A1 remains unchanged
+
 ## What Future P6 Work Can Build On
 Later P6 phases can build on this foundation by adding:
 - stronger per-surface eligibility rules
-- explicit Trade Hub guarded-stop rendering
-- explicit Dashboard referral rendering
+- broader surface rollout when a natural inline home exists
 - broader message family expansion if product doctrine still supports it
 
 Those future phases should extend the same message-policy seam rather than inventing a separate notification stack.
