@@ -75,6 +75,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
+    expect(source).not.toMatch(/createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/);
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
   });
 

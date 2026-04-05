@@ -22,6 +22,7 @@ function createMarketEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
     pctChange: 0.08,
     metadata: {
       signalTitle: 'Momentum spike',
+      relatedSymbols: ['ETH'],
     },
     ...overrides,
   };
@@ -42,6 +43,7 @@ function createSnapshotContext(
       summary: null,
       dismissible: false,
     },
+    sinceLastCheckedSummaryCount: 0,
     latestRelevantEvent: null,
     ...overrides,
   };
@@ -166,6 +168,34 @@ describe('createMessagePolicyVM', () => {
     expect(JSON.stringify(result)).not.toMatch(/evt-price-move-2|dip_buying|dip_signal/);
   });
 
+  it('uses richer interpreted history support to keep borderline advanced change as an alert without widening the family model', () => {
+    const result = createMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      snapshot: createSnapshotContext({
+        sinceLastCheckedSummaryCount: 2,
+        latestRelevantEvent: createMarketEvent({
+          confidenceScore: 0.89,
+          pctChange: 0.05,
+        }),
+      }),
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'ALERT',
+          title: 'Meaningful change noticed',
+          summary:
+            'ETH is standing out in recent interpreted context. Recent interpreted history supports keeping it in view. Review Snapshot if it changes your plan.',
+          priority: 'MEDIUM',
+          surface: 'SNAPSHOT',
+          dismissible: false,
+        },
+      ],
+    });
+  });
+
   it('keeps strong beginner event context as a calm briefing instead of a louder alert', () => {
     const result = createMessagePolicyVM({
       surface: 'SNAPSHOT',
@@ -194,6 +224,36 @@ describe('createMessagePolicyVM', () => {
       ],
     });
     expect(JSON.stringify(result)).not.toMatch(/evt-price-move-beginner|raw_signal_should_not_leak/);
+  });
+
+  it('keeps richer multi-symbol context conservative by turning it into a briefing instead of a louder alert', () => {
+    const result = createMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      snapshot: createSnapshotContext({
+        sinceLastCheckedSummaryCount: 2,
+        latestRelevantEvent: createMarketEvent({
+          metadata: {
+            signalTitle: 'Cluster move',
+            relatedSymbols: ['ETH', 'BTC'],
+          },
+        }),
+      }),
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'BRIEFING',
+          title: 'A change is worth a calm look',
+          summary:
+            'A small group of symbols is standing out in recent interpreted context. Recent interpreted history supports keeping it in view. Snapshot can help you judge whether it changes your current setup.',
+          priority: 'LOW',
+          surface: 'SNAPSHOT',
+          dismissible: false,
+        },
+      ],
+    });
   });
 
   it('keeps Dashboard referral and Trade Hub guarded stop as separate message families', () => {
@@ -337,15 +397,15 @@ describe('createMessagePolicyVM', () => {
     });
   });
 
-  it('does not let advanced profile bypass alert thresholds when context stays middling', () => {
+  it('does not let advanced profile bypass alert thresholds when context stays middling and unsupported', () => {
     expect(
       createMessagePolicyVM({
         surface: 'SNAPSHOT',
         snapshot: createSnapshotContext({
           profile: 'ADVANCED',
           latestRelevantEvent: createMarketEvent({
-            confidenceScore: 0.85,
-            pctChange: 0.04,
+            confidenceScore: 0.89,
+            pctChange: 0.05,
           }),
         }),
       }),

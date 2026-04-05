@@ -1,14 +1,15 @@
-# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3)
+# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4)
 
 ## Why This Exists
 PocketPilot already had calm briefing and reorientation groundwork, but `P6` still needed one explicit product spine for messaging.
 
 P6-A1 created that spine.
 P6-A2 reused it for narrow Dashboard and Trade Hub rollout.
-P6-A3 keeps the same spine and makes it smarter about when interpreted change should stay quiet, become a narrower alert, or disappear entirely.
+P6-A3 made alert treatment profile-aware.
+P6-A4 now improves the interpreted input quality feeding that same seam.
 
-The point is not to make PocketPilot louder.
-The point is to make message treatment clearer, calmer, and more consistent across profiles.
+The point is still not to make PocketPilot louder.
+The point is to make message treatment clearer, calmer, and more truthful.
 
 ## Message Families
 PocketPilot still uses five explicit message families:
@@ -35,7 +36,7 @@ PocketPilot messaging must preserve:
 - user control over automation theatre
 - knowledge that empowers without gatekeeping
 
-That means P6-A1 through P6-A3 still reject:
+That means P6-A1 through P6-A4 still reject:
 - push mechanics
 - unread counters
 - badge-count theatre
@@ -44,18 +45,25 @@ That means P6-A1 through P6-A3 still reject:
 - "toast everything" behavior
 - background delivery
 
-## Profile Sensitivity Without Noise Inflation
-P6-A3 adds one service-owned tuning layer.
+## Richer Inputs Without Noise Inflation
+P6-A4 adds one service-owned prepared alert-input helper.
 It is explicit, bounded, and not user-editable in this phase.
 
-Current posture:
-- Beginner should not be punished with more noise, so strong event-only change can remain a calm `BRIEFING`
-- Middle can receive a narrow `ALERT` when interpreted change is strong enough, but middling change still prefers `BRIEFING`
-- Advanced can receive tighter, more compact alert copy, but not a flood of alerts
-- If interpreted context is too thin, PocketPilot should say less, not more
+Current prepared inputs include:
+- clearer subject scope
+- compact event-family grouping
+- explicit confirmation support
+- one interpreted change-strength scale
 
-Profile sensitivity tunes treatment.
-It does not rewrite the meaning of the message families.
+Current posture:
+- beginner should not be punished with more noise, so strong change can still remain a calm `BRIEFING`
+- middle can still receive a narrow `ALERT` for stronger change, but meaningful change remains briefing territory
+- advanced can keep a calmer alert for history-backed borderline change when the interpreted subject stays clear
+- broader or thinner context should suppress or downgrade rather than inflate alert volume
+- if interpreted context is too thin, PocketPilot should say less, not more
+
+Richer inputs tune treatment.
+They do not rewrite the meaning of the message families.
 
 ## Current Consumer Surfaces
 Snapshot remains the main consumer for tuned alert behavior.
@@ -82,12 +90,13 @@ Those surfaces still:
 - avoid urgency theatre
 
 ## Threshold Posture
-P6-A3 keeps alerting narrower than "anything changed."
+P6-A4 keeps alerting narrower than "anything changed."
 
 Current tuning principles:
-- confirmed interpreted change is required
-- stronger confidence and change magnitude are required for `ALERT`
-- calmer thresholds may allow `BRIEFING`
+- confirmed interpreted change is still required for alert treatment
+- subject clarity matters; single-symbol scope is calmer and easier to trust
+- stronger interpreted continuity can support an alert for borderline change
+- multi-symbol or broader-scope change should stay more conservative
 - middling or thin context should suppress to no message
 - stronger stop and routing families stay semantically separate
 
@@ -95,7 +104,7 @@ This gives PocketPilot fewer, better-shaped messages rather than broader message
 
 ## What Future P6 Work Can Build On
 Later `P6` phases can build on this foundation by adding:
-- richer interpreted inputs for threshold tuning
+- other high-trust interpreted inputs on the same seam
 - more explicit surface eligibility where a natural inline home exists
 - deeper calm copy refinement for existing families
 

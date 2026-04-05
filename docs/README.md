@@ -308,6 +308,7 @@ Market Providers
 -> ReorientationSummary
 -> ReorientationSurfaceState
 -> SnapshotBriefingState
+-> Prepared message input context
 -> Message profile tuning
 -> MessagePolicyAvailability
 -> SnapshotSurfaceVM
@@ -424,6 +425,7 @@ PocketPilot is easiest to read at three levels.
 - `P6-A1` Alert and message policy foundation over the existing Snapshot/reorientation groundwork
 - `P6-A2` Guarded-stop and referral rollout to Trade Hub and Dashboard through the same message-policy seam
 - `P6-A3` Alert threshold and profile sensitivity tuning on the same canonical message-policy seam
+- `P6-A4` Richer interpreted alert inputs on the same canonical message-policy seam
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing
 - `P6-R4` Snapshot foreground-return truth refresh through the shared prepared VM path

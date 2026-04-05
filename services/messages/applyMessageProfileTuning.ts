@@ -1,16 +1,11 @@
 import type { UserProfile } from '@/core/profile/types';
-import type { EventType, MarketEvent } from '@/core/types/marketEvent';
 import type {
   AlertThresholdDecision,
   MessagePolicySnapshotContext,
   MessageSensitivityProfile,
+  PreparedMessageInputContext,
   PreparedMessage,
 } from '@/services/messages/types';
-
-type AlertThresholdRule = {
-  minConfidence: number;
-  minAbsPctChange: number;
-};
 
 export function resolveMessageSensitivityProfile(
   profile: UserProfile,
@@ -25,97 +20,87 @@ export function resolveMessageSensitivityProfile(
   }
 }
 
-function createAlertRule(eventType: EventType): AlertThresholdRule {
-  switch (eventType) {
-    case 'MOMENTUM_BUILDING':
-      return {
-        minConfidence: 0.92,
-        minAbsPctChange: 0.04,
-      };
-    case 'DIP_DETECTED':
-      return {
-        minConfidence: 0.92,
-        minAbsPctChange: 0.05,
-      };
-    default:
-      return {
-        minConfidence: 0.9,
-        minAbsPctChange: 0.05,
-      };
-  }
-}
-
-function createCalmReviewRule(eventType: EventType): AlertThresholdRule {
-  switch (eventType) {
-    case 'MOMENTUM_BUILDING':
-      return {
-        minConfidence: 0.84,
-        minAbsPctChange: 0.03,
-      };
-    case 'DIP_DETECTED':
-      return {
-        minConfidence: 0.84,
-        minAbsPctChange: 0.04,
-      };
-    default:
-      return {
-        minConfidence: 0.82,
-        minAbsPctChange: 0.03,
-      };
-  }
-}
-
-function hasUsableAlertMetrics(event: MarketEvent): boolean {
-  return (
-    typeof event.symbol === 'string' &&
-    event.symbol.trim().length > 0 &&
-    Number.isFinite(event.confidenceScore) &&
-    typeof event.pctChange === 'number' &&
-    Number.isFinite(event.pctChange)
-  );
-}
-
-function meetsThreshold(event: MarketEvent, rule: AlertThresholdRule): boolean {
-  return (
-    event.confidenceScore >= rule.minConfidence &&
-    Math.abs(event.pctChange ?? 0) >= rule.minAbsPctChange
-  );
-}
-
 function decideAlertThreshold(
-  event: MarketEvent | null | undefined,
+  inputContext: PreparedMessageInputContext | null | undefined,
   sensitivity: MessageSensitivityProfile,
 ): AlertThresholdDecision {
-  if (!event || !hasUsableAlertMetrics(event)) {
+  if (
+    !inputContext ||
+    inputContext.eventFamily === 'NON_ALERTABLE' ||
+    inputContext.confirmationSupport === 'ESTIMATED_OR_THIN' ||
+    inputContext.changeStrength === 'THIN' ||
+    inputContext.subjectScope === 'PORTFOLIO'
+  ) {
     return 'SUPPRESS';
   }
 
-  if (sensitivity === 'GUIDED') {
-    return meetsThreshold(event, createCalmReviewRule(event.eventType))
+  if (!inputContext.isSingleSymbolScope) {
+    return inputContext.changeStrength === 'STRONG' &&
+      inputContext.confirmationSupport === 'CONFIRMED_WITH_HISTORY'
       ? 'DOWNGRADE_TO_BRIEFING'
       : 'SUPPRESS';
   }
 
-  if (meetsThreshold(event, createAlertRule(event.eventType))) {
+  if (sensitivity === 'GUIDED') {
+    return inputContext.changeStrength === 'STRONG' ? 'DOWNGRADE_TO_BRIEFING' : 'SUPPRESS';
+  }
+
+  if (sensitivity === 'BALANCED') {
+    if (inputContext.changeStrength === 'STRONG') {
+      return 'KEEP_AS_ALERT';
+    }
+
+    return inputContext.changeStrength === 'MEANINGFUL' ? 'DOWNGRADE_TO_BRIEFING' : 'SUPPRESS';
+  }
+
+  if (inputContext.changeStrength === 'STRONG') {
     return 'KEEP_AS_ALERT';
   }
 
-  if (sensitivity === 'BALANCED' && meetsThreshold(event, createCalmReviewRule(event.eventType))) {
-    return 'DOWNGRADE_TO_BRIEFING';
+  if (
+    inputContext.changeStrength === 'MEANINGFUL' &&
+    inputContext.confirmationSupport === 'CONFIRMED_WITH_HISTORY'
+  ) {
+    return 'KEEP_AS_ALERT';
   }
 
   return 'SUPPRESS';
 }
 
-function createEventSubject(event: MarketEvent): string {
-  return `${event.symbol} is standing out in recent interpreted context.`;
+function compactCopy(parts: ReadonlyArray<string | null | undefined>): string {
+  return parts
+    .map((part) => part?.trim())
+    .filter((part): part is string => Boolean(part))
+    .join(' ');
 }
 
-function createDowngradedBriefingTitle(eventType: EventType): string {
-  switch (eventType) {
-    case 'MOMENTUM_BUILDING':
+function createEventSubject(inputContext: PreparedMessageInputContext): string {
+  if (inputContext.subjectLabel) {
+    return `${inputContext.subjectLabel} is standing out in recent interpreted context.`;
+  }
+
+  if (inputContext.subjectScope === 'MULTI_SYMBOL') {
+    return 'A small group of symbols is standing out in recent interpreted context.';
+  }
+
+  return 'Recent interpreted context is standing out at the portfolio level.';
+}
+
+function createHistorySupportSentence(
+  inputContext: PreparedMessageInputContext,
+): string | null {
+  return inputContext.confirmationSupport === 'CONFIRMED_WITH_HISTORY'
+    ? 'Recent interpreted history supports keeping it in view.'
+    : null;
+}
+
+function createDowngradedBriefingTitle(
+  inputContext: PreparedMessageInputContext,
+): string {
+  switch (inputContext.eventFamily) {
+    case 'MOMENTUM':
       return 'Momentum is worth watching';
-    case 'DIP_DETECTED':
+    case 'PULLBACK':
       return 'A dip is worth keeping in view';
     default:
       return 'A change is worth a calm look';
@@ -123,57 +108,104 @@ function createDowngradedBriefingTitle(eventType: EventType): string {
 }
 
 function createDowngradedBriefingSummary(
-  event: MarketEvent,
+  inputContext: PreparedMessageInputContext,
   sensitivity: MessageSensitivityProfile,
 ): string {
-  const subject = createEventSubject(event);
+  const subject = createEventSubject(inputContext);
+  const historySupport = createHistorySupportSentence(inputContext);
 
-  switch (event.eventType) {
-    case 'MOMENTUM_BUILDING':
+  switch (inputContext.eventFamily) {
+    case 'MOMENTUM':
       return sensitivity === 'GUIDED'
-        ? `${subject} Snapshot can help you judge whether the momentum belongs in view without rushing.`
-        : `${subject} Snapshot can help you judge whether the momentum matters to your setup.`;
-    case 'DIP_DETECTED':
+        ? compactCopy([
+            subject,
+            historySupport,
+            'Snapshot can help you judge whether the momentum belongs in view without rushing.',
+          ])
+        : compactCopy([
+            subject,
+            historySupport,
+            'Snapshot can help you judge whether the momentum matters to your setup.',
+          ]);
+    case 'PULLBACK':
       return sensitivity === 'GUIDED'
-        ? `${subject} Snapshot can help you decide whether the dip belongs in view without rushing.`
-        : `${subject} Snapshot can help you judge whether the dip belongs in scope.`;
+        ? compactCopy([
+            subject,
+            historySupport,
+            'Snapshot can help you decide whether the dip belongs in view without rushing.',
+          ])
+        : compactCopy([
+            subject,
+            historySupport,
+            'Snapshot can help you judge whether the dip belongs in scope.',
+          ]);
     default:
       return sensitivity === 'GUIDED'
-        ? `${subject} Snapshot can help you decide whether it changes your plan without rushing.`
-        : `${subject} Snapshot can help you judge whether it changes your current setup.`;
+        ? compactCopy([
+            subject,
+            historySupport,
+            'Snapshot can help you decide whether it changes your plan without rushing.',
+          ])
+        : compactCopy([
+            subject,
+            historySupport,
+            'Snapshot can help you judge whether it changes your current setup.',
+          ]);
   }
 }
 
 function createAlertSummary(
-  event: MarketEvent,
+  inputContext: PreparedMessageInputContext,
   sensitivity: MessageSensitivityProfile,
 ): string {
-  const subject = createEventSubject(event);
+  const subject = createEventSubject(inputContext);
+  const historySupport = createHistorySupportSentence(inputContext);
 
   if (sensitivity === 'DIRECT') {
-    switch (event.eventType) {
-      case 'MOMENTUM_BUILDING':
-        return `${subject} Review Snapshot if the momentum matters to your setup.`;
-      case 'DIP_DETECTED':
-        return `${subject} Review Snapshot if the dip belongs in scope.`;
+    switch (inputContext.eventFamily) {
+      case 'MOMENTUM':
+        return compactCopy([
+          subject,
+          historySupport,
+          'Review Snapshot if the momentum matters to your setup.',
+        ]);
+      case 'PULLBACK':
+        return compactCopy([
+          subject,
+          historySupport,
+          'Review Snapshot if the dip belongs in scope.',
+        ]);
       default:
-        return `${subject} Review Snapshot if it changes your plan.`;
+        return compactCopy([subject, historySupport, 'Review Snapshot if it changes your plan.']);
     }
   }
 
-  switch (event.eventType) {
-    case 'MOMENTUM_BUILDING':
-      return `${subject} Snapshot can help you judge whether momentum matters without rushing.`;
-    case 'DIP_DETECTED':
-      return `${subject} Snapshot can help you decide whether the dip belongs in view.`;
+  switch (inputContext.eventFamily) {
+    case 'MOMENTUM':
+      return compactCopy([
+        subject,
+        historySupport,
+        'Snapshot can help you judge whether momentum matters without rushing.',
+      ]);
+    case 'PULLBACK':
+      return compactCopy([
+        subject,
+        historySupport,
+        'Snapshot can help you decide whether the dip belongs in view.',
+      ]);
     default:
-      return `${subject} Review Snapshot before deciding whether it changes your plan.`;
+      return compactCopy([
+        subject,
+        historySupport,
+        'Review Snapshot before deciding whether it changes your plan.',
+      ]);
   }
 }
 
 export function applyMessageProfileTuning(params: {
   candidate: PreparedMessage;
   snapshot: MessagePolicySnapshotContext;
+  inputContext: PreparedMessageInputContext | null;
 }): {
   decision: AlertThresholdDecision;
   sensitivity: MessageSensitivityProfile;
@@ -189,10 +221,9 @@ export function applyMessageProfileTuning(params: {
     };
   }
 
-  const latestRelevantEvent = params.snapshot.latestRelevantEvent;
-  const decision = decideAlertThreshold(latestRelevantEvent, sensitivity);
+  const decision = decideAlertThreshold(params.inputContext, sensitivity);
 
-  if (!latestRelevantEvent || decision === 'SUPPRESS') {
+  if (!params.inputContext || decision === 'SUPPRESS') {
     return {
       decision,
       sensitivity,
@@ -207,8 +238,8 @@ export function applyMessageProfileTuning(params: {
       message: {
         ...params.candidate,
         kind: 'BRIEFING',
-        title: createDowngradedBriefingTitle(latestRelevantEvent.eventType),
-        summary: createDowngradedBriefingSummary(latestRelevantEvent, sensitivity),
+        title: createDowngradedBriefingTitle(params.inputContext),
+        summary: createDowngradedBriefingSummary(params.inputContext, sensitivity),
         priority: 'LOW',
       },
     };
@@ -220,7 +251,7 @@ export function applyMessageProfileTuning(params: {
     message: {
       ...params.candidate,
       priority: 'MEDIUM',
-      summary: createAlertSummary(latestRelevantEvent, sensitivity),
+      summary: createAlertSummary(params.inputContext, sensitivity),
     },
   };
 }
