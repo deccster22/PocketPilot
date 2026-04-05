@@ -235,6 +235,46 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('execution-feed');
   });
 
+  it('labels prepared plan stop references as PREPARED_PLAN without implying execution authority', async () => {
+    const result = await fetchRiskToolVM({
+      confirmationSession: createConfirmationSession({
+        preparedRiskReferences: {
+          entryPrice: 104,
+          stopPrice: 100,
+          targetPrice: null,
+        },
+      }),
+      preparedQuoteScan: createPreparedQuoteScan(),
+      input: {
+        accountSize: null,
+        riskAmount: 80,
+        riskPercent: null,
+        entryPrice: null,
+        stopPrice: null,
+        targetPrice: null,
+        symbol: null,
+        allowPreparedReferences: true,
+      },
+    });
+
+    expect(result.summary.entryReference).toEqual({
+      value: 104,
+      source: 'PREPARED_PLAN',
+    });
+    expect(result.summary.stopReference).toEqual({
+      value: 100,
+      source: 'PREPARED_PLAN',
+    });
+    expect(result.summary.targetReference).toEqual({
+      value: null,
+      source: 'UNAVAILABLE',
+    });
+    expect(result.summary.state).toBe('READY');
+    expect(JSON.stringify(result)).not.toContain('executionAvailable');
+    expect(JSON.stringify(result)).not.toContain('confirmationPath');
+    expect(JSON.stringify(result)).not.toContain('BRACKET');
+  });
+
   it('uses a prepared quote entry reference when user entry is absent', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession(),

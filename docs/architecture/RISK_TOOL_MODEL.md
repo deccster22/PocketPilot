@@ -1,4 +1,4 @@
-# Risk Tool Model (P5-R4)
+# Risk Tool Model (P5-R5)
 
 ## Purpose
 
@@ -7,7 +7,8 @@
 P5-R1 established the first deterministic sizing lane.
 P5-R2 added source-tagged prepared references plus quote-assisted entry help.
 P5-R3 kept that same contract small and added one honest service-owned prepared plan path through the selected Trade Hub session.
-P5-R4 keeps the contract stable again and deepens the producer side of that same path.
+P5-R4 kept the contract stable again and deepened the producer side of that same path.
+P5-R5 keeps the same contract and selector rules while allowing strategy-owned event context to publish optional stop or target references when that context is concrete enough to support them honestly.
 
 It gives the user a calm, deterministic sizing summary from:
 
@@ -76,7 +77,7 @@ The source-tagged risk contract stays intentionally small:
 - no raw provider, signal, or runtime metadata
 - no motivational scoring or judgmental copy
 
-P5-R4 still does not widen the risk contract with broker payload or settings fields.
+P5-R5 still does not widen the risk contract with broker payload or settings fields.
 Instead, it relies on one sibling trade-context handoff:
 
 ```ts
@@ -105,21 +106,31 @@ That handoff stays explicit:
 
 ## Prepared Plan Producer Rules
 
-P5-R4 adds one canonical producer helper in `services/trade/createPreparedRiskReferences.ts`.
+P5-R4 added one canonical producer helper in `services/trade/createPreparedRiskReferences.ts`.
+P5-R5 keeps that helper as the one numeric producer and adds one supporting strategy/event interpreter in `services/trade/createStrategyPreparedRiskReferences.ts`.
 
-That helper keeps prepared plan references honest:
+Together they keep prepared plan references honest:
 
-- explicit prepared entry, stop, and target values are only read from service-owned trade context that already expresses them through `MarketEvent.metadata.preparedRiskReferences`
-- each field is only populated when the grouped plan context expresses one non-conflicting positive value for that field
-- if no explicit prepared entry exists, actionable plans may fall back to a confirmed primary-event price as a prepared entry reference
-- stop and target do not receive any quote-derived or heuristic fallback
-- ambiguous or conflicting values stay `null`
+- explicit prepared entry, stop, and target values are still only read from service-owned trade context that already expresses them through `MarketEvent.metadata.preparedRiskReferences`
+- each explicit field is only populated when the grouped plan context expresses one non-conflicting positive value for that field
+- if no explicit field exists, the helper may inspect `MarketEvent.metadata.strategyPreparedRiskContext`
+- strategy-owned publishing is intentionally conservative:
+  - the event must stay scoped to one symbol
+  - the event must be confirmed
+  - the grouped context must agree on one derived value for that field
+  - the derived value must sit on an honest side of the current event price for the requested field
+- the current P5-R5 strategy-owned path only supports baseline-grounded publishing where the strategy/event context explicitly asks for it:
+  - momentum-style baseline context may publish a `stopPrice`
+  - dip-style baseline context may publish a `targetPrice`
+- if no explicit or strategy-owned entry exists, actionable plans may still fall back to a confirmed primary-event price as a prepared entry reference
+- stop and target still do not receive any quote-derived fallback
+- ambiguous, conflicting, multi-symbol, or otherwise weak strategy-owned context stays `null`
 
 This keeps producer truth in `services/trade/` instead of letting `app/` guess which upstream facts are trustworthy.
 
 ## Reference Selection Rules
 
-P5-R2 introduced and P5-R4 continues to rely on one canonical selector in `services/risk/selectRiskReferences.ts`.
+P5-R2 introduced and P5-R5 continues to rely on one canonical selector in `services/risk/selectRiskReferences.ts`.
 
 That selector keeps the reference rules explicit:
 
@@ -127,7 +138,7 @@ That selector keeps the reference rules explicit:
 - prepared references are only used when `allowPreparedReferences !== false`
 - prepared plan references outrank prepared quote references when both exist for the same field
 - prepared plan references now arrive through `ConfirmationSession.preparedRiskReferences`
-- P5-R4 improves the usefulness of that prepared plan path by giving the selected plan a better producer upstream, not by changing selector trust rules
+- P5-R5 improves the usefulness of that prepared plan path by giving the selected plan a better producer upstream, not by changing selector trust rules
 - prepared quote assistance is currently limited to the current price as an entry reference
 - stop and target references are only taken from prepared plan context when that context honestly provides them
 - unavailable values stay `UNAVAILABLE`; the seam does not invent stop or target numbers
@@ -142,7 +153,7 @@ The user should be able to see whether a value came from:
 
 ## Calculation Rules
 
-P5-R4 keeps formulas explainable:
+P5-R5 keeps formulas explainable:
 
 - `stopDistance = abs(entryPrice - stopPrice)` when both prices are valid and distinct
 - `riskAmount = explicit riskAmount` when supplied
@@ -203,7 +214,7 @@ That placement matters:
 
 ## Intentional Exclusions
 
-P5-R4 does not add:
+P5-R5 does not add:
 
 - broker APIs
 - order dispatch

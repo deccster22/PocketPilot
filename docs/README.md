@@ -417,6 +417,7 @@ PocketPilot is easiest to read at three levels.
 - `P5-R2` Quote-assisted risk references
 - `P5-R3` Prepared plan stop/target references
 - `P5-R4` Prepared plan producers for risk references
+- `P5-R5` Strategy-owned prepared stop/target publishing
 - `P6` Alerts, message policy, and reorientation briefing seams
 - `P6-R2` Snapshot placement for the foreground reorientation briefing
 - `P6-R3` Durable dismiss persistence for the Snapshot reorientation briefing

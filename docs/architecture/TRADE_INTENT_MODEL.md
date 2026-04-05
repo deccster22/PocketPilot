@@ -97,6 +97,7 @@ P5-R1 adds `RiskToolVM` as a sibling support seam that combines one selected Tra
 P5-R2 adds source-tagged prepared references plus optional prepared quote entry assistance to that same `RiskToolVM` seam while keeping explicit user values authoritative.
 P5-R3 adds `preparedRiskReferences` to the selected-plan ownership seam so honest prepared plan entry, stop, and target references can reach that same risk tool without becoming execution-prefill behavior.
 P5-R4 adds one canonical producer helper in `services/trade/` so those prepared references are populated only when grouped plan context already expresses them honestly.
+P5-R5 keeps that same handoff and producer contract but allows service-owned strategy/event context to publish optional stop or target references when scoped confirmed event interpretation can support them honestly.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:
@@ -263,6 +264,7 @@ Risk-tool seams intentionally remain small and deterministic. They only:
 - consume explicit user inputs plus selected-plan and prepared quote context
 - consume prepared plan entry, stop, and target references only when the selected session honestly carries them
 - rely on one canonical trade-service producer path for prepared plan references before that selected session handoff exists
+- allow that producer path to use explicit numeric event metadata first and thinner strategy-owned event publishing context second
 - choose user-versus-prepared reference precedence once in services
 - calculate stop distance, risk amount, position size, and optional reward/risk
 - return honest `UNAVAILABLE`, `INCOMPLETE`, or `READY` state

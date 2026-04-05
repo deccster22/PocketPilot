@@ -135,6 +135,40 @@ describe('createMarketEvents', () => {
     expect(summaryEvent.pctChange).toBe(0.05);
     expect(summaryEvent.confidenceScore).toBe(1);
   });
+
+  it('preserves strategy-owned prepared risk context inside event metadata for later trade services', () => {
+    const [event] = createMarketEvents({
+      accountId: 'acct-1',
+      quotesBySymbol,
+      pctChangeBySymbol: { AAPL: 0.05, MSFT: -0.01 },
+      signals: [
+        {
+          ...signals[0]!,
+          eventHint: {
+            ...signals[0]!.eventHint,
+            metadata: {
+              threshold: 0.04,
+              strategyPreparedRiskContext: {
+                stopPrice: {
+                  basis: 'BASELINE_PRICE',
+                },
+              },
+            },
+          },
+        },
+      ],
+    });
+
+    expect(event.metadata).toEqual(
+      expect.objectContaining({
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      }),
+    );
+  });
 });
 
 describe('eventStream', () => {

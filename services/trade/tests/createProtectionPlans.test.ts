@@ -79,8 +79,7 @@ describe('createProtectionPlans', () => {
         createdAt: 110,
       },
       {
-        planId:
-          'acct-1:momentum_basics:BTC:ACCUMULATE:acct-1:momentum_basics:momentum:BTC:100',
+        planId: 'acct-1:momentum_basics:BTC:ACCUMULATE:acct-1:momentum_basics:momentum:BTC:100',
         accountId: 'acct-1',
         strategyId: 'momentum_basics',
         symbol: 'BTC',
@@ -148,6 +147,61 @@ describe('createProtectionPlans', () => {
       entryPrice: 99.5,
       stopPrice: 95,
       targetPrice: 108,
+    });
+  });
+
+  it('publishes strategy-owned baseline stop and target references only when the grouped context grounds them', () => {
+    const momentumEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:momentum:BTC:121',
+      timestamp: 121,
+      price: 104,
+      pctChange: 0.04,
+      metadata: {
+        relatedSymbols: ['BTC'],
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      },
+    });
+    const dipEvent = createEvent({
+      eventId: 'acct-1:dip_buying:dip:ETH:122',
+      timestamp: 122,
+      symbol: 'ETH',
+      strategyId: 'dip_buying',
+      eventType: 'DIP_DETECTED',
+      price: 96,
+      pctChange: -0.04,
+      metadata: {
+        relatedSymbols: ['ETH'],
+        strategyPreparedRiskContext: {
+          targetPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      },
+    });
+    const orientationContext = createOrientationContext({
+      accountId: 'acct-1',
+      currentEvents: [momentumEvent, dipEvent],
+      strategyAlignment: 'Aligned',
+    });
+
+    const result = createProtectionPlans({
+      orientationContext,
+      marketEvents: [momentumEvent, dipEvent],
+    });
+
+    expect(result[0]?.preparedRiskReferences).toEqual({
+      entryPrice: 96,
+      stopPrice: null,
+      targetPrice: 100,
+    });
+    expect(result[1]?.preparedRiskReferences).toEqual({
+      entryPrice: 104,
+      stopPrice: 100,
+      targetPrice: null,
     });
   });
 
@@ -249,6 +303,54 @@ describe('createProtectionPlans', () => {
 
     expect(plan.preparedRiskReferences).toEqual({
       entryPrice: 100,
+      stopPrice: null,
+      targetPrice: null,
+    });
+  });
+
+  it('keeps strategy-owned stop publishing quiet when grouped context is ambiguous', () => {
+    const firstEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:momentum:BTC:620',
+      timestamp: 620,
+      price: 104,
+      pctChange: 0.04,
+      metadata: {
+        relatedSymbols: ['BTC'],
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      },
+    });
+    const secondEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:move:BTC:621',
+      timestamp: 621,
+      eventType: 'PRICE_MOVEMENT',
+      price: 110,
+      pctChange: 0.05,
+      metadata: {
+        relatedSymbols: ['BTC'],
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      },
+    });
+    const orientationContext = createOrientationContext({
+      accountId: 'acct-1',
+      currentEvents: [firstEvent, secondEvent],
+      strategyAlignment: 'Aligned',
+    });
+
+    const [plan] = createProtectionPlans({
+      orientationContext,
+      marketEvents: [firstEvent, secondEvent],
+    });
+
+    expect(plan.preparedRiskReferences).toEqual({
+      entryPrice: 104,
       stopPrice: null,
       targetPrice: null,
     });
