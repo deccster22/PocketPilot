@@ -121,6 +121,7 @@ The risk-tool contract shape is:
 The risk-tool seam is support-only. It consumes prepared confirmation-session context, optional prepared quote context, and explicit user inputs and returns a calm sizing summary without constructing orders, implying execution readiness, or leaking provider/runtime detail.
 Prepared plan references may supply entry, stop, or target values when the selected confirmation session honestly carries them.
 P5-R4 deepens that support by improving the service-owned producer path upstream of the confirmation session, not by adding app-side interpretation.
+P5-R5 keeps that UI contract unchanged and only enriches the upstream producer path when scoped strategy/event context can honestly support a calm prepared stop or target.
 Explicit user values still win, prepared plan references outrank prepared quote help for the same field, and quote help still does not invent exits.
 
 `ExecutionCapabilityResolution` is:
@@ -449,6 +450,7 @@ The screen may format preview labels for readability, but it must not construct 
 The screen may collect explicit risk-tool inputs and render prepared risk-tool values plus calm source labels, but it must not calculate stop distance, position size, reward/risk, or local reference precedence on its own.
 Prepared risk references should read like optional support context, not as auto-filled execution intent, and explicit user values remain authoritative when entered.
 Prepared plan references should become more useful quietly when the selected plan already carries honest producer-owned values; if no honest value exists, the surface should stay quiet.
+Prepared strategy-owned stop or target references should keep the same prepared-plan label and should not introduce extra UI drama or technical source detail.
 Unavailable references should stay visually quiet; "Not set" is enough when the prepared plan has nothing honest to contribute.
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.

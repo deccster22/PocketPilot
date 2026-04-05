@@ -64,8 +64,8 @@ describe('fetchConfirmationSessionVM', () => {
         accountId: 'acct-basic',
         symbol: 'ETH',
         eventType: 'PRICE_MOVEMENT',
-      alignmentState: 'WATCHFUL',
-      certainty: 'estimated',
+        alignmentState: 'WATCHFUL',
+        certainty: 'estimated',
         metadata: {
           hidden: 'eth',
         },
@@ -323,6 +323,44 @@ describe('fetchConfirmationSessionVM', () => {
       targetPrice: 112,
     });
     expect(JSON.stringify(result.session)).not.toContain('providerNote');
+    expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
+  });
+
+  it('carries strategy-owned prepared stop and target references through the selected session without leaking internals', async () => {
+    const momentumEvent = createEvent({
+      eventId: 'acct-live:momentum_basics:signal:BTC:140',
+      timestamp: 140,
+      price: 104,
+      pctChange: 0.04,
+      metadata: {
+        hidden: true,
+        relatedSymbols: ['BTC'],
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+        runtimeNote: 'do-not-leak',
+      },
+    });
+
+    mockUpstreamContext({
+      btcEvent: momentumEvent,
+      marketEvents: [momentumEvent],
+      latestRelevantEvent: momentumEvent,
+    });
+
+    const result = await fetchConfirmationSessionVM({
+      profile: 'ADVANCED',
+    });
+
+    expect(result.session.preparedRiskReferences).toEqual({
+      entryPrice: 104,
+      stopPrice: 100,
+      targetPrice: null,
+    });
+    expect(JSON.stringify(result.session)).not.toContain('strategyPreparedRiskContext');
+    expect(JSON.stringify(result.session)).not.toContain('runtimeNote');
     expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
   });
 

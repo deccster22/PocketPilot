@@ -54,6 +54,11 @@ export const dipBuyingStrategy: Strategy = {
           metadata: {
             threshold: Math.abs(DIP_THRESHOLD),
             estimatedQuote: estimatedSymbols.has(symbol),
+            strategyPreparedRiskContext: {
+              targetPrice: {
+                basis: 'BASELINE_PRICE',
+              },
+            },
           },
         },
       }));

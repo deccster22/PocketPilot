@@ -1,4 +1,5 @@
 import type { MarketEvent } from '@/core/types/marketEvent';
+import { resolveStrategyPreparedField } from '@/services/trade/createStrategyPreparedRiskReferences';
 import type {
   PreparedTradePlanRiskReferences,
   ProtectionPlanIntentType,
@@ -130,15 +131,34 @@ export function createPreparedRiskReferences(params: {
   const explicitEntry = resolvePreparedField(params.events, 'entryPrice');
   const explicitStop = resolvePreparedField(params.events, 'stopPrice');
   const explicitTarget = resolvePreparedField(params.events, 'targetPrice');
+  const strategyEntry = explicitEntry.hasExplicitValue
+    ? null
+    : resolveStrategyPreparedField(params.events, 'entryPrice');
+  const strategyStop = explicitStop.hasExplicitValue
+    ? null
+    : resolveStrategyPreparedField(params.events, 'stopPrice');
+  const strategyTarget = explicitTarget.hasExplicitValue
+    ? null
+    : resolveStrategyPreparedField(params.events, 'targetPrice');
 
   return normalisePreparedRiskReferences({
     entryPrice: explicitEntry.hasExplicitValue
       ? explicitEntry.value
-      : resolveFallbackEntryPrice({
-          intentType: params.intentType,
-          primaryEvent: params.primaryEvent,
-        }),
-    stopPrice: explicitStop.value,
-    targetPrice: explicitTarget.value,
+      : strategyEntry?.hasStrategyContext
+        ? strategyEntry.value
+        : resolveFallbackEntryPrice({
+            intentType: params.intentType,
+            primaryEvent: params.primaryEvent,
+          }),
+    stopPrice: explicitStop.hasExplicitValue
+      ? explicitStop.value
+      : strategyStop?.hasStrategyContext
+        ? strategyStop.value
+        : null,
+    targetPrice: explicitTarget.hasExplicitValue
+      ? explicitTarget.value
+      : strategyTarget?.hasStrategyContext
+        ? strategyTarget.value
+        : null,
   });
 }

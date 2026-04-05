@@ -117,6 +117,27 @@ describe('dipBuyingStrategy', () => {
     expect(result[0]?.message).toContain('(estimated quote)');
   });
 
+  it('publishes explicit baseline target context for later service-owned risk helpers', () => {
+    const result = dipBuyingStrategy.evaluate(
+      createScan({
+        pctChangeBySymbol: {
+          AAPL: -0.05,
+        },
+      }),
+      ctx,
+    );
+
+    expect(result[0]?.eventHint.metadata).toEqual(
+      expect.objectContaining({
+        strategyPreparedRiskContext: {
+          targetPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      }),
+    );
+  });
+
   it('uses ctx.nowMs for all signals', () => {
     const result = dipBuyingStrategy.evaluate(
       createScan({

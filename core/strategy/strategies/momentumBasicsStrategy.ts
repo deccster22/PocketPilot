@@ -54,6 +54,11 @@ export const momentumBasicsStrategy: Strategy = {
           metadata: {
             threshold: MOMENTUM_THRESHOLD,
             estimatedQuote: estimatedSymbols.has(symbol),
+            strategyPreparedRiskContext: {
+              stopPrice: {
+                basis: 'BASELINE_PRICE',
+              },
+            },
           },
         },
       }));

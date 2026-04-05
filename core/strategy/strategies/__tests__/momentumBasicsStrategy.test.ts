@@ -117,6 +117,27 @@ describe('momentumBasicsStrategy', () => {
     expect(result[0]?.message).toContain('(estimated quote)');
   });
 
+  it('publishes explicit baseline stop context for later service-owned risk helpers', () => {
+    const result = momentumBasicsStrategy.evaluate(
+      createScan({
+        pctChangeBySymbol: {
+          AAPL: 0.05,
+        },
+      }),
+      ctx,
+    );
+
+    expect(result[0]?.eventHint.metadata).toEqual(
+      expect.objectContaining({
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      }),
+    );
+  });
+
   it('uses ctx.nowMs for all signals', () => {
     const result = momentumBasicsStrategy.evaluate(
       createScan({
