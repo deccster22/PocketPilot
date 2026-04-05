@@ -13,6 +13,7 @@ import {
 import { DebugObservatoryPanel } from '@/app/components/debug/DebugObservatoryPanel';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { SnapshotBriefingCard } from '@/app/components/SnapshotBriefingCard';
+import { ThirtyThousandFootScreen } from '@/app/screens/ThirtyThousandFootScreen';
 import {
   refreshSnapshotScreenSurface,
   createSnapshotScreenViewData,
@@ -29,7 +30,10 @@ import {
 import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
+type SnapshotRoute = 'HOME' | 'THIRTY_THOUSAND_FOOT';
+
 export function SnapshotScreen() {
+  const [route, setRoute] = useState<SnapshotRoute>('HOME');
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [snapshotSurface, setSnapshotSurface] = useState<SnapshotSurfaceVM | null>(null);
   const [snapshotMessagePolicy, setSnapshotMessagePolicy] =
@@ -49,6 +53,7 @@ export function SnapshotScreen() {
 
   function handleProfileChange(nextProfile: UserProfile) {
     baselineScanRef.current = undefined;
+    setRoute('HOME');
     setProfile(nextProfile);
     setCurrentSessionDismissState(EMPTY_REORIENTATION_DISMISS_STATE);
   }
@@ -151,6 +156,15 @@ export function SnapshotScreen() {
     [snapshotMessagePolicy, snapshotSurface],
   );
 
+  if (route === 'THIRTY_THOUSAND_FOOT') {
+    return (
+      <ThirtyThousandFootScreen
+        vm={snapshotSurface?.thirtyThousandFoot ?? null}
+        onBack={() => setRoute('HOME')}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -188,6 +202,24 @@ export function SnapshotScreen() {
                     : undefined
                 }
               />
+            </View>
+          ) : null}
+          {screenView?.thirtyThousandFoot.visible ? (
+            <View style={styles.contextAffordanceSection}>
+              <Text style={styles.briefingLabel}>30,000 ft</Text>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setRoute('THIRTY_THOUSAND_FOOT')}
+                style={styles.contextAffordance}
+              >
+                <Text style={styles.contextAffordanceTitle}>
+                  {screenView.thirtyThousandFoot.title}
+                </Text>
+                <Text style={styles.contextAffordanceSummary}>
+                  {screenView.thirtyThousandFoot.summary}
+                </Text>
+                <Text style={styles.contextAffordanceLink}>Open broader context</Text>
+              </Pressable>
             </View>
           ) : null}
         </View>
@@ -254,10 +286,37 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 4,
   },
+  contextAffordanceSection: {
+    gap: 8,
+    marginTop: 4,
+  },
   briefingLabel: {
     fontSize: 12,
     fontWeight: '600',
     color: '#6b7280',
+  },
+  contextAffordance: {
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#dbe4ea',
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    padding: 12,
+  },
+  contextAffordanceTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  contextAffordanceSummary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
+  },
+  contextAffordanceLink: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0f766e',
   },
   bundleLabel: {
     fontSize: 14,

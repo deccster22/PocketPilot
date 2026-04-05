@@ -1,6 +1,8 @@
 import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
+import { fetchThirtyThousandFootVM } from '@/services/context/fetchThirtyThousandFootVM';
+import type { ThirtyThousandFootVM } from '@/services/context/types';
 import { createSnapshotBriefingState } from '@/services/orientation/createSnapshotBriefingState';
 import { createReorientationSummaryFromSnapshot } from '@/services/orientation/createReorientationSummaryFromSnapshot';
 import { createReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
@@ -20,6 +22,7 @@ export type SnapshotSurfaceVM = {
   snapshot: SnapshotVM;
   reorientation: ReturnType<typeof createReorientationSurfaceState>;
   briefing: ReturnType<typeof createSnapshotBriefingState>;
+  thirtyThousandFoot: ThirtyThousandFootVM;
 };
 
 export async function fetchSnapshotSurfaceVM(params: {
@@ -64,6 +67,10 @@ export async function fetchSnapshotSurfaceVM(params: {
     summary,
     visibility: reorientationVisibility,
   });
+  const thirtyThousandFoot = await fetchThirtyThousandFootVM({
+    snapshot,
+    surface: 'SNAPSHOT',
+  });
 
   return {
     snapshot,
@@ -72,5 +79,6 @@ export async function fetchSnapshotSurfaceVM(params: {
       reorientation,
       snapshot,
     }),
+    thirtyThousandFoot,
   };
 }

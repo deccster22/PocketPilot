@@ -134,6 +134,18 @@ const availableSurface = {
     ],
     dismissible: true,
   },
+  thirtyThousandFoot: {
+    generatedAt: '2026-04-01T00:00:00.000Z',
+    fit: {
+      state: 'UNKNOWN',
+      summary:
+        'There is not enough interpreted context yet to describe strategy fit clearly.',
+    },
+    availability: {
+      status: 'UNAVAILABLE',
+      reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+    },
+  },
 } as SnapshotSurfaceVM;
 
 const availableMessagePolicy: MessagePolicyAvailability = {
@@ -267,6 +279,9 @@ describe('snapshotForegroundRefresh', () => {
       bundleName: undefined,
       portfolioValueText: undefined,
       message: {
+        visible: false,
+      },
+      thirtyThousandFoot: {
         visible: false,
       },
     });

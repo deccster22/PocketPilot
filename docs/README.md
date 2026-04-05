@@ -111,6 +111,8 @@ Examples:
 - `architecture/MARKET_EVENT_MODEL.md`
 - `architecture/EVENT_STREAM_MODEL.md`
 - `architecture/EXPLANATION_MODEL.md`
+- `architecture/STRATEGY_FIT_MODEL.md`
+- `architecture/THIRTY_THOUSAND_FOOT_MODEL.md`
 - `architecture/SNAPSHOT_SYSTEM.md`
 - `architecture/TRADE_INTENT_MODEL.md`
 - `architecture/RISK_TOOL_MODEL.md`
@@ -155,6 +157,7 @@ Examples:
 - `product/FOUNDER_ONE_PAGER.md`
 - `product/PRODUCT_SPEC.md`
 - `product/SNAPSHOT_VISION.md`
+- `product/THIRTY_THOUSAND_FOOT_VIEW.md`
 - `product/PROFILE_EXPLANATION_MODEL.md`
 - `product/LOG_AND_JOURNAL_MODEL.md`
 - `product/ASSET_NARRATIVE_MODEL.md`
@@ -222,6 +225,7 @@ Examples:
 
 - `ux/ORIENTATION_LAYER.md`
 - `ux/SNAPSHOT_SPEC.md`
+- `ux/THIRTY_THOUSAND_FOOT_SPEC.md`
 - `ux/DASHBOARD_SPEC.md`
 - `ux/STRATEGY_AWARE_UI.md`
 - `ux/PROFILE_EXPERIENCE.md`
@@ -305,6 +309,9 @@ Market Providers
 -> Event Queries / Since Last Checked
 -> OrientationContext
 -> SnapshotModel
+-> PreparedContextInputs
+-> StrategyFitSummary
+-> ThirtyThousandFootVM
 -> ReorientationSummary
 -> ReorientationSurfaceState
 -> SnapshotBriefingState
@@ -431,6 +438,8 @@ PocketPilot is easiest to read at three levels.
 - `P6-R4` Snapshot foreground-return truth refresh through the shared prepared VM path
 - `P6-R5` Snapshot orientation cohesion through one canonical subordinate briefing zone
 - `P6-R5A` Retire the legacy reorientation-only app presentation path so Snapshot keeps one canonical briefing surface
+- `PX-C1` Strategy Fit / 30,000 ft View foundation
+- `PX-C2` Richer volatility / structural context inputs on the same canonical context lane
 - `PX-E1` Early explanation and lineage groundwork for the Dashboard Focus surface
 - `PX-E2` Dashboard explanation deepening on the same canonical seam
 - `P7` Knowledge baseline

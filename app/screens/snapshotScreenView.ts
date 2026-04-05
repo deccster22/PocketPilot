@@ -41,6 +41,16 @@ export type SnapshotScreenMessageViewData =
       summary: string;
     };
 
+export type SnapshotScreenThirtyThousandFootViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+    };
+
 export type SnapshotScreenViewData = {
   currentStateLabel: string;
   currentStateValue: string;
@@ -51,6 +61,7 @@ export type SnapshotScreenViewData = {
   bundleName?: string;
   portfolioValueText?: string;
   message: SnapshotScreenMessageViewData;
+  thirtyThousandFoot: SnapshotScreenThirtyThousandFootViewData;
 };
 
 export function shouldRefreshSnapshotOnAppForegroundTransition(
@@ -128,6 +139,17 @@ export function createSnapshotScreenViewData(
     };
   }
 
+  const thirtyThousandFoot =
+    surface?.thirtyThousandFoot.availability.status === 'AVAILABLE'
+      ? {
+          visible: true as const,
+          title: surface.thirtyThousandFoot.availability.title,
+          summary: surface.thirtyThousandFoot.availability.summary,
+        }
+      : {
+          visible: false as const,
+        };
+
   return {
     currentStateLabel: model.core.currentState.label,
     currentStateValue: model.core.currentState.value,
@@ -141,5 +163,6 @@ export function createSnapshotScreenViewData(
         ? undefined
         : model.secondary.portfolioValue.toFixed(2),
     message,
+    thirtyThousandFoot,
   };
 }
