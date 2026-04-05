@@ -197,6 +197,44 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('timestampMs');
   });
 
+  it('keeps a producer-provided plan entry reference ahead of quote help while exits stay honest', async () => {
+    const result = await fetchRiskToolVM({
+      confirmationSession: createConfirmationSession({
+        preparedRiskReferences: {
+          entryPrice: 20.5,
+          stopPrice: null,
+          targetPrice: null,
+        },
+      }),
+      preparedQuoteScan: createPreparedQuoteScan(),
+      input: {
+        accountSize: null,
+        riskAmount: 100,
+        riskPercent: null,
+        entryPrice: null,
+        stopPrice: 19,
+        targetPrice: null,
+        symbol: null,
+        allowPreparedReferences: true,
+      },
+    });
+
+    expect(result.summary.entryReference).toEqual({
+      value: 20.5,
+      source: 'PREPARED_PLAN',
+    });
+    expect(result.summary.stopReference).toEqual({
+      value: 19,
+      source: 'USER_INPUT',
+    });
+    expect(result.summary.targetReference).toEqual({
+      value: null,
+      source: 'UNAVAILABLE',
+    });
+    expect(result.summary.entryPrice).toBe(20.5);
+    expect(JSON.stringify(result)).not.toContain('execution-feed');
+  });
+
   it('uses a prepared quote entry reference when user entry is absent', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession(),

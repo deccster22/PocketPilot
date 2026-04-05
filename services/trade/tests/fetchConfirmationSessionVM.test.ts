@@ -47,20 +47,31 @@ describe('fetchConfirmationSessionVM', () => {
     }));
   });
 
-  function mockUpstreamContext() {
-    const btcEvent = createEvent();
-    const ethEvent = createEvent({
-      eventId: 'acct-basic:momentum_basics:signal:ETH:200',
-      timestamp: 200,
-      accountId: 'acct-basic',
-      symbol: 'ETH',
-      eventType: 'PRICE_MOVEMENT',
+  function mockUpstreamContext(
+    overrides: {
+      btcEvent?: MarketEvent;
+      ethEvent?: MarketEvent;
+      marketEvents?: MarketEvent[];
+      latestRelevantEvent?: MarketEvent;
+    } = {},
+  ) {
+    const btcEvent = overrides.btcEvent ?? createEvent();
+    const ethEvent =
+      overrides.ethEvent ??
+      createEvent({
+        eventId: 'acct-basic:momentum_basics:signal:ETH:200',
+        timestamp: 200,
+        accountId: 'acct-basic',
+        symbol: 'ETH',
+        eventType: 'PRICE_MOVEMENT',
       alignmentState: 'WATCHFUL',
       certainty: 'estimated',
-      metadata: {
-        hidden: 'eth',
-      },
-    });
+        metadata: {
+          hidden: 'eth',
+        },
+      });
+    const marketEvents = overrides.marketEvents ?? [btcEvent, ethEvent];
+    const latestRelevantEvent = overrides.latestRelevantEvent ?? btcEvent;
 
     mockFetchSurfaceContext.mockResolvedValue({
       portfolioValue: 300,
@@ -135,18 +146,18 @@ describe('fetchConfirmationSessionVM', () => {
         },
       },
       signals: [],
-      marketEvents: [btcEvent, ethEvent],
+      marketEvents,
       eventStream: {
         accountId: 'acct-live',
         timestamp: 200,
-        events: [btcEvent, ethEvent],
+        events: marketEvents,
       },
       orientationContext: {
         accountId: 'acct-live',
         symbol: 'BTC',
         strategyId: 'momentum_basics',
         currentState: {
-          latestRelevantEvent: btcEvent,
+          latestRelevantEvent,
           strategyAlignment: 'Aligned',
           certainty: 'confirmed',
         },
@@ -177,7 +188,11 @@ describe('fetchConfirmationSessionVM', () => {
         supported: true,
         unavailableReason: null,
       },
-      preparedRiskReferences: null,
+      preparedRiskReferences: {
+        entryPrice: 100,
+        stopPrice: null,
+        targetPrice: null,
+      },
       preview: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
         headline: {
@@ -279,6 +294,38 @@ describe('fetchConfirmationSessionVM', () => {
     expect(JSON.stringify(result.session)).not.toContain('hidden');
   });
 
+  it('carries explicit prepared stop and target references from the plan producer without leaking metadata', async () => {
+    const preparedEvent = createEvent({
+      metadata: {
+        hidden: true,
+        preparedRiskReferences: {
+          entryPrice: 101,
+          stopPrice: 95,
+          targetPrice: 112,
+        },
+        providerNote: 'do-not-leak',
+      },
+    });
+
+    mockUpstreamContext({
+      btcEvent: preparedEvent,
+      marketEvents: [preparedEvent],
+      latestRelevantEvent: preparedEvent,
+    });
+
+    const result = await fetchConfirmationSessionVM({
+      profile: 'ADVANCED',
+    });
+
+    expect(result.session.preparedRiskReferences).toEqual({
+      entryPrice: 101,
+      stopPrice: 95,
+      targetPrice: 112,
+    });
+    expect(JSON.stringify(result.session)).not.toContain('providerNote');
+    expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
+  });
+
   it('switches the selected plan and recomputes the prepared session deterministically', async () => {
     mockUpstreamContext();
 
@@ -303,6 +350,7 @@ describe('fetchConfirmationSessionVM', () => {
       symbol: 'ETH',
       actionState: 'WAIT',
     });
+    expect(switched.preparedRiskReferences).toBeNull();
     expect(switched.shell?.confirmation).toEqual({
       requiresConfirmation: true,
       pathType: 'GUIDED_SEQUENCE',

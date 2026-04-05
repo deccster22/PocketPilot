@@ -71,7 +71,11 @@ describe('createProtectionPlans', () => {
         constraints: {
           maxPositionSize: 0.05,
         },
-        preparedRiskReferences: null,
+        preparedRiskReferences: {
+          entryPrice: 100,
+          stopPrice: null,
+          targetPrice: null,
+        },
         createdAt: 110,
       },
       {
@@ -94,10 +98,57 @@ describe('createProtectionPlans', () => {
         constraints: {
           maxPositionSize: 0.1,
         },
-        preparedRiskReferences: null,
+        preparedRiskReferences: {
+          entryPrice: 100,
+          stopPrice: null,
+          targetPrice: null,
+        },
         createdAt: 100,
       },
     ]);
+  });
+
+  it('uses explicit service-owned prepared references when the grouped plan context expresses one clear value', () => {
+    const momentumEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:momentum:BTC:120',
+      timestamp: 120,
+      metadata: {
+        signalTitle: 'Hidden signal title',
+        preparedRiskReferences: {
+          entryPrice: 99.5,
+          stopPrice: 95,
+          targetPrice: 108,
+        },
+      },
+    });
+    const movementEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:move:BTC:121',
+      timestamp: 121,
+      eventType: 'PRICE_MOVEMENT',
+      metadata: {
+        signalTitle: 'Hidden movement title',
+        preparedRiskReferences: {
+          stopPrice: 95,
+          targetPrice: 108,
+        },
+      },
+    });
+    const orientationContext = createOrientationContext({
+      accountId: 'acct-1',
+      currentEvents: [momentumEvent, movementEvent],
+      strategyAlignment: 'Aligned',
+    });
+
+    const [plan] = createProtectionPlans({
+      orientationContext,
+      marketEvents: [momentumEvent, movementEvent],
+    });
+
+    expect(plan.preparedRiskReferences).toEqual({
+      entryPrice: 99.5,
+      stopPrice: 95,
+      targetPrice: 108,
+    });
   });
 
   it('downgrades certainty and waits when data quality or estimated pricing is present', () => {
@@ -128,6 +179,7 @@ describe('createProtectionPlans', () => {
     expect(plan.constraints).toEqual({
       cooldownActive: true,
     });
+    expect(plan.preparedRiskReferences).toBeNull();
   });
 
   it('uses hold when conflicting action events exist for the same scope', () => {
@@ -159,6 +211,47 @@ describe('createProtectionPlans', () => {
     expect(plan.intentType).toBe('HOLD');
     expect(plan.rationale.primaryEventId).toBe('acct-1:mean_reversion:dip:SOL:200');
     expect(plan.riskProfile.certainty).toBe('MEDIUM');
+    expect(plan.preparedRiskReferences).toBeNull();
+  });
+
+  it('leaves ambiguous prepared stop and target references unset instead of guessing', () => {
+    const firstEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:momentum:BTC:610',
+      timestamp: 610,
+      metadata: {
+        preparedRiskReferences: {
+          stopPrice: 95,
+          targetPrice: 108,
+        },
+      },
+    });
+    const secondEvent = createEvent({
+      eventId: 'acct-1:momentum_basics:move:BTC:611',
+      timestamp: 611,
+      eventType: 'PRICE_MOVEMENT',
+      metadata: {
+        preparedRiskReferences: {
+          stopPrice: 94,
+          targetPrice: 111,
+        },
+      },
+    });
+    const orientationContext = createOrientationContext({
+      accountId: 'acct-1',
+      currentEvents: [firstEvent, secondEvent],
+      strategyAlignment: 'Aligned',
+    });
+
+    const [plan] = createProtectionPlans({
+      orientationContext,
+      marketEvents: [firstEvent, secondEvent],
+    });
+
+    expect(plan.preparedRiskReferences).toEqual({
+      entryPrice: 100,
+      stopPrice: null,
+      targetPrice: null,
+    });
   });
 
   it('is deterministic for the same inputs regardless of input event order', () => {

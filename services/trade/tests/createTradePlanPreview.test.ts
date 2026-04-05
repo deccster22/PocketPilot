@@ -82,4 +82,21 @@ describe('createTradePlanPreview', () => {
     expect(first).not.toHaveProperty('strategyId');
     expect(first).not.toHaveProperty('createdAt');
   });
+
+  it('keeps prepared risk references out of the preview contract even when the plan carries them', () => {
+    const preview = createTradePlanPreview(
+      createPlan({
+        preparedRiskReferences: {
+          entryPrice: 101,
+          stopPrice: 95,
+          targetPrice: 112,
+        },
+      }),
+    );
+
+    expect(preview).not.toHaveProperty('preparedRiskReferences');
+    expect(JSON.stringify(preview)).not.toContain('entryPrice');
+    expect(JSON.stringify(preview)).not.toContain('stopPrice');
+    expect(JSON.stringify(preview)).not.toContain('targetPrice');
+  });
 });
