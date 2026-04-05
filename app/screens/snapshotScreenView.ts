@@ -1,9 +1,14 @@
 import type { UserProfile } from '@/core/profile/types';
+import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
+import type {
+  MessagePolicyAvailability,
+  MessagePolicyKind,
+  MessagePriority,
+} from '@/services/messages/types';
 import {
   shouldClearPersistedReorientationDismissState,
   type ReorientationDismissState,
 } from '@/services/orientation/reorientationPersistence';
-import type { SnapshotBriefingKind } from '@/services/orientation/types';
 import {
   fetchSnapshotSurfaceVM,
   type SnapshotSurfaceVM,
@@ -23,17 +28,17 @@ export type SnapshotScreenBriefingItemViewData = {
   detail: string;
 };
 
-export type SnapshotScreenBriefingViewData =
+export type SnapshotScreenMessageViewData =
   | {
       visible: false;
     }
   | {
       visible: true;
-      kind: SnapshotBriefingKind;
+      kind: MessagePolicyKind;
+      priority: MessagePriority;
       dismissible: boolean;
       title: string;
-      subtitle?: string | null;
-      items: SnapshotScreenBriefingItemViewData[];
+      summary: string;
     };
 
 export type SnapshotScreenViewData = {
@@ -45,7 +50,7 @@ export type SnapshotScreenViewData = {
   strategyStatusValue: string;
   bundleName?: string;
   portfolioValueText?: string;
-  briefing: SnapshotScreenBriefingViewData;
+  message: SnapshotScreenMessageViewData;
 };
 
 export function shouldRefreshSnapshotOnAppForegroundTransition(
@@ -65,12 +70,15 @@ export async function refreshSnapshotScreenSurface(params: {
   reorientationDismissState: ReorientationDismissState;
   currentSessionDismissState: ReorientationDismissState;
   fetchSnapshotSurface?: typeof fetchSnapshotSurfaceVM;
+  fetchMessagePolicy?: typeof fetchMessagePolicyVM;
 }): Promise<{
   surface: SnapshotSurfaceVM;
+  messagePolicy: MessagePolicyAvailability;
   nextBaselineScan: SnapshotSurfaceVM['snapshot']['scan'];
   shouldClearPersistedDismissState: boolean;
 }> {
   const fetchSnapshotSurface = params.fetchSnapshotSurface ?? fetchSnapshotSurfaceVM;
+  const fetchMessagePolicy = params.fetchMessagePolicy ?? fetchMessagePolicyVM;
   const surface = await fetchSnapshotSurface({
     profile: params.profile,
     baselineScan: params.baselineScan,
@@ -78,9 +86,15 @@ export async function refreshSnapshotScreenSurface(params: {
     reorientationDismissState: params.reorientationDismissState,
     currentSessionDismissState: params.currentSessionDismissState,
   });
+  const messagePolicy = await fetchMessagePolicy({
+    surface: 'SNAPSHOT',
+    profile: params.profile,
+    snapshotSurface: surface,
+  });
 
   return {
     surface,
+    messagePolicy,
     nextBaselineScan: params.baselineScan ?? surface.snapshot.scan,
     shouldClearPersistedDismissState: shouldClearPersistedReorientationDismissState({
       summary: surface.reorientation.summary,
@@ -91,6 +105,7 @@ export async function refreshSnapshotScreenSurface(params: {
 
 export function createSnapshotScreenViewData(
   surface: SnapshotSurfaceVM | null,
+  messagePolicy?: MessagePolicyAvailability | null,
 ): SnapshotScreenViewData | null {
   const model = surface?.snapshot.model;
 
@@ -98,21 +113,18 @@ export function createSnapshotScreenViewData(
     return null;
   }
 
-  let briefing: SnapshotScreenBriefingViewData = {
+  let message: SnapshotScreenMessageViewData = {
     visible: false,
   };
 
-  if (surface.briefing.status === 'VISIBLE') {
-    briefing = {
+  if (messagePolicy?.status === 'AVAILABLE' && messagePolicy.messages[0]) {
+    message = {
       visible: true,
-      kind: surface.briefing.kind,
-      dismissible: surface.briefing.dismissible,
-      title: surface.briefing.title,
-      subtitle: surface.briefing.subtitle,
-      items: surface.briefing.items.map((item) => ({
-        label: item.label,
-        detail: item.detail,
-      })),
+      kind: messagePolicy.messages[0].kind,
+      priority: messagePolicy.messages[0].priority,
+      dismissible: messagePolicy.messages[0].dismissible,
+      title: messagePolicy.messages[0].title,
+      summary: messagePolicy.messages[0].summary,
     };
   }
 
@@ -128,6 +140,6 @@ export function createSnapshotScreenViewData(
       model.secondary?.portfolioValue === undefined
         ? undefined
         : model.secondary.portfolioValue.toFixed(2),
-    briefing,
+    message,
   };
 }

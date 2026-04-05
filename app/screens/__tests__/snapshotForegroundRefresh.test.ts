@@ -3,6 +3,7 @@ import {
   refreshSnapshotScreenSurface,
   shouldRefreshSnapshotOnAppForegroundTransition,
 } from '@/app/screens/snapshotScreenView';
+import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 const availableSurface = {
@@ -135,6 +136,21 @@ const availableSurface = {
   },
 } as SnapshotSurfaceVM;
 
+const availableMessagePolicy: MessagePolicyAvailability = {
+  status: 'AVAILABLE',
+  messages: [
+    {
+      kind: 'REORIENTATION',
+      title: 'Welcome back',
+      summary:
+        'Welcome back. Here is a quick briefing to help you get your bearings. Some recent market context was captured with data quality limits in view.',
+      priority: 'MEDIUM',
+      surface: 'SNAPSHOT',
+      dismissible: true,
+    },
+  ],
+};
+
 describe('snapshotForegroundRefresh', () => {
   it('refreshes only on explicit background or inactive to active transitions', () => {
     expect(shouldRefreshSnapshotOnAppForegroundTransition('background', 'active')).toBe(true);
@@ -145,8 +161,9 @@ describe('snapshotForegroundRefresh', () => {
     expect(shouldRefreshSnapshotOnAppForegroundTransition('unknown', 'active')).toBe(false);
   });
 
-  it('routes foreground refresh through the same prepared Snapshot VM path as mount', async () => {
+  it('routes foreground refresh through the same prepared Snapshot VM path and canonical message policy seam', async () => {
     const fetchSnapshotSurface = jest.fn().mockResolvedValue(availableSurface);
+    const fetchMessagePolicy = jest.fn().mockResolvedValue(availableMessagePolicy);
 
     const initialMountResult = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
@@ -157,6 +174,7 @@ describe('snapshotForegroundRefresh', () => {
         dismissedAt: null,
       },
       fetchSnapshotSurface,
+      fetchMessagePolicy,
     });
     const foregroundResult = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
@@ -168,6 +186,7 @@ describe('snapshotForegroundRefresh', () => {
         dismissedAt: null,
       },
       fetchSnapshotSurface,
+      fetchMessagePolicy,
     });
 
     expect(fetchSnapshotSurface).toHaveBeenNthCalledWith(1, {
@@ -192,11 +211,23 @@ describe('snapshotForegroundRefresh', () => {
         dismissedAt: null,
       },
     });
+    expect(fetchMessagePolicy).toHaveBeenNthCalledWith(1, {
+      surface: 'SNAPSHOT',
+      profile: 'BEGINNER',
+      snapshotSurface: availableSurface,
+    });
+    expect(fetchMessagePolicy).toHaveBeenNthCalledWith(2, {
+      surface: 'SNAPSHOT',
+      profile: 'BEGINNER',
+      snapshotSurface: availableSurface,
+    });
     expect(initialMountResult.surface).toBe(availableSurface);
+    expect(initialMountResult.messagePolicy).toBe(availableMessagePolicy);
     expect(foregroundResult.surface).toBe(availableSurface);
+    expect(foregroundResult.messagePolicy).toBe(availableMessagePolicy);
   });
 
-  it('keeps a dismissed cycle hidden after foreground refresh without leaking raw signals', async () => {
+  it('keeps a dismissed cycle hidden after foreground refresh without leaking raw signals or notification language', async () => {
     const fetchSnapshotSurface = jest.fn().mockResolvedValue({
       ...availableSurface,
       reorientation: {
@@ -209,6 +240,10 @@ describe('snapshotForegroundRefresh', () => {
         reason: 'NO_MEANINGFUL_BRIEFING',
       },
     } as SnapshotSurfaceVM);
+    const fetchMessagePolicy = jest.fn().mockResolvedValue({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
+    } satisfies MessagePolicyAvailability);
 
     const result = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
@@ -219,9 +254,10 @@ describe('snapshotForegroundRefresh', () => {
         dismissedAt: '2026-04-01T00:00:00.000Z',
       },
       fetchSnapshotSurface,
+      fetchMessagePolicy,
     });
 
-    expect(createSnapshotScreenViewData(result.surface)).toEqual({
+    expect(createSnapshotScreenViewData(result.surface, result.messagePolicy)).toEqual({
       currentStateLabel: 'Current State',
       currentStateValue: 'Up',
       change24hLabel: 'Last 24h Change',
@@ -230,14 +266,14 @@ describe('snapshotForegroundRefresh', () => {
       strategyStatusValue: 'Watchful',
       bundleName: undefined,
       portfolioValueText: undefined,
-      briefing: {
+      message: {
         visible: false,
       },
     });
     expect(JSON.stringify(result.surface.reorientation.summary)).not.toMatch(
       /signalsTriggered|budget_blocked_symbols|signalTitle/,
     );
-    expect(JSON.stringify(result.surface.briefing)).not.toMatch(/unread|badge|notification|urgent/);
+    expect(JSON.stringify(result.messagePolicy)).not.toMatch(/unread|badge|notification|urgent/);
   });
 
   it('marks stale persisted dismissal for clearing when a newer eligible cycle appears on foreground refresh', async () => {
@@ -255,6 +291,7 @@ describe('snapshotForegroundRefresh', () => {
         },
       },
     } as SnapshotSurfaceVM);
+    const fetchMessagePolicy = jest.fn().mockResolvedValue(availableMessagePolicy);
 
     const result = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
@@ -265,6 +302,7 @@ describe('snapshotForegroundRefresh', () => {
         dismissedAt: '2026-04-01T00:00:00.000Z',
       },
       fetchSnapshotSurface,
+      fetchMessagePolicy,
     });
 
     expect(result.shouldClearPersistedDismissState).toBe(true);

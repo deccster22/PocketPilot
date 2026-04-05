@@ -26,11 +26,14 @@ import {
   EMPTY_REORIENTATION_DISMISS_STATE,
   type ReorientationDismissState,
 } from '@/services/orientation/reorientationPersistence';
+import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 export function SnapshotScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [snapshotSurface, setSnapshotSurface] = useState<SnapshotSurfaceVM | null>(null);
+  const [snapshotMessagePolicy, setSnapshotMessagePolicy] =
+    useState<MessagePolicyAvailability | null>(null);
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [currentSessionDismissState, setCurrentSessionDismissState] =
     useState<ReorientationDismissState>(EMPTY_REORIENTATION_DISMISS_STATE);
@@ -114,6 +117,7 @@ export function SnapshotScreen() {
         }
 
         setSnapshotSurface(result.surface);
+        setSnapshotMessagePolicy(result.messagePolicy);
         baselineScanRef.current = result.nextBaselineScan;
 
         if (result.shouldClearPersistedDismissState) {
@@ -127,6 +131,7 @@ export function SnapshotScreen() {
         }
 
         setSnapshotSurface(null);
+        setSnapshotMessagePolicy(null);
       });
 
     return () => {
@@ -142,8 +147,8 @@ export function SnapshotScreen() {
   ]);
 
   const screenView = useMemo(
-    () => createSnapshotScreenViewData(snapshotSurface),
-    [snapshotSurface],
+    () => createSnapshotScreenViewData(snapshotSurface, snapshotMessagePolicy),
+    [snapshotMessagePolicy, snapshotSurface],
   );
 
   return (
@@ -164,13 +169,13 @@ export function SnapshotScreen() {
           <Text style={styles.bundleLabel}>
             {screenView?.strategyStatusLabel ?? 'Strategy Status'}: {screenView?.strategyStatusValue ?? '--'}
           </Text>
-          {screenView?.briefing.visible ? (
+          {screenView?.message.visible ? (
             <View style={styles.briefingSection}>
-              <Text style={styles.briefingLabel}>Briefing</Text>
+              <Text style={styles.briefingLabel}>Update</Text>
               <SnapshotBriefingCard
-                briefing={screenView.briefing}
+                message={screenView.message}
                 onDismiss={
-                  screenView.briefing.dismissible
+                  screenView.message.dismissible
                     ? () => {
                         const nextDismissState = createReorientationDismissState(
                           snapshotSurface?.reorientation.summary,

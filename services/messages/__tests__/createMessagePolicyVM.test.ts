@@ -1,0 +1,251 @@
+import type { MarketEvent } from '@/core/types/marketEvent';
+import { createMessagePolicyVM } from '@/services/messages/createMessagePolicyVM';
+import type { MessagePolicySnapshotContext } from '@/services/messages/types';
+
+function createMarketEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
+  return {
+    eventId: 'evt-price-move-1',
+    timestamp: Date.parse('2026-04-05T00:00:00.000Z'),
+    accountId: 'acct-1',
+    symbol: 'ETH',
+    strategyId: 'momentum_basics',
+    eventType: 'PRICE_MOVEMENT',
+    alignmentState: 'WATCHFUL',
+    signalsTriggered: ['momentum_signal'],
+    confidenceScore: 0.92,
+    certainty: 'confirmed',
+    price: 120,
+    pctChange: 0.08,
+    metadata: {
+      signalTitle: 'Momentum spike',
+    },
+    ...overrides,
+  };
+}
+
+function createSnapshotContext(
+  overrides: Partial<MessagePolicySnapshotContext> = {},
+): MessagePolicySnapshotContext {
+  return {
+    profile: 'ADVANCED',
+    briefing: {
+      status: 'HIDDEN',
+      reason: 'NO_REORIENTATION',
+    },
+    reorientation: {
+      status: 'HIDDEN',
+      reason: 'NOT_NEEDED',
+      summary: null,
+      dismissible: false,
+    },
+    latestRelevantEvent: null,
+    ...overrides,
+  };
+}
+
+describe('createMessagePolicyVM', () => {
+  it('keeps reorientation distinct from alert-worthy change and prefers the prepared reorientation note', () => {
+    const result = createMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      snapshot: createSnapshotContext({
+        briefing: {
+          status: 'VISIBLE',
+          kind: 'REORIENTATION',
+          title: 'Welcome back',
+          subtitle: 'Welcome back. Here is a quick briefing to help you get your bearings.',
+          items: [
+            {
+              label: 'Current orientation',
+              detail: 'Snapshot reads up with strategy status at watchful.',
+            },
+          ],
+          dismissible: true,
+        },
+        reorientation: {
+          status: 'VISIBLE',
+          reason: 'AVAILABLE',
+          summary: {
+            status: 'AVAILABLE',
+            profileId: 'ADVANCED',
+            inactiveDays: 14,
+            headline: 'A few meaningful shifts were prepared while you were away.',
+            summaryItems: [
+              {
+                kind: 'PRICE_CHANGE',
+                label: 'Current orientation',
+                detail: 'Snapshot reads up with strategy status at watchful.',
+              },
+            ],
+            generatedFrom: {
+              lastActiveAt: '2026-03-22T00:00:00.000Z',
+              now: '2026-04-05T00:00:00.000Z',
+            },
+            maxItems: 3,
+          },
+          dismissible: true,
+        },
+        latestRelevantEvent: createMarketEvent({
+          eventId: 'evt-hidden-alert',
+          strategyId: 'strategy_should_not_leak',
+          signalsTriggered: ['raw_signal_id'],
+        }),
+      }),
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'REORIENTATION',
+          title: 'Welcome back',
+          summary:
+            'Welcome back. Here is a quick briefing to help you get your bearings. Snapshot reads up with strategy status at watchful.',
+          priority: 'MEDIUM',
+          surface: 'SNAPSHOT',
+          dismissible: true,
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toMatch(
+      /evt-hidden-alert|strategy_should_not_leak|raw_signal_id|notification|badge|unread|urgent/,
+    );
+  });
+
+  it('creates a calm alert only from confirmed interpreted change when no briefing already owns Snapshot', () => {
+    const result = createMessagePolicyVM({
+      surface: 'SNAPSHOT',
+      snapshot: createSnapshotContext({
+        latestRelevantEvent: createMarketEvent({
+          eventId: 'evt-price-move-2',
+          strategyId: 'dip_buying',
+          signalsTriggered: ['dip_signal'],
+        }),
+      }),
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'ALERT',
+          title: 'Meaningful change noticed',
+          summary:
+            'ETH is standing out in recent interpreted context. Review Snapshot before deciding whether it changes your plan.',
+          priority: 'HIGH',
+          surface: 'SNAPSHOT',
+          dismissible: false,
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toMatch(/evt-price-move-2|dip_buying|dip_signal/);
+  });
+
+  it('keeps referral and guarded stop as separate message families', () => {
+    const referralResult = createMessagePolicyVM({
+      surface: 'DASHBOARD',
+      referral: {
+        title: 'Better handled elsewhere',
+        summary: 'This topic is outside PocketPilot scope and should be handled through a trusted reference.',
+      },
+    });
+    const guardedStopResult = createMessagePolicyVM({
+      surface: 'TRADE_HUB',
+      guardedStop: {
+        title: 'Pause here',
+        summary: 'PocketPilot cannot continue this path safely with the current context.',
+      },
+    });
+
+    expect(referralResult).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'REFERRAL',
+          title: 'Better handled elsewhere',
+          summary:
+            'This topic is outside PocketPilot scope and should be handled through a trusted reference.',
+          priority: 'MEDIUM',
+          surface: 'DASHBOARD',
+          dismissible: false,
+        },
+      ],
+    });
+    expect(guardedStopResult).toEqual({
+      status: 'AVAILABLE',
+      messages: [
+        {
+          kind: 'GUARDED_STOP',
+          title: 'Pause here',
+          summary: 'PocketPilot cannot continue this path safely with the current context.',
+          priority: 'HIGH',
+          surface: 'TRADE_HUB',
+          dismissible: false,
+        },
+      ],
+    });
+  });
+
+  it('returns NOT_ENABLED_FOR_SURFACE when a message exists but belongs somewhere else', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'SNAPSHOT',
+        guardedStop: {
+          title: 'Pause here',
+          summary: 'PocketPilot cannot continue this path safely with the current context.',
+        },
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
+  });
+
+  it('returns NO_MESSAGE when interpreted context is present but not strong enough for a message', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'SNAPSHOT',
+        snapshot: createSnapshotContext({
+          profile: 'BEGINNER',
+          latestRelevantEvent: createMarketEvent(),
+        }),
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
+    });
+  });
+
+  it('returns INSUFFICIENT_INTERPRETED_CONTEXT when no prepared inputs are available', () => {
+    expect(
+      createMessagePolicyVM({
+        surface: 'SNAPSHOT',
+      }),
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+    });
+  });
+
+  it('is deterministic for identical inputs', () => {
+    const input = {
+      surface: 'SNAPSHOT' as const,
+      snapshot: createSnapshotContext({
+        briefing: {
+          status: 'VISIBLE' as const,
+          kind: 'SINCE_LAST_CHECKED' as const,
+          title: 'Since last checked',
+          subtitle: 'A calm read on the most meaningful interpreted changes since your last visit.',
+          items: [
+            {
+              label: 'Current orientation',
+              detail: 'Snapshot reads down with strategy status at watchful.',
+            },
+          ],
+          dismissible: false,
+        },
+      }),
+    };
+
+    expect(createMessagePolicyVM(input)).toEqual(createMessagePolicyVM(input));
+  });
+});

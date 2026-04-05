@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('snapshot briefing placement', () => {
-  it('anchors one canonical Snapshot briefing zone only on Snapshot in this phase', () => {
+  it('anchors one canonical Snapshot message zone only on Snapshot in this phase', () => {
     const snapshotScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'SnapshotScreen.tsx'),
       'utf8',
@@ -20,6 +20,7 @@ describe('snapshot briefing placement', () => {
     expect(snapshotScreenSource).toMatch(/AppState/);
     expect(snapshotScreenSource).toMatch(/refreshSnapshotScreenSurface/);
     expect(snapshotScreenSource).toMatch(/defaultReorientationDismissStore/);
+    expect(snapshotScreenSource).not.toMatch(/inbox|badge|toast|notification center|modal/i);
     expect(snapshotScreenSource).not.toMatch(/ReorientationSummaryCard/);
     expect(snapshotScreenSource).not.toMatch(/reorientationSummaryView/);
     expect(snapshotScreenSource).not.toMatch(/useFocusEffect|useIsFocused/);

@@ -1,17 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { SnapshotScreenBriefingViewData } from '@/app/screens/snapshotScreenView';
-import type { SnapshotBriefingKind } from '@/services/orientation/types';
-
-function getEyebrow(kind: SnapshotBriefingKind) {
-  return kind === 'REORIENTATION' ? 'Welcome Back' : 'Since Last Checked';
-}
+import type { SnapshotScreenMessageViewData } from '@/app/screens/snapshotScreenView';
 
 export function SnapshotBriefingCard(params: {
-  briefing: SnapshotScreenBriefingViewData;
+  message: SnapshotScreenMessageViewData;
   onDismiss?: () => void;
 }) {
-  if (!params.briefing.visible) {
+  if (!params.message.visible) {
     return null;
   }
 
@@ -19,9 +14,8 @@ export function SnapshotBriefingCard(params: {
     <View style={styles.card}>
       <View style={styles.headerRow}>
         <View style={styles.headerCopy}>
-          <Text style={styles.title}>{getEyebrow(params.briefing.kind)}</Text>
-          <Text style={styles.headline}>{params.briefing.title}</Text>
-          {params.briefing.subtitle ? <Text style={styles.meta}>{params.briefing.subtitle}</Text> : null}
+          <Text style={styles.headline}>{params.message.title}</Text>
+          <Text style={styles.summary}>{params.message.summary}</Text>
         </View>
         {params.onDismiss ? (
           <Pressable onPress={params.onDismiss} style={styles.dismissButton}>
@@ -29,12 +23,6 @@ export function SnapshotBriefingCard(params: {
           </Pressable>
         ) : null}
       </View>
-      {params.briefing.items.map((item) => (
-        <View key={`${item.label}:${item.detail}`} style={styles.item}>
-          <Text style={styles.itemLabel}>{item.label}</Text>
-          <Text style={styles.itemDetail}>{item.detail}</Text>
-        </View>
-      ))}
     </View>
   );
 }
@@ -57,21 +45,16 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 4,
   },
-  title: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#4b5563',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
   headline: {
     fontSize: 15,
+    fontWeight: '600',
     lineHeight: 21,
     color: '#111827',
   },
-  meta: {
-    fontSize: 12,
-    color: '#6b7280',
+  summary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#374151',
   },
   dismissButton: {
     alignSelf: 'flex-start',
@@ -83,19 +66,6 @@ const styles = StyleSheet.create({
   dismissText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#374151',
-  },
-  item: {
-    gap: 2,
-  },
-  itemLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  itemDetail: {
-    fontSize: 13,
-    lineHeight: 19,
     color: '#374151',
   },
 });
