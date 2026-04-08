@@ -7,7 +7,7 @@ import type {
 } from '@/services/knowledge/types';
 
 function isKnowledgeTopicEnabledForSurface(surface: KnowledgeSurface): boolean {
-  return surface === 'KNOWLEDGE_LIBRARY';
+  return surface === 'KNOWLEDGE_LIBRARY' || surface === 'STRATEGY_PREVIEW';
 }
 
 export function fetchKnowledgeTopicDetailVM(params?: {

@@ -2,7 +2,12 @@ export type KnowledgeDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 export type KnowledgeMediaType = 'ARTICLE' | 'DIAGRAM' | 'VIDEO' | 'INTERACTIVE' | 'CASE_STUDY';
 
-export type KnowledgeSurface = 'KNOWLEDGE_LIBRARY' | 'DASHBOARD' | 'SNAPSHOT' | 'TRADE_HUB';
+export type KnowledgeSurface =
+  | 'KNOWLEDGE_LIBRARY'
+  | 'DASHBOARD'
+  | 'SNAPSHOT'
+  | 'TRADE_HUB'
+  | 'STRATEGY_PREVIEW';
 
 export type KnowledgeCatalogFamily =
   | 'orientation'
@@ -100,3 +105,30 @@ export type KnowledgeTopicDetailVM = {
   generatedAt: string | null;
   availability: KnowledgeTopicAvailability;
 };
+
+export type KnowledgeContextSurface =
+  | 'SNAPSHOT'
+  | 'DASHBOARD'
+  | 'TRADE_HUB'
+  | 'INSIGHTS'
+  | 'STRATEGY_PREVIEW';
+
+export type ContextualKnowledgeCandidate = {
+  topicId: string;
+  title: string;
+  reason: string;
+};
+
+export type ContextualKnowledgeAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_RELEVANT_TOPIC'
+        | 'NOT_ENABLED_FOR_SURFACE'
+        | 'INSUFFICIENT_INTERPRETED_CONTEXT';
+    }
+  | {
+      status: 'AVAILABLE';
+      surface: KnowledgeContextSurface;
+      items: ReadonlyArray<ContextualKnowledgeCandidate>;
+    };
