@@ -1,10 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { ContextualKnowledgeCard } from '@/app/components/ContextualKnowledgeCard';
+import { KnowledgeTopicScreen } from '@/app/screens/KnowledgeTopicScreen';
 import { StrategyPreviewCard } from '@/app/components/StrategyPreviewCard';
 import { createStrategyNavigatorScreenViewData } from '@/app/screens/strategyNavigatorScreenView';
+import { fetchContextualKnowledgeAvailability } from '@/services/knowledge/fetchContextualKnowledgeAvailability';
+import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
 import { fetchStrategyNavigatorVM } from '@/services/strategyNavigator/fetchStrategyNavigatorVM';
 import type { StrategyPreviewScenarioId } from '@/services/strategyNavigator/types';
+
+type StrategyNavigatorRoute = 'HOME' | 'KNOWLEDGE_TOPIC';
 
 type StrategySelectionButtonProps = {
   title: string;
@@ -63,9 +69,11 @@ function ScenarioSelectionButton(props: ScenarioSelectionButtonProps) {
 }
 
 export function StrategyNavigatorScreen() {
+  const [route, setRoute] = useState<StrategyNavigatorRoute>('HOME');
   const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
   const [selectedScenarioId, setSelectedScenarioId] =
     useState<StrategyPreviewScenarioId>('DIP_VOLATILITY');
+  const [selectedKnowledgeTopicId, setSelectedKnowledgeTopicId] = useState<string | null>(null);
 
   const vm = useMemo(
     () =>
@@ -77,9 +85,40 @@ export function StrategyNavigatorScreen() {
     [selectedScenarioId, selectedStrategyId],
   );
   const screenView = useMemo(() => createStrategyNavigatorScreenViewData(vm), [vm]);
+  const contextualKnowledge = useMemo(
+    () =>
+      fetchContextualKnowledgeAvailability({
+        surface: 'STRATEGY_PREVIEW',
+        strategyNavigatorVM: vm,
+      }),
+    [vm],
+  );
+  const knowledgeTopicVM = useMemo(
+    () =>
+      fetchKnowledgeTopicDetailVM({
+        surface: 'STRATEGY_PREVIEW',
+        topicId: selectedKnowledgeTopicId,
+      }),
+    [selectedKnowledgeTopicId],
+  );
+
+  function handleOpenKnowledgeTopic(topicId: string) {
+    setSelectedKnowledgeTopicId(topicId);
+    setRoute('KNOWLEDGE_TOPIC');
+  }
 
   if (!screenView) {
     return null;
+  }
+
+  if (route === 'KNOWLEDGE_TOPIC') {
+    return (
+      <KnowledgeTopicScreen
+        topicVM={knowledgeTopicVM}
+        onBack={() => setRoute('HOME')}
+        onOpenTopic={handleOpenKnowledgeTopic}
+      />
+    );
   }
 
   return (
@@ -139,6 +178,15 @@ export function StrategyNavigatorScreen() {
             </View>
           )}
         </View>
+
+        {contextualKnowledge.status === 'AVAILABLE' ? (
+          <View style={styles.section}>
+            <ContextualKnowledgeCard
+              items={contextualKnowledge.items}
+              onOpenTopic={handleOpenKnowledgeTopic}
+            />
+          </View>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

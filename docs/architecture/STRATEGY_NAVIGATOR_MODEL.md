@@ -119,6 +119,7 @@ The preview must not answer:
 
 - render prepared strategy and scenario options
 - render prepared preview sections
+- render one prepared contextual knowledge affordance when services mark it available
 - format simple display labels and timestamps
 
 `app/` may not:
@@ -126,6 +127,7 @@ The preview must not answer:
 - import the strategy catalog directly
 - shape scenario meaning locally
 - derive event importance locally
+- derive contextual-knowledge relevance locally
 - build recommendation or execution language
 
 ## Relationship To Later Work
@@ -135,7 +137,7 @@ P9-S1 is the first rung of the Strategy Navigator family.
 Later `P9` work can extend this seam with:
 
 - richer surface transformations when the product has a stronger reason for them
-- strategy-specific contextual links into Knowledge
+- deeper or broader strategy-specific contextual links into Knowledge after the current proof path has proven stable
 - more nuanced interpreted scenarios when the current catalog has proven useful
 
 Those later steps should deepen the same service-owned seam rather than replacing it with a simulator, an advice engine, or a broker handoff.

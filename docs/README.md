@@ -246,6 +246,7 @@ Examples:
 - `ux/KNOWLEDGE_LIBRARY_SPEC.md`
 - `phases/P7-K1.md`
 - `phases/P7-K2.md`
+- `phases/P7-K3.md`
 - `knowledge/README.md`
 - `knowledge/_register/CONTENT_REGISTER.md`
 - `knowledge/_templates/KNOWLEDGE_NODE_TEMPLATE.md`
@@ -353,6 +354,9 @@ docs/knowledge + CONTENT_REGISTER
 -> createKnowledgeTopicDetailVM
 -> fetchKnowledgeTopicDetailVM
 -> Knowledge topic detail screen
+-> createContextualKnowledgeAvailability
+-> fetchContextualKnowledgeAvailability
+-> one thin Strategy Preview contextual affordance
 ```
 
 Insights/Event History now uses its own thin reflection seam:
@@ -469,6 +473,7 @@ PocketPilot is easiest to read at three levels.
 - `P7` Knowledge baseline
 - `P7-K1` Knowledge baseline foundation
 - `P7-K2` Knowledge topic detail surface
+- `P7-K3` Knowledge contextual eligibility seam
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P8-I1` Insights / Event History foundation
 - `P8-I2` Insights last-viewed continuity

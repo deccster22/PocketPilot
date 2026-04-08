@@ -37,6 +37,7 @@ The first surface is intentionally thin:
 - one strategy selection rail
 - one finite scenario rail
 - one prepared preview card
+- one optional contextual knowledge affordance when the service-owned eligibility seam says it is relevant
 
 The prepared card explains:
 
@@ -83,7 +84,7 @@ P9-S1 does not add:
 - scenario editing
 - onboarding orchestration
 - prediction scoring
-- wider Knowledge rollout
+- wider Knowledge rollout beyond one thin optional proof path
 
 ## Relationship To Roadmap
 

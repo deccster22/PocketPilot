@@ -34,6 +34,24 @@ describe('fetchKnowledgeTopicDetailVM', () => {
     });
   });
 
+  it('allows the thin Strategy Preview proof path to open one prepared topic detail', () => {
+    expect(
+      fetchKnowledgeTopicDetailVM({
+        surface: 'STRATEGY_PREVIEW',
+        topicId: 'strategy-buy-the-dip',
+      }),
+    ).toMatchObject({
+      generatedAt: null,
+      availability: {
+        status: 'AVAILABLE',
+        topic: {
+          topicId: 'strategy-buy-the-dip',
+          title: 'Buy the Dip',
+        },
+      },
+    });
+  });
+
   it('returns honest unavailable states for missing selection and missing topic ids', () => {
     expect(
       fetchKnowledgeTopicDetailVM({

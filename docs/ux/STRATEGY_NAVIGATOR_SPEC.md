@@ -15,6 +15,7 @@ It should help a user compare strategy lenses without:
 - one top-level Preview destination in this phase
 - app renders prepared strategy and scenario options only
 - app renders one prepared preview card only
+- app may render one prepared contextual knowledge card only when services mark it available
 - unavailable state stays honest and minimal
 - no execution CTA
 - no wizard flow
@@ -29,6 +30,7 @@ The P9-S1 layout is intentionally plain:
 2. Strategy selector
 3. Scenario selector
 4. Preview card or honest unavailable state
+5. Optional contextual knowledge card
 
 This is enough for orientation.
 The first surface does not need a full multi-panel transformation yet.
@@ -84,3 +86,10 @@ P9-S1 should still remain the reference for the core mood:
 - exploratory
 - non-directive
 - service-owned
+
+The P7-K3 proof path should still stay:
+
+- optional
+- subordinate to the preview card
+- easy to ignore
+- limited to prepared service-owned candidates
