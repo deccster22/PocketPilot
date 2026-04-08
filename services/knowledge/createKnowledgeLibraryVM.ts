@@ -1,50 +1,31 @@
 import type {
+  KnowledgeCatalogEntry,
   KnowledgeLibraryAvailability,
   KnowledgeLibraryItem,
   KnowledgeLibrarySection,
-  KnowledgeNode,
 } from '@/services/knowledge/types';
 
 const SECTION_TITLES = {
-  'getting-started': 'Getting Started',
-  'strategy-basics': 'Strategy Basics',
-  'event-interpretation': 'Event Interpretation',
-  'risk-and-discipline': 'Risk and Discipline',
+  orientation: 'Orientation',
+  'core-language': 'Core Language',
+  strategies: 'Strategy Guides',
+  'action-risk': 'Action and Risk',
+  reflection: 'Reflection',
+  'knowledge-system': 'Knowledge System',
 } as const;
 
 type SectionId = keyof typeof SECTION_TITLES;
 
 const SECTION_ORDER: readonly SectionId[] = [
-  'getting-started',
-  'strategy-basics',
-  'event-interpretation',
-  'risk-and-discipline',
+  'orientation',
+  'core-language',
+  'strategies',
+  'action-risk',
+  'reflection',
+  'knowledge-system',
 ];
 
-const TOPIC_ORDER_BY_SECTION: Readonly<Record<SectionId, readonly string[]>> = {
-  'getting-started': ['how-pocketpilot-thinks', 'estimated-vs-confirmed-context'],
-  'strategy-basics': ['strategy-basics-momentum-and-dips'],
-  'event-interpretation': ['reading-market-events'],
-  'risk-and-discipline': ['discipline-before-action'],
-};
-
-function resolveSectionId(topicId: string): SectionId | null {
-  switch (topicId) {
-    case 'how-pocketpilot-thinks':
-    case 'estimated-vs-confirmed-context':
-      return 'getting-started';
-    case 'strategy-basics-momentum-and-dips':
-      return 'strategy-basics';
-    case 'reading-market-events':
-      return 'event-interpretation';
-    case 'discipline-before-action':
-      return 'risk-and-discipline';
-    default:
-      return null;
-  }
-}
-
-function toKnowledgeLibraryItem(node: KnowledgeNode): KnowledgeLibraryItem {
+function toKnowledgeLibraryItem(node: KnowledgeCatalogEntry): KnowledgeLibraryItem {
   return {
     topicId: node.topicId,
     title: node.title,
@@ -54,14 +35,15 @@ function toKnowledgeLibraryItem(node: KnowledgeNode): KnowledgeLibraryItem {
   };
 }
 
+function compareNodes(left: KnowledgeCatalogEntry, right: KnowledgeCatalogEntry): number {
+  return left.title.localeCompare(right.title);
+}
+
 function buildSection(params: {
   sectionId: SectionId;
-  nodesByTopicId: ReadonlyMap<string, KnowledgeNode>;
+  nodesBySectionId: ReadonlyMap<SectionId, ReadonlyArray<KnowledgeCatalogEntry>>;
 }): KnowledgeLibrarySection | null {
-  const items = TOPIC_ORDER_BY_SECTION[params.sectionId]
-    .map((topicId) => params.nodesByTopicId.get(topicId))
-    .filter((node): node is KnowledgeNode => Boolean(node))
-    .map(toKnowledgeLibraryItem);
+  const items = (params.nodesBySectionId.get(params.sectionId) ?? []).map(toKnowledgeLibraryItem);
 
   if (items.length === 0) {
     return null;
@@ -75,24 +57,26 @@ function buildSection(params: {
 }
 
 export function createKnowledgeLibraryVM(params: {
-  nodes: ReadonlyArray<KnowledgeNode>;
+  nodes: ReadonlyArray<KnowledgeCatalogEntry>;
 }): KnowledgeLibraryAvailability {
-  const nodesByTopicId = new Map<string, KnowledgeNode>();
+  const nodesBySectionId = new Map<SectionId, ReadonlyArray<KnowledgeCatalogEntry>>();
 
-  params.nodes.forEach((node) => {
-    const sectionId = resolveSectionId(node.topicId);
-
-    if (!sectionId || nodesByTopicId.has(node.topicId)) {
-      return;
-    }
-
-    nodesByTopicId.set(node.topicId, node);
+  SECTION_ORDER.forEach((sectionId) => {
+    nodesBySectionId.set(
+      sectionId,
+      params.nodes
+        .filter(
+          (node): node is KnowledgeCatalogEntry =>
+            node.family === sectionId && node.priority === 'NOW',
+        )
+        .sort(compareNodes),
+    );
   });
 
   const sections = SECTION_ORDER.map((sectionId) =>
     buildSection({
       sectionId,
-      nodesByTopicId,
+      nodesBySectionId,
     }),
   ).filter((section): section is KnowledgeLibrarySection => Boolean(section));
 

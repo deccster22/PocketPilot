@@ -2,78 +2,57 @@ import { createKnowledgeLibraryVM } from '@/services/knowledge/createKnowledgeLi
 import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
 
 describe('createKnowledgeLibraryVM', () => {
-  it('groups the baseline catalog into deterministic sections and item order', () => {
+  it('groups the canonical catalog into deterministic shelf sections and item order', () => {
     const reversedCatalog = [...knowledgeCatalog].reverse();
+    const result = createKnowledgeLibraryVM({ nodes: reversedCatalog });
 
-    expect(createKnowledgeLibraryVM({ nodes: reversedCatalog })).toEqual({
+    expect(result).toMatchObject({
       status: 'AVAILABLE',
       sections: [
         {
-          id: 'getting-started',
-          title: 'Getting Started',
-          items: [
-            {
-              topicId: 'how-pocketpilot-thinks',
-              title: 'How PocketPilot thinks',
-              summary:
-                'PocketPilot turns interpreted market events into calmer surfaces instead of a raw market feed.',
-              difficulty: 'BEGINNER',
-              mediaType: 'ARTICLE',
-            },
-            {
-              topicId: 'estimated-vs-confirmed-context',
-              title: 'Estimated and confirmed context',
-              summary:
-                'Estimated inputs stay usable, but PocketPilot labels them clearly so the surface does not read as settled fact.',
-              difficulty: 'BEGINNER',
-              mediaType: 'ARTICLE',
-            },
-          ],
+          id: 'orientation',
+          title: 'Orientation',
         },
         {
-          id: 'strategy-basics',
-          title: 'Strategy Basics',
-          items: [
-            {
-              topicId: 'strategy-basics-momentum-and-dips',
-              title: 'Strategy basics: momentum and dips',
-              summary:
-                'PocketPilot uses simple strategy language first, so a move can be read as building strength, a dip worth watching, or just movement that needs more context.',
-              difficulty: 'BEGINNER',
-              mediaType: 'ARTICLE',
-            },
-          ],
+          id: 'core-language',
+          title: 'Core Language',
         },
         {
-          id: 'event-interpretation',
-          title: 'Event Interpretation',
-          items: [
-            {
-              topicId: 'reading-market-events',
-              title: 'Reading PocketPilot market events',
-              summary:
-                'A market event describes what changed in the interpreted picture and how settled that read looks right now.',
-              difficulty: 'INTERMEDIATE',
-              mediaType: 'DIAGRAM',
-            },
-          ],
+          id: 'strategies',
+          title: 'Strategy Guides',
         },
         {
-          id: 'risk-and-discipline',
-          title: 'Risk and Discipline',
-          items: [
-            {
-              topicId: 'discipline-before-action',
-              title: 'Discipline before action',
-              summary:
-                'PocketPilot keeps review, constraints, and confirmation ahead of speed so the product stays strategy-first.',
-              difficulty: 'INTERMEDIATE',
-              mediaType: 'CASE_STUDY',
-            },
-          ],
+          id: 'action-risk',
+          title: 'Action and Risk',
         },
       ],
     });
+
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected knowledge library to be available.');
+    }
+
+    expect(result.sections.map((section) => section.items.length)).toEqual([6, 10, 10, 5]);
+    expect(result.sections[0].items.map((item) => item.topicId)).toEqual([
+      'pp-choosing-profile-and-strategy',
+      'pp-what-dashboard-is-for',
+      'pp-what-pocketpilot-is',
+      'pp-what-snapshot-is-for',
+      'pp-what-trade-hub-is-for',
+      'pp-why-pocketpilot-supports-action-without-pushing-action',
+    ]);
+    expect(result.sections[2].items.map((item) => item.topicId)).toEqual([
+      'strategy-breakout-watcher',
+      'strategy-buy-the-dip',
+      'strategy-candle-signals',
+      'strategy-confluence-alignment',
+      'strategy-fibonacci-zones',
+      'strategy-momentum-pulse',
+      'strategy-range-trader',
+      'strategy-reversion-bounce',
+      'strategy-trend-follow',
+      'pp-what-strategy-preview-strategy-navigator-is-for',
+    ]);
   });
 
   it('returns unavailable when no baseline nodes are present', () => {
@@ -83,12 +62,16 @@ describe('createKnowledgeLibraryVM', () => {
     });
   });
 
-  it('keeps the canonical KnowledgeNode contract explicit and minimal', () => {
+  it('keeps the canonical catalog entry contract explicit and service-owned', () => {
     expect(Object.keys(knowledgeCatalog[0]).sort()).toEqual([
       'content',
       'difficulty',
       'eventTypeLinks',
+      'family',
       'mediaType',
+      'priority',
+      'relatedTopicIds',
+      'sections',
       'signalLinks',
       'strategyLinks',
       'summary',
@@ -97,7 +80,7 @@ describe('createKnowledgeLibraryVM', () => {
     ]);
   });
 
-  it('returns display-safe library items without raw links, content bodies, or engagement metadata', () => {
+  it('returns display-safe library items without raw topic sections, raw content, or source metadata', () => {
     const result = createKnowledgeLibraryVM({ nodes: knowledgeCatalog });
 
     if (result.status !== 'AVAILABLE') {
@@ -107,16 +90,16 @@ describe('createKnowledgeLibraryVM', () => {
     const serialized = JSON.stringify(result.sections);
 
     expect(serialized).not.toMatch(
-      /content|strategyLinks|signalLinks|eventTypeLinks|providerId|metadata|progress|completion|streak|recommended/i,
+      /"content":|"sections":|"relatedTopicIds":|canonicalPath|docs\/knowledge|providerId|metadata|completion|streak|recommended/i,
     );
   });
 
-  it('keeps the seed baseline copy calm and non-directive', () => {
+  it('keeps the canonical baseline copy calm and non-directive', () => {
     knowledgeCatalog.forEach((node) => {
       const copy = `${node.title} ${node.summary} ${node.content}`;
 
       expect(copy).not.toMatch(/!/);
-      expect(copy).not.toMatch(/buy now|act now|don't miss|guaranteed|beat the market|urgent/i);
+      expect(copy).not.toMatch(/must read|required reading|complete to continue|unlock/i);
     });
   });
 });

@@ -1,20 +1,20 @@
-# Knowledge Library Spec (P7-K1)
+# Knowledge Library Spec (P7-K1, P7-K2)
 
 ## Purpose
+
 The Knowledge Library is PocketPilot's first dedicated learning surface.
 
-In P7-K1 it exists to provide one calm, always-accessible reference shelf for:
-- how PocketPilot thinks
-- how to read basic strategy language
-- how to interpret market-event framing
-- why the product keeps discipline ahead of urgency
+In `P7-K1` it became one calm, always-accessible reference shelf.
+In `P7-K2` it gains one subordinate topic detail route so a user can move from the shelf into a deeper topic without turning the app into a document browser.
 
-This is the baseline library, not the finished knowledge system.
+This is still a baseline knowledge system, not the finished knowledge family.
 
 ## Surface Rules
-- one top-level destination only in this phase
-- app renders prepared sections and items only
-- no app-side grouping, sorting, or node assembly
+
+- one top-level destination with one subordinate topic route only in this phase
+- library shelf remains the entry point
+- app renders prepared sections, items, and topic detail only
+- no app-side grouping, topic lookup, or node assembly
 - no recommendation rail
 - no gamification
 - no urgency language
@@ -22,10 +22,12 @@ This is the baseline library, not the finished knowledge system.
 
 If knowledge is unavailable, the surface should show a minimal honest state rather than decorative filler.
 
-## Surface Contract
-The screen consumes the prepared `KnowledgeLibraryVM`.
+## Surface Contracts
 
-Current shape:
+The shelf consumes the prepared `KnowledgeLibraryVM`.
+The detail view consumes the prepared `KnowledgeTopicDetailVM`.
+
+Current shelf shape:
 
 ```ts
 {
@@ -50,34 +52,86 @@ Current shape:
 }
 ```
 
+Current detail shape:
+
+```ts
+{
+  generatedAt: string | null
+  availability:
+    | {
+        status: 'UNAVAILABLE'
+        reason: 'NO_TOPIC_SELECTED' | 'TOPIC_NOT_FOUND' | 'NOT_ENABLED_FOR_SURFACE'
+      }
+    | {
+        status: 'AVAILABLE'
+        topic: {
+          topicId: string
+          title: string
+          summary: string
+          difficulty: KnowledgeDifficulty | null
+          sections: readonly Array<{
+            heading: string
+            body: readonly string[]
+          }>
+          relatedTopicIds: readonly string[]
+          relatedTopics: readonly Array<{
+            topicId: string
+            title: string
+            summary: string
+            difficulty: KnowledgeDifficulty | null
+            mediaType: KnowledgeMediaType | null
+          }>
+        }
+      }
+}
+```
+
 The screen may format labels for display, but it must not:
+
 - import or shape raw `KnowledgeNode` content
+- read markdown files or repo paths
 - decide section taxonomy
+- infer related-topic metadata locally
 - infer contextual eligibility
 
 ## Initial Structure
-The first structure is intentionally boring and legible.
 
-Baseline sections:
-- Getting Started
-- Strategy Basics
-- Event Interpretation
-- Risk and Discipline
+The first structure remains intentionally boring and legible.
 
-The point is easy scanning, not taxonomy sophistication.
+Baseline shelf sections:
+
+- Orientation
+- Core Language
+- Strategy Guides
+- Action and Risk
+
+The topic view should show:
+
+- one back path to the shelf
+- one summary
+- one optional difficulty badge
+- prepared sections for one topic
+- a small related-topics list
+
+The point is easy scanning and one calmer deeper step, not taxonomy sophistication.
 
 ## Presentation Guidance
-- use simple cards or list rows
+
+- use simple cards or list rows on the shelf
 - let title, summary, difficulty, and media type do the work
+- let the topic view read like a calm article, not a file inspector
 - prefer whitespace and restraint over visual theatre
-- treat the surface as reference material, not a task queue
+- treat related topics as optional follow-on reading, not a required path
 
 ## Explicit Exclusions
-P7-K1 does not add:
+
+`P7-K2` does not add:
+
 - Dashboard contextual links
 - Snapshot contextual links
 - Trade Hub contextual links
-- article-detail navigation complexity
+- raw markdown or repo-file browsing
 - search or ranking systems
-- streaks, quizzes, badges, or completion bars
-- AI chat or personalised tutoring
+- quizzes, streaks, badges, or completion bars
+- AI chat or personalized tutoring
+- push notifications or background polling

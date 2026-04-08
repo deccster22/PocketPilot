@@ -1,17 +1,18 @@
 export type KnowledgeDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
-export type KnowledgeMediaType =
-  | 'ARTICLE'
-  | 'DIAGRAM'
-  | 'VIDEO'
-  | 'INTERACTIVE'
-  | 'CASE_STUDY';
+export type KnowledgeMediaType = 'ARTICLE' | 'DIAGRAM' | 'VIDEO' | 'INTERACTIVE' | 'CASE_STUDY';
 
-export type KnowledgeSurface =
-  | 'KNOWLEDGE_LIBRARY'
-  | 'DASHBOARD'
-  | 'SNAPSHOT'
-  | 'TRADE_HUB';
+export type KnowledgeSurface = 'KNOWLEDGE_LIBRARY' | 'DASHBOARD' | 'SNAPSHOT' | 'TRADE_HUB';
+
+export type KnowledgeCatalogFamily =
+  | 'orientation'
+  | 'core-language'
+  | 'strategies'
+  | 'action-risk'
+  | 'reflection'
+  | 'knowledge-system';
+
+export type KnowledgeCatalogPriority = 'NOW' | 'NEXT' | 'LATER';
 
 export type KnowledgeNode = {
   topicId: string;
@@ -23,6 +24,18 @@ export type KnowledgeNode = {
   strategyLinks: ReadonlyArray<string>;
   signalLinks: ReadonlyArray<string>;
   eventTypeLinks: ReadonlyArray<string>;
+};
+
+export type KnowledgeTopicSection = {
+  heading: string;
+  body: ReadonlyArray<string>;
+};
+
+export type KnowledgeCatalogEntry = KnowledgeNode & {
+  family: KnowledgeCatalogFamily;
+  priority: KnowledgeCatalogPriority;
+  sections: ReadonlyArray<KnowledgeTopicSection>;
+  relatedTopicIds: ReadonlyArray<string>;
 };
 
 export type KnowledgeLibraryItem = {
@@ -53,4 +66,37 @@ export type KnowledgeLibraryVM = {
   title: string;
   summary: string;
   availability: KnowledgeLibraryAvailability;
+};
+
+export type KnowledgeTopicRelatedItem = {
+  topicId: string;
+  title: string;
+  summary: string;
+  difficulty: KnowledgeDifficulty | null;
+  mediaType: KnowledgeMediaType | null;
+};
+
+export type KnowledgeTopicDetail = {
+  topicId: string;
+  title: string;
+  summary: string;
+  difficulty: KnowledgeDifficulty | null;
+  sections: ReadonlyArray<KnowledgeTopicSection>;
+  relatedTopicIds: ReadonlyArray<string>;
+  relatedTopics: ReadonlyArray<KnowledgeTopicRelatedItem>;
+};
+
+export type KnowledgeTopicAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_TOPIC_SELECTED' | 'TOPIC_NOT_FOUND' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      topic: KnowledgeTopicDetail;
+    };
+
+export type KnowledgeTopicDetailVM = {
+  generatedAt: string | null;
+  availability: KnowledgeTopicAvailability;
 };
