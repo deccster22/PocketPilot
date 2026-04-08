@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v2 markdown source
 Source: docs/source/README_v2.md
 
-Last Updated: 2026-04-07
+Last Updated: 2026-04-08
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-07
+**Last updated:** 2026-04-08
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -242,10 +242,14 @@ Learning library structure, content types, and media support.
 Examples:
 
 - `product/KNOWLEDGE_LAYER.md`
-- `architecture/KNOWLEDGE_NODE_MODEL.md`
+- `architecture/KNOWLEDGE_MODEL.md`
 - `ux/KNOWLEDGE_LIBRARY_SPEC.md`
 - `phases/P7-K1.md`
-- canonical `docs/knowledge/` corpus files once the imported library tree is normalized
+- `knowledge/README.md`
+- `knowledge/_register/CONTENT_REGISTER.md`
+- `knowledge/_templates/KNOWLEDGE_NODE_TEMPLATE.md`
+- `knowledge/00-orientation/what-pocketpilot-is.md`
+- `knowledge/20-strategies/README.md`
 
 Question answered: **What does the learning layer look like?**
 
@@ -292,7 +296,7 @@ docs/
 - `strategies/` = strategy-specific models and launch strategy definitions
 - `roadmap/` = phases, runbooks, and phase reporting
 - `ux/` = surface-level UX specs and experience design intent
-- `knowledge/` = broader learning content framework and media specs as the corpus expands
+- `knowledge/` = canonical Knowledge Library corpus, shelf indexes, register, template, and media scaffolding
 - `research/` = historical exploration and supporting synthesis
 - `incoming/` = temporary staging area for fresh imports awaiting triage
 - `source/` = milestone PDFs and provenance artifacts only

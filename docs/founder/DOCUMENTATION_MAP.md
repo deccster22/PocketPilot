@@ -3,7 +3,7 @@
 - Title: PocketPilot Documentation Map
 - Version: v2
 - Source file: `docs/source/PocketPilot Documentation Map v3.pdf`
-- Last updated: 2026-04-07
+- Last updated: 2026-04-08
 
 File: `docs/founder/PocketPilot Documentation Map`
 
@@ -150,12 +150,10 @@ User experience behaviour.
 ### Tier 9 - Knowledge
 
 - Knowledge Library README / shelf structure
-- Topic register
-- Topic template
-- Core concepts
-- Strategy guides
-- Market examples
-- Media specs
+- Shelf README files for orientation, core language, strategies, action-risk, reflection, knowledge-system, and media
+- Canonical content register (`CONTENT_REGISTER.md` / `CONTENT_REGISTER.csv`)
+- Canonical knowledge node template
+- Live orientation, core-language, strategy, action-risk, reflection, and knowledge-system nodes
 
 Knowledge Library corpus and support docs.
 
@@ -587,20 +585,28 @@ Historical knowledge.
 
 - `README.md`
   - Status: Knowledge
-  - Maturity: Planned canonical shelf entry point
-  - Operational Expansion: when corpus import is normalized
-- `TOPIC_REGISTER.md`
+  - Maturity: Active canonical shelf entry point
+  - Operational Expansion: update when shelf structure changes
+- `00-orientation/README.md` through `50-knowledge-system/README.md`
   - Status: Knowledge
-  - Maturity: Planned canonical register
-  - Operational Expansion: when corpus import is normalized
-- `TOPIC_TEMPLATE.md`
+  - Maturity: Active shelf indexes
+  - Operational Expansion: keep aligned with live shelf contents
+- `90-media/README.md`
   - Status: Knowledge
-  - Maturity: Planned canonical authoring template
-  - Operational Expansion: when corpus import is normalized
-- core concept / strategy guide / market example corpus files
+  - Maturity: Reserved
+  - Operational Expansion: when media assets become canonical
+- `_register/CONTENT_REGISTER.md` and `_register/CONTENT_REGISTER.csv`
   - Status: Knowledge
-  - Maturity: emerging
-  - Operational Expansion: progressive as the P7 corpus lands
+  - Maturity: Active canonical register
+  - Operational Expansion: update with live corpus changes only
+- `_templates/KNOWLEDGE_NODE_TEMPLATE.md`
+  - Status: Knowledge
+  - Maturity: Active canonical authoring template
+  - Operational Expansion: refine only when the node contract changes
+- numbered shelf corpus files under `00-orientation/`, `10-core-language/`, `20-strategies/`, `30-action-risk/`, `40-reflection/`, and `50-knowledge-system/`
+  - Status: Knowledge
+  - Maturity: Active canonical corpus
+  - Operational Expansion: progressive as the live P7 corpus grows
 
 #### `/research`
 
