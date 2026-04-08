@@ -180,9 +180,3 @@ Why:
 - Forward planning mentions `P5-12`, but no merged phase doc or current ledger entry under that label exists in the repo today.
 - `P6-R1` is present in repo docs and code, but the currently available phase-reporting artifact does not record it as cleanly as `P6-R2` through `P6-R5A`.
 - `P8` concepts have early enabling seams in `P3` and `P6`; future work should not mark `P8` done until the broader insights and reflection family actually lands.
-
-## Conversion Notes
-
-Replaced prior content under:
-
-- `## Developer Sequencing Read`
