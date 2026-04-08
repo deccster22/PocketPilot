@@ -18,10 +18,10 @@ describe('fetchKnowledgeLibraryVM', () => {
     }
 
     expect(result.availability.sections.map((section) => section.title)).toEqual([
-      'Getting Started',
-      'Strategy Basics',
-      'Event Interpretation',
-      'Risk and Discipline',
+      'Orientation',
+      'Core Language',
+      'Strategy Guides',
+      'Action and Risk',
     ]);
   });
 

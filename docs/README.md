@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v2 markdown source
 Source: docs/source/README_v2.md
 
-Last Updated: 2026-04-08
+Last Updated: 2026-04-09
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-08
+**Last updated:** 2026-04-09
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -245,6 +245,7 @@ Examples:
 - `architecture/KNOWLEDGE_MODEL.md`
 - `ux/KNOWLEDGE_LIBRARY_SPEC.md`
 - `phases/P7-K1.md`
+- `phases/P7-K2.md`
 - `knowledge/README.md`
 - `knowledge/_register/CONTENT_REGISTER.md`
 - `knowledge/_templates/KNOWLEDGE_NODE_TEMPLATE.md`
@@ -343,10 +344,15 @@ Market Providers
 Knowledge baseline uses its own thin product seam:
 
 ```text
-knowledgeCatalog
+docs/knowledge + CONTENT_REGISTER
+-> generate-knowledge-catalog
+-> knowledgeCatalog
 -> createKnowledgeLibraryVM
 -> fetchKnowledgeLibraryVM
 -> Knowledge Library tab
+-> createKnowledgeTopicDetailVM
+-> fetchKnowledgeTopicDetailVM
+-> Knowledge topic detail screen
 ```
 
 Insights/Event History now uses its own thin reflection seam:
@@ -462,6 +468,7 @@ PocketPilot is easiest to read at three levels.
 - `PX-E2` Dashboard explanation deepening on the same canonical seam
 - `P7` Knowledge baseline
 - `P7-K1` Knowledge baseline foundation
+- `P7-K2` Knowledge topic detail surface
 - `P8` Insights / Event Ledger / Since Last Checked / Reorientation
 - `P8-I1` Insights / Event History foundation
 - `P8-I2` Insights last-viewed continuity

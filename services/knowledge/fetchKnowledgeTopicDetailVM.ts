@@ -1,28 +1,28 @@
-import { createKnowledgeLibraryVM } from '@/services/knowledge/createKnowledgeLibraryVM';
+import { createKnowledgeTopicDetailVM } from '@/services/knowledge/createKnowledgeTopicDetailVM';
 import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
 import type {
   KnowledgeCatalogEntry,
-  KnowledgeLibraryVM,
   KnowledgeSurface,
+  KnowledgeTopicDetailVM,
 } from '@/services/knowledge/types';
 
-function isKnowledgeEnabledForSurface(surface: KnowledgeSurface): boolean {
+function isKnowledgeTopicEnabledForSurface(surface: KnowledgeSurface): boolean {
   return surface === 'KNOWLEDGE_LIBRARY';
 }
 
-export function fetchKnowledgeLibraryVM(params?: {
+export function fetchKnowledgeTopicDetailVM(params?: {
   surface?: KnowledgeSurface;
+  topicId?: string | null;
   nodes?: ReadonlyArray<KnowledgeCatalogEntry>;
-}): KnowledgeLibraryVM {
+}): KnowledgeTopicDetailVM {
   const surface = params?.surface ?? 'KNOWLEDGE_LIBRARY';
   const nodes = params?.nodes ?? knowledgeCatalog;
 
   return {
-    title: 'Knowledge Library',
-    summary:
-      'A quiet reference shelf for how PocketPilot frames strategy, market events, and calm discipline.',
-    availability: isKnowledgeEnabledForSurface(surface)
-      ? createKnowledgeLibraryVM({
+    generatedAt: null,
+    availability: isKnowledgeTopicEnabledForSurface(surface)
+      ? createKnowledgeTopicDetailVM({
+          topicId: params?.topicId,
           nodes,
         })
       : {
