@@ -2,7 +2,7 @@
 Title: PocketPilot - CANON
 Version: 0.5
 Source: docs/source/PocketPilot_CANON.pdf
-Last Updated: 2026-03-12
+Last Updated: 2026-04-08
 ---
 
 # PocketPilot - CANON v0.5
@@ -73,6 +73,7 @@ Strategy alignment, meaningful events, and action-support logic must be derived 
 - Fit can express favourable, mixed, or unfavourable conditions for the selected strategy
 - Fit must not function as a switch recommendation engine
 - Fit should be secondary to core alignment state
+- Fit may support a broader descriptive context lane, but it must not become a recommendation or urgency system
 
 ### 4. Snapshot Is Sacred
 
@@ -87,6 +88,7 @@ Strategy alignment, meaningful events, and action-support logic must be derived 
 ### 5. 30,000 ft View
 
 - Provides macro context during elevated volatility or major structural shifts
+- Remains an opt-in descriptive lane
 - Should stabilise the user emotionally without changing the product tone
 - Must not recommend action
 - Must not escalate urgency
@@ -230,7 +232,8 @@ type StrategyContext = {
 ```
 
 - `StrategyContext` is the active interpretation frame for the selected account
-- Trade Hub, Snapshot, Alerts, and Insights should all consume a consistent `StrategyContext` rather than rebuilding fragments independently
+- Trade Hub, Snapshot, Dashboard, Alerts, Insights, and broader context lanes should all consume consistent service-owned interpretation rather than rebuilding fragments independently
+- Prepared surface contracts and VMs belong in `services/`; `app/` renders prepared interpretation rather than composing it locally
 
 ### 16. ProfileConfig and ProfileVoicePolicy
 
@@ -273,7 +276,7 @@ type KnowledgeNode = {
 };
 ```
 
-- Knowledge supports guardrails but does not gate features
+- Knowledge now has a baseline landed foundation, but it still supports guardrails and orientation without gating features
 - Beginner access should be stable and obvious
 - Intermediate access should include contextual links during drift or ambiguity
 - Advanced access should remain available without constant surfacing
@@ -290,12 +293,13 @@ PocketPilot avoids signal overproduction by filtering output through Strategy ->
 
 ### 19. Strategy Preview / Strategy Navigator
 
-A future exploratory mode should allow the user to select a strategy, view a simulated scenario or event feed, and watch the interface transform. This may live in onboarding, the Knowledge Library, or both.
+PocketPilot now has a first landed foundation for this exploratory feature family. Current implementation may use `Strategy Preview` as the visible exploratory surface label while `Strategy Navigator` remains the canonical internal family name.
 
-- Shows how signals appear
+- Shows how interpreted events would appear
 - Shows how alerts behave
 - Shows how the dashboard shifts
 - Reduces beginner commitment anxiety
+- Must remain simulated, descriptive, and non-directive
 
 ### 20. Quick Action Panel Rules
 
@@ -331,12 +335,16 @@ Signal exposure must scale by profile and strategy relevance.
 
 - Strategy alignment alerts are account-scoped
 - Risk alerts are account-scoped
+- Message policy is a canonical service-owned seam with explicit families: `BRIEFING`, `ALERT`, `REORIENTATION`, `REFERRAL`, and `GUARDED_STOP`
 - No global signal aggregation
 - Foreground-only scanning remains the Phase 1 rule
 - Any future push logic must be explicitly phase-gated and cannot rely on background market polling until guardrails are revised
 - Messaging tone varies by profile, but event logic stays canonical
+- `app/` may render prepared message-policy output only; it must not infer, relabel, or merge message families locally
 
 ## Knowledge Layer
+
+Baseline knowledge foundation now exists, but the governing posture does not change:
 
 - Beginner: stable, always-visible strategy knowledge access
 - Intermediate: contextual links during drift
@@ -361,7 +369,6 @@ Signal exposure must scale by profile and strategy relevance.
 - SL/TP hard enforcement mode
 - Background monitoring limits
 - Account pinning UX refinement
-- Canonical product name for Strategy Preview / Strategy Navigator
 - How much of the financial-PFD metaphor becomes visible language vs internal design principle
 - Exact placement of Year in Review and compare-period tooling within Insights
 - Whether quick actions remain advanced-only forever or become capability-gated by explicit consent
@@ -405,21 +412,28 @@ Signal exposure must scale by profile and strategy relevance.
 
 ## Development Workstream Phasing
 
-### Historical / Already Done
+Since v0.5, several subphases and cross-cutting groundwork families have landed. In particular, `P5-R1` to `P5-R5`, `P6-A1` to `P6-A4`, `PX-C1` and `PX-C2`, `P7-K1`, `P8-I1` to `P8-I4`, `P9-S1`, `PX-E1` and `PX-E2`, and `PX-API1` to `PX-API5` are now part of repo reality.
+
+`docs/phases/PHASE_MAP.md` is the canonical taxonomy and implementation-status reconciliation document for landed subphases and PX sequencing. PX families remain cross-cutting and do not imply completion of numbered product families.
+
+### Historical / Already Landed
 
 - P0: Vision, doctrine, architecture and repo discipline foundation
 - P1: Strategy engine foundations
 - P2: Snapshot / provider / governance / debug observatory foundation
-
-### Next Phases
-
 - P3: Event system and orientation layer
 - P4: Snapshot + Dashboard UX shaping
 - P5: Trade Hub and `ProtectionPlan`
-- P6: Alerts and message policy
-- P7: Knowledge baseline
-- P8: Insights / Event Ledger / Since Last Checked / Reorientation
-- P9: Pattern Navigator / Strategy Navigator / richer explanation layer
+
+### Current Families / Partial Foundations
+
+- P6: Alerts, reorientation, and message policy family; groundwork now exists through the `P6-R*` and `P6-A*` lanes, but the broader family remains incomplete
+- P7: Knowledge baseline family; first foundation landed through `P7-K1`
+- P8: Insights, Event Ledger, Since Last Checked, and reflection family; early foundations landed through `P8-I1` to `P8-I4`
+- P9: Pattern Navigator / Strategy Navigator / richer explanation family; first Preview foundation landed through `P9-S1`, while `PX-E*` remains groundwork rather than proof of full `P9` completion
+
+### Later Families
+
 - P10: Beta hardening
 - P11: Launch prep
 
@@ -446,8 +460,12 @@ v0.4 retained decisions remain valid unless explicitly superseded below.
 - `P2D9`: `ProfileConfig` is the primary object and `ProfileVoicePolicy` is the nested narration rules subsystem
 - `P2D10`: Strategy Preview vs Strategy Navigator are the same feature family, not two separate roadmap items. Canonical internal family name: Strategy Navigator. Onboarding sub-mode: Strategy Preview. Same concept, two labels. The final product-facing name remains open.
 - `P2D11`: Canonical system lifecycle: Formation -> Development -> Confirmation / Invalidation -> Resolution. Allowed explanatory copy: "aftermath" as human-facing language.
+- `P6D1`: Message policy is a canonical service-owned seam with distinct message-family meaning. `BRIEFING`, `ALERT`, `REORIENTATION`, `REFERRAL`, and `GUARDED_STOP` must not be collapsed or inferred locally in `app/`.
+- `PXD1`: Prepared service-owned seams and VMs are the preferred product pattern across Snapshot, Dashboard, Trade Hub, Insights, broader context, and Preview surfaces. `app/` remains a renderer of prepared interpretation, not a local interpretation engine.
+- `PXD2`: Strategy Fit and 30,000 ft are one descriptive, opt-in context lane. They remain secondary to alignment and must not drift into recommendation, urgency, or regime-override behavior.
+- `P9D1`: Strategy Preview / Strategy Navigator now has a first landed foundation. Visible labeling may use Strategy Preview, but the family remains simulated, descriptive, non-directive, and non-executional.
 
-Historical implementation reporting continues in the phase ledger; CANON remains the doctrine and architecture source of truth.
+Historical implementation reporting continues in `docs/phases/PHASE_MAP.md`; CANON remains the doctrine and architecture source of truth.
 
 ## Conversion Notes
 

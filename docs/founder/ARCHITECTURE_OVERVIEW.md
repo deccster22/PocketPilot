@@ -2,9 +2,9 @@
 
 - Title: PocketPilot Architecture Overview
 - Source file: `docs/source/PocketPilot Architecture Overview.pdf`
-- Last updated: 2026-03-20
+- Last updated: 2026-04-08
 
-File: `docs/founder/pocketpilot-architecture-overview.md`
+File: `docs/founder/ARCHITECTURE_OVERVIEW.md`
 
 Purpose: Explains the core system shape in one page.
 
@@ -102,13 +102,15 @@ These states drive alerts and dashboard interpretation.
 
 Translates strategy states into human-readable insight.
 
-Primary surfaces:
+It now reaches users through prepared service-owned seams and surfaces such as:
 
 - Snapshot
-- Since Last Checked
 - Dashboard
+- Trade Hub
+- Insights / Since Last Checked
 - 30,000 ft View
-- Insights
+- Strategy Preview / Navigator
+- message-policy and context seams as prepared intermediates
 
 ## User Interface
 
@@ -119,4 +121,5 @@ Adaptive interface shaped by:
 - relevance filtering
 
 The UI does not interpret signals directly.
+PocketPilot increasingly relies on prepared service-owned contracts and VMs, with `app/` rendering prepared output rather than deriving interpretation locally.
 It presents the output of the Orientation Layer.
