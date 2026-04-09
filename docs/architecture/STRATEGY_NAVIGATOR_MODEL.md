@@ -1,4 +1,4 @@
-# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
 
 ## Purpose
 
@@ -8,6 +8,7 @@
 `P9-S2` deepened that same seam with one service-owned preview-to-knowledge follow-through path.
 `P9-S3` adds one service-owned preview-explanation layer that explains why a strategy reacts to the simulated scenario the way it does.
 `P9-S4` deepens the finite scenario layer with interpreted scenario traits plus one service-owned scenario-contrast seam that explains what changes for that strategy in this kind of simulated backdrop.
+`P9-S5` keeps those same service-owned seams and adds one render-only compaction pass in `app/` so the existing prepared preview stays calm as subordinate shelves accumulate.
 
 The lane now exists to:
 
@@ -142,6 +143,7 @@ Rules:
 - one canonical preview-explanation contract
 - one canonical preview-contrast contract
 - one canonical preview-to-knowledge follow-through contract
+- no second preview VM family just for compaction
 - one selected strategy at a time
 - one finite scenario catalog
 - no execution fields
@@ -179,6 +181,26 @@ The preview must not answer:
 - whether the strategy is likely to profit
 - whether the user is ready to execute
 - what a broker or adapter would do next
+
+## P9-S5 Surface Compaction Rules
+
+`P9-S5` does not widen the service contract.
+It only clarifies how `app/screens/strategyNavigatorScreenView.ts` may group and order already-prepared content for rendering.
+
+The compaction pass may:
+
+- keep one dominant main-preview-focus block
+- keep one stable supporting-detail order for Dashboard shift, Market events, and Alert posture
+- group explanation plus contrast into one lighter supporting-context shelf
+- present knowledge follow-through as one clearly optional helpful-next-reading shelf
+- drop subordinate shelves cleanly when services return them unavailable
+
+The compaction pass may not:
+
+- derive new preview meaning locally
+- create new explanation, contrast, or knowledge-selection logic
+- widen the fetch seam
+- create a second preview contract family
 
 ## Preview Contrast Rules
 
@@ -264,6 +286,7 @@ The selector must not:
 - render prepared preview-contrast content when `contrast.status === 'AVAILABLE'`
 - render prepared preview-explanation content when `explanation.status === 'AVAILABLE'`
 - render prepared knowledge follow-through items when `knowledgeFollowThrough.status === 'AVAILABLE'`
+- group prepared sections into a calmer render hierarchy for focus, supporting context, and optional reading
 - open prepared topic detail by `topicId`
 - format simple display labels and timestamps
 
@@ -306,7 +329,7 @@ That keeps Strategy Preview explanatory without turning the shared Dashboard why
 
 ## Relationship To Later Work
 
-`P9-S1`, `P9-S2`, `P9-S3`, and `P9-S4` are the first four rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, and `P9-S5` are the first five rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 
