@@ -72,6 +72,19 @@ describe('createStrategyNavigatorScreenViewData', () => {
             ],
           },
         },
+        contrast: {
+          status: 'AVAILABLE',
+          content: {
+            title: 'What changes in this scenario',
+            summary:
+              'Compared with a calmer pullback, Dip Buying leans more toward whether weakness is settling into a calmer pullback because volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
+            bullets: [
+              'More attention here: Dip-detected events would matter most when they are followed by calmer price movement.',
+              'Less central here: clean continuation language or quick rebound framing, because the backdrop is still stressed rather than settled.',
+              'Preview expression: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+            ],
+          },
+        },
         knowledgeFollowThrough: {
           status: 'AVAILABLE',
           items: [
@@ -140,6 +153,16 @@ describe('createStrategyNavigatorScreenViewData', () => {
         ],
         alertPosture:
           'Alerts would feel patient and would describe the dip as something to monitor rather than something to chase.',
+        contrast: {
+          title: 'What changes in this scenario',
+          summary:
+            'Compared with a calmer pullback, Dip Buying leans more toward whether weakness is settling into a calmer pullback because volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
+          bullets: [
+            'More attention here: Dip-detected events would matter most when they are followed by calmer price movement.',
+            'Less central here: clean continuation language or quick rebound framing, because the backdrop is still stressed rather than settled.',
+            'Preview expression: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+          ],
+        },
         explanation: {
           title: 'Why Dip Buying reacts this way',
           summary:
@@ -193,6 +216,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
         explanation: {
           status: 'UNAVAILABLE',
           reason: 'NO_EXPLANATION_AVAILABLE',
+        },
+        contrast: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_CONTRAST_AVAILABLE',
         },
       }),
     ).toEqual({
@@ -276,6 +303,19 @@ describe('createStrategyNavigatorScreenViewData', () => {
           ],
         },
       },
+      contrast: {
+        status: 'AVAILABLE',
+        content: {
+          title: 'What changes in this scenario',
+          summary:
+            'Compared with a more neutral or mixed backdrop, Trend Follow leans more toward whether the broader directional structure is still holding because volatility is contained, structure is directional and orderly, and the condition is more extended than a neutral pause.',
+          bullets: [
+            'More attention here: Momentum-building events would matter when they reinforce an already established directional picture.',
+            'Less central here: oversold or reversal language, because the backdrop is still extending rather than resetting.',
+            'Preview expression: The Dashboard would bring sustained directional names forward when follow-through remains orderly.',
+          ],
+        },
+      },
       knowledgeFollowThrough: {
         status: 'UNAVAILABLE',
         reason: 'KNOWLEDGE_UNAVAILABLE',
@@ -334,6 +374,19 @@ describe('createStrategyNavigatorScreenViewData', () => {
         status: 'UNAVAILABLE',
         reason: 'NO_EXPLANATION_AVAILABLE',
       },
+      contrast: {
+        status: 'AVAILABLE',
+        content: {
+          title: 'What changes in this scenario',
+          summary:
+            'Compared with a more neutral or mixed backdrop, Trend Follow leans more toward whether the broader directional structure is still holding because volatility is contained, structure is directional and orderly, and the condition is more extended than a neutral pause.',
+          bullets: [
+            'More attention here: Momentum-building events would matter when they reinforce an already established directional picture.',
+            'Less central here: oversold or reversal language, because the backdrop is still extending rather than resetting.',
+            'Preview expression: The Dashboard would bring sustained directional names forward when follow-through remains orderly.',
+          ],
+        },
+      },
       knowledgeFollowThrough: {
         status: 'UNAVAILABLE',
         reason: 'KNOWLEDGE_UNAVAILABLE',
@@ -341,6 +394,77 @@ describe('createStrategyNavigatorScreenViewData', () => {
     });
 
     expect(result?.preview?.explanation).toBeNull();
+  });
+
+  it('renders no contrast section when services return contrast unavailable', () => {
+    const result = createStrategyNavigatorScreenViewData({
+      title: 'Strategy Preview',
+      summary: 'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'trend_following',
+      selectedScenarioId: 'TREND_CONTINUATION',
+      strategyOptions: [
+        {
+          strategyId: 'trend_following',
+          title: 'Trend Follow',
+          summary: 'Tracks whether directional structure is still holding together.',
+          archetype: 'MIDDLE',
+        },
+      ],
+      scenarios: [
+        {
+          scenarioId: 'TREND_CONTINUATION',
+          title: 'Trend continuation',
+          summary:
+            'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
+        },
+      ],
+      availability: {
+        status: 'AVAILABLE',
+        strategyId: 'trend_following',
+        scenario: {
+          scenarioId: 'TREND_CONTINUATION',
+          title: 'Trend continuation',
+          summary:
+            'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
+        },
+        focus: {
+          snapshotHeadline:
+            'Snapshot would read this as a continuation first and would ask whether the broader structure is still carrying it cleanly.',
+          dashboardFocus: [
+            'The Dashboard would bring sustained directional names forward when follow-through remains orderly.',
+          ],
+          eventHighlights: [
+            'Momentum-building events would matter when they reinforce an already established directional picture.',
+          ],
+          alertPosture:
+            'Alerts would feel steady and would mostly describe whether the trend still has structure behind it.',
+        },
+      },
+      explanation: {
+        status: 'AVAILABLE',
+        content: {
+          title: 'Why Trend Follow reacts this way',
+          summary:
+            'Trend Follow reads the move through the larger directional structure when an existing move is still extending in an orderly way. This keeps the simulated read focused on interpretation priorities rather than outcomes.',
+          bullets: [
+            'What it is noticing: Snapshot would read this as a continuation first and would ask whether the broader structure is still carrying it cleanly.',
+            'Why that matters: This lens cares about whether the broader direction is still holding together, not just whether one move is loud.',
+            'Relevant interpreted MarketEvents: Momentum-building events would matter when they reinforce an already established directional picture.',
+          ],
+        },
+      },
+      contrast: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_CONTRAST_AVAILABLE',
+      },
+      knowledgeFollowThrough: {
+        status: 'UNAVAILABLE',
+        reason: 'KNOWLEDGE_UNAVAILABLE',
+      },
+    });
+
+    expect(result?.preview?.contrast).toBeNull();
   });
 
   it('keeps the screen helper on the prepared Strategy Preview VM only', () => {
@@ -351,10 +475,11 @@ describe('createStrategyNavigatorScreenViewData', () => {
 
     expect(source).toMatch(/availability\.status === 'UNAVAILABLE'/);
     expect(source).toMatch(/vm\.strategyOptions\.map/);
+    expect(source).toMatch(/vm\.contrast\.status === 'AVAILABLE'/);
     expect(source).toMatch(/vm\.explanation\.status === 'AVAILABLE'/);
     expect(source).toMatch(/vm\.knowledgeFollowThrough\?\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(
-      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
+      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyPreviewContrast|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
     );
   });
 

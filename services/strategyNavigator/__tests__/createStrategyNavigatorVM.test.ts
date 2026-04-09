@@ -18,12 +18,13 @@ function createStrategies() {
 
 describe('createStrategyNavigatorVM', () => {
   it('builds one calm descriptive preview from explicit strategy and scenario inputs', () => {
+    const scenarios = listStrategyPreviewScenarios();
     const result = createStrategyNavigatorVM({
       generatedAt: '2026-04-05T00:00:00.000Z',
       selectedStrategyId: 'momentum_basics',
       selectedScenarioId: 'TREND_CONTINUATION',
       strategies: createStrategies(),
-      scenarios: listStrategyPreviewScenarios(),
+      scenarios,
       knowledgeNodes: knowledgeCatalog,
     });
 
@@ -42,21 +43,11 @@ describe('createStrategyNavigatorVM', () => {
       'mean_reversion',
       'fib_levels',
     ]);
-    expect(result.scenarios.map((scenario) => scenario.scenarioId)).toEqual([
-      'DIP_VOLATILITY',
-      'TREND_CONTINUATION',
-      'MIXED_REVERSAL',
-      'RANGE_COMPRESSION',
-    ]);
+    expect(result.scenarios).toEqual(scenarios);
     expect(result.availability).toEqual({
       status: 'AVAILABLE',
       strategyId: 'momentum_basics',
-      scenario: {
-        scenarioId: 'TREND_CONTINUATION',
-        title: 'Trend continuation',
-        summary:
-          'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
-      },
+      scenario: scenarios[1],
       focus: {
         snapshotHeadline:
           'Snapshot would keep strength in view, but it would still wait for orderly follow-through rather than celebrate the move.',
@@ -85,6 +76,19 @@ describe('createStrategyNavigatorVM', () => {
         ],
       },
     });
+    expect(result.contrast).toEqual({
+      status: 'AVAILABLE',
+      content: {
+        title: 'What changes in this scenario',
+        summary:
+          'Compared with a more neutral or mixed backdrop, Momentum Basics leans more toward orderly follow-through instead of loud movement alone because volatility is contained, structure is directional and orderly, and the condition is more extended than a neutral pause.',
+        bullets: [
+          'More attention here: Momentum-building events would matter most when they repeat without support starting to fray.',
+          'Less central here: oversold or reversal language, because the backdrop is still extending rather than resetting.',
+          'Preview expression: Names still building orderly strength would move closer to the prime zone.',
+        ],
+      },
+    });
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'AVAILABLE',
       items: [
@@ -105,56 +109,48 @@ describe('createStrategyNavigatorVM', () => {
   });
 
   it('returns unavailable honestly when a strategy has not been selected yet', () => {
-    expect(
-      createStrategyNavigatorVM({
-        generatedAt: '2026-04-05T00:00:00.000Z',
-        selectedStrategyId: null,
-        selectedScenarioId: 'DIP_VOLATILITY',
-        strategies: createStrategies(),
-        scenarios: listStrategyPreviewScenarios(),
-      }).availability,
-    ).toEqual({
+    const result = createStrategyNavigatorVM({
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: null,
+      selectedScenarioId: 'DIP_VOLATILITY',
+      strategies: createStrategies(),
+      scenarios: listStrategyPreviewScenarios(),
+    });
+
+    expect(result.availability).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_STRATEGY_SELECTED',
     });
-    expect(
-      createStrategyNavigatorVM({
-        generatedAt: '2026-04-05T00:00:00.000Z',
-        selectedStrategyId: null,
-        selectedScenarioId: 'DIP_VOLATILITY',
-        strategies: createStrategies(),
-        scenarios: listStrategyPreviewScenarios(),
-      }).explanation,
-    ).toEqual({
+    expect(result.explanation).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_EXPLANATION_AVAILABLE',
+    });
+    expect(result.contrast).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_CONTRAST_AVAILABLE',
     });
   });
 
   it('returns unavailable honestly when a scenario is missing', () => {
-    expect(
-      createStrategyNavigatorVM({
-        generatedAt: '2026-04-05T00:00:00.000Z',
-        selectedStrategyId: 'dip_buying',
-        selectedScenarioId: null,
-        strategies: createStrategies(),
-        scenarios: listStrategyPreviewScenarios(),
-      }).availability,
-    ).toEqual({
+    const result = createStrategyNavigatorVM({
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'dip_buying',
+      selectedScenarioId: null,
+      strategies: createStrategies(),
+      scenarios: listStrategyPreviewScenarios(),
+    });
+
+    expect(result.availability).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_SCENARIO_AVAILABLE',
     });
-    expect(
-      createStrategyNavigatorVM({
-        generatedAt: '2026-04-05T00:00:00.000Z',
-        selectedStrategyId: 'dip_buying',
-        selectedScenarioId: null,
-        strategies: createStrategies(),
-        scenarios: listStrategyPreviewScenarios(),
-      }).explanation,
-    ).toEqual({
+    expect(result.explanation).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_EXPLANATION_AVAILABLE',
+    });
+    expect(result.contrast).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_CONTRAST_AVAILABLE',
     });
   });
 
@@ -177,6 +173,10 @@ describe('createStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_SURFACE',
     });
+    expect(result.contrast).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
   });
 
   it('keeps the preview intact and returns follow-through unavailable honestly when knowledge context is missing', () => {
@@ -191,6 +191,7 @@ describe('createStrategyNavigatorVM', () => {
 
     expect(result.availability.status).toBe('AVAILABLE');
     expect(result.explanation.status).toBe('AVAILABLE');
+    expect(result.contrast.status).toBe('AVAILABLE');
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'UNAVAILABLE',
       reason: 'KNOWLEDGE_UNAVAILABLE',

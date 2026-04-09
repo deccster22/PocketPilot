@@ -2,6 +2,7 @@ import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
 import type { KnowledgeCatalogEntry } from '@/services/knowledge/types';
 
+import { createStrategyPreviewContrast } from './createStrategyPreviewContrast';
 import { createStrategyPreviewExplanation } from './createStrategyPreviewExplanation';
 import { selectStrategyPreviewKnowledge } from './selectStrategyPreviewKnowledge';
 import type {
@@ -22,6 +23,17 @@ type StrategyPreviewLens =
 
 function isEnabledForSurface(surface: StrategyNavigatorSurface): boolean {
   return surface === 'STRATEGY_NAVIGATOR';
+}
+
+function copyScenario(scenario: StrategyPreviewScenario): StrategyPreviewScenario {
+  return {
+    ...scenario,
+    traits: scenario.traits
+      ? {
+          ...scenario.traits,
+        }
+      : undefined,
+  };
 }
 
 function toStrategyOptions(
@@ -481,8 +493,8 @@ export function createStrategyNavigatorVM(params: {
     selectedStrategyId,
     selectedScenarioId,
     strategyOptions,
-    scenarios: [...params.scenarios],
-  } satisfies Omit<StrategyNavigatorVM, 'availability' | 'explanation' | 'knowledgeFollowThrough'>;
+    scenarios: params.scenarios.map(copyScenario),
+  } satisfies Omit<StrategyNavigatorVM, 'availability' | 'explanation' | 'contrast' | 'knowledgeFollowThrough'>;
   const selectedStrategy = selectedStrategyId
     ? params.strategies.find((strategy) => strategy.id === selectedStrategyId)
     : undefined;
@@ -500,6 +512,9 @@ export function createStrategyNavigatorVM(params: {
       explanation: createStrategyPreviewExplanation({
         surface,
       }),
+      contrast: createStrategyPreviewContrast({
+        surface,
+      }),
     };
   }
 
@@ -511,6 +526,10 @@ export function createStrategyNavigatorVM(params: {
         reason: 'NO_STRATEGY_SELECTED',
       },
       explanation: createStrategyPreviewExplanation({
+        surface,
+        scenario: selectedScenario,
+      }),
+      contrast: createStrategyPreviewContrast({
         surface,
         scenario: selectedScenario,
       }),
@@ -528,20 +547,31 @@ export function createStrategyNavigatorVM(params: {
         surface,
         strategy: selectedStrategy,
       }),
+      contrast: createStrategyPreviewContrast({
+        surface,
+        strategy: selectedStrategy,
+      }),
     };
   }
 
   const focus = createFocus(selectedStrategy.id, selectedScenario.scenarioId);
+  const explanation = createStrategyPreviewExplanation({
+    surface,
+    strategy: selectedStrategy,
+    scenario: selectedScenario,
+    focus,
+  });
 
   return {
     ...baseVm,
     availability: {
       status: 'AVAILABLE',
       strategyId: selectedStrategy.id,
-      scenario: selectedScenario,
+      scenario: copyScenario(selectedScenario),
       focus,
     },
-    explanation: createStrategyPreviewExplanation({
+    explanation,
+    contrast: createStrategyPreviewContrast({
       surface,
       strategy: selectedStrategy,
       scenario: selectedScenario,

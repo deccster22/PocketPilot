@@ -42,6 +42,19 @@ export function StrategyPreviewCard(props: {
         <Text style={styles.body}>{props.preview.alertPosture}</Text>
       </View>
 
+      {props.preview.contrast ? (
+        <View style={styles.contrastSection}>
+          <Text style={styles.sectionLabel}>Scenario contrast</Text>
+          <Text style={styles.explanationTitle}>{props.preview.contrast.title}</Text>
+          <Text style={styles.body}>{props.preview.contrast.summary}</Text>
+          {props.preview.contrast.bullets.map((item) => (
+            <Text key={item} style={styles.listItem}>
+              - {item}
+            </Text>
+          ))}
+        </View>
+      ) : null}
+
       {props.preview.explanation ? (
         <View style={styles.explanationSection}>
           <Text style={styles.sectionLabel}>Why this strategy cares here</Text>
@@ -114,6 +127,14 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
     borderRadius: 12,
     backgroundColor: '#f8fafc',
+    padding: 12,
+  },
+  contrastSection: {
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#f3e8d3',
+    borderRadius: 12,
+    backgroundColor: '#fffaf0',
     padding: 12,
   },
   sectionLabel: {
