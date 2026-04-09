@@ -1,4 +1,4 @@
-# Strategy Preview (P9-S1, P9-S2, P9-S3, P9-S4)
+# Strategy Preview (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
 
 ## Why This Exists
 
@@ -40,6 +40,13 @@ The point is orientation, not persuasion.
 - subordinate to the preview
 - free of prediction or action language
 
+`P9-S5` keeps the same posture while compacting the surface around the same prepared content so that:
+
+- the main preview focus stays dominant
+- explanation and contrast stay supportive rather than rival sections
+- knowledge follow-through stays clearly optional
+- no new logic family is introduced
+
 It is not:
 
 - a live market simulator
@@ -57,9 +64,10 @@ The surface remains intentionally thin:
 - one strategy selection rail
 - one finite scenario rail
 - one prepared preview card
-- one small optional scenario-contrast section inside that preview card when the service-owned seam says it is honestly available
-- one small optional explanation section inside that preview card when the service-owned seam says it is honestly available
-- one small optional preview-to-knowledge section when the service-owned selector says it is honestly relevant
+- one dominant preview-focus block inside that preview card
+- one compact detail stack for Dashboard shift, Market events, and Alert posture
+- one small optional supporting-context shelf that groups explanation and scenario contrast when the service-owned seams say they are honestly available
+- one small optional helpful-next-reading section when the service-owned selector says it is honestly relevant
 
 The prepared preview explains:
 
@@ -129,7 +137,7 @@ That path must not become:
 
 ## Deliberate Omissions
 
-`P9-S4` still does not add:
+`P9-S5` still does not add:
 
 - live quotes
 - broker integration
@@ -144,12 +152,13 @@ That path must not become:
 
 ## Relationship To Roadmap
 
-Strategy Preview is now the first visible `P9` lane with three linked rungs:
+Strategy Preview is now the first visible `P9` lane with five linked rungs:
 
 - `P9-S1` established the simulated preview contract
 - `P9-S2` adds the optional knowledge follow-through contract
 - `P9-S3` adds one optional preview explanation layer inside the same prepared VM
 - `P9-S4` adds one optional scenario-contrast layer and richer interpreted scenario traits inside that same prepared VM
+- `P9-S5` compacts that same prepared surface so the main preview stays readable as subordinate shelves accumulate
 
 Later `P9` work can deepen this mode, but it should keep the same product promise:
 

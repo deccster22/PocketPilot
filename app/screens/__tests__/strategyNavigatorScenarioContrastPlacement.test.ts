@@ -30,7 +30,8 @@ describe('strategy navigator scenario contrast placement', () => {
       /createStrategyPreviewContrast|createStrategyNavigatorVM|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime/,
     );
     expect(strategyNavigatorScreenViewSource).toMatch(/vm\.contrast\.status === 'AVAILABLE'/);
-    expect(strategyPreviewCardSource).toMatch(/props\.preview\.contrast/);
+    expect(strategyNavigatorScreenViewSource).toMatch(/sectionId: 'CONTRAST'/);
+    expect(strategyPreviewCardSource).toMatch(/props\.preview\.supportingSections/);
     expect(strategyPreviewCardSource).not.toMatch(
       /createStrategyPreviewContrast|fetchStrategyNavigatorVM|createStrategyNavigatorVM|signalCode|signalsTriggered|providerId|metadata|runtime/,
     );

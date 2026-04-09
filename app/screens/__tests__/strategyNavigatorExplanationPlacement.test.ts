@@ -30,7 +30,8 @@ describe('strategy navigator explanation placement', () => {
       /createStrategyPreviewExplanation|createStrategyNavigatorVM|selectStrategyPreviewKnowledge|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime/,
     );
     expect(strategyNavigatorScreenViewSource).toMatch(/vm\.explanation\.status === 'AVAILABLE'/);
-    expect(strategyPreviewCardSource).toMatch(/props\.preview\.explanation/);
+    expect(strategyNavigatorScreenViewSource).toMatch(/sectionId: 'EXPLANATION'/);
+    expect(strategyPreviewCardSource).toMatch(/props\.preview\.supportingSections/);
     expect(strategyPreviewCardSource).not.toMatch(
       /createStrategyPreviewExplanation|fetchStrategyNavigatorVM|createStrategyNavigatorVM|signalCode|signalsTriggered|providerId|metadata|runtime/,
     );
