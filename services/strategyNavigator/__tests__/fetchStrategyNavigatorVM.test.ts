@@ -44,6 +44,23 @@ describe('fetchStrategyNavigatorVM', () => {
           'Price movement tightens and activity quiets down, leaving the next move unresolved instead of obvious.',
       },
     ]);
+    expect(result.knowledgeFollowThrough).toEqual({
+      status: 'AVAILABLE',
+      items: [
+        {
+          topicId: 'strategy-buy-the-dip',
+          title: 'Buy the Dip',
+          reason:
+            'This preview is about pullbacks and stabilisation, so this is the clearest strategy follow-through if you want more context.',
+        },
+        {
+          topicId: 'pp-estimated-vs-confirmed-context',
+          title: 'Estimated vs Confirmed Context',
+          reason:
+            'This simulated dip stays unsettled, so certainty boundaries matter before the move sounds cleaner than it is.',
+        },
+      ],
+    });
   });
 
   it('returns unavailable when the selected strategy is outside the starter preview set', () => {
@@ -72,9 +89,25 @@ describe('fetchStrategyNavigatorVM', () => {
       throw new Error('Expected preview to be available.');
     }
 
-    expect(JSON.stringify(result.availability.focus)).not.toMatch(
-      /eventId|signalsTriggered|signalCode|providerId|metadata|runtime|accountId|confidenceScore|notification|badge/i,
+    expect(JSON.stringify(result)).not.toMatch(
+      /eventId|signalsTriggered|signalCode|providerId|metadata|runtime|accountId|confidenceScore|notification|badge|docs\/knowledge|README\.md|canonicalPath|markdown/i,
     );
+  });
+
+  it('keeps the preview available when knowledge inputs are missing and returns follow-through unavailable honestly', () => {
+    const result = fetchStrategyNavigatorVM({
+      surface: 'STRATEGY_NAVIGATOR',
+      selectedStrategyId: 'trend_following',
+      selectedScenarioId: 'TREND_CONTINUATION',
+      knowledgeNodes: [],
+      nowProvider: () => Date.parse('2026-04-05T00:00:00.000Z'),
+    });
+
+    expect(result.availability.status).toBe('AVAILABLE');
+    expect(result.knowledgeFollowThrough).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'KNOWLEDGE_UNAVAILABLE',
+    });
   });
 
   it('stays deterministic for identical inputs once time is supplied', () => {

@@ -1,11 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { ContextualKnowledgeCard } from '@/app/components/ContextualKnowledgeCard';
 import { KnowledgeTopicScreen } from '@/app/screens/KnowledgeTopicScreen';
 import { StrategyPreviewCard } from '@/app/components/StrategyPreviewCard';
 import { createStrategyNavigatorScreenViewData } from '@/app/screens/strategyNavigatorScreenView';
-import { fetchContextualKnowledgeAvailability } from '@/services/knowledge/fetchContextualKnowledgeAvailability';
 import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
 import { fetchStrategyNavigatorVM } from '@/services/strategyNavigator/fetchStrategyNavigatorVM';
 import type { StrategyPreviewScenarioId } from '@/services/strategyNavigator/types';
@@ -85,14 +83,6 @@ export function StrategyNavigatorScreen() {
     [selectedScenarioId, selectedStrategyId],
   );
   const screenView = useMemo(() => createStrategyNavigatorScreenViewData(vm), [vm]);
-  const contextualKnowledge = useMemo(
-    () =>
-      fetchContextualKnowledgeAvailability({
-        surface: 'STRATEGY_PREVIEW',
-        strategyNavigatorVM: vm,
-      }),
-    [vm],
-  );
   const knowledgeTopicVM = useMemo(
     () =>
       fetchKnowledgeTopicDetailVM({
@@ -169,7 +159,10 @@ export function StrategyNavigatorScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preview</Text>
           {screenView.preview ? (
-            <StrategyPreviewCard preview={screenView.preview} />
+            <StrategyPreviewCard
+              onOpenKnowledgeTopic={handleOpenKnowledgeTopic}
+              preview={screenView.preview}
+            />
           ) : (
             <View style={styles.unavailableCard}>
               <Text style={styles.unavailableText}>
@@ -178,15 +171,6 @@ export function StrategyNavigatorScreen() {
             </View>
           )}
         </View>
-
-        {contextualKnowledge.status === 'AVAILABLE' ? (
-          <View style={styles.section}>
-            <ContextualKnowledgeCard
-              items={contextualKnowledge.items}
-              onOpenTopic={handleOpenKnowledgeTopic}
-            />
-          </View>
-        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

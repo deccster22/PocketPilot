@@ -1,7 +1,8 @@
-# Strategy Navigator Spec (P9-S1)
+# Strategy Navigator Spec (P9-S1, P9-S2)
 
 ## Purpose
-The first Strategy Navigator surface should feel like a quiet briefing simulator.
+
+Strategy Navigator should feel like a quiet briefing simulator with one gentle next step.
 
 It should help a user compare strategy lenses without:
 
@@ -9,13 +10,14 @@ It should help a user compare strategy lenses without:
 - hype
 - prediction theatre
 - simulator complexity
+- homework-flow energy
 
 ## Surface Rules
 
 - one top-level Preview destination in this phase
 - app renders prepared strategy and scenario options only
 - app renders one prepared preview card only
-- app may render one prepared contextual knowledge card only when services mark it available
+- app may render one small prepared knowledge follow-through section inside that preview card only when services mark it available
 - unavailable state stays honest and minimal
 - no execution CTA
 - no wizard flow
@@ -24,21 +26,22 @@ It should help a user compare strategy lenses without:
 
 ## Initial Layout
 
-The P9-S1 layout is intentionally plain:
+The `P9-S2` layout remains intentionally plain:
 
 1. Title and short calming summary
 2. Strategy selector
 3. Scenario selector
 4. Preview card or honest unavailable state
-5. Optional contextual knowledge card
+5. Optional related-reading section inside the preview card
 
 This is enough for orientation.
-The first surface does not need a full multi-panel transformation yet.
+The first surface still does not need a full multi-panel transformation.
 
 ## Interaction Guidance
 
 - selecting a strategy should immediately refresh the prepared preview
 - selecting a scenario should immediately refresh the prepared preview
+- if prepared knowledge is available, opening a topic should feel like an optional shelf step, not a branch in a funnel
 - every state change should remain deterministic
 - the user should never feel trapped in a flow
 
@@ -51,6 +54,7 @@ The preview card should show:
 - a short Dashboard shift list
 - a short MarketEvents-that-matter list
 - one alert-posture line
+- zero or a few optional related-reading items
 
 The card should not show:
 
@@ -59,6 +63,22 @@ The card should not show:
 - implied profit probability
 - signal IDs or provider internals
 - celebratory or alarmist styling
+- markdown content blocks
+
+## Knowledge Follow-Through Guidance
+
+The optional section should feel like:
+
+- "Core concepts behind this preview"
+- "Related strategy reading"
+- "Read next if helpful"
+
+It should not feel like:
+
+- "Complete this first"
+- "Recommended path"
+- "Start onboarding"
+- "Unlock the next step"
 
 ## Tone Guidance
 
@@ -75,21 +95,22 @@ Avoid:
 - heroic language
 - coaching pressure
 - challenge or game framing
+- guilt-based educational tone
 
 ## Relationship To Later UX Work
 
 Future `P9` UX may introduce richer transformations, context links, or deeper explanation shelves.
 
-P9-S1 should still remain the reference for the core mood:
+`P9-S1` and `P9-S2` should still remain the reference for the core mood:
 
 - calm
 - exploratory
 - non-directive
 - service-owned
 
-The P7-K3 proof path should still stay:
+The preview-to-knowledge bridge should still stay:
 
 - optional
-- subordinate to the preview card
+- subordinate to the preview
 - easy to ignore
-- limited to prepared service-owned candidates
+- limited to prepared service-owned items

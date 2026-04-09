@@ -1,4 +1,5 @@
 import { listCatalog } from '@/core/strategy/catalog';
+import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
 import { createStrategyNavigatorVM } from '@/services/strategyNavigator/createStrategyNavigatorVM';
 import { listStrategyPreviewScenarios } from '@/services/strategyNavigator/strategyPreviewScenarios';
 
@@ -23,6 +24,7 @@ describe('createStrategyNavigatorVM', () => {
       selectedScenarioId: 'TREND_CONTINUATION',
       strategies: createStrategies(),
       scenarios: listStrategyPreviewScenarios(),
+      knowledgeNodes: knowledgeCatalog,
     });
 
     expect(result.title).toBe('Strategy Preview');
@@ -70,6 +72,23 @@ describe('createStrategyNavigatorVM', () => {
           'Alerts would stay observational and mostly confirm that strength is still building in an orderly way.',
       },
     });
+    expect(result.knowledgeFollowThrough).toEqual({
+      status: 'AVAILABLE',
+      items: [
+        {
+          topicId: 'strategy-momentum-pulse',
+          title: 'Momentum Pulse',
+          reason:
+            'This preview keeps the momentum lens grounded in pace, follow-through, and whether acceleration still looks orderly.',
+        },
+        {
+          topicId: 'pp-what-market-regime-means',
+          title: 'What Market Regime Means',
+          reason:
+            'This simulated continuation makes more sense when the broader backdrop still has room in the interpretation.',
+        },
+      ],
+    });
   });
 
   it('returns unavailable honestly when a strategy has not been selected yet', () => {
@@ -110,11 +129,29 @@ describe('createStrategyNavigatorVM', () => {
         selectedScenarioId: 'MIXED_REVERSAL',
         strategies: createStrategies(),
         scenarios: listStrategyPreviewScenarios(),
+        knowledgeNodes: knowledgeCatalog,
         surface: 'DASHBOARD',
       }).availability,
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
+  });
+
+  it('keeps the preview intact and returns follow-through unavailable honestly when knowledge context is missing', () => {
+    const result = createStrategyNavigatorVM({
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'trend_following',
+      selectedScenarioId: 'TREND_CONTINUATION',
+      strategies: createStrategies(),
+      scenarios: listStrategyPreviewScenarios(),
+      knowledgeNodes: null,
+    });
+
+    expect(result.availability.status).toBe('AVAILABLE');
+    expect(result.knowledgeFollowThrough).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'KNOWLEDGE_UNAVAILABLE',
     });
   });
 
@@ -125,19 +162,20 @@ describe('createStrategyNavigatorVM', () => {
       selectedScenarioId: 'RANGE_COMPRESSION',
       strategies: createStrategies(),
       scenarios: listStrategyPreviewScenarios(),
+      knowledgeNodes: knowledgeCatalog,
     });
 
     if (result.availability.status !== 'AVAILABLE') {
       throw new Error('Expected preview to be available.');
     }
 
-    const serialized = JSON.stringify(result.availability.focus);
+    const serialized = JSON.stringify(result);
 
     expect(serialized).not.toMatch(
-      /buy|sell|entry|exit|execute|execution|dispatch|order|broker|profit|forecast|prediction|guarantee|urgent|act now/i,
+      /sell|execute|execution|dispatch|broker|profit|forecast|prediction|guarantee|urgent|act now/i,
     );
     expect(serialized).not.toMatch(
-      /eventId|signalsTriggered|signalCode|providerId|metadata|runtime|accountId|confidenceScore/i,
+      /eventId|signalsTriggered|signalCode|providerId|metadata|runtime|accountId|confidenceScore|docs\/knowledge|README\.md|canonicalPath|markdown/i,
     );
   });
 
@@ -148,6 +186,7 @@ describe('createStrategyNavigatorVM', () => {
       selectedScenarioId: 'MIXED_REVERSAL' as const,
       strategies: createStrategies(),
       scenarios: listStrategyPreviewScenarios(),
+      knowledgeNodes: knowledgeCatalog,
     };
 
     expect(createStrategyNavigatorVM(params)).toEqual(createStrategyNavigatorVM(params));

@@ -1,8 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { StrategyPreviewCardViewData } from '@/app/screens/strategyNavigatorScreenView';
 
-export function StrategyPreviewCard(props: { preview: StrategyPreviewCardViewData }) {
+export function StrategyPreviewCard(props: {
+  preview: StrategyPreviewCardViewData;
+  onOpenKnowledgeTopic?: (topicId: string) => void;
+}) {
   return (
     <View style={styles.card}>
       <Text style={styles.eyebrow}>Prepared walkthrough</Text>
@@ -38,6 +41,28 @@ export function StrategyPreviewCard(props: { preview: StrategyPreviewCardViewDat
         <Text style={styles.sectionLabel}>Alert posture</Text>
         <Text style={styles.body}>{props.preview.alertPosture}</Text>
       </View>
+
+      {props.preview.knowledgeItems.length > 0 ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Core concepts behind this preview</Text>
+          <Text style={styles.body}>
+            Optional reading if you want a little more context without leaving the simulated lane.
+          </Text>
+          {props.preview.knowledgeItems.map((item) => (
+            <Pressable
+              key={item.topicId}
+              accessibilityRole="button"
+              disabled={!props.onOpenKnowledgeTopic}
+              onPress={() => props.onOpenKnowledgeTopic?.(item.topicId)}
+              style={styles.knowledgeItem}
+            >
+              <Text style={styles.knowledgeTitle}>{item.title}</Text>
+              <Text style={styles.knowledgeReason}>{item.reason}</Text>
+              <Text style={styles.knowledgeLink}>Open topic</Text>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -85,5 +110,28 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     color: '#334155',
+  },
+  knowledgeItem: {
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#dbe4ea',
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    padding: 12,
+  },
+  knowledgeTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  knowledgeReason: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
+  },
+  knowledgeLink: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0f766e',
   },
 });
