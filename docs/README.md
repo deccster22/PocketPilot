@@ -76,6 +76,35 @@ If a proposed change weakens any of the above, stop and resolve it before procee
 
 ---
 
+## Current Product-Behavior Canonical Set
+
+The 2026-04-09 normalization pass imports the Product Behavior Wave as the live base, applies the Founder Pass only to matching front-door product docs, and places the Follow-On docs at their canonical live homes instead of keeping a parallel source-tree layout.
+
+Product:
+
+- `product/AI_EXPLANATION_LAYER.md`
+- `product/ASSET_NARRATIVE_MODEL.md`
+- `product/KNOWLEDGE_LAYER.md`
+- `product/LOG_AND_JOURNAL_MODEL.md`
+- `product/NOTIFICATION_PHILOSOPHY.md`
+- `product/PROFILE_EXPLANATION_MODEL.md`
+- `product/RELEVANCE_PRINCIPLE.md`
+- `product/SNAPSHOT_VISION.md`
+
+Behaviours:
+
+- `behaviours/SIGNAL_EXPOSURE.md`
+- `behaviours/CONFIDENCE_LANGUAGE.md`
+- `behaviours/NOTIFICATION_SYSTEM.md`
+
+Architecture:
+
+- `architecture/PROFILE_SYSTEM.md`
+
+These paths are the live source of truth for this product-behaviour set.
+
+---
+
 ## Documentation Hierarchy
 
 PocketPilot docs now map to **ten tiers**. This is the current mental model for the repo.
@@ -181,7 +210,6 @@ Examples:
 - `behaviours/SIGNAL_EXPOSURE.md`
 - `behaviours/CONFIDENCE_LANGUAGE.md`
 - `behaviours/NOTIFICATION_SYSTEM.md`
-- `behaviours/SYSTEM_BEHAVIOUR.md`
 
 Question answered: **How do features behave safely and consistently in the real product?**
 
