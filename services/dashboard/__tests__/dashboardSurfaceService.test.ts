@@ -1,4 +1,4 @@
-﻿import { readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MarketEvent } from '@/core/types/marketEvent';
@@ -39,6 +39,16 @@ describe('fetchDashboardSurfaceVM', () => {
     const event = createEvent();
 
     mockFetchDashboardData.mockResolvedValue({
+      accountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'strategy-a',
+        },
+      },
       scan: {
         accountId: 'acct-live',
         symbols: ['BTC'],
@@ -123,6 +133,16 @@ describe('fetchDashboardSurfaceVM', () => {
 
     const result = await fetchDashboardSurfaceVM({ profile: 'ADVANCED' });
 
+    expect(result.accountContext).toEqual({
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-live',
+        displayName: 'Live account',
+        selectionMode: 'PRIMARY_FALLBACK',
+        baseCurrency: 'USD',
+        strategyId: 'strategy-a',
+      },
+    });
     expect(result.scan.accountId).toBe('acct-live');
     expect(result.model).toEqual({
       primeZone: {
@@ -164,6 +184,68 @@ describe('fetchDashboardSurfaceVM', () => {
     const serialized = JSON.stringify(result.explanation);
 
     expect(serialized).not.toMatch(/signalsTriggered|metadata|eventId|providerId/);
+  });
+
+  it('keeps Dashboard account-scoped when upstream data contains other-account events', async () => {
+    const selectedAccountEvent = createEvent();
+    const otherAccountEvent = createEvent({
+      eventId: 'acct-basic:strategy-b:signal:ETH:300',
+      timestamp: 300,
+      accountId: 'acct-basic',
+      symbol: 'ETH',
+      strategyId: 'strategy-b',
+      eventType: 'PRICE_MOVEMENT',
+      alignmentState: 'NEEDS_REVIEW',
+      pctChange: -0.08,
+    });
+
+    mockFetchDashboardData.mockResolvedValue({
+      accountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'strategy-a',
+        },
+      },
+      scan: {
+        accountId: 'acct-live',
+      } as never,
+      orientationContext: {
+        profile: 'ADVANCED',
+        assets: [],
+      },
+      explanationContext: {
+        accountId: 'acct-live',
+        currentState: {
+          latestRelevantEvent: selectedAccountEvent,
+          strategyAlignment: 'Watchful',
+          certainty: 'confirmed',
+        },
+        historyContext: {
+          eventsSinceLastViewed: [otherAccountEvent, selectedAccountEvent],
+          sinceLastChecked: {
+            sinceTimestamp: 90,
+            accountId: 'acct-live',
+            summaryCount: 2,
+            events: [otherAccountEvent, selectedAccountEvent],
+          },
+        },
+      },
+      events: [otherAccountEvent, selectedAccountEvent],
+    });
+
+    const result = await fetchDashboardSurfaceVM({ profile: 'ADVANCED' });
+
+    expect(result.model.primeZone.items).toEqual([
+      expect.objectContaining({
+        accountId: 'acct-live',
+        symbol: 'BTC',
+      }),
+    ]);
+    expect(JSON.stringify(result.model)).not.toContain('acct-basic');
   });
 
   it('keeps dashboard decoupled from snapshot service flow', () => {

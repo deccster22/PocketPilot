@@ -1,6 +1,7 @@
 ﻿import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import type { UserProfile } from '@/core/profile/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
+import type { SelectedAccountAvailability } from '@/services/accounts/types';
 import type { OrientationContext as ExplanationContext } from '@/services/orientation/createOrientationContext';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -8,6 +9,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 import type { OrientationContext } from './types';
 
 export type DashboardData = {
+  accountContext: SelectedAccountAvailability;
   scan: ForegroundScanResult;
   events: MarketEvent[];
   orientationContext: OrientationContext;
@@ -67,6 +69,7 @@ export async function fetchDashboardData(params: {
   const upstream = await fetchSurfaceContext(params);
 
   return {
+    accountContext: upstream.selectedAccountContext,
     scan: upstream.scan,
     events: cloneDashboardEvents(upstream.marketEvents),
     orientationContext: {

@@ -10,8 +10,21 @@ function createSnapshot(overrides?: {
   currentState?: string;
   currentTrendDirection?: SnapshotVM['model']['core']['currentState']['trendDirection'];
   events?: SnapshotVM['eventStream']['events'];
+  accountContext?: SnapshotVM['accountContext'];
 }): SnapshotVM {
   return {
+    accountContext:
+      overrides?.accountContext ??
+      ({
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-1',
+          displayName: 'Primary account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      } as NonNullable<SnapshotVM['accountContext']>),
     model: {
       profile: 'BEGINNER',
       core: {
@@ -145,5 +158,41 @@ describe('fetchThirtyThousandFootVM', () => {
     expect(JSON.stringify(result)).not.toMatch(
       /eventId|strategyId|signalsTriggered|metadata|providerId|broker:live|accountId/,
     );
+  });
+
+  it('keeps fit account-scoped when a different account has more stressed events', async () => {
+    const result = await fetchThirtyThousandFootVM({
+      snapshot: createSnapshot({
+        strategyAlignment: 'Aligned',
+        change24h: 0.01,
+        currentTrendDirection: 'UP',
+        events: [
+          {
+            eventId: 'acct-basic:momentum_basics:signal:ETH:2',
+            timestamp: Date.parse('2026-04-05T00:00:01.000Z'),
+            accountId: 'acct-basic',
+            symbol: 'ETH',
+            strategyId: 'momentum_basics',
+            eventType: 'PRICE_MOVEMENT',
+            alignmentState: 'NEEDS_REVIEW',
+            signalsTriggered: ['snapshot_move_threshold_met'],
+            confidenceScore: 0.95,
+            certainty: 'confirmed',
+            price: 90,
+            pctChange: -0.08,
+            metadata: {
+              direction: 'down',
+            },
+          },
+        ],
+      }),
+      surface: 'SNAPSHOT',
+    });
+
+    expect(result.fit).toEqual({
+      state: 'FAVOURABLE',
+      summary:
+        'Conditions look broadly favourable for this strategy. Broader structure remains stable and volatility is closer to recent norms.',
+    });
   });
 });

@@ -1,4 +1,5 @@
 import type { UserProfile } from '@/core/profile/types';
+import type { AccountSelectionMode } from '@/services/accounts/types';
 import {
   fetchDashboardSurfaceVM,
   type DashboardSurfaceVM,
@@ -12,6 +13,16 @@ import type {
   MessagePriority,
 } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
+
+export type DashboardScreenAccountContextViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+    };
 
 export type DashboardScreenZoneItemViewData = {
   title: string;
@@ -38,6 +49,7 @@ export type DashboardScreenMessageViewData =
 
 export type DashboardScreenViewData = {
   profileLabel: string;
+  accountContext: DashboardScreenAccountContextViewData;
   message: DashboardScreenMessageViewData;
   primeZone: DashboardScreenZoneViewData;
   secondaryZone: DashboardScreenZoneViewData;
@@ -61,6 +73,43 @@ export type DashboardScreenViewData = {
             };
       };
 };
+
+function formatSelectionMode(selectionMode: AccountSelectionMode): string {
+  switch (selectionMode) {
+    case 'EXPLICIT':
+      return 'Explicit account context';
+    case 'PRIMARY_FALLBACK':
+      return 'Primary-account context';
+    default:
+      return 'Highest-value fallback context';
+  }
+}
+
+function createAccountContextViewData(
+  accountContext: DashboardSurfaceVM['accountContext'],
+): DashboardScreenAccountContextViewData {
+  if (accountContext.status !== 'AVAILABLE') {
+    return {
+      visible: false,
+    };
+  }
+
+  return {
+    visible: true,
+    title: `Current account: ${accountContext.account.displayName}`,
+    summary: [
+      formatSelectionMode(accountContext.account.selectionMode),
+      accountContext.account.baseCurrency
+        ? `${accountContext.account.baseCurrency} base currency`
+        : null,
+      accountContext.account.strategyId
+        ? `Strategy ${accountContext.account.strategyId}`
+        : null,
+    ]
+      .filter((value): value is string => Boolean(value))
+      .join(' | '),
+  };
+}
 
 function formatEventTypeLabel(item: DashboardItem): string {
   switch (item.eventType) {
@@ -186,6 +235,7 @@ export function createDashboardScreenViewData(
 
   return {
     profileLabel: surface.model.meta.profile,
+    accountContext: createAccountContextViewData(surface.accountContext),
     message: createDashboardMessageViewData(messagePolicy),
     primeZone: {
       title: 'Prime Zone',

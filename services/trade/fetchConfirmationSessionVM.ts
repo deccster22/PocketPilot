@@ -1,4 +1,6 @@
 import type { UserProfile } from '@/core/profile/types';
+import { enforceAccountScopedTruth } from '@/services/accounts/enforceAccountScopedTruth';
+import type { SelectedAccountContext } from '@/services/accounts/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
@@ -11,6 +13,7 @@ import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview'
 import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
 import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
+import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
 import type {
   ConfirmationSession,
   ConfirmationSessionActions,
@@ -44,11 +47,18 @@ export async function fetchConfirmationSessionVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = createProtectionPlans({
-    orientationContext: upstream.orientationContext,
-    marketEvents: upstream.marketEvents,
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: upstream.selectedAccountContext,
+    protectionPlans: createProtectionPlans({
+      orientationContext: upstream.orientationContext,
+      marketEvents: upstream.marketEvents,
+    }),
   });
   const capabilityCache = new Map<string, Awaited<ReturnType<typeof getAccountCapabilities>>>();
+  const selectedAccount =
+    upstream.selectedAccountContext.status === 'AVAILABLE'
+      ? upstream.selectedAccountContext.account
+      : null;
   let currentSession = await buildConfirmationSession({
     plan:
       params.selectedPlanId === undefined
@@ -63,6 +73,7 @@ export async function fetchConfirmationSessionVM(params: {
             profile: params.profile,
           }),
     capabilityCache,
+    selectedAccount,
   });
 
   const actions: ConfirmationSessionActions = {
@@ -124,6 +135,7 @@ export async function fetchConfirmationSessionVM(params: {
                 profile: params.profile,
               }),
         capabilityCache,
+        selectedAccount,
       });
 
       return currentSession;
@@ -152,6 +164,7 @@ function resolveSessionPlan(params: {
 async function buildConfirmationSession(params: {
   plan: ProtectionPlan | null;
   capabilityCache: Map<string, Awaited<ReturnType<typeof getAccountCapabilities>>>;
+  selectedAccount: SelectedAccountContext | null;
 }): Promise<ConfirmationSession> {
   if (!params.plan) {
     return {
@@ -178,7 +191,7 @@ async function buildConfirmationSession(params: {
     capabilityResolution: executionCapability,
   });
 
-  return {
+  const session: ConfirmationSession = {
     planId: params.plan.planId,
     accountId: params.plan.accountId,
     executionCapability,
@@ -187,4 +200,15 @@ async function buildConfirmationSession(params: {
     shell,
     flow: createConfirmationFlow({ shell }),
   };
+
+  if (!params.selectedAccount) {
+    return session;
+  }
+
+  return enforceAccountScopedTruth({
+    label: 'Execution support',
+    selectedAccount: params.selectedAccount,
+    accountIds: [params.plan.accountId, executionCapability.accountId],
+    value: session,
+  });
 }

@@ -50,6 +50,16 @@ describe('fetchTradePlanPreviewVM', () => {
     });
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',
@@ -197,6 +207,16 @@ describe('fetchTradePlanPreviewVM', () => {
     });
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',

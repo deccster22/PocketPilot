@@ -5,6 +5,7 @@ import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
+import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
 import type { TradePlanPreview } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
@@ -34,9 +35,12 @@ export async function fetchTradePlanPreviewVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = createProtectionPlans({
-    orientationContext: upstream.orientationContext,
-    marketEvents: upstream.marketEvents,
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: upstream.selectedAccountContext,
+    protectionPlans: createProtectionPlans({
+      orientationContext: upstream.orientationContext,
+      marketEvents: upstream.marketEvents,
+    }),
   });
   const selectedPlan = resolveSelectedTradePlan({
     protectionPlans,

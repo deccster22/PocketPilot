@@ -1,6 +1,10 @@
 import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import type { AlignmentState, MarketEvent } from '@/core/types/marketEvent';
+import type {
+  AccountContextCandidate,
+  SelectedAccountAvailability,
+} from '@/services/accounts/types';
 import {
   buildDebugObservatoryPayload,
   type DebugObservatoryPayload,
@@ -18,6 +22,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext, type SurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
 export type SnapshotVM = {
+  accountContext?: SelectedAccountAvailability;
   model: SnapshotModel;
   // Legacy bridge fields remain aligned during the SnapshotModel transition.
   portfolioValue: number;
@@ -47,6 +52,8 @@ export function formatAlignmentState(alignmentState: AlignmentState): string {
 
 export async function fetchSnapshotVM(params: {
   profile: UserProfile;
+  accounts?: ReadonlyArray<AccountContextCandidate>;
+  selectedAccountId?: string | null;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   includeDebugObservatory?: boolean;
@@ -58,6 +65,8 @@ export async function fetchSnapshotVM(params: {
   const nowProvider = params.nowProvider ?? Date.now;
   const upstream = await fetchSurfaceContext({
     profile: params.profile,
+    accounts: params.accounts,
+    selectedAccountId: params.selectedAccountId,
     baselineScan: params.baselineScan,
     nowProvider,
     eventLedger: params.eventLedger,
@@ -101,6 +110,7 @@ export async function fetchSnapshotVM(params: {
   });
 
   return {
+    accountContext: upstream.selectedAccountContext,
     model: snapshotModel,
     portfolioValue: upstream.portfolioValue,
     change24h: upstream.change24h,

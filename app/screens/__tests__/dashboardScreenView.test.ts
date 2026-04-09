@@ -10,6 +10,16 @@ import {
 
 function createSurface(): DashboardSurfaceVM {
   return {
+    accountContext: {
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-1',
+        displayName: 'Primary account',
+        selectionMode: 'PRIMARY_FALLBACK',
+        baseCurrency: 'USD',
+        strategyId: 'momentum_basics',
+      },
+    },
     model: {
       primeZone: {
         items: [
@@ -65,7 +75,8 @@ function createSurface(): DashboardSurfaceVM {
       status: 'AVAILABLE' as const,
       explanation: {
         title: 'Why BTC is in focus',
-        summary: 'BTC is in focus because momentum is strengthening in the current interpreted picture.',
+        summary:
+          'BTC is in focus because momentum is strengthening in the current interpreted picture.',
         contextNote:
           'The current state remains watchful, so this stays active without reading as settled.',
         confidence: 'MODERATE' as const,
@@ -75,7 +86,8 @@ function createSurface(): DashboardSurfaceVM {
           {
             kind: 'MARKET_EVENT' as const,
             label: 'BTC momentum context',
-            detail: 'BTC remains in focus because momentum is strengthening in the current interpreted picture.',
+            detail:
+              'BTC remains in focus because momentum is strengthening in the current interpreted picture.',
             timestamp: '2026-04-01T00:00:00.000Z',
           },
         ],
@@ -91,6 +103,11 @@ describe('createDashboardScreenViewData', () => {
 
     expect(view).toEqual({
       profileLabel: 'ADVANCED',
+      accountContext: {
+        visible: true,
+        title: 'Current account: Primary account',
+        summary: 'Primary-account context | USD base currency | Strategy momentum_basics',
+      },
       message: {
         visible: false,
       },
@@ -127,7 +144,8 @@ describe('createDashboardScreenViewData', () => {
       explanation: {
         visible: true,
         title: 'Why BTC is in focus',
-        summary: 'BTC is in focus because momentum is strengthening in the current interpreted picture.',
+        summary:
+          'BTC is in focus because momentum is strengthening in the current interpreted picture.',
         confidenceText: 'Support: Moderate',
         confidenceNote:
           'Confidence is moderate because more than one prepared input supports this interpretation. It reflects evidence support, not a guaranteed outcome.',
@@ -147,18 +165,24 @@ describe('createDashboardScreenViewData', () => {
     });
   });
 
-  it('keeps the screen helper on the prepared message-policy and explanation contracts only', () => {
+  it('keeps the screen helper on the prepared account, message-policy, and explanation contracts only', () => {
     const source = readFileSync(
       join(process.cwd(), 'app', 'screens', 'dashboardScreenView.ts'),
       'utf8',
     );
 
+    expect(source).toMatch(/accountContext\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
+    expect(source).not.toMatch(/portfolioValue|isPrimary|selectedAccountId|resolveSelectedAccountContext/);
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
-    expect(source).not.toMatch(/createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/);
-    expect(source).not.toMatch(/createExplanationSummary|signalsTriggered|eventId|providerId|metadata/);
+    expect(source).not.toMatch(
+      /createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/,
+    );
+    expect(source).not.toMatch(
+      /createExplanationSummary|signalsTriggered|eventId|providerId|metadata/,
+    );
   });
 
   it('passes through the prepared Dashboard referral without classifying it locally', () => {
@@ -225,9 +249,35 @@ describe('createDashboardScreenViewData', () => {
     expect(createDashboardScreenViewData(null)).toBeNull();
   });
 
+  it('hides the account-context cue when the prepared account seam is unavailable', () => {
+    expect(
+      createDashboardScreenViewData({
+        ...createSurface(),
+        accountContext: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_VALID_ACCOUNT_CONTEXT',
+        },
+      }),
+    ).toMatchObject({
+      accountContext: {
+        visible: false,
+      },
+    });
+  });
+
   it('hides the explanation card when the prepared explanation is unavailable', () => {
     expect(
       createDashboardScreenViewData({
+        accountContext: {
+          status: 'AVAILABLE',
+          account: {
+            accountId: 'acct-1',
+            displayName: 'Primary account',
+            selectionMode: 'EXPLICIT',
+            baseCurrency: 'USD',
+            strategyId: 'momentum_basics',
+          },
+        },
         model: {
           primeZone: { items: [] },
           secondaryZone: { items: [] },

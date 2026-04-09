@@ -151,6 +151,16 @@ function createSnapshotSurface(): SnapshotSurfaceVM {
 
 function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): DashboardSurfaceVM {
   return {
+    accountContext: {
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-1',
+        displayName: 'Primary account',
+        selectionMode: 'PRIMARY_FALLBACK',
+        baseCurrency: 'USD',
+        strategyId: 'momentum_basics',
+      },
+    },
     model: {
       primeZone: { items: [] },
       secondaryZone: {
