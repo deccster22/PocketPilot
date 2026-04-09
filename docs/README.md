@@ -410,16 +410,17 @@ EventLedger
 -> Insights recent-comparison shelf
 ```
 
-P9-S1 and P9-S2 now define the first thin Strategy Navigator / Preview path:
+P9-S1 through P9-S3 now define the first thin Strategy Navigator / Preview path:
 
 ```text
 core strategy catalog
 -> strategyPreviewScenarios
 -> createStrategyNavigatorVM
--> selectStrategyPreviewKnowledge
 -> fetchStrategyNavigatorVM
 -> Strategy Preview tab
 ```
+
+Within `createStrategyNavigatorVM`, the same service-owned lane now calls `createStrategyPreviewExplanation` and `selectStrategyPreviewKnowledge` so the app still consumes one prepared preview contract.
 
 Key rule: **services own truth, app renders prepared contracts**.
 
@@ -493,6 +494,7 @@ PocketPilot is easiest to read at three levels.
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P9-S1` Strategy Navigator / Preview foundation
 - `P9-S2` Strategy Navigator preview-to-knowledge follow-through
+- `P9-S3` Strategy Navigator preview explanation deepening
 - `P10` Beta hardening
 - `P11` Launch prep
 

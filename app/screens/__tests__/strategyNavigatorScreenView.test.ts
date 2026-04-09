@@ -59,6 +59,19 @@ describe('createStrategyNavigatorScreenViewData', () => {
               'Alerts would feel patient and would describe the dip as something to monitor rather than something to chase.',
           },
         },
+        explanation: {
+          status: 'AVAILABLE',
+          content: {
+            title: 'Why Dip Buying reacts this way',
+            summary:
+              'Dip Buying watches for weakness that is starting to settle into a calmer pullback when the market is dropping while volatility is expanding. This keeps the simulated read focused on interpretation priorities rather than outcomes.',
+            bullets: [
+              'What it is noticing: Snapshot would treat this as a dip worth watching, but only once the drop starts to settle into something interpretable.',
+              'Why that matters: This lens cares about whether pressure is becoming more interpretable, because a messy drop is different from a steadier dip-watch setup.',
+              'Relevant interpreted MarketEvents: Dip-detected events would matter most when they are followed by calmer price movement. Estimated-price events would matter if the backdrop is still too noisy to trust the read.',
+            ],
+          },
+        },
         knowledgeFollowThrough: {
           status: 'AVAILABLE',
           items: [
@@ -127,6 +140,16 @@ describe('createStrategyNavigatorScreenViewData', () => {
         ],
         alertPosture:
           'Alerts would feel patient and would describe the dip as something to monitor rather than something to chase.',
+        explanation: {
+          title: 'Why Dip Buying reacts this way',
+          summary:
+            'Dip Buying watches for weakness that is starting to settle into a calmer pullback when the market is dropping while volatility is expanding. This keeps the simulated read focused on interpretation priorities rather than outcomes.',
+          bullets: [
+            'What it is noticing: Snapshot would treat this as a dip worth watching, but only once the drop starts to settle into something interpretable.',
+            'Why that matters: This lens cares about whether pressure is becoming more interpretable, because a messy drop is different from a steadier dip-watch setup.',
+            'Relevant interpreted MarketEvents: Dip-detected events would matter most when they are followed by calmer price movement. Estimated-price events would matter if the backdrop is still too noisy to trust the read.',
+          ],
+        },
         knowledgeItems: [
           {
             topicId: 'strategy-buy-the-dip',
@@ -166,6 +189,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
         availability: {
           status: 'UNAVAILABLE',
           reason: 'NO_STRATEGY_SELECTED',
+        },
+        explanation: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_EXPLANATION_AVAILABLE',
         },
       }),
     ).toEqual({
@@ -236,6 +263,19 @@ describe('createStrategyNavigatorScreenViewData', () => {
             'Alerts would feel steady and would mostly describe whether the trend still has structure behind it.',
         },
       },
+      explanation: {
+        status: 'AVAILABLE',
+        content: {
+          title: 'Why Trend Follow reacts this way',
+          summary:
+            'Trend Follow reads the move through the larger directional structure when an existing move is still extending in an orderly way. This keeps the simulated read focused on interpretation priorities rather than outcomes.',
+          bullets: [
+            'What it is noticing: Snapshot would read this as a continuation first and would ask whether the broader structure is still carrying it cleanly.',
+            'Why that matters: This lens cares about whether the broader direction is still holding together, not just whether one move is loud.',
+            'Relevant interpreted MarketEvents: Momentum-building events would matter when they reinforce an already established directional picture.',
+          ],
+        },
+      },
       knowledgeFollowThrough: {
         status: 'UNAVAILABLE',
         reason: 'KNOWLEDGE_UNAVAILABLE',
@@ -243,6 +283,64 @@ describe('createStrategyNavigatorScreenViewData', () => {
     });
 
     expect(result?.preview?.knowledgeItems).toEqual([]);
+  });
+
+  it('renders no explanation section when services return explanation unavailable', () => {
+    const result = createStrategyNavigatorScreenViewData({
+      title: 'Strategy Preview',
+      summary: 'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'trend_following',
+      selectedScenarioId: 'TREND_CONTINUATION',
+      strategyOptions: [
+        {
+          strategyId: 'trend_following',
+          title: 'Trend Follow',
+          summary: 'Tracks whether directional structure is still holding together.',
+          archetype: 'MIDDLE',
+        },
+      ],
+      scenarios: [
+        {
+          scenarioId: 'TREND_CONTINUATION',
+          title: 'Trend continuation',
+          summary:
+            'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
+        },
+      ],
+      availability: {
+        status: 'AVAILABLE',
+        strategyId: 'trend_following',
+        scenario: {
+          scenarioId: 'TREND_CONTINUATION',
+          title: 'Trend continuation',
+          summary:
+            'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
+        },
+        focus: {
+          snapshotHeadline:
+            'Snapshot would read this as a continuation first and would ask whether the broader structure is still carrying it cleanly.',
+          dashboardFocus: [
+            'The Dashboard would bring sustained directional names forward when follow-through remains orderly.',
+          ],
+          eventHighlights: [
+            'Momentum-building events would matter when they reinforce an already established directional picture.',
+          ],
+          alertPosture:
+            'Alerts would feel steady and would mostly describe whether the trend still has structure behind it.',
+        },
+      },
+      explanation: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_EXPLANATION_AVAILABLE',
+      },
+      knowledgeFollowThrough: {
+        status: 'UNAVAILABLE',
+        reason: 'KNOWLEDGE_UNAVAILABLE',
+      },
+    });
+
+    expect(result?.preview?.explanation).toBeNull();
   });
 
   it('keeps the screen helper on the prepared Strategy Preview VM only', () => {
@@ -253,9 +351,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
 
     expect(source).toMatch(/availability\.status === 'UNAVAILABLE'/);
     expect(source).toMatch(/vm\.strategyOptions\.map/);
+    expect(source).toMatch(/vm\.explanation\.status === 'AVAILABLE'/);
     expect(source).toMatch(/vm\.knowledgeFollowThrough\?\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(
-      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
+      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
     );
   });
 
