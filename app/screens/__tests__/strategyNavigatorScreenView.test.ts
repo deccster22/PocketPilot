@@ -59,6 +59,23 @@ describe('createStrategyNavigatorScreenViewData', () => {
               'Alerts would feel patient and would describe the dip as something to monitor rather than something to chase.',
           },
         },
+        knowledgeFollowThrough: {
+          status: 'AVAILABLE',
+          items: [
+            {
+              topicId: 'strategy-buy-the-dip',
+              title: 'Buy the Dip',
+              reason:
+                'This preview is about pullbacks and stabilisation, so this is the clearest strategy follow-through if you want more context.',
+            },
+            {
+              topicId: 'pp-estimated-vs-confirmed-context',
+              title: 'Estimated vs Confirmed Context',
+              reason:
+                'This simulated dip stays unsettled, so certainty boundaries matter before the move sounds cleaner than it is.',
+            },
+          ],
+        },
       }),
     ).toEqual({
       title: 'Strategy Preview',
@@ -110,6 +127,20 @@ describe('createStrategyNavigatorScreenViewData', () => {
         ],
         alertPosture:
           'Alerts would feel patient and would describe the dip as something to monitor rather than something to chase.',
+        knowledgeItems: [
+          {
+            topicId: 'strategy-buy-the-dip',
+            title: 'Buy the Dip',
+            reason:
+              'This preview is about pullbacks and stabilisation, so this is the clearest strategy follow-through if you want more context.',
+          },
+          {
+            topicId: 'pp-estimated-vs-confirmed-context',
+            title: 'Estimated vs Confirmed Context',
+            reason:
+              'This simulated dip stays unsettled, so certainty boundaries matter before the move sounds cleaner than it is.',
+          },
+        ],
       },
     });
   });
@@ -160,6 +191,60 @@ describe('createStrategyNavigatorScreenViewData', () => {
     });
   });
 
+  it('keeps knowledge follow-through optional when services mark it unavailable', () => {
+    const result = createStrategyNavigatorScreenViewData({
+      title: 'Strategy Preview',
+      summary: 'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'trend_following',
+      selectedScenarioId: 'TREND_CONTINUATION',
+      strategyOptions: [
+        {
+          strategyId: 'trend_following',
+          title: 'Trend Follow',
+          summary: 'Tracks whether directional structure is still holding together.',
+          archetype: 'MIDDLE',
+        },
+      ],
+      scenarios: [
+        {
+          scenarioId: 'TREND_CONTINUATION',
+          title: 'Trend continuation',
+          summary:
+            'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
+        },
+      ],
+      availability: {
+        status: 'AVAILABLE',
+        strategyId: 'trend_following',
+        scenario: {
+          scenarioId: 'TREND_CONTINUATION',
+          title: 'Trend continuation',
+          summary:
+            'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
+        },
+        focus: {
+          snapshotHeadline:
+            'Snapshot would read this as a continuation first and would ask whether the broader structure is still carrying it cleanly.',
+          dashboardFocus: [
+            'The Dashboard would bring sustained directional names forward when follow-through remains orderly.',
+          ],
+          eventHighlights: [
+            'Momentum-building events would matter when they reinforce an already established directional picture.',
+          ],
+          alertPosture:
+            'Alerts would feel steady and would mostly describe whether the trend still has structure behind it.',
+        },
+      },
+      knowledgeFollowThrough: {
+        status: 'UNAVAILABLE',
+        reason: 'KNOWLEDGE_UNAVAILABLE',
+      },
+    });
+
+    expect(result?.preview?.knowledgeItems).toEqual([]);
+  });
+
   it('keeps the screen helper on the prepared Strategy Preview VM only', () => {
     const source = readFileSync(
       join(process.cwd(), 'app', 'screens', 'strategyNavigatorScreenView.ts'),
@@ -168,8 +253,9 @@ describe('createStrategyNavigatorScreenViewData', () => {
 
     expect(source).toMatch(/availability\.status === 'UNAVAILABLE'/);
     expect(source).toMatch(/vm\.strategyOptions\.map/);
+    expect(source).toMatch(/vm\.knowledgeFollowThrough\?\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(
-      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
+      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
     );
   });
 

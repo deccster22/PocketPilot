@@ -34,6 +34,25 @@ export type StrategyPreviewFocus = {
   alertPosture: string;
 };
 
+export type StrategyPreviewKnowledgeLink = {
+  topicId: string;
+  title: string;
+  reason: string;
+};
+
+export type StrategyPreviewKnowledgeFollowThrough =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_RELEVANT_KNOWLEDGE'
+        | 'NOT_ENABLED_FOR_SURFACE'
+        | 'KNOWLEDGE_UNAVAILABLE';
+    }
+  | {
+      status: 'AVAILABLE';
+      items: ReadonlyArray<StrategyPreviewKnowledgeLink>;
+    };
+
 export type StrategyPreviewAvailability =
   | {
       status: 'UNAVAILABLE';
@@ -58,4 +77,5 @@ export type StrategyNavigatorVM = {
   strategyOptions: ReadonlyArray<StrategyPreviewStrategyOption>;
   scenarios: ReadonlyArray<StrategyPreviewScenario>;
   availability: StrategyPreviewAvailability;
+  knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };

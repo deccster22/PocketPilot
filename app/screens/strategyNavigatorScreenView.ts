@@ -26,6 +26,11 @@ export type StrategyPreviewCardViewData = {
   dashboardFocus: ReadonlyArray<string>;
   eventHighlights: ReadonlyArray<string>;
   alertPosture: string;
+  knowledgeItems: ReadonlyArray<{
+    topicId: string;
+    title: string;
+    reason: string;
+  }>;
 };
 
 export type StrategyNavigatorScreenViewData = {
@@ -108,24 +113,27 @@ export function createStrategyNavigatorScreenViewData(
   }
 
   const selectedStrategy = strategyOptions.find((strategy) => strategy.strategyId === availability.strategyId);
+  const knowledgeItems =
+    vm.knowledgeFollowThrough?.status === 'AVAILABLE' ? vm.knowledgeFollowThrough.items : [];
 
   return {
     title: vm.title,
     summary: vm.summary,
     guidanceText:
       'This mode stays simulated, descriptive, and exploratory. It does not open an execution path.',
-      generatedAtText: formatGeneratedAt(vm.generatedAt),
-      availabilityMessage: null,
-      strategyOptions,
-      scenarioOptions,
-      preview: {
-        strategyTitle: selectedStrategy?.title ?? 'Selected strategy',
-        scenarioTitle: availability.scenario.title,
-        scenarioSummary: availability.scenario.summary,
-        snapshotHeadline: availability.focus.snapshotHeadline,
-        dashboardFocus: availability.focus.dashboardFocus,
-        eventHighlights: availability.focus.eventHighlights,
-        alertPosture: availability.focus.alertPosture,
-      },
-    };
+    generatedAtText: formatGeneratedAt(vm.generatedAt),
+    availabilityMessage: null,
+    strategyOptions,
+    scenarioOptions,
+    preview: {
+      strategyTitle: selectedStrategy?.title ?? 'Selected strategy',
+      scenarioTitle: availability.scenario.title,
+      scenarioSummary: availability.scenario.summary,
+      snapshotHeadline: availability.focus.snapshotHeadline,
+      dashboardFocus: availability.focus.dashboardFocus,
+      eventHighlights: availability.focus.eventHighlights,
+      alertPosture: availability.focus.alertPosture,
+      knowledgeItems,
+    },
+  };
 }

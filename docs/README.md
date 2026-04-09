@@ -356,7 +356,17 @@ docs/knowledge + CONTENT_REGISTER
 -> Knowledge topic detail screen
 -> createContextualKnowledgeAvailability
 -> fetchContextualKnowledgeAvailability
--> one thin Strategy Preview contextual affordance
+-> generic contextual availability for approved surfaces
+```
+
+P9-S2 adds one preview-owned knowledge follow-through on top of that same catalog:
+
+```text
+knowledgeCatalog
+-> selectStrategyPreviewKnowledge
+-> createStrategyNavigatorVM
+-> fetchStrategyNavigatorVM
+-> Strategy Preview follow-through section
 ```
 
 Insights/Event History now uses its own thin reflection seam:
@@ -400,12 +410,13 @@ EventLedger
 -> Insights recent-comparison shelf
 ```
 
-P9-S1 adds the first thin Strategy Navigator / Preview path:
+P9-S1 and P9-S2 now define the first thin Strategy Navigator / Preview path:
 
 ```text
 core strategy catalog
 -> strategyPreviewScenarios
 -> createStrategyNavigatorVM
+-> selectStrategyPreviewKnowledge
 -> fetchStrategyNavigatorVM
 -> Strategy Preview tab
 ```
@@ -481,6 +492,7 @@ PocketPilot is easiest to read at three levels.
 - `P8-I4` Compare-period / reflection summary foundation
 - `P9` Pattern Navigator / Strategy Navigator / richer explanation layer
 - `P9-S1` Strategy Navigator / Preview foundation
+- `P9-S2` Strategy Navigator preview-to-knowledge follow-through
 - `P10` Beta hardening
 - `P11` Launch prep
 

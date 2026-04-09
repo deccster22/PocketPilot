@@ -18,6 +18,7 @@ It is not there to delay access, demand completion, or perform as a motivational
 ## P7 Baseline Posture
 
 `P7-K1`, `P7-K2`, and `P7-K3` together define the first usable knowledge baseline.
+`P9-S2` builds on that baseline with one preview-owned follow-through path.
 
 What that now means:
 
@@ -28,6 +29,7 @@ What that now means:
 - one top-level Knowledge Library shelf
 - one subordinate topic detail view keyed by `topicId`
 - one thin Strategy Preview proof path for optional contextual knowledge
+- one Strategy Navigator-owned preview follow-through path
 
 What it still does not mean:
 
@@ -47,7 +49,7 @@ Knowledge should be easy to reach and easy to ignore.
 Rules:
 
 - the Knowledge Library remains a top-level destination
-- topic detail opens from the library shelf, related topics, and one approved Strategy Preview proof path
+- topic detail opens from the library shelf, related topics, the original Strategy Preview proof path, and the `P9-S2` preview follow-through path
 - library access does not gate Snapshot, Dashboard, Trade Hub, or monitoring flows
 - missing knowledge content must degrade honestly instead of manufacturing filler
 - contextual support stays narrow, optional, and service-owned in this phase
@@ -74,7 +76,7 @@ Avoid:
 
 ## Topic Detail Rules
 
-P7-K2 and P7-K3 add calmer deeper steps, not a second knowledge product.
+P7-K2, P7-K3, and P9-S2 add calmer deeper steps, not a second knowledge product.
 
 Rules:
 
@@ -88,6 +90,7 @@ Rules:
 ## Contextual Eligibility Rules
 
 `P7-K3` adds one thin contextual seam before any broad rollout.
+`P9-S2` adds one narrower preview-specific follow-through seam in `services/strategyNavigator/`.
 
 Rules:
 
@@ -97,6 +100,13 @@ Rules:
 - contextual knowledge can appear only when the interpreted surface has enough signal to justify it
 - Strategy Preview is the only proof-path surface in this phase
 - Snapshot and Trade Hub remain deliberately out of rollout for now
+
+Preview follow-through rules layered on top:
+
+- `services/strategyNavigator` owns the preview-to-knowledge item selection for Strategy Preview
+- the preview may show only a few prepared follow-through items
+- the preview follow-through stays optional and secondary to the preview card
+- the preview follow-through must not turn the knowledge layer into onboarding theatre
 
 ## Audience Fit
 
@@ -108,4 +118,5 @@ The same knowledge layer should still feel natural across profiles.
 
 `P7-K2` deepens that shared base with one canonical topic view.
 `P7-K3` adds one minimal eligibility seam so later contextual rollout can build on a prepared contract instead of UI-side guesses.
+`P9-S2` adds one service-owned preview follow-through path so Strategy Navigator can bridge interpretation into reading without pushing a broader rollout.
 Broader profile-sensitive contextual surfacing can still come later once this thinner seam has proven stable.

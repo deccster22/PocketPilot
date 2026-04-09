@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P9-S2)
 
 ## Purpose
 
@@ -7,6 +7,7 @@
 `P7-K1` established the baseline shelf seam.
 `P7-K2` extends that same seam with one subordinate topic detail contract without turning knowledge into a CMS, markdown browser, or gating system.
 `P7-K3` adds one thin contextual-eligibility seam without turning knowledge into a recommendation engine or broad rollout system.
+`P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
 
@@ -166,7 +167,17 @@ knowledgeCatalog
 -> Knowledge topic detail screen
 -> createContextualKnowledgeAvailability
 -> fetchContextualKnowledgeAvailability
--> one thin Strategy Preview contextual affordance
+-> generic contextual availability for approved surfaces
+```
+
+`P9-S2` then adds a preview-specific follow-through path on top of the same catalog:
+
+```text
+knowledgeCatalog
+-> selectStrategyPreviewKnowledge
+-> createStrategyNavigatorVM
+-> fetchStrategyNavigatorVM
+-> Strategy Preview follow-through section
 ```
 
 Responsibilities:
@@ -178,6 +189,7 @@ Responsibilities:
 - `services/knowledge/fetchKnowledgeTopicDetailVM.ts` owns topic-detail surface enablement
 - `services/knowledge/createContextualKnowledgeAvailability.ts` owns contextual candidate shaping
 - `services/knowledge/fetchContextualKnowledgeAvailability.ts` owns contextual surface interpretation
+- `services/strategyNavigator/selectStrategyPreviewKnowledge.ts` owns preview-specific follow-through selection
 - `app/screens/*knowledge*View.ts` files format prepared display text only
 - `app/` does not read docs files, browse markdown, group raw nodes, infer related-topic metadata, or rank contextual candidates locally
 
@@ -191,6 +203,7 @@ Rules locked in this phase:
 - the topic detail surface is subordinate to that same shelf
 - the contextual seam is allowed to return `AVAILABLE` only when interpreted surface context is strong enough
 - Strategy Preview is the only proof-path consumer in `P7-K3`
+- `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
 - unavailable knowledge must not block Dashboard, Snapshot, Trade Hub, or monitoring flows
@@ -207,4 +220,4 @@ Later phases can build on this seam by:
 - connecting knowledge more deeply with `P8` reflection flows and future `P9` explanation work
 - adding recommendation logic only after the shelf and detail contracts are already stable
 
-Those later phases should extend the same catalog and fetch seams instead of inventing parallel knowledge paths.
+Those later phases should extend the same catalog and service-owned selection seams instead of inventing UI-side knowledge paths.

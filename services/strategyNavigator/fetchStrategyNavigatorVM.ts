@@ -1,6 +1,8 @@
 import { listCatalog } from '@/core/strategy/catalog';
 import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
+import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
+import type { KnowledgeCatalogEntry } from '@/services/knowledge/types';
 
 import { createStrategyNavigatorVM } from './createStrategyNavigatorVM';
 import { listStrategyPreviewScenarios } from './strategyPreviewScenarios';
@@ -41,6 +43,7 @@ export function fetchStrategyNavigatorVM(params?: {
   nowProvider?: () => number;
   strategies?: ReadonlyArray<StrategyCatalogEntry>;
   scenarios?: ReadonlyArray<StrategyPreviewScenario>;
+  knowledgeNodes?: ReadonlyArray<KnowledgeCatalogEntry> | null;
 }): StrategyNavigatorVM {
   const strategies = listPreviewStrategies(params?.strategies ?? listCatalog());
   const scenarios = params?.scenarios ?? listStrategyPreviewScenarios();
@@ -51,6 +54,7 @@ export function fetchStrategyNavigatorVM(params?: {
     selectedScenarioId: params?.selectedScenarioId,
     strategies,
     scenarios,
+    knowledgeNodes: params?.knowledgeNodes ?? knowledgeCatalog,
     surface: params?.surface,
   });
 }

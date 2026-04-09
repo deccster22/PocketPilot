@@ -1,6 +1,8 @@
 import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
+import type { KnowledgeCatalogEntry } from '@/services/knowledge/types';
 
+import { selectStrategyPreviewKnowledge } from './selectStrategyPreviewKnowledge';
 import type {
   StrategyNavigatorSurface,
   StrategyNavigatorVM,
@@ -464,12 +466,22 @@ export function createStrategyNavigatorVM(params: {
   selectedScenarioId?: StrategyPreviewScenarioId | null;
   strategies: ReadonlyArray<StrategyCatalogEntry>;
   scenarios: ReadonlyArray<StrategyPreviewScenario>;
+  knowledgeNodes?: ReadonlyArray<KnowledgeCatalogEntry> | null;
   surface?: StrategyNavigatorSurface;
 }): StrategyNavigatorVM {
   const surface = params.surface ?? 'STRATEGY_NAVIGATOR';
   const selectedStrategyId = params.selectedStrategyId ?? null;
   const selectedScenarioId = params.selectedScenarioId ?? null;
   const strategyOptions = toStrategyOptions(params.strategies);
+  const baseVm = {
+    title: 'Strategy Preview',
+    summary: 'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
+    generatedAt: params.generatedAt,
+    selectedStrategyId,
+    selectedScenarioId,
+    strategyOptions,
+    scenarios: [...params.scenarios],
+  } satisfies Omit<StrategyNavigatorVM, 'availability' | 'knowledgeFollowThrough'>;
   const selectedStrategy = selectedStrategyId
     ? params.strategies.find((strategy) => strategy.id === selectedStrategyId)
     : undefined;
@@ -479,14 +491,7 @@ export function createStrategyNavigatorVM(params: {
 
   if (!isEnabledForSurface(surface)) {
     return {
-      title: 'Strategy Preview',
-      summary:
-        'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
-      generatedAt: params.generatedAt,
-      selectedStrategyId,
-      selectedScenarioId,
-      strategyOptions,
-      scenarios: [...params.scenarios],
+      ...baseVm,
       availability: {
         status: 'UNAVAILABLE',
         reason: 'NOT_ENABLED_FOR_SURFACE',
@@ -496,14 +501,7 @@ export function createStrategyNavigatorVM(params: {
 
   if (!selectedStrategy) {
     return {
-      title: 'Strategy Preview',
-      summary:
-        'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
-      generatedAt: params.generatedAt,
-      selectedStrategyId,
-      selectedScenarioId,
-      strategyOptions,
-      scenarios: [...params.scenarios],
+      ...baseVm,
       availability: {
         status: 'UNAVAILABLE',
         reason: 'NO_STRATEGY_SELECTED',
@@ -513,14 +511,7 @@ export function createStrategyNavigatorVM(params: {
 
   if (!selectedScenario) {
     return {
-      title: 'Strategy Preview',
-      summary:
-        'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
-      generatedAt: params.generatedAt,
-      selectedStrategyId,
-      selectedScenarioId,
-      strategyOptions,
-      scenarios: [...params.scenarios],
+      ...baseVm,
       availability: {
         status: 'UNAVAILABLE',
         reason: 'NO_SCENARIO_AVAILABLE',
@@ -528,20 +519,22 @@ export function createStrategyNavigatorVM(params: {
     };
   }
 
+  const focus = createFocus(selectedStrategy.id, selectedScenario.scenarioId);
+
   return {
-    title: 'Strategy Preview',
-    summary:
-      'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
-    generatedAt: params.generatedAt,
-    selectedStrategyId,
-    selectedScenarioId,
-    strategyOptions,
-    scenarios: [...params.scenarios],
+    ...baseVm,
     availability: {
       status: 'AVAILABLE',
       strategyId: selectedStrategy.id,
       scenario: selectedScenario,
-      focus: createFocus(selectedStrategy.id, selectedScenario.scenarioId),
+      focus,
     },
+    knowledgeFollowThrough: selectStrategyPreviewKnowledge({
+      surface,
+      strategyId: selectedStrategy.id,
+      scenarioId: selectedScenario.scenarioId,
+      focus,
+      nodes: params.knowledgeNodes,
+    }),
   };
 }
