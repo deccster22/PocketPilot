@@ -2,6 +2,7 @@ import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
 import type { KnowledgeCatalogEntry } from '@/services/knowledge/types';
 
+import { createStrategyPreviewExplanation } from './createStrategyPreviewExplanation';
 import { selectStrategyPreviewKnowledge } from './selectStrategyPreviewKnowledge';
 import type {
   StrategyNavigatorSurface,
@@ -481,7 +482,7 @@ export function createStrategyNavigatorVM(params: {
     selectedScenarioId,
     strategyOptions,
     scenarios: [...params.scenarios],
-  } satisfies Omit<StrategyNavigatorVM, 'availability' | 'knowledgeFollowThrough'>;
+  } satisfies Omit<StrategyNavigatorVM, 'availability' | 'explanation' | 'knowledgeFollowThrough'>;
   const selectedStrategy = selectedStrategyId
     ? params.strategies.find((strategy) => strategy.id === selectedStrategyId)
     : undefined;
@@ -496,6 +497,9 @@ export function createStrategyNavigatorVM(params: {
         status: 'UNAVAILABLE',
         reason: 'NOT_ENABLED_FOR_SURFACE',
       },
+      explanation: createStrategyPreviewExplanation({
+        surface,
+      }),
     };
   }
 
@@ -506,6 +510,10 @@ export function createStrategyNavigatorVM(params: {
         status: 'UNAVAILABLE',
         reason: 'NO_STRATEGY_SELECTED',
       },
+      explanation: createStrategyPreviewExplanation({
+        surface,
+        scenario: selectedScenario,
+      }),
     };
   }
 
@@ -516,6 +524,10 @@ export function createStrategyNavigatorVM(params: {
         status: 'UNAVAILABLE',
         reason: 'NO_SCENARIO_AVAILABLE',
       },
+      explanation: createStrategyPreviewExplanation({
+        surface,
+        strategy: selectedStrategy,
+      }),
     };
   }
 
@@ -529,6 +541,12 @@ export function createStrategyNavigatorVM(params: {
       scenario: selectedScenario,
       focus,
     },
+    explanation: createStrategyPreviewExplanation({
+      surface,
+      strategy: selectedStrategy,
+      scenario: selectedScenario,
+      focus,
+    }),
     knowledgeFollowThrough: selectStrategyPreviewKnowledge({
       surface,
       strategyId: selectedStrategy.id,

@@ -72,6 +72,19 @@ describe('createStrategyNavigatorVM', () => {
           'Alerts would stay observational and mostly confirm that strength is still building in an orderly way.',
       },
     });
+    expect(result.explanation).toEqual({
+      status: 'AVAILABLE',
+      content: {
+        title: 'Why Momentum Basics reacts this way',
+        summary:
+          'Momentum Basics looks for orderly strength and clean follow-through when an existing move is still extending in an orderly way. This keeps the simulated read focused on interpretation priorities rather than outcomes.',
+        bullets: [
+          'What it is noticing: Snapshot would keep strength in view, but it would still wait for orderly follow-through rather than celebrate the move.',
+          'Why that matters: This lens gives more weight to moves that keep building in a steady way than to fast movement on its own.',
+          'Relevant interpreted MarketEvents: Momentum-building events would matter most when they repeat without support starting to fray. Price-movement events would stay secondary unless they begin to interrupt the broader strength read.',
+        ],
+      },
+    });
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'AVAILABLE',
       items: [
@@ -104,6 +117,18 @@ describe('createStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NO_STRATEGY_SELECTED',
     });
+    expect(
+      createStrategyNavigatorVM({
+        generatedAt: '2026-04-05T00:00:00.000Z',
+        selectedStrategyId: null,
+        selectedScenarioId: 'DIP_VOLATILITY',
+        strategies: createStrategies(),
+        scenarios: listStrategyPreviewScenarios(),
+      }).explanation,
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_EXPLANATION_AVAILABLE',
+    });
   });
 
   it('returns unavailable honestly when a scenario is missing', () => {
@@ -119,20 +144,36 @@ describe('createStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NO_SCENARIO_AVAILABLE',
     });
-  });
-
-  it('keeps surface eligibility in services instead of leaving it to app', () => {
     expect(
       createStrategyNavigatorVM({
         generatedAt: '2026-04-05T00:00:00.000Z',
-        selectedStrategyId: 'trend_following',
-        selectedScenarioId: 'MIXED_REVERSAL',
+        selectedStrategyId: 'dip_buying',
+        selectedScenarioId: null,
         strategies: createStrategies(),
         scenarios: listStrategyPreviewScenarios(),
-        knowledgeNodes: knowledgeCatalog,
-        surface: 'DASHBOARD',
-      }).availability,
+      }).explanation,
     ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_EXPLANATION_AVAILABLE',
+    });
+  });
+
+  it('keeps surface eligibility in services instead of leaving it to app', () => {
+    const result = createStrategyNavigatorVM({
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'trend_following',
+      selectedScenarioId: 'MIXED_REVERSAL',
+      strategies: createStrategies(),
+      scenarios: listStrategyPreviewScenarios(),
+      knowledgeNodes: knowledgeCatalog,
+      surface: 'DASHBOARD',
+    });
+
+    expect(result.availability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
+    expect(result.explanation).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_SURFACE',
     });
@@ -149,6 +190,7 @@ describe('createStrategyNavigatorVM', () => {
     });
 
     expect(result.availability.status).toBe('AVAILABLE');
+    expect(result.explanation.status).toBe('AVAILABLE');
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'UNAVAILABLE',
       reason: 'KNOWLEDGE_UNAVAILABLE',

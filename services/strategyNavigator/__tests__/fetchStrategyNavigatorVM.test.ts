@@ -44,6 +44,19 @@ describe('fetchStrategyNavigatorVM', () => {
           'Price movement tightens and activity quiets down, leaving the next move unresolved instead of obvious.',
       },
     ]);
+    expect(result.explanation).toEqual({
+      status: 'AVAILABLE',
+      content: {
+        title: 'Why Dip Buying reacts this way',
+        summary:
+          'Dip Buying watches for weakness that is starting to settle into a calmer pullback when the market is dropping while volatility is expanding. This keeps the simulated read focused on interpretation priorities rather than outcomes.',
+        bullets: [
+          'What it is noticing: Snapshot would treat this as a dip worth watching, but only once the drop starts to settle into something interpretable.',
+          'Why that matters: This lens cares about whether pressure is becoming more interpretable, because a messy drop is different from a steadier dip-watch setup.',
+          'Relevant interpreted MarketEvents: Dip-detected events would matter most when they are followed by calmer price movement. Estimated-price events would matter if the backdrop is still too noisy to trust the read.',
+        ],
+      },
+    });
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'AVAILABLE',
       items: [
@@ -75,6 +88,17 @@ describe('fetchStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NO_STRATEGY_SELECTED',
     });
+    expect(
+      fetchStrategyNavigatorVM({
+        surface: 'STRATEGY_NAVIGATOR',
+        selectedStrategyId: 'snapshot_change',
+        selectedScenarioId: 'TREND_CONTINUATION',
+        nowProvider: () => Date.parse('2026-04-05T00:00:00.000Z'),
+      }).explanation,
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_EXPLANATION_AVAILABLE',
+    });
   });
 
   it('keeps raw internals out of the prepared user-facing preview output', () => {
@@ -104,6 +128,7 @@ describe('fetchStrategyNavigatorVM', () => {
     });
 
     expect(result.availability.status).toBe('AVAILABLE');
+    expect(result.explanation.status).toBe('AVAILABLE');
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'UNAVAILABLE',
       reason: 'KNOWLEDGE_UNAVAILABLE',

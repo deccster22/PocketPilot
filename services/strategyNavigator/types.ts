@@ -34,6 +34,22 @@ export type StrategyPreviewFocus = {
   alertPosture: string;
 };
 
+export type StrategyPreviewExplanation = {
+  title: string;
+  summary: string;
+  bullets: ReadonlyArray<string>;
+};
+
+export type StrategyPreviewExplanationAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_EXPLANATION_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      content: StrategyPreviewExplanation;
+    };
+
 export type StrategyPreviewKnowledgeLink = {
   topicId: string;
   title: string;
@@ -77,5 +93,6 @@ export type StrategyNavigatorVM = {
   strategyOptions: ReadonlyArray<StrategyPreviewStrategyOption>;
   scenarios: ReadonlyArray<StrategyPreviewScenario>;
   availability: StrategyPreviewAvailability;
+  explanation: StrategyPreviewExplanationAvailability;
   knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };

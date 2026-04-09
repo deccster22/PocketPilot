@@ -1,8 +1,9 @@
-# Strategy Navigator Spec (P9-S1, P9-S2)
+# Strategy Navigator Spec (P9-S1, P9-S2, P9-S3)
 
 ## Purpose
 
 Strategy Navigator should feel like a quiet briefing simulator with one gentle next step.
+`P9-S3` adds one calm why shelf inside that same briefing card.
 
 It should help a user compare strategy lenses without:
 
@@ -17,6 +18,7 @@ It should help a user compare strategy lenses without:
 - one top-level Preview destination in this phase
 - app renders prepared strategy and scenario options only
 - app renders one prepared preview card only
+- app may render one small prepared explanation section inside that preview card only when services mark it available
 - app may render one small prepared knowledge follow-through section inside that preview card only when services mark it available
 - unavailable state stays honest and minimal
 - no execution CTA
@@ -26,13 +28,14 @@ It should help a user compare strategy lenses without:
 
 ## Initial Layout
 
-The `P9-S2` layout remains intentionally plain:
+The `P9-S3` layout remains intentionally plain:
 
 1. Title and short calming summary
 2. Strategy selector
 3. Scenario selector
 4. Preview card or honest unavailable state
-5. Optional related-reading section inside the preview card
+5. Optional why-this-strategy-cares section inside the preview card
+6. Optional related-reading section inside the preview card
 
 This is enough for orientation.
 The first surface still does not need a full multi-panel transformation.
@@ -54,6 +57,7 @@ The preview card should show:
 - a short Dashboard shift list
 - a short MarketEvents-that-matter list
 - one alert-posture line
+- zero or one short prepared explanation section
 - zero or a few optional related-reading items
 
 The card should not show:
@@ -64,6 +68,28 @@ The card should not show:
 - signal IDs or provider internals
 - celebratory or alarmist styling
 - markdown content blocks
+
+## Preview Explanation Guidance
+
+The optional explanation section should feel like:
+
+- "Why this strategy cares here"
+- "What this lens is noticing"
+- "Why that matters for this worldview"
+
+It should stay:
+
+- short
+- calm
+- educational
+- subordinate to the preview
+
+It should not feel like:
+
+- "What to do next"
+- "Expected move"
+- "Best strategy here"
+- "Simulated outcome score"
 
 ## Knowledge Follow-Through Guidance
 
@@ -101,7 +127,7 @@ Avoid:
 
 Future `P9` UX may introduce richer transformations, context links, or deeper explanation shelves.
 
-`P9-S1` and `P9-S2` should still remain the reference for the core mood:
+`P9-S1`, `P9-S2`, and `P9-S3` should still remain the reference for the core mood:
 
 - calm
 - exploratory

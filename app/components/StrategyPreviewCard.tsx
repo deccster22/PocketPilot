@@ -42,6 +42,19 @@ export function StrategyPreviewCard(props: {
         <Text style={styles.body}>{props.preview.alertPosture}</Text>
       </View>
 
+      {props.preview.explanation ? (
+        <View style={styles.explanationSection}>
+          <Text style={styles.sectionLabel}>Why this strategy cares here</Text>
+          <Text style={styles.explanationTitle}>{props.preview.explanation.title}</Text>
+          <Text style={styles.body}>{props.preview.explanation.summary}</Text>
+          {props.preview.explanation.bullets.map((item) => (
+            <Text key={item} style={styles.listItem}>
+              - {item}
+            </Text>
+          ))}
+        </View>
+      ) : null}
+
       {props.preview.knowledgeItems.length > 0 ? (
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Core concepts behind this preview</Text>
@@ -95,11 +108,24 @@ const styles = StyleSheet.create({
   section: {
     gap: 6,
   },
+  explanationSection: {
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    padding: 12,
+  },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
     color: '#1f2937',
     textTransform: 'uppercase',
+  },
+  explanationTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0f172a',
   },
   body: {
     fontSize: 13,
