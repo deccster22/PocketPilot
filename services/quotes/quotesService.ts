@@ -24,6 +24,7 @@ export async function fetchQuotes(
   deps: QuotesServiceDeps,
   params: {
     accounts: Account[];
+    selectedAccountId?: string | null;
     symbols: string[];
     cachedQuotes?: Record<string, Quote>;
     context: Omit<ProviderRequestContext, 'accountId' | 'symbols'> & {
@@ -31,19 +32,19 @@ export async function fetchQuotes(
     };
   },
 ): Promise<FetchQuotesResult> {
-  const accountId = selectExecutionAccount(params.accounts);
+  const accountId = selectExecutionAccount(params.accounts, params.selectedAccountId);
   const nowMs = deps.nowProvider ? deps.nowProvider() : Date.now();
   const routerResult = await deps.getQuotesForSymbols({
+    accountId,
+    symbols: params.symbols,
+    nowMs,
+    cachedQuotes: params.cachedQuotes,
+    context: {
+      ...params.context,
       accountId,
       symbols: params.symbols,
-      nowMs,
-      cachedQuotes: params.cachedQuotes,
-      context: {
-        ...params.context,
-        accountId,
-        symbols: params.symbols,
-      },
-    });
+    },
+  });
 
   return {
     accountId,

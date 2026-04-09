@@ -4,6 +4,7 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
+import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
 import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
@@ -31,9 +32,12 @@ export async function fetchTradeHubVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = createProtectionPlans({
-    orientationContext: upstream.orientationContext,
-    marketEvents: upstream.marketEvents,
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: upstream.selectedAccountContext,
+    protectionPlans: createProtectionPlans({
+      orientationContext: upstream.orientationContext,
+      marketEvents: upstream.marketEvents,
+    }),
   });
 
   return {

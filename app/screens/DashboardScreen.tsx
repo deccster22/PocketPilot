@@ -83,6 +83,12 @@ export function DashboardScreen() {
           <ProfileSelector value={profile} onChange={setProfile} />
           <Text style={styles.label}>Prepared surface for {screenView?.profileLabel ?? profile}</Text>
         </View>
+        {screenView?.accountContext.visible ? (
+          <View style={styles.noteCard}>
+            <Text style={styles.noteTitle}>{screenView.accountContext.title}</Text>
+            <Text style={styles.noteSummary}>{screenView.accountContext.summary}</Text>
+          </View>
+        ) : null}
         {screenView?.message.visible ? (
           <View style={styles.noteCard}>
             <Text style={styles.noteTitle}>{screenView.message.title}</Text>

@@ -1,4 +1,5 @@
 import type { UserProfile } from '@/core/profile/types';
+import { enforceAccountScopedTruth } from '@/services/accounts/enforceAccountScopedTruth';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
@@ -7,6 +8,7 @@ import { createTradePlanConfirmationShell } from '@/services/trade/createTradePl
 import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
 import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
+import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
 import type { TradePlanConfirmationShell } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
@@ -36,9 +38,12 @@ export async function fetchTradePlanConfirmationVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = createProtectionPlans({
-    orientationContext: upstream.orientationContext,
-    marketEvents: upstream.marketEvents,
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: upstream.selectedAccountContext,
+    protectionPlans: createProtectionPlans({
+      orientationContext: upstream.orientationContext,
+      marketEvents: upstream.marketEvents,
+    }),
   });
   const selectedPlan = resolveSelectedTradePlan({
     protectionPlans,
@@ -56,12 +61,24 @@ export async function fetchTradePlanConfirmationVM(params: {
 
   const capabilities = await getAccountCapabilities(selectedPlan.accountId);
   const capabilityResolution = resolveExecutionCapability(capabilities);
+  const confirmationShell =
+    upstream.selectedAccountContext.status === 'AVAILABLE'
+      ? enforceAccountScopedTruth({
+          label: 'Execution support',
+          selectedAccount: upstream.selectedAccountContext.account,
+          accountIds: [selectedPlan.accountId, capabilityResolution.accountId],
+          value: createTradePlanConfirmationShell({
+            plan: selectedPlan,
+            capabilityResolution,
+          }),
+        })
+      : createTradePlanConfirmationShell({
+          plan: selectedPlan,
+          capabilityResolution,
+        });
 
   return {
-    confirmationShell: createTradePlanConfirmationShell({
-      plan: selectedPlan,
-      capabilityResolution,
-    }),
+    confirmationShell,
     selectedPlanId: selectedPlan.planId,
     scan: upstream.scan,
   };

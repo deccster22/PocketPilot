@@ -370,6 +370,16 @@ Market Providers
 -> Submission Intent
 ```
 
+PX-MA1 adds one explicit multi-account integrity lane above those consumers:
+
+```text
+AccountContextCandidate
+-> resolveSelectedAccountContext
+-> fetchSelectedAccountContext
+-> fetchSurfaceContext
+-> account-scoped Snapshot, Dashboard, Strategy Fit / 30,000 ft, message policy, and trade-support consumers
+```
+
 Knowledge baseline uses its own thin product seam:
 
 ```text
@@ -538,6 +548,7 @@ Current examples:
 
 - `PX-API1` through `PX-API5` for runtime doctrine and hardening
 - `PX-PM1` for this phase-map audit and roadmap alignment pass
+- `PX-MA1` for multi-account / account-scoped integrity foundation
 - `PX-E1` and `PX-E2` are explanation groundwork, not proof that the richer `P9` family is complete.
 
 Use `P#-subphase` only for scoped work inside one canonical family. Example: `P6-R5A` is cleanup within `P6`; it does not imply completion of `P7`, `P8`, or `P9`.

@@ -1,4 +1,4 @@
-# Dashboard Spec (P4-5 + PX-E2)
+# Dashboard Spec (P4-5 + PX-E2 + PX-MA1)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
@@ -33,6 +33,7 @@ Dashboard also has a surface VM with one optional explanation seam:
 
 ```ts
 {
+  accountContext: SelectedAccountAvailability,
   model: DashboardSurfaceModel,
   scan: ForegroundScanResult,
   explanation: ExplanationAvailability
@@ -46,7 +47,7 @@ P6-A2 adds one additional prepared input on the same screen helper path:
 
 ## Service Path
 Dashboard continues to use its own upstream preparation seam:
-- `services/upstream/fetchSurfaceContext.ts` assembles shared deterministic truth.
+- `services/upstream/fetchSurfaceContext.ts` assembles shared deterministic truth, including selected-account context.
 - `services/dashboard/dashboardDataService.ts` prepares Dashboard-owned upstream inputs from that shared truth.
 - `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and Dashboard explanation VM.
 - `services/dashboard/fetchDashboardExplanationVM.ts` selects the prime explanation target and calls the canonical explanation builder.
@@ -97,6 +98,19 @@ The Dashboard why note still does not show:
 - modal warning theatre
 - urgency language
 - predictive wording
+
+## Passive Account Context Cue (PX-MA1)
+Dashboard now has one minimal passive account-context cue only:
+- render it only when the prepared selected-account seam is `AVAILABLE`
+- keep it calm, subordinate, and informational rather than control-like
+- show the current account name plus sparse context such as selection mode, base currency, and strategy id when available
+- do not add selector sprawl, warning styling, or hidden switching behavior
+- do not let `app/` derive fallback rules or account truth locally
+
+Why Dashboard first:
+- Dashboard is already account-scoped in canon and safer than disturbing Snapshot's sacred compactness
+- the cue makes current account scope legible without introducing broad multi-account UI
+- it proves the shared service seam while keeping product posture calm and explicit
 
 ## Dashboard Referral Note (P6-A2)
 Dashboard now has one optional message-policy note only:

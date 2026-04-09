@@ -74,6 +74,16 @@ describe('fetchConfirmationSessionVM', () => {
     const latestRelevantEvent = overrides.latestRelevantEvent ?? btcEvent;
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',
@@ -364,7 +374,7 @@ describe('fetchConfirmationSessionVM', () => {
     expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
   });
 
-  it('switches the selected plan and recomputes the prepared session deterministically', async () => {
+  it('keeps risk and execution support scoped to the selected account even when another-account plan id is requested', async () => {
     mockUpstreamContext();
 
     const first = await fetchConfirmationSessionVM({
@@ -380,22 +390,15 @@ describe('fetchConfirmationSessionVM', () => {
       'acct-basic:momentum_basics:ETH:HOLD:acct-basic:momentum_basics:signal:ETH:200',
     );
 
-    expect(switched.planId).toBe(
-      'acct-basic:momentum_basics:ETH:HOLD:acct-basic:momentum_basics:signal:ETH:200',
-    );
-    expect(switched.preview?.headline).toEqual({
-      intentType: 'HOLD',
-      symbol: 'ETH',
-      actionState: 'WAIT',
+    expect(switched).toEqual({
+      planId: null,
+      accountId: null,
+      executionCapability: null,
+      preparedRiskReferences: null,
+      preview: null,
+      shell: null,
+      flow: null,
     });
-    expect(switched.preparedRiskReferences).toBeNull();
-    expect(switched.shell?.confirmation).toEqual({
-      requiresConfirmation: true,
-      pathType: 'GUIDED_SEQUENCE',
-      stepsLabel: 'Review separate order steps',
-      executionAvailable: false,
-    });
-    expect(switched.flow?.planId).toBe(switched.planId);
   });
 
   it('recomputes acknowledgement state through the session API and resets back to the initial session', async () => {

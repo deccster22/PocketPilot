@@ -1,4 +1,8 @@
 import type { UserProfile } from '@/core/profile/types';
+import {
+  filterAccountScopedItems,
+  scopeOrientationContextToSelectedAccount,
+} from '@/services/accounts/enforceAccountScopedTruth';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
@@ -57,13 +61,27 @@ export async function fetchThirtyThousandFootVM(params: {
       lastViewedTimestamp: params.lastViewedTimestamp,
       lastViewedState: params.lastViewedState,
     }));
+  const scopedCurrentEvents =
+    snapshot.accountContext?.status === 'AVAILABLE'
+      ? filterAccountScopedItems({
+          selectedAccount: snapshot.accountContext.account,
+          items: snapshot.eventStream.events,
+        })
+      : snapshot.eventStream.events;
+  const scopedOrientationContext =
+    snapshot.accountContext?.status === 'AVAILABLE'
+      ? scopeOrientationContextToSelectedAccount({
+          selectedAccount: snapshot.accountContext.account,
+          orientationContext: snapshot.orientationContext,
+        })
+      : snapshot.orientationContext;
   const contextInputs = createPreparedContextInputs({
     strategyAlignment:
-      snapshot.orientationContext.currentState.strategyAlignment ?? snapshot.strategyAlignment,
+      scopedOrientationContext.currentState.strategyAlignment ?? snapshot.strategyAlignment,
     change24h: snapshot.model.core.change24h.value,
     currentState: snapshot.model.core.currentState.trendDirection,
-    currentEvents: snapshot.eventStream.events,
-    orientationContext: snapshot.orientationContext,
+    currentEvents: scopedCurrentEvents,
+    orientationContext: scopedOrientationContext,
   });
   const fit = createStrategyFitSummary({
     contextInputs,

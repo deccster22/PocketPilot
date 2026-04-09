@@ -35,7 +35,12 @@ function computePctChange(
 
 export async function runForegroundScan(
   deps: ForegroundScanDeps,
-  params: { accounts: Account[]; symbols: string[]; baselineQuotes?: Record<string, Quote> },
+  params: {
+    accounts: Account[];
+    selectedAccountId?: string | null;
+    symbols: string[];
+    baselineQuotes?: Record<string, Quote>;
+  },
 ): Promise<ForegroundScanResult> {
   const { accountId, quotes, routerMeta } = await fetchQuotes(
     {
@@ -44,6 +49,7 @@ export async function runForegroundScan(
     },
     {
       accounts: params.accounts,
+      selectedAccountId: params.selectedAccountId,
       symbols: params.symbols,
       context: {
         role: 'execution',
