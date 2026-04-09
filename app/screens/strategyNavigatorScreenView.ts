@@ -26,6 +26,11 @@ export type StrategyPreviewCardViewData = {
   dashboardFocus: ReadonlyArray<string>;
   eventHighlights: ReadonlyArray<string>;
   alertPosture: string;
+  contrast: {
+    title: string;
+    summary: string;
+    bullets: ReadonlyArray<string>;
+  } | null;
   explanation: {
     title: string;
     summary: string;
@@ -118,6 +123,7 @@ export function createStrategyNavigatorScreenViewData(
   }
 
   const selectedStrategy = strategyOptions.find((strategy) => strategy.strategyId === availability.strategyId);
+  const contrast = vm.contrast.status === 'AVAILABLE' ? vm.contrast.content : null;
   const explanation = vm.explanation.status === 'AVAILABLE' ? vm.explanation.content : null;
   const knowledgeItems =
     vm.knowledgeFollowThrough?.status === 'AVAILABLE' ? vm.knowledgeFollowThrough.items : [];
@@ -139,6 +145,7 @@ export function createStrategyNavigatorScreenViewData(
       dashboardFocus: availability.focus.dashboardFocus,
       eventHighlights: availability.focus.eventHighlights,
       alertPosture: availability.focus.alertPosture,
+      contrast,
       explanation,
       knowledgeItems,
     },

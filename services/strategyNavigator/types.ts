@@ -14,10 +14,17 @@ export type StrategyPreviewScenarioId =
   | 'MIXED_REVERSAL'
   | 'RANGE_COMPRESSION';
 
+export type StrategyPreviewScenarioTraits = {
+  volatilityState: string | null;
+  structureState: string | null;
+  conditionState: string | null;
+};
+
 export type StrategyPreviewScenario = {
   scenarioId: StrategyPreviewScenarioId;
   title: string;
   summary: string;
+  traits?: StrategyPreviewScenarioTraits;
 };
 
 export type StrategyPreviewStrategyOption = {
@@ -48,6 +55,22 @@ export type StrategyPreviewExplanationAvailability =
   | {
       status: 'AVAILABLE';
       content: StrategyPreviewExplanation;
+    };
+
+export type StrategyPreviewContrast = {
+  title: string;
+  summary: string;
+  bullets: ReadonlyArray<string>;
+};
+
+export type StrategyPreviewContrastAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_CONTRAST_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      content: StrategyPreviewContrast;
     };
 
 export type StrategyPreviewKnowledgeLink = {
@@ -94,5 +117,6 @@ export type StrategyNavigatorVM = {
   scenarios: ReadonlyArray<StrategyPreviewScenario>;
   availability: StrategyPreviewAvailability;
   explanation: StrategyPreviewExplanationAvailability;
+  contrast: StrategyPreviewContrastAvailability;
   knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };

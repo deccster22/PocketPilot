@@ -1,4 +1,4 @@
-# Strategy Navigator Model (P9-S1, P9-S2, P9-S3)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4)
 
 ## Purpose
 
@@ -7,11 +7,13 @@
 `P9-S1` established the first simulated preview seam.
 `P9-S2` deepened that same seam with one service-owned preview-to-knowledge follow-through path.
 `P9-S3` adds one service-owned preview-explanation layer that explains why a strategy reacts to the simulated scenario the way it does.
+`P9-S4` deepens the finite scenario layer with interpreted scenario traits plus one service-owned scenario-contrast seam that explains what changes for that strategy in this kind of simulated backdrop.
 
 The lane now exists to:
 
 - let a user choose one strategy and one finite simulated scenario
 - show how PocketPilot would reinterpret the same backdrop through that strategy
+- show how that strategy's emphasis changes versus calmer or alternative conditions for that same scenario family
 - explain why that simulated backdrop matters to the selected strategy in calm worldview terms
 - optionally offer a small set of prepared knowledge next steps if the user wants more context
 - stay calm, descriptive, educational, and non-directive
@@ -33,10 +35,17 @@ type StrategyPreviewScenarioId =
   | 'MIXED_REVERSAL'
   | 'RANGE_COMPRESSION';
 
+type StrategyPreviewScenarioTraits = {
+  volatilityState: string | null;
+  structureState: string | null;
+  conditionState: string | null;
+};
+
 type StrategyPreviewScenario = {
   scenarioId: StrategyPreviewScenarioId;
   title: string;
   summary: string;
+  traits?: StrategyPreviewScenarioTraits;
 };
 
 type StrategyPreviewFocus = {
@@ -60,6 +69,22 @@ type StrategyPreviewExplanationAvailability =
   | {
       status: 'AVAILABLE';
       content: StrategyPreviewExplanation;
+    };
+
+type StrategyPreviewContrast = {
+  title: string;
+  summary: string;
+  bullets: readonly string[];
+};
+
+type StrategyPreviewContrastAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_CONTRAST_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      content: StrategyPreviewContrast;
     };
 
 type StrategyPreviewKnowledgeLink = {
@@ -106,6 +131,7 @@ type StrategyNavigatorVM = {
   scenarios: readonly StrategyPreviewScenario[];
   availability: StrategyPreviewAvailability;
   explanation: StrategyPreviewExplanationAvailability;
+  contrast: StrategyPreviewContrastAvailability;
   knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };
 ```
@@ -114,6 +140,7 @@ Rules:
 
 - one canonical preview contract
 - one canonical preview-explanation contract
+- one canonical preview-contrast contract
 - one canonical preview-to-knowledge follow-through contract
 - one selected strategy at a time
 - one finite scenario catalog
@@ -134,6 +161,7 @@ The current canonical service path is:
 Within `createStrategyNavigatorVM`, the same service-owned lane now calls:
 
 - `createStrategyPreviewExplanation`
+- `createStrategyPreviewContrast`
 - `selectStrategyPreviewKnowledge`
 
 ## Preview Rules
@@ -151,6 +179,31 @@ The preview must not answer:
 - whether the strategy is likely to profit
 - whether the user is ready to execute
 - what a broker or adapter would do next
+
+## Preview Contrast Rules
+
+`P9-S4` adds one subordinate contrast shelf inside the same Strategy Navigator VM.
+
+The contrast answers three questions only:
+
+- what is different about this scenario for the selected strategy
+- what the strategy pays more attention to here
+- what becomes less central here
+
+The contrast must:
+
+- stay short, calm, and educational
+- reuse the finite scenario catalog and interpreted scenario traits
+- describe emphasis shifts rather than outcomes
+- remain subordinate to the preview itself
+- return `UNAVAILABLE` honestly when the seam does not have enough prepared context
+
+The contrast must not:
+
+- imply a recommendation or readiness state
+- promise that the scenario resolves a certain way
+- expose raw signal lists, provider diagnostics, or runtime metadata
+- turn Strategy Preview into a live simulator or broad strategy battle surface
 
 ## Preview Explanation Rules
 
@@ -208,6 +261,7 @@ The selector must not:
 
 - render prepared strategy and scenario options
 - render prepared preview sections
+- render prepared preview-contrast content when `contrast.status === 'AVAILABLE'`
 - render prepared preview-explanation content when `explanation.status === 'AVAILABLE'`
 - render prepared knowledge follow-through items when `knowledgeFollowThrough.status === 'AVAILABLE'`
 - open prepared topic detail by `topicId`
@@ -218,6 +272,7 @@ The selector must not:
 - import the strategy catalog directly
 - shape scenario meaning locally
 - derive event importance locally
+- derive preview contrast wording locally
 - derive preview explanation wording locally
 - derive knowledge relevance locally
 - read markdown files or docs paths
@@ -251,10 +306,12 @@ That keeps Strategy Preview explanatory without turning the shared Dashboard why
 
 ## Relationship To Later Work
 
-`P9-S1`, `P9-S2`, and `P9-S3` are the first three rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, and `P9-S4` are the first four rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 
+- richer scenario framing when the finite starter catalog proves stable
+- deeper scenario contrast depth when the current contrast seam proves useful
 - richer explanation depth when the current preview explanation proves useful
 - richer surface transformations when the product has a stronger reason for them
 - broader or deeper knowledge integration when the current follow-through proves useful

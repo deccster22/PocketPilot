@@ -1,7 +1,9 @@
 import { fetchStrategyNavigatorVM } from '@/services/strategyNavigator/fetchStrategyNavigatorVM';
+import { listStrategyPreviewScenarios } from '@/services/strategyNavigator/strategyPreviewScenarios';
 
 describe('fetchStrategyNavigatorVM', () => {
   it('returns one canonical prepared Strategy Preview VM with deterministic starter catalogs', () => {
+    const scenarios = listStrategyPreviewScenarios();
     const result = fetchStrategyNavigatorVM({
       surface: 'STRATEGY_NAVIGATOR',
       selectedStrategyId: 'dip_buying',
@@ -18,32 +20,7 @@ describe('fetchStrategyNavigatorVM', () => {
       'mean_reversion',
       'fib_levels',
     ]);
-    expect(result.scenarios).toEqual([
-      {
-        scenarioId: 'DIP_VOLATILITY',
-        title: 'Dip with expanding volatility',
-        summary:
-          'A quick drop lands alongside wider price swings, so the move looks less settled than a routine pullback.',
-      },
-      {
-        scenarioId: 'TREND_CONTINUATION',
-        title: 'Trend continuation',
-        summary:
-          'An existing move keeps extending in the same direction, with enough order to ask whether the backdrop is still supporting it.',
-      },
-      {
-        scenarioId: 'MIXED_REVERSAL',
-        title: 'Mixed reversal attempt',
-        summary:
-          'A prior move starts to unwind, but the picture is still divided rather than cleanly flipped into a new regime.',
-      },
-      {
-        scenarioId: 'RANGE_COMPRESSION',
-        title: 'Range compression',
-        summary:
-          'Price movement tightens and activity quiets down, leaving the next move unresolved instead of obvious.',
-      },
-    ]);
+    expect(result.scenarios).toEqual(scenarios);
     expect(result.explanation).toEqual({
       status: 'AVAILABLE',
       content: {
@@ -54,6 +31,19 @@ describe('fetchStrategyNavigatorVM', () => {
           'What it is noticing: Snapshot would treat this as a dip worth watching, but only once the drop starts to settle into something interpretable.',
           'Why that matters: This lens cares about whether pressure is becoming more interpretable, because a messy drop is different from a steadier dip-watch setup.',
           'Relevant interpreted MarketEvents: Dip-detected events would matter most when they are followed by calmer price movement. Estimated-price events would matter if the backdrop is still too noisy to trust the read.',
+        ],
+      },
+    });
+    expect(result.contrast).toEqual({
+      status: 'AVAILABLE',
+      content: {
+        title: 'What changes in this scenario',
+        summary:
+          'Compared with a calmer pullback, Dip Buying leans more toward whether weakness is settling into a calmer pullback because volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
+        bullets: [
+          'More attention here: Dip-detected events would matter most when they are followed by calmer price movement.',
+          'Less central here: clean continuation language or quick rebound framing, because the backdrop is still stressed rather than settled.',
+          'Preview expression: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
         ],
       },
     });
@@ -99,6 +89,17 @@ describe('fetchStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NO_EXPLANATION_AVAILABLE',
     });
+    expect(
+      fetchStrategyNavigatorVM({
+        surface: 'STRATEGY_NAVIGATOR',
+        selectedStrategyId: 'snapshot_change',
+        selectedScenarioId: 'TREND_CONTINUATION',
+        nowProvider: () => Date.parse('2026-04-05T00:00:00.000Z'),
+      }).contrast,
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_CONTRAST_AVAILABLE',
+    });
   });
 
   it('keeps raw internals out of the prepared user-facing preview output', () => {
@@ -129,6 +130,7 @@ describe('fetchStrategyNavigatorVM', () => {
 
     expect(result.availability.status).toBe('AVAILABLE');
     expect(result.explanation.status).toBe('AVAILABLE');
+    expect(result.contrast.status).toBe('AVAILABLE');
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'UNAVAILABLE',
       reason: 'KNOWLEDGE_UNAVAILABLE',
