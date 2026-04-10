@@ -6,16 +6,24 @@ import { InsightsArchiveScreen } from '@/app/screens/InsightsArchiveScreen';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
 import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
 import { InsightsSummaryScreen } from '@/app/screens/InsightsSummaryScreen';
+import { InsightsYearInReviewScreen } from '@/app/screens/InsightsYearInReviewScreen';
 import { createInsightsScreenViewData } from '@/app/screens/insightsScreenView';
 import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
 import { fetchPeriodSummaryVM } from '@/services/insights/fetchPeriodSummaryVM';
 import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
 import { fetchSummaryArchiveVM } from '@/services/insights/fetchSummaryArchiveVM';
+import { fetchYearInReviewVM } from '@/services/insights/fetchYearInReviewVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
 import type { ReflectionPeriod } from '@/services/insights/types';
 
-type InsightsRoute = 'HOME' | 'DETAIL' | 'REFLECTION' | 'SUMMARY' | 'SUMMARY_ARCHIVE';
+type InsightsRoute =
+  | 'HOME'
+  | 'DETAIL'
+  | 'REFLECTION'
+  | 'SUMMARY'
+  | 'SUMMARY_ARCHIVE'
+  | 'YEAR_IN_REVIEW';
 
 const DEFAULT_SUMMARY_PERIOD: ReflectionPeriod = 'LAST_MONTH';
 
@@ -43,6 +51,12 @@ export function InsightsScreen() {
       nowProvider,
     }),
   );
+  const [yearInReviewVM] = useState(() =>
+    fetchYearInReviewVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+    }),
+  );
   const [reflectionVM] = useState(() =>
     fetchReflectionComparisonVM({
       surface: 'INSIGHTS_SCREEN',
@@ -61,6 +75,7 @@ export function InsightsScreen() {
     hasReflection: historyVM.availability.status === 'AVAILABLE',
     hasSummaries: true,
     hasSummaryArchive: true,
+    hasYearInReview: true,
   });
 
   function openSummaryPeriod(period: ReflectionPeriod) {
@@ -125,6 +140,12 @@ export function InsightsScreen() {
         onBack={() => setRoute('HOME')}
         onOpenSummary={openSummaryPeriod}
       />
+    );
+  }
+
+  if (route === 'YEAR_IN_REVIEW') {
+    return (
+      <InsightsYearInReviewScreen yearInReviewVM={yearInReviewVM} onBack={() => setRoute('HOME')} />
     );
   }
 
@@ -209,6 +230,21 @@ export function InsightsScreen() {
             {screenView.summaryArchiveActionSummary ? (
               <Text style={styles.archiveButtonSummary}>
                 {screenView.summaryArchiveActionSummary}
+              </Text>
+            ) : null}
+          </Pressable>
+        ) : null}
+
+        {screenView.yearInReviewActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setRoute('YEAR_IN_REVIEW')}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.yearInReviewActionLabel}</Text>
+            {screenView.yearInReviewActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>
+                {screenView.yearInReviewActionSummary}
               </Text>
             ) : null}
           </Pressable>

@@ -2,8 +2,8 @@ import type { EventLedgerEntry } from '@/core/types/eventLedger';
 
 import { isMarketEvent } from '@/services/insights/historyInterpretation';
 import {
-  createReflectionPeriodWindow,
-  formatReflectionPeriodTitle,
+  createAnnualReviewWindow,
+  formatAnnualReviewTitle,
 } from '@/services/insights/periodSummaryShared';
 import {
   capitalize,
@@ -14,19 +14,17 @@ import {
   type ReviewProfile,
 } from '@/services/insights/reviewProfileShared';
 import type {
-  PeriodSummaryItem,
-  PeriodSummaryVM,
-  ReflectionPeriod,
+  AnnualReviewPeriod,
+  YearInReviewItem,
+  YearInReviewVM,
 } from '@/services/insights/types';
 
-type PeriodProfile = ReviewProfile;
-
-const MIN_PERIOD_EVENT_COUNT = 2;
+const MIN_YEAR_IN_REVIEW_EVENT_COUNT = 3;
 
 function createUnavailableVM(
   generatedAt: string,
-  reason: Extract<PeriodSummaryVM['availability'], { status: 'UNAVAILABLE' }>['reason'],
-): PeriodSummaryVM {
+  reason: Extract<YearInReviewVM['availability'], { status: 'UNAVAILABLE' }>['reason'],
+): YearInReviewVM {
   return {
     generatedAt,
     availability: {
@@ -37,12 +35,11 @@ function createUnavailableVM(
 }
 
 function createSummary(params: {
-  period: ReflectionPeriod;
-  overallProfile: PeriodProfile;
-  newerProfile: PeriodProfile | null;
-  earlierProfile: PeriodProfile | null;
+  year: number;
+  overallProfile: ReviewProfile;
+  newerProfile: ReviewProfile | null;
+  earlierProfile: ReviewProfile | null;
 }): string {
-  const title = formatReflectionPeriodTitle(params.period);
   const newerTheme = formatReviewThemePhrase(params.newerProfile?.dominantTheme ?? null);
   const earlierTheme = formatReviewThemePhrase(params.earlierProfile?.dominantTheme ?? null);
   const overallTheme = formatReviewThemePhrase(params.overallProfile.dominantTheme);
@@ -52,17 +49,17 @@ function createSummary(params: {
     earlierTheme &&
     params.newerProfile?.dominantTheme !== params.earlierProfile?.dominantTheme
   ) {
-    return `${title} moved from ${earlierTheme} toward ${newerTheme} in interpreted history.`;
+    return `Across ${params.year}, interpreted history moved from ${earlierTheme} toward ${newerTheme}.`;
   }
 
   if (overallTheme) {
-    return `${title} stayed centered more on ${overallTheme} than on a new interpreted pattern.`;
+    return `Across ${params.year}, interpreted history stayed centered more on ${overallTheme} than on a new interpreted pattern.`;
   }
 
-  return `${title} stayed brief and descriptive because interpreted history in this period was limited.`;
+  return `Across ${params.year}, interpreted history stayed brief because the year returned limited context.`;
 }
 
-function createFocusItem(profile: PeriodProfile): PeriodSummaryItem | null {
+function createFocusItem(profile: ReviewProfile): YearInReviewItem | null {
   const themePhrase = formatReviewThemePhrase(profile.dominantTheme);
 
   if (!themePhrase) {
@@ -70,17 +67,17 @@ function createFocusItem(profile: PeriodProfile): PeriodSummaryItem | null {
   }
 
   return {
-    label: 'What stayed most visible',
-    value: `${capitalize(themePhrase)} appeared most often in this period's interpreted history.`,
+    label: 'What stood out most',
+    value: `${capitalize(themePhrase)} appeared most often in interpreted history across the year.`,
     emphasis: 'NEUTRAL',
   };
 }
 
 function createDevelopmentItem(params: {
-  overallProfile: PeriodProfile;
-  newerProfile: PeriodProfile | null;
-  earlierProfile: PeriodProfile | null;
-}): PeriodSummaryItem | null {
+  overallProfile: ReviewProfile;
+  newerProfile: ReviewProfile | null;
+  earlierProfile: ReviewProfile | null;
+}): YearInReviewItem | null {
   const newerTheme = formatReviewThemePhrase(params.newerProfile?.dominantTheme ?? null);
   const earlierTheme = formatReviewThemePhrase(params.earlierProfile?.dominantTheme ?? null);
 
@@ -90,8 +87,8 @@ function createDevelopmentItem(params: {
     params.newerProfile?.dominantTheme !== params.earlierProfile?.dominantTheme
   ) {
     return {
-      label: 'How the period developed',
-      value: `The later part leaned more on ${newerTheme}, while the earlier part leaned more on ${earlierTheme}.`,
+      label: 'How the year developed',
+      value: `The later part of the year leaned more on ${newerTheme}, while the earlier part leaned more on ${earlierTheme}.`,
       emphasis: 'SHIFT',
     };
   }
@@ -109,8 +106,8 @@ function createDevelopmentItem(params: {
     params.newerProfile?.dominantAlignment !== params.earlierProfile?.dominantAlignment
   ) {
     return {
-      label: 'How the period developed',
-      value: `The later part moved from ${earlierAlignment} toward ${newerAlignment}.`,
+      label: 'How the year developed',
+      value: `The later part of the year moved from ${earlierAlignment} toward ${newerAlignment}.`,
       emphasis: 'SHIFT',
     };
   }
@@ -122,18 +119,18 @@ function createDevelopmentItem(params: {
   }
 
   return {
-    label: 'How the period developed',
-    value: `The period stayed centered on ${overallTheme} rather than taking on a different interpreted pattern.`,
+    label: 'How the year developed',
+    value: `The year stayed centered on ${overallTheme} rather than taking on a different interpreted pattern.`,
     emphasis: 'NEUTRAL',
   };
 }
 
-function createContextOrRecurringItem(profile: PeriodProfile): PeriodSummaryItem | null {
+function createContextOrRecurringItem(profile: ReviewProfile): YearInReviewItem | null {
   if (profile.hasProvisionalContext) {
     return {
       label: 'Context note',
       value:
-        'Some supporting price context stayed estimated or partial, so this summary remains directional rather than exhaustive.',
+        'Some supporting price context stayed estimated or partial during the year, so this debrief remains directional rather than exhaustive.',
       emphasis: 'CONTEXT',
     };
   }
@@ -141,7 +138,7 @@ function createContextOrRecurringItem(profile: PeriodProfile): PeriodSummaryItem
   if (profile.topSymbol) {
     return {
       label: 'Recurring symbol',
-      value: `${profile.topSymbol} appeared most often in interpreted notes across this period.`,
+      value: `${profile.topSymbol} appeared most often in interpreted notes across the year.`,
       emphasis: 'NEUTRAL',
     };
   }
@@ -159,44 +156,44 @@ function createContextOrRecurringItem(profile: PeriodProfile): PeriodSummaryItem
   };
 }
 
-function createLimitations(profile: PeriodProfile): string[] {
+function createLimitations(profile: ReviewProfile): string[] {
   const limitations: string[] = [];
 
-  if (profile.eventCount < 4) {
+  if (profile.eventCount < 6) {
     limitations.push(
-      'This summary is drawn from a lighter stretch of interpreted history, so it stays brief.',
+      'This review is drawn from a lighter stretch of interpreted history, so it stays brief.',
     );
   }
 
   if (profile.groupCount === 1) {
     limitations.push(
-      'Most of this period returned to one recurring interpreted pattern, so the summary emphasizes continuity over change.',
+      'Most of the year returned to one recurring interpreted pattern, so the debrief emphasizes continuity over change.',
     );
   }
 
   return limitations;
 }
 
-export function createPeriodSummaryVM(params: {
+export function createYearInReviewVM(params: {
   generatedAt: string;
   history: ReadonlyArray<EventLedgerEntry>;
-  period: ReflectionPeriod | null;
-}): PeriodSummaryVM {
+  period: AnnualReviewPeriod | null;
+}): YearInReviewVM {
   if (!params.period) {
     return createUnavailableVM(params.generatedAt, 'NO_PERIOD_SELECTED');
   }
 
-  const window = createReflectionPeriodWindow(params.period, params.generatedAt);
-  const periodHistory = params.history
+  const window = createAnnualReviewWindow(params.period, params.generatedAt);
+  const yearHistory = params.history
     .filter(isMarketEvent)
     .filter((event) => event.timestamp >= window.startAtMs && event.timestamp < window.endAtMs);
 
-  if (periodHistory.length < MIN_PERIOD_EVENT_COUNT) {
+  if (yearHistory.length < MIN_YEAR_IN_REVIEW_EVENT_COUNT) {
     return createUnavailableVM(params.generatedAt, 'INSUFFICIENT_HISTORY');
   }
 
-  const overallProfile = createReviewProfile(periodHistory);
-  const sliceProfiles = createReviewSliceProfiles(periodHistory);
+  const overallProfile = createReviewProfile(yearHistory);
+  const sliceProfiles = createReviewSliceProfiles(yearHistory);
   const items = [
     createFocusItem(overallProfile),
     createDevelopmentItem({
@@ -205,16 +202,16 @@ export function createPeriodSummaryVM(params: {
       earlierProfile: sliceProfiles?.earlierProfile ?? null,
     }),
     createContextOrRecurringItem(overallProfile),
-  ].filter((item): item is PeriodSummaryItem => Boolean(item));
+  ].filter((item): item is YearInReviewItem => Boolean(item));
 
   return {
     generatedAt: params.generatedAt,
     availability: {
       status: 'AVAILABLE',
       period: params.period,
-      title: formatReflectionPeriodTitle(params.period),
+      title: formatAnnualReviewTitle(params.period, params.generatedAt),
       summary: createSummary({
-        period: params.period,
+        year: window.year,
         overallProfile,
         newerProfile: sliceProfiles?.newerProfile ?? null,
         earlierProfile: sliceProfiles?.earlierProfile ?? null,

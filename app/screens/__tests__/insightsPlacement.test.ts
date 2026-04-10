@@ -24,6 +24,10 @@ describe('insights placement', () => {
       join(process.cwd(), 'app', 'screens', 'InsightsArchiveScreen.tsx'),
       'utf8',
     );
+    const insightsYearInReviewScreenSource = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'InsightsYearInReviewScreen.tsx'),
+      'utf8',
+    );
     const dashboardScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'DashboardScreen.tsx'),
       'utf8',
@@ -45,14 +49,16 @@ describe('insights placement', () => {
     expect(insightsScreenSource).toMatch(/fetchPeriodSummaryVM/);
     expect(insightsScreenSource).toMatch(/fetchReflectionComparisonVM/);
     expect(insightsScreenSource).toMatch(/fetchSummaryArchiveVM/);
+    expect(insightsScreenSource).toMatch(/fetchYearInReviewVM/);
     expect(insightsScreenSource).toMatch(/markInsightsHistoryViewed/);
     expect(insightsScreenSource).toMatch(/InsightsArchiveScreen/);
     expect(insightsScreenSource).toMatch(/InsightsDetailScreen/);
     expect(insightsScreenSource).toMatch(/InsightsReflectionScreen/);
     expect(insightsScreenSource).toMatch(/InsightsSummaryScreen/);
+    expect(insightsScreenSource).toMatch(/InsightsYearInReviewScreen/);
     expect(insightsScreenSource).toMatch(/EventHistoryCard/);
     expect(insightsScreenSource).not.toMatch(
-      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createPeriodSummaryVM|createReflectionComparisonVM|createSummaryArchiveVM|createSinceLastChecked|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createPeriodSummaryVM|createReflectionComparisonVM|createSummaryArchiveVM|createYearInReviewVM|createSinceLastChecked|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(insightsDetailScreenSource).toMatch(/createInsightsDetailScreenViewData/);
     expect(insightsDetailScreenSource).toMatch(/InsightsDetailCard/);
@@ -73,6 +79,11 @@ describe('insights placement', () => {
     expect(insightsArchiveScreenSource).toMatch(/onOpenSummary/);
     expect(insightsArchiveScreenSource).not.toMatch(
       /fetchSummaryArchiveVM|createSummaryArchiveVM|fetchPeriodSummaryVM|createPeriodSummaryVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
+    );
+    expect(insightsYearInReviewScreenSource).toMatch(/createInsightsYearInReviewScreenViewData/);
+    expect(insightsYearInReviewScreenSource).toMatch(/yearInReviewVM/);
+    expect(insightsYearInReviewScreenSource).not.toMatch(
+      /fetchYearInReviewVM|createYearInReviewVM|createPeriodSummaryVM|fetchPeriodSummaryVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(dashboardScreenSource).not.toMatch(/EventHistoryCard|fetchInsightsHistoryVM/);
     expect(snapshotScreenSource).not.toMatch(/EventHistoryCard|fetchInsightsHistoryVM/);
