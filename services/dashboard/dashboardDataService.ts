@@ -66,7 +66,10 @@ export async function fetchDashboardData(params: {
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
 }): Promise<DashboardData> {
-  const upstream = await fetchSurfaceContext(params);
+  const upstream = await fetchSurfaceContext({
+    ...params,
+    accountSwitchingEnabled: true,
+  });
 
   return {
     accountContext: upstream.selectedAccountContext,

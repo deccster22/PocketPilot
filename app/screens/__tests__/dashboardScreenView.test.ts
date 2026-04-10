@@ -19,6 +19,26 @@ function createSurface(): DashboardSurfaceVM {
         baseCurrency: 'USD',
         strategyId: 'momentum_basics',
       },
+      switching: {
+        status: 'AVAILABLE',
+        selectedAccountId: 'acct-1',
+        options: [
+          {
+            accountId: 'acct-1',
+            displayName: 'Primary account',
+            strategyId: 'momentum_basics',
+            isPrimary: true,
+            isSelected: true,
+          },
+          {
+            accountId: 'acct-2',
+            displayName: 'Backup account',
+            strategyId: 'dip_buying',
+            isPrimary: false,
+            isSelected: false,
+          },
+        ],
+      },
     },
     model: {
       primeZone: {
@@ -107,6 +127,27 @@ describe('createDashboardScreenViewData', () => {
         visible: true,
         title: 'Current account: Primary account',
         summary: 'Primary-account context | USD base currency | Strategy momentum_basics',
+        switcher: {
+          visible: true,
+          title: 'Account context controls',
+          summary: 'Switch deliberately or mark one primary fallback.',
+          options: [
+            {
+              accountId: 'acct-1',
+              title: 'Primary account',
+              summary: 'Strategy momentum_basics',
+              isSelected: true,
+              isPrimary: true,
+            },
+            {
+              accountId: 'acct-2',
+              title: 'Backup account',
+              summary: 'Strategy dip_buying',
+              isSelected: false,
+              isPrimary: false,
+            },
+          ],
+        },
       },
       message: {
         visible: false,
@@ -174,7 +215,9 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/accountContext\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
-    expect(source).not.toMatch(/portfolioValue|isPrimary|selectedAccountId|resolveSelectedAccountContext/);
+    expect(source).not.toMatch(
+      /portfolioValue|selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability/,
+    );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
     expect(source).not.toMatch(
@@ -261,6 +304,30 @@ describe('createDashboardScreenViewData', () => {
     ).toMatchObject({
       accountContext: {
         visible: false,
+      },
+    });
+  });
+
+  it('keeps the account cue passive when switching is unavailable', () => {
+    const surface = createSurface();
+
+    expect(
+      createDashboardScreenViewData({
+        ...surface,
+        accountContext: {
+          ...surface.accountContext,
+          switching: {
+            status: 'UNAVAILABLE',
+            reason: 'SINGLE_ACCOUNT_ONLY',
+          },
+        },
+      }),
+    ).toMatchObject({
+      accountContext: {
+        visible: true,
+        switcher: {
+          visible: false,
+        },
       },
     });
   });

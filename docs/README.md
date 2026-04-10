@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-09
+Last Updated: 2026-04-10
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-09
+**Last updated:** 2026-04-10
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -57,6 +57,7 @@ Start with:
 - Execution-aware. Execution venue truth beats synthetic purity.
 - Calm in tone. No urgency language, volatility theatre, dopamine loops, or shame.
 - User-directed. No hidden automation or silent control shifts.
+- Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.

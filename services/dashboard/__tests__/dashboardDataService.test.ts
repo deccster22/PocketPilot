@@ -156,6 +156,7 @@ describe('fetchDashboardData', () => {
     expect(mockFetchSurfaceContext).toHaveBeenCalledWith({
       profile: 'ADVANCED',
       nowProvider,
+      accountSwitchingEnabled: true,
     });
     expect(result.scan.accountId).toBe('acct-live');
     expect(result.accountContext).toEqual({

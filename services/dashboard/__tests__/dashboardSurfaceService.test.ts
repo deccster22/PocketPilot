@@ -248,6 +248,75 @@ describe('fetchDashboardSurfaceVM', () => {
     expect(JSON.stringify(result.model)).not.toContain('acct-basic');
   });
 
+  it('keeps Dashboard account-scoped after the selected account changes explicitly', async () => {
+    const switchedAccountEvent = createEvent({
+      eventId: 'acct-basic:strategy-b:signal:ETH:300',
+      timestamp: 300,
+      accountId: 'acct-basic',
+      symbol: 'ETH',
+      strategyId: 'strategy-b',
+      eventType: 'PRICE_MOVEMENT',
+      alignmentState: 'NEEDS_REVIEW',
+      pctChange: -0.08,
+    });
+    const otherAccountEvent = createEvent();
+
+    mockFetchDashboardData.mockResolvedValue({
+      accountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-basic',
+          displayName: 'Basic account',
+          selectionMode: 'EXPLICIT',
+          baseCurrency: 'USD',
+          strategyId: 'strategy-b',
+        },
+      },
+      scan: {
+        accountId: 'acct-basic',
+      } as never,
+      orientationContext: {
+        profile: 'ADVANCED',
+        assets: [],
+      },
+      explanationContext: {
+        accountId: 'acct-basic',
+        currentState: {
+          latestRelevantEvent: switchedAccountEvent,
+          strategyAlignment: 'Needs review',
+          certainty: 'confirmed',
+        },
+        historyContext: {
+          eventsSinceLastViewed: [otherAccountEvent, switchedAccountEvent],
+          sinceLastChecked: {
+            sinceTimestamp: 90,
+            accountId: 'acct-basic',
+            summaryCount: 2,
+            events: [otherAccountEvent, switchedAccountEvent],
+          },
+        },
+      },
+      events: [otherAccountEvent, switchedAccountEvent],
+    });
+
+    const result = await fetchDashboardSurfaceVM({ profile: 'ADVANCED' });
+
+    expect(result.accountContext).toMatchObject({
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-basic',
+        selectionMode: 'EXPLICIT',
+      },
+    });
+    expect(result.model.primeZone.items).toEqual([
+      expect.objectContaining({
+        accountId: 'acct-basic',
+        symbol: 'ETH',
+      }),
+    ]);
+    expect(JSON.stringify(result.model)).not.toContain('acct-live');
+  });
+
   it('keeps dashboard decoupled from snapshot service flow', () => {
     const serviceSource = readFileSync(
       join(process.cwd(), 'services', 'dashboard', 'dashboardSurfaceService.ts'),

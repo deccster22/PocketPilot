@@ -1,6 +1,7 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { DashboardAccountSwitcher } from '@/app/components/DashboardAccountSwitcher';
 import { ExplanationCard } from '@/app/components/ExplanationCard';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import {
@@ -8,6 +9,8 @@ import {
   refreshDashboardScreenSurface,
 } from '@/app/screens/dashboardScreenView';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { setPrimaryAccount } from '@/services/accounts/setPrimaryAccount';
+import { switchSelectedAccount } from '@/services/accounts/switchSelectedAccount';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
 import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -40,6 +43,9 @@ export function DashboardScreen() {
   const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceVM | null>(null);
   const [messagePolicy, setMessagePolicy] = useState<MessagePolicyAvailability | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
+  const [refreshNonce, setRefreshNonce] = useState(0);
+  const [accountSwitcherExpanded, setAccountSwitcherExpanded] = useState(false);
+  const [accountActionPending, setAccountActionPending] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,12 +72,63 @@ export function DashboardScreen() {
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan]);
+  }, [profile, baselineScan, refreshNonce]);
 
   const screenView = useMemo(
     () => createDashboardScreenViewData(surfaceModel, messagePolicy),
     [messagePolicy, surfaceModel],
   );
+
+  async function handleSwitchAccount(accountId: string) {
+    if (surfaceModel?.accountContext.status !== 'AVAILABLE') {
+      return;
+    }
+
+    if (surfaceModel.accountContext.switching?.status !== 'AVAILABLE') {
+      return;
+    }
+
+    setAccountActionPending(true);
+
+    try {
+      const result = await switchSelectedAccount({
+        options: surfaceModel.accountContext.switching.options,
+        accountId,
+      });
+
+      if (result.status === 'UPDATED') {
+        setBaselineScan(undefined);
+        setRefreshNonce((value) => value + 1);
+      }
+    } finally {
+      setAccountActionPending(false);
+    }
+  }
+
+  async function handleSetPrimaryAccount(accountId: string) {
+    if (surfaceModel?.accountContext.status !== 'AVAILABLE') {
+      return;
+    }
+
+    if (surfaceModel.accountContext.switching?.status !== 'AVAILABLE') {
+      return;
+    }
+
+    setAccountActionPending(true);
+
+    try {
+      const result = await setPrimaryAccount({
+        options: surfaceModel.accountContext.switching.options,
+        accountId,
+      });
+
+      if (result.status === 'UPDATED') {
+        setRefreshNonce((value) => value + 1);
+      }
+    } finally {
+      setAccountActionPending(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -84,10 +141,14 @@ export function DashboardScreen() {
           <Text style={styles.label}>Prepared surface for {screenView?.profileLabel ?? profile}</Text>
         </View>
         {screenView?.accountContext.visible ? (
-          <View style={styles.noteCard}>
-            <Text style={styles.noteTitle}>{screenView.accountContext.title}</Text>
-            <Text style={styles.noteSummary}>{screenView.accountContext.summary}</Text>
-          </View>
+          <DashboardAccountSwitcher
+            accountContext={screenView.accountContext}
+            expanded={accountSwitcherExpanded}
+            busy={accountActionPending}
+            onToggleExpanded={() => setAccountSwitcherExpanded((value) => !value)}
+            onSwitchAccount={handleSwitchAccount}
+            onSetPrimaryAccount={handleSetPrimaryAccount}
+          />
         ) : null}
         {screenView?.message.visible ? (
           <View style={styles.noteCard}>

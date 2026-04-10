@@ -1,4 +1,4 @@
-# Dashboard Spec (P4-5 + PX-E2 + PX-MA1)
+# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
@@ -99,17 +99,30 @@ The Dashboard why note still does not show:
 - urgency language
 - predictive wording
 
-## Passive Account Context Cue (PX-MA1)
-Dashboard now has one minimal passive account-context cue only:
-- render it only when the prepared selected-account seam is `AVAILABLE`
-- keep it calm, subordinate, and informational rather than control-like
+## Account Context Cue And Controls (PX-MA1 + PX-MA2)
+Dashboard keeps the same account-context cue, but PX-MA2 lets it deepen carefully when the prepared seam says switching is honestly available.
+
+Rules:
+- render the cue only when the prepared selected-account seam is `AVAILABLE`
+- keep the cue calm, subordinate, and compact
 - show the current account name plus sparse context such as selection mode, base currency, and strategy id when available
-- do not add selector sprawl, warning styling, or hidden switching behavior
-- do not let `app/` derive fallback rules or account truth locally
+- if the prepared switching seam is `AVAILABLE`, the cue may expand inline to show eligible account options
+- switching must always be explicit; no hidden account change
+- primary-account updates must stay legible but low-drama
+- if switching is unavailable, preserve the passive cue or render nothing
+- do not add selector sprawl, warning styling, or settings-panel behaviour
+- do not let `app/` derive fallback rules, switching eligibility, or account truth locally
+
+PX-MA2 still does not allow:
+- all-accounts strategy state
+- aggregate fit state
+- aggregate holdings or exposure views
+- cross-surface switcher rollout everywhere
+- broad account-management UI
 
 Why Dashboard first:
 - Dashboard is already account-scoped in canon and safer than disturbing Snapshot's sacred compactness
-- the cue makes current account scope legible without introducing broad multi-account UI
+- the cue now makes account context controllable as well as legible
 - it proves the shared service seam while keeping product posture calm and explicit
 
 ## Dashboard Referral Note (P6-A2)
