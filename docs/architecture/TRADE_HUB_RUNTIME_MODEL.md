@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -32,6 +32,9 @@ Prepared plan in, bounded action path out.
 - `readinessState`
 - `capabilityPath`
 - `confirmationRequirements`
+- `riskBasisAvailability`
+- `selectedRiskBasis`
+- `riskPerTradeContext`
 - `boundedKnowledgeLinks[]`
 - `rationaleSummary`
 
@@ -46,12 +49,20 @@ The view renders the selected prepared path only.
 ## 6. Hard constraints
 - no one-tap default execution
 - no hidden UI-side action reprioritization
+- no hidden UI-side risk-basis switching
 - no implicit urgency escalators
 - no plan-creation logic in presentation code
+- no UI-side risk math
 
 ## 7. Runtime subcomponents
 ### Protection plan generator
 Produces canonical plan options.
+
+### Risk basis selector
+Determines which explicit risk bases are supported on the surface and preserves user-selected basis state without silent fallback in the app layer.
+
+### Risk-per-trade context builder
+Builds one calm prepared framing from selected basis, prepared plan references, and current selected-account context where honest.
 
 ### Capability mapper
 Determines valid execution path by venue / platform constraints.
@@ -66,6 +77,8 @@ Ensures required confirmation steps remain intact.
 - plan contract tests
 - capability-path tests
 - confirmation-required tests
+- risk-basis explicitness tests
+- prepared risk-context recomputation tests
 - profile visibility tests
 - knowledge-link boundary tests
 

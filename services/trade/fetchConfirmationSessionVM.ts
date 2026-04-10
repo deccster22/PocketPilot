@@ -6,6 +6,7 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createConfirmationFlow } from '@/services/trade/createConfirmationFlow';
 import { createConfirmationFlowActions } from '@/services/trade/createConfirmationFlowActions';
+import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { normalisePreparedRiskReferences } from '@/services/trade/createPreparedRiskReferences';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
@@ -18,6 +19,7 @@ import type {
   ConfirmationSession,
   ConfirmationSessionActions,
   ProtectionPlan,
+  RiskBasis,
 } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
@@ -31,6 +33,7 @@ export type ConfirmationSessionVM = {
 export async function fetchConfirmationSessionVM(params: {
   profile: UserProfile;
   selectedPlanId?: string;
+  selectedRiskBasis?: RiskBasis | null;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   eventLedger?: EventLedgerService;
@@ -59,6 +62,13 @@ export async function fetchConfirmationSessionVM(params: {
     upstream.selectedAccountContext.status === 'AVAILABLE'
       ? upstream.selectedAccountContext.account
       : null;
+  const selectedAccountRiskContext =
+    upstream.selectedAccountContext.status === 'AVAILABLE'
+      ? {
+          portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
+          baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
+        }
+      : null;
   let currentSession = await buildConfirmationSession({
     plan:
       params.selectedPlanId === undefined
@@ -71,9 +81,11 @@ export async function fetchConfirmationSessionVM(params: {
             planId: params.selectedPlanId,
             protectionPlans,
             profile: params.profile,
-          }),
+            }),
     capabilityCache,
     selectedAccount,
+    selectedRiskBasis: params.selectedRiskBasis,
+    selectedAccountRiskContext,
   });
 
   const actions: ConfirmationSessionActions = {
@@ -136,6 +148,8 @@ export async function fetchConfirmationSessionVM(params: {
               }),
         capabilityCache,
         selectedAccount,
+        selectedRiskBasis: params.selectedRiskBasis,
+        selectedAccountRiskContext,
       });
 
       return currentSession;
@@ -165,6 +179,11 @@ async function buildConfirmationSession(params: {
   plan: ProtectionPlan | null;
   capabilityCache: Map<string, Awaited<ReturnType<typeof getAccountCapabilities>>>;
   selectedAccount: SelectedAccountContext | null;
+  selectedRiskBasis?: RiskBasis | null;
+  selectedAccountRiskContext: {
+    portfolioValue: number | null;
+    baseCurrency: string | null;
+  } | null;
 }): Promise<ConfirmationSession> {
   if (!params.plan) {
     return {
@@ -178,7 +197,12 @@ async function buildConfirmationSession(params: {
     };
   }
 
-  const preview = createTradePlanPreview(params.plan);
+  const risk = createPreparedTradeRiskLane({
+    plan: params.plan,
+    requestedBasis: params.selectedRiskBasis,
+    accountContext: params.selectedAccountRiskContext,
+  });
+  const preview = createTradePlanPreview(params.plan, risk);
   const cachedCapabilities = params.capabilityCache.get(params.plan.accountId);
   const capabilities =
     cachedCapabilities ?? (await getAccountCapabilities(params.plan.accountId));

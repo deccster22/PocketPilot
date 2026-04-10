@@ -27,13 +27,17 @@ Possible core objects:
 - `RiskPreview`
 - `RiskRewardCalculation`
 - `MaxLossModel`
+- `RiskBasisAvailability`
+- `RiskPerTradeContext`
 - `ReadinessState`
 
 ## 4. Responsibilities
 - calculate structured risk context
+- keep selected risk basis explicit and legible
 - prepare bounded review outputs for Trade Hub
 - support stop loss / take profit explanation
 - provide consistent max loss / position sizing / risk-reward logic
+- prepare risk-per-trade context without turning it into advice
 - expose readiness constraints without silently overriding the user
 
 ## 5. Invariants
@@ -41,6 +45,7 @@ Possible core objects:
 - capability-aware where needed
 - confidence-honest
 - support-not-enforcement unless future policy explicitly changes that
+- selected risk basis must flow through prepared summaries
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -57,6 +62,7 @@ Possible core objects:
 
 ## 8. Testing expectations
 - calculation correctness tests
+- explicit-basis selection tests
 - account-scope tests
 - consumer contract tests
 - support-vs-enforcement boundary tests

@@ -1,7 +1,14 @@
-import type { ProtectionPlan, TradePlanPreview } from '@/services/trade/types';
+import type {
+  PreparedTradeRiskLane,
+  ProtectionPlan,
+  TradePlanPreview,
+} from '@/services/trade/types';
 import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
 
-export function createTradePlanPreview(plan: ProtectionPlan): TradePlanPreview {
+export function createTradePlanPreview(
+  plan: ProtectionPlan,
+  risk: PreparedTradeRiskLane,
+): TradePlanPreview {
   return {
     planId: plan.planId,
     headline: {
@@ -32,5 +39,6 @@ export function createTradePlanPreview(plan: ProtectionPlan): TradePlanPreview {
       orderPreviewAvailable: false,
       executionPreviewAvailable: false,
     },
+    risk,
   };
 }

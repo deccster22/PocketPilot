@@ -5,6 +5,48 @@ import type {
   ExecutionPreviewVM,
 } from '@/services/trade/types';
 
+function createPreviewRisk() {
+  return {
+    activeBasis: 'ACCOUNT_PERCENT' as const,
+    activeBasisLabel: 'Account %',
+    basisAvailability: {
+      status: 'AVAILABLE' as const,
+      selectedBasis: 'ACCOUNT_PERCENT' as const,
+      options: [
+        {
+          basis: 'ACCOUNT_PERCENT' as const,
+          label: 'Account %',
+          isSelected: true,
+        },
+        {
+          basis: 'FIXED_CURRENCY' as const,
+          label: 'Fixed currency',
+          isSelected: false,
+        },
+        {
+          basis: 'POSITION_PERCENT' as const,
+          label: 'Position %',
+          isSelected: false,
+        },
+      ],
+    },
+    context: {
+      status: 'UNAVAILABLE' as const,
+      basis: 'ACCOUNT_PERCENT' as const,
+      headline: 'Account % risk frame unavailable',
+      summary:
+        'PocketPilot can frame this basis once prepared entry, stop, and position-cap context are all available.',
+      items: [
+        {
+          label: 'Needed',
+          value: 'Prepared entry, prepared stop, and a prepared position cap',
+        },
+      ],
+      reason: 'MISSING_PRICE_REFERENCES' as const,
+    },
+  };
+}
+
 function createSession(): ConfirmationSession {
   const executionCapability: ExecutionCapabilityResolution = {
     accountId: 'acct-live',
@@ -43,6 +85,7 @@ function createSession(): ConfirmationSession {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      risk: createPreviewRisk(),
     },
     shell: {
       planId: 'plan-btc',

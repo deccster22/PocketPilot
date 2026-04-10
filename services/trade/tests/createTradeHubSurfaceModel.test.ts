@@ -1,5 +1,5 @@
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
-import type { ProtectionPlan } from '@/services/trade/types';
+import type { PreparedTradeRiskLane, ProtectionPlan } from '@/services/trade/types';
 
 function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
   return {
@@ -26,10 +26,54 @@ function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
   };
 }
 
+function createRiskLane(overrides: Partial<PreparedTradeRiskLane> = {}): PreparedTradeRiskLane {
+  return {
+    activeBasis: 'ACCOUNT_PERCENT',
+    activeBasisLabel: 'Account %',
+    basisAvailability: {
+      status: 'AVAILABLE',
+      selectedBasis: 'ACCOUNT_PERCENT',
+      options: [
+        {
+          basis: 'ACCOUNT_PERCENT',
+          label: 'Account %',
+          isSelected: true,
+        },
+        {
+          basis: 'FIXED_CURRENCY',
+          label: 'Fixed currency',
+          isSelected: false,
+        },
+        {
+          basis: 'POSITION_PERCENT',
+          label: 'Position %',
+          isSelected: false,
+        },
+      ],
+    },
+    context: {
+      status: 'UNAVAILABLE',
+      basis: 'ACCOUNT_PERCENT',
+      headline: 'Account % risk frame unavailable',
+      summary:
+        'PocketPilot can frame this basis once prepared entry, stop, and position-cap context are all available.',
+      items: [
+        {
+          label: 'Needed',
+          value: 'Prepared entry, prepared stop, and a prepared position cap',
+        },
+      ],
+      reason: 'MISSING_PRICE_REFERENCES',
+    },
+    ...overrides,
+  };
+}
+
 describe('createTradeHubSurfaceModel', () => {
   it('creates one primary plan and profile-limited alternatives', () => {
     const result = createTradeHubSurfaceModel({
       profile: 'BEGINNER',
+      risk: createRiskLane(),
       protectionPlans: [
         createPlan({
           planId: 'wait-plan',
@@ -87,6 +131,7 @@ describe('createTradeHubSurfaceModel', () => {
           actionState: 'CAUTION',
         },
       ],
+      risk: createRiskLane(),
       meta: {
         hasPrimaryPlan: true,
         profile: 'BEGINNER',
@@ -118,10 +163,12 @@ describe('createTradeHubSurfaceModel', () => {
 
     const resultA = createTradeHubSurfaceModel({
       profile: 'ADVANCED',
+      risk: createRiskLane(),
       protectionPlans: [wait, ready, caution],
     });
     const resultB = createTradeHubSurfaceModel({
       profile: 'ADVANCED',
+      risk: createRiskLane(),
       protectionPlans: [caution, ready, wait],
     });
 
@@ -131,6 +178,7 @@ describe('createTradeHubSurfaceModel', () => {
   it('does not leak non-surface fields into plan cards', () => {
     const [alternativePlan] = createTradeHubSurfaceModel({
       profile: 'MIDDLE',
+      risk: createRiskLane(),
       protectionPlans: [
         createPlan({
           planId: 'alt-plan',
@@ -156,11 +204,29 @@ describe('createTradeHubSurfaceModel', () => {
     expect(
       createTradeHubSurfaceModel({
         profile: 'ADVANCED',
+        risk: createRiskLane({
+          activeBasis: null,
+          activeBasisLabel: null,
+          basisAvailability: {
+            status: 'UNAVAILABLE',
+            reason: 'NOT_ENABLED_FOR_SURFACE',
+          },
+          context: null,
+        }),
         protectionPlans: [],
       }),
     ).toEqual({
       primaryPlan: null,
       alternativePlans: [],
+      risk: {
+        activeBasis: null,
+        activeBasisLabel: null,
+        basisAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NOT_ENABLED_FOR_SURFACE',
+        },
+        context: null,
+      },
       meta: {
         hasPrimaryPlan: false,
         profile: 'ADVANCED',

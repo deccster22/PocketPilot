@@ -11,6 +11,14 @@ export type TradePlanPreviewViewData = {
   constraintsText: string;
   confirmationText: string;
   placeholderText: string;
+  riskBasisText: string;
+  riskStatusText: string;
+  riskHeadline: string;
+  riskSummary: string;
+  riskItems: ReadonlyArray<{
+    label: string;
+    value: string;
+  }>;
 };
 
 function formatIntentLabel(intentType: TradePlanPreview['headline']['intentType']): string {
@@ -76,5 +84,19 @@ export function createTradePlanPreviewViewData(
       preview.placeholders.orderPreviewAvailable || preview.placeholders.executionPreviewAvailable
         ? 'Execution placeholders are available.'
         : 'Order and execution previews are placeholder-only in this phase.',
+    riskBasisText: `Risk basis: ${preview.risk.activeBasisLabel ?? 'Unavailable'}`,
+    riskStatusText:
+      preview.risk.context?.status === 'AVAILABLE'
+        ? 'Prepared risk context available'
+        : 'Prepared risk context unavailable',
+    riskHeadline: preview.risk.context?.headline ?? 'Risk context unavailable',
+    riskSummary:
+      preview.risk.context?.summary ??
+      'PocketPilot could not prepare a risk-per-trade context for this plan yet.',
+    riskItems:
+      preview.risk.context?.items.map((item) => ({
+        label: item.label,
+        value: item.value,
+      })) ?? [],
   };
 }
