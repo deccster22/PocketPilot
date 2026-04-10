@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
+import { InsightsArchiveScreen } from '@/app/screens/InsightsArchiveScreen';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
 import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
 import { InsightsSummaryScreen } from '@/app/screens/InsightsSummaryScreen';
@@ -10,10 +11,11 @@ import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchive
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
 import { fetchPeriodSummaryVM } from '@/services/insights/fetchPeriodSummaryVM';
 import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
+import { fetchSummaryArchiveVM } from '@/services/insights/fetchSummaryArchiveVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
 import type { ReflectionPeriod } from '@/services/insights/types';
 
-type InsightsRoute = 'HOME' | 'DETAIL' | 'REFLECTION' | 'SUMMARY';
+type InsightsRoute = 'HOME' | 'DETAIL' | 'REFLECTION' | 'SUMMARY' | 'SUMMARY_ARCHIVE';
 
 const DEFAULT_SUMMARY_PERIOD: ReflectionPeriod = 'LAST_MONTH';
 
@@ -35,6 +37,12 @@ export function InsightsScreen() {
       nowProvider,
     }),
   );
+  const [summaryArchiveVM] = useState(() =>
+    fetchSummaryArchiveVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+    }),
+  );
   const [reflectionVM] = useState(() =>
     fetchReflectionComparisonVM({
       surface: 'INSIGHTS_SCREEN',
@@ -52,7 +60,20 @@ export function InsightsScreen() {
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
     hasReflection: historyVM.availability.status === 'AVAILABLE',
     hasSummaries: true,
+    hasSummaryArchive: true,
   });
+
+  function openSummaryPeriod(period: ReflectionPeriod) {
+    setSelectedSummaryPeriod(period);
+    setSummaryVM(
+      fetchPeriodSummaryVM({
+        surface: 'INSIGHTS_SCREEN',
+        nowProvider,
+        period,
+      }),
+    );
+    setRoute('SUMMARY');
+  }
 
   useEffect(() => {
     markInsightsHistoryViewed({
@@ -91,17 +112,18 @@ export function InsightsScreen() {
       <InsightsSummaryScreen
         summaryVM={summaryVM}
         selectedPeriod={selectedSummaryPeriod}
-        onSelectPeriod={(period) => {
-          setSelectedSummaryPeriod(period);
-          setSummaryVM(
-            fetchPeriodSummaryVM({
-              surface: 'INSIGHTS_SCREEN',
-              nowProvider,
-              period,
-            }),
-          );
-        }}
+        onSelectPeriod={openSummaryPeriod}
         onBack={() => setRoute('HOME')}
+      />
+    );
+  }
+
+  if (route === 'SUMMARY_ARCHIVE') {
+    return (
+      <InsightsArchiveScreen
+        summaryArchiveVM={summaryArchiveVM}
+        onBack={() => setRoute('HOME')}
+        onOpenSummary={openSummaryPeriod}
       />
     );
   }
@@ -173,6 +195,21 @@ export function InsightsScreen() {
             <Text style={styles.archiveButtonText}>{screenView.summaryActionLabel}</Text>
             {screenView.summaryActionSummary ? (
               <Text style={styles.archiveButtonSummary}>{screenView.summaryActionSummary}</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
+
+        {screenView.summaryArchiveActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setRoute('SUMMARY_ARCHIVE')}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.summaryArchiveActionLabel}</Text>
+            {screenView.summaryArchiveActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>
+                {screenView.summaryArchiveActionSummary}
+              </Text>
             ) : null}
           </Pressable>
         ) : null}

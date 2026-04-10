@@ -27,6 +27,8 @@ export type InsightsScreenViewData = {
   reflectionActionSummary: string | null;
   summaryActionLabel: string | null;
   summaryActionSummary: string | null;
+  summaryArchiveActionLabel: string | null;
+  summaryArchiveActionSummary: string | null;
   sections: InsightsHistorySectionViewData[];
 };
 
@@ -49,6 +51,7 @@ export function createInsightsScreenViewData(
     hasArchive?: boolean;
     hasReflection?: boolean;
     hasSummaries?: boolean;
+    hasSummaryArchive?: boolean;
   },
 ): InsightsScreenViewData | null {
   if (!vm) {
@@ -69,6 +72,10 @@ export function createInsightsScreenViewData(
       summaryActionLabel: params?.hasSummaries ? 'View period summaries' : null,
       summaryActionSummary: params?.hasSummaries
         ? 'Open a calm monthly or quarterly readback built from interpreted history.'
+        : null,
+      summaryArchiveActionLabel: params?.hasSummaryArchive ? 'Browse summary archive' : null,
+      summaryArchiveActionSummary: params?.hasSummaryArchive
+        ? 'Revisit prepared monthly and quarterly readbacks on a quiet archive shelf.'
         : null,
       sections: [],
     };
@@ -91,6 +98,10 @@ export function createInsightsScreenViewData(
     summaryActionLabel: params?.hasSummaries ? 'View period summaries' : null,
     summaryActionSummary: params?.hasSummaries
       ? 'Open a calm monthly or quarterly readback built from interpreted history.'
+      : null,
+    summaryArchiveActionLabel: params?.hasSummaryArchive ? 'Browse summary archive' : null,
+    summaryArchiveActionSummary: params?.hasSummaryArchive
+      ? 'Revisit prepared monthly and quarterly readbacks on a quiet archive shelf.'
       : null,
     sections: vm.availability.sections.map((section) => ({
       id: section.id,

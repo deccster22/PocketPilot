@@ -41,6 +41,7 @@ describe('createInsightsScreenViewData', () => {
           hasArchive: true,
           hasReflection: true,
           hasSummaries: true,
+          hasSummaryArchive: true,
         },
       ),
     ).toEqual({
@@ -59,6 +60,9 @@ describe('createInsightsScreenViewData', () => {
       summaryActionLabel: 'View period summaries',
       summaryActionSummary:
         'Open a calm monthly or quarterly readback built from interpreted history.',
+      summaryArchiveActionLabel: 'Browse summary archive',
+      summaryArchiveActionSummary:
+        'Revisit prepared monthly and quarterly readbacks on a quiet archive shelf.',
       sections: [
         {
           id: 'recent-history',
@@ -96,6 +100,7 @@ describe('createInsightsScreenViewData', () => {
         },
         {
           hasSummaries: true,
+          hasSummaryArchive: true,
         },
       ),
     ).toEqual({
@@ -112,6 +117,9 @@ describe('createInsightsScreenViewData', () => {
       summaryActionLabel: 'View period summaries',
       summaryActionSummary:
         'Open a calm monthly or quarterly readback built from interpreted history.',
+      summaryArchiveActionLabel: 'Browse summary archive',
+      summaryArchiveActionSummary:
+        'Revisit prepared monthly and quarterly readbacks on a quiet archive shelf.',
       sections: [],
     });
   });
@@ -127,8 +135,9 @@ describe('createInsightsScreenViewData', () => {
     expect(source).toMatch(/hasArchive/);
     expect(source).toMatch(/hasReflection/);
     expect(source).toMatch(/hasSummaries/);
+    expect(source).toMatch(/hasSummaryArchive/);
     expect(source).not.toMatch(
-      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchReflectionComparisonVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchReflectionComparisonVM|fetchSummaryArchiveVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
     );
   });
 

@@ -6,6 +6,10 @@ import {
   isMarketEvent,
   type StoryGroup,
 } from '@/services/insights/historyInterpretation';
+import {
+  createReflectionPeriodWindow,
+  formatReflectionPeriodTitle,
+} from '@/services/insights/periodSummaryShared';
 import type {
   PeriodSummaryItem,
   PeriodSummaryVM,
@@ -13,11 +17,6 @@ import type {
 } from '@/services/insights/types';
 
 type PeriodTheme = 'MOMENTUM' | 'PULLBACK' | 'PRICE_SHIFT' | 'PROVISIONAL';
-
-type PeriodWindow = {
-  startAtMs: number;
-  endAtMs: number;
-};
 
 type PeriodProfile = {
   dominantTheme: PeriodTheme | null;
@@ -40,38 +39,6 @@ function createUnavailableVM(
       status: 'UNAVAILABLE',
       reason,
     },
-  };
-}
-
-function createPeriodWindow(period: ReflectionPeriod, generatedAt: string): PeriodWindow {
-  const now = new Date(generatedAt);
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth();
-
-  if (period === 'LAST_MONTH') {
-    const currentMonthStartMs = Date.UTC(year, month, 1);
-    const previousMonthStartMs = Date.UTC(
-      month === 0 ? year - 1 : year,
-      month === 0 ? 11 : month - 1,
-      1,
-    );
-
-    return {
-      startAtMs: previousMonthStartMs,
-      endAtMs: currentMonthStartMs,
-    };
-  }
-
-  const currentQuarterStartMonth = Math.floor(month / 3) * 3;
-  const currentQuarterStartMs = Date.UTC(year, currentQuarterStartMonth, 1);
-  const previousQuarterStartMonth = currentQuarterStartMonth - 3;
-  const previousQuarterYear = previousQuarterStartMonth < 0 ? year - 1 : year;
-  const normalisedQuarterStartMonth =
-    previousQuarterStartMonth < 0 ? previousQuarterStartMonth + 12 : previousQuarterStartMonth;
-
-  return {
-    startAtMs: Date.UTC(previousQuarterYear, normalisedQuarterStartMonth, 1),
-    endAtMs: currentQuarterStartMs,
   };
 }
 
@@ -211,10 +178,6 @@ function createPeriodSliceProfiles(history: ReadonlyArray<MarketEvent>): {
   };
 }
 
-function formatPeriodTitle(period: ReflectionPeriod): string {
-  return period === 'LAST_MONTH' ? 'Last month' : 'Last quarter';
-}
-
 function formatThemePhrase(theme: PeriodTheme | null): string | null {
   switch (theme) {
     case 'MOMENTUM':
@@ -253,7 +216,7 @@ function createSummary(params: {
   newerProfile: PeriodProfile | null;
   earlierProfile: PeriodProfile | null;
 }): string {
-  const title = formatPeriodTitle(params.period);
+  const title = formatReflectionPeriodTitle(params.period);
   const newerTheme = formatThemePhrase(params.newerProfile?.dominantTheme ?? null);
   const earlierTheme = formatThemePhrase(params.earlierProfile?.dominantTheme ?? null);
   const overallTheme = formatThemePhrase(params.overallProfile.dominantTheme);
@@ -393,7 +356,7 @@ export function createPeriodSummaryVM(params: {
     return createUnavailableVM(params.generatedAt, 'NO_PERIOD_SELECTED');
   }
 
-  const window = createPeriodWindow(params.period, params.generatedAt);
+  const window = createReflectionPeriodWindow(params.period, params.generatedAt);
   const periodHistory = params.history
     .filter(isMarketEvent)
     .filter((event) => event.timestamp >= window.startAtMs && event.timestamp < window.endAtMs);
@@ -420,7 +383,7 @@ export function createPeriodSummaryVM(params: {
     availability: {
       status: 'AVAILABLE',
       period: params.period,
-      title: formatPeriodTitle(params.period),
+      title: formatReflectionPeriodTitle(params.period),
       summary: createSummary({
         period: params.period,
         overallProfile,

@@ -61,6 +61,7 @@ Each event should carry:
 - Reorientation assembler
 - Summary generator
 - Monthly / quarterly summary builder
+- Summary archive assembler
 - Asset narrative generator
 - Event Ledger view model
 - Log / Journal attachment layer
@@ -72,6 +73,7 @@ Each event should carry:
 - no view-layer mutation of event meaning
 - no merging user reflection into canonical event truth
 - no scorecard or analytics-theatre reshaping inside ledger consumers
+- no app-side rebuilding of summary archive cards from raw ledger rows
 
 ## 7. Architecture responsibilities
 

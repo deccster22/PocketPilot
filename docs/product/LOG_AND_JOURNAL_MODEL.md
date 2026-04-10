@@ -12,6 +12,7 @@ Reflection should help users remember what mattered, not make them perform self-
 
 - Event Ledger is canonical structured truth.
 - Monthly and quarterly summaries are service-owned calm period readbacks built from interpreted history.
+- Summary Archive is the calm service-owned shelf where prepared period readbacks can be revisited later.
 - Log and Journal remain optional user-authored meaning layers for later phases.
 
 These layers should stay related without collapsing into one mixed voice.
@@ -41,6 +42,7 @@ Deeper, slower, and more reflective.
 - not required for core product use
 - separate from canonical ledger truth
 - monthly / quarterly summaries stay calm and service-owned
+- summary archive stays service-owned, descriptive, and browseable without theatre
 - no scorecards, streaks, or performance theatre
 
 ## What monthly / quarterly summaries are for
@@ -49,10 +51,17 @@ Deeper, slower, and more reflective.
 - highlight what changed across a meaningful period without making the user feel graded
 - stay narrower than Year in Review and lighter than journaling
 
+## What summary archive is for
+
+- keep prepared monthly / quarterly readbacks available after the moment has passed
+- provide one quiet shelf under Insights instead of pushing reflection into a reporting center
+- stay narrower than Year in Review, exports, or journaling expansion
+
 ## What this family is not
 
 - not a mini report card
 - not a giant export digest
+- not Year in Review in this phase
 - not freeform journaling in this phase
 - not a guilt loop
 - not a behavior-scoring system
@@ -65,4 +74,5 @@ Deeper, slower, and more reflective.
 - diary coercion
 - "good trader / bad trader" scoring
 - moralizing period recaps
+- archive-as-dashboard drift
 - AI-generated reflection commentary
