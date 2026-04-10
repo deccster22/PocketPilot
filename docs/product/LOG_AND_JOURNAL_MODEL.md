@@ -14,6 +14,7 @@ Reflection should help users remember what mattered, not make them perform self-
 - Monthly and quarterly summaries are service-owned calm period readbacks built from interpreted history.
 - Summary Archive is the calm service-owned shelf where prepared period readbacks can be revisited later.
 - Year in Review is one calm service-owned annual debrief built from the last completed calendar year.
+- Export foundation is one calm service-owned preparation seam for reflection output that is already ready under Insights.
 - Log and Journal remain optional user-authored meaning layers for later phases.
 
 These layers should stay related without collapsing into one mixed voice.
@@ -45,6 +46,7 @@ Deeper, slower, and more reflective.
 - monthly / quarterly summaries stay calm and service-owned
 - Year in Review stays calm, service-owned, and descriptive rather than evaluative
 - summary archive stays service-owned, descriptive, and browseable without theatre
+- reflection exports stay service-owned, explicit about coverage, timezone-labeled, and profile-aware
 - no scorecards, streaks, or performance theatre
 
 ## What monthly / quarterly summaries are for
@@ -65,10 +67,18 @@ Deeper, slower, and more reflective.
 - answer what stood out across the year without turning reflection into a brag reel or report card
 - stay narrower than exports, journaling expansion, or a full analytics suite
 
+## What export foundation is for
+
+- prepare one calm export request from reflection material that is already ready under Insights
+- keep export shaping in `services/` rather than turning `app/` into a reporting engine
+- expose profile-aware formats honestly: formatted PDF summary for all profiles, summary CSV for intermediate and advanced, and event-ledger CSV for advanced
+- keep period selection explicit and timezone labeling visible for CSV-oriented exports
+- stay narrower than a report center, export-management suite, or journaling workflow
+
 ## What this family is not
 
 - not a mini report card
-- not a giant export digest
+- not a giant export digest or export-management center
 - not freeform journaling in this phase
 - not a guilt loop
 - not a behavior-scoring system
@@ -83,4 +93,5 @@ Deeper, slower, and more reflective.
 - moralizing period recaps
 - performance-style annual recaps
 - archive-as-dashboard drift
+- export-center drift
 - AI-generated reflection commentary

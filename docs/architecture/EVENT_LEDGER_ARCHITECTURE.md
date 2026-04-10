@@ -77,6 +77,7 @@ Each event should carry:
 - no scorecard or analytics-theatre reshaping inside ledger consumers
 - no app-side rebuilding of summary archive cards from raw ledger rows
 - no app-side rebuilding of annual debrief items from raw ledger rows
+- no app-side shaping of reflection export options or prepared export payloads
 
 ## 7. Architecture responsibilities
 
@@ -108,6 +109,13 @@ Ledger must support:
 - grouped summary generation
 - account-scoped and strategy-scoped filtering
 - stable references for user-note linkage
+
+Reflection export foundations must also keep these constraints:
+
+- formatted summary exports stay calm, explicit, and service-owned
+- CSV-oriented exports must carry an explicit timezone label
+- event-level export may widen to ledger rows only when that format is explicitly selected
+- provider/runtime diagnostics and other internal-only metadata stay out of user-facing export contracts by default
 
 ## 9. Testing expectations
 
