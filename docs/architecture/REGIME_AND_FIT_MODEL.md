@@ -23,11 +23,12 @@ This document exists to keep that lane honest until any future regime work is ex
 - broader context may stabilise interpretation, but it must not silently override selected-account truth
 - `UNKNOWN` or `UNAVAILABLE` is better than invented macro confidence
 
-## PX-MA1 Scope Preservation
+## PX-MA1 / PX-MA2 Scope Preservation
 
-PX-MA1 makes one important rule explicit for this lane:
+PX-MA1 and PX-MA2 make one important rule explicit for this lane:
 
 - `PreparedContextInputs` must be built from selected-account scoped events and orientation context only
+- explicit account switching may change which selected account is active, but it still must pass through the same service-owned seam before Strategy Fit or 30,000 ft consume it
 
 That means:
 

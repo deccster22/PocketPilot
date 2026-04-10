@@ -1,14 +1,18 @@
-# Multi-Account Model (PX-MA1)
+# Multi-Account Model (PX-MA1 + PX-MA2)
 
 ## Purpose
 
 PX-MA1 adds PocketPilot's first thin multi-account integrity seam.
 
-The goal is not full multi-account product rollout. The goal is to make one selected-account truth explicit, deterministic, and reusable so strategy interpretation stays honest.
+PX-MA2 builds on that seam with one explicit switching path and one explicit primary-account preference path.
+
+The goal is still not full multi-account product rollout. The goal is to keep one selected-account truth explicit, deterministic, reusable, and now intentionally controllable without leaking account management into `app/`.
 
 PocketPilot rules preserved here:
 
 - selected-account truth is owned by `services/`
+- explicit account switching remains owned by `services/`
+- primary-account preference remains owned by `services/`
 - strategy alignment, fit, alerts, risk, and execution support remain account-scoped
 - Dashboard remains account-scoped
 - no aggregated global strategy alignment
@@ -31,14 +35,38 @@ type SelectedAccountContext = {
   strategyId: string | null;
 };
 
+type SwitchableAccountOption = {
+  accountId: string;
+  displayName: string;
+  strategyId: string | null;
+  isPrimary: boolean;
+  isSelected: boolean;
+};
+
+type AccountSwitchingAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'SINGLE_ACCOUNT_ONLY'
+        | 'NO_SWITCHABLE_ACCOUNTS'
+        | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      selectedAccountId: string;
+      options: ReadonlyArray<SwitchableAccountOption>;
+    };
+
 type SelectedAccountAvailability =
   | {
       status: 'UNAVAILABLE';
       reason: 'NO_ACCOUNTS_AVAILABLE' | 'NO_VALID_ACCOUNT_CONTEXT';
+      switching?: AccountSwitchingAvailability;
     }
   | {
       status: 'AVAILABLE';
       account: SelectedAccountContext;
+      switching?: AccountSwitchingAvailability;
     };
 ```
 
@@ -50,6 +78,17 @@ Rules:
 - no holdings dump
 - no provider/runtime diagnostics
 - no app-owned fallback logic
+
+PX-MA2 also adds one service-owned preference seam:
+
+```ts
+type AccountPreferenceState = {
+  selectedAccountId: string | null;
+  primaryAccountId: string | null;
+};
+```
+
+The current repo implementation keeps that store session-scoped in `services/accounts/accountPreferenceStore.ts`. Later durable device persistence can attach to the same seam without moving resolution or validation rules into `app/`.
 
 ## Resolution Order
 
@@ -71,19 +110,41 @@ Deterministic fallback details:
 
 Multiple primary flags do not create a second resolver path. The system falls back to the same deterministic highest-value rule instead of inventing hidden precedence.
 
+## Switching And Primary Preference Rules
+
+PX-MA2 adds these additional rules:
+
+- switching is explicit only and must start from a user action
+- if switching is unavailable, surfaces should stay passive rather than inventing hidden controls
+- primary-account updates change fallback preference only; they do not silently replace a valid explicit selection
+- Dashboard is the only surface with switching enabled in this phase
+- non-Dashboard surfaces may still carry the same selected-account truth, but not an interactive switcher
+
 ## Canonical Service Path
 
 The current shared path is:
 
 ```text
 AccountContextCandidate[]
++ AccountPreferenceStore
+-> applyPrimaryAccountPreference
 -> resolveSelectedAccountContext
+-> createAccountSwitchingAvailability
 -> fetchSelectedAccountContext
 -> fetchSurfaceContext
 -> Snapshot / Dashboard / Strategy Fit / 30,000 ft / message policy / trade-support consumers
 ```
 
 `app/` consumes prepared `SelectedAccountAvailability` only.
+
+PX-MA2's explicit action path is:
+
+```text
+Dashboard tap
+-> switchSelectedAccount / setPrimaryAccount
+-> AccountPreferenceStore
+-> next fetchSelectedAccountContext
+```
 
 ## Account-Scoped Enforcement Rules
 
@@ -99,13 +160,17 @@ Current enforcement intent:
 
 PocketPilot may later add aggregate holdings or exposure views, but that future work must not become aggregate strategy truth.
 
-## First Proof Path
+## Proof Path
 
-PX-MA1 adds one quiet proof path on Dashboard:
+PX-MA1 adds one quiet proof path on Dashboard.
 
-- one passive current-account cue
-- visible only when selected-account context is `AVAILABLE`
-- informational only, not a management panel
+PX-MA2 deepens that same proof path carefully:
+
+- one current-account cue
+- one inline expand path when switching is honestly available
+- one explicit switch action
+- one explicit primary-account preference action
+- no management-panel sprawl
 
 Why Dashboard first:
 
@@ -125,3 +190,11 @@ PX-MA1 does not add:
 - background syncing or polling
 - push notifications
 - execution automation or order dispatch
+
+PX-MA2 still does not add:
+
+- broad account-management settings
+- aggregate holdings or exposure views
+- cross-surface switching rollout everywhere
+- account comparison analytics
+- aggregated strategy or fit truth

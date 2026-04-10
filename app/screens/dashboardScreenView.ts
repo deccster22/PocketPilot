@@ -1,5 +1,9 @@
 import type { UserProfile } from '@/core/profile/types';
-import type { AccountSelectionMode } from '@/services/accounts/types';
+import type {
+  AccountSelectionMode,
+  AccountSwitchingAvailability,
+  SwitchableAccountOption,
+} from '@/services/accounts/types';
 import {
   fetchDashboardSurfaceVM,
   type DashboardSurfaceVM,
@@ -22,6 +26,26 @@ export type DashboardScreenAccountContextViewData =
       visible: true;
       title: string;
       summary: string;
+      switcher: DashboardScreenAccountSwitcherViewData;
+    };
+
+export type DashboardScreenAccountSwitchOptionViewData = {
+  accountId: string;
+  title: string;
+  summary: string | null;
+  isSelected: boolean;
+  isPrimary: boolean;
+};
+
+export type DashboardScreenAccountSwitcherViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+      options: DashboardScreenAccountSwitchOptionViewData[];
     };
 
 export type DashboardScreenZoneItemViewData = {
@@ -108,6 +132,36 @@ function createAccountContextViewData(
     ]
       .filter((value): value is string => Boolean(value))
       .join(' | '),
+    switcher: createAccountSwitcherViewData(accountContext.switching),
+  };
+}
+
+function formatAccountSwitchOptionSummary(
+  option: SwitchableAccountOption,
+): string | null {
+  return option.strategyId ? `Strategy ${option.strategyId}` : null;
+}
+
+function createAccountSwitcherViewData(
+  switchingAvailability?: AccountSwitchingAvailability,
+): DashboardScreenAccountSwitcherViewData {
+  if (switchingAvailability?.status !== 'AVAILABLE') {
+    return {
+      visible: false,
+    };
+  }
+
+  return {
+    visible: true,
+    title: 'Account context controls',
+    summary: 'Switch deliberately or mark one primary fallback.',
+    options: switchingAvailability.options.map((option) => ({
+      accountId: option.accountId,
+      title: option.displayName,
+      summary: formatAccountSwitchOptionSummary(option),
+      isSelected: option.isSelected,
+      isPrimary: option.isPrimary,
+    })),
   };
 }
 

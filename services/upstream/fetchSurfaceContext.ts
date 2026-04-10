@@ -23,6 +23,7 @@ import {
   summarizeAlignment,
   type EventStream,
 } from '@/services/events/eventStream';
+import { defaultAccountPreferenceStore } from '@/services/accounts/accountPreferenceStore';
 import {
   enforceAccountScopedTruth,
   filterAccountScopedItems,
@@ -32,6 +33,7 @@ import {
 import { fetchSelectedAccountContext } from '@/services/accounts/fetchSelectedAccountContext';
 import type {
   AccountContextCandidate,
+  AccountPreferenceStore,
   SelectedAccountAvailability,
 } from '@/services/accounts/types';
 import {
@@ -62,6 +64,20 @@ const SURFACE_ACCOUNTS: ReadonlyArray<AccountContextCandidate> = [
     isPrimary: true,
     baseCurrency: 'USD',
     strategyId: 'momentum_basics',
+  },
+  {
+    id: 'acct-basic',
+    displayName: 'Basic account',
+    portfolioValue: 6_500,
+    baseCurrency: 'USD',
+    strategyId: 'dip_buying',
+  },
+  {
+    id: 'acct-manual',
+    displayName: 'Manual account',
+    portfolioValue: 4_250,
+    baseCurrency: 'USD',
+    strategyId: 'data_quality',
   },
 ];
 
@@ -96,6 +112,8 @@ export async function fetchSurfaceContext(params: {
   profile: UserProfile;
   accounts?: ReadonlyArray<AccountContextCandidate>;
   selectedAccountId?: string | null;
+  accountPreferenceStore?: Pick<AccountPreferenceStore, 'load'>;
+  accountSwitchingEnabled?: boolean;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   eventLedger?: EventLedgerService;
@@ -115,9 +133,13 @@ export async function fetchSurfaceContext(params: {
   });
   const primaryProvider = createQuoteBrokerProvider(broker, 'execution');
   const accounts = params.accounts ?? SURFACE_ACCOUNTS;
+  const accountPreferenceStore =
+    params.accountPreferenceStore ?? defaultAccountPreferenceStore;
   const selectedAccountContext = await fetchSelectedAccountContext({
     accounts,
     selectedAccountId: params.selectedAccountId,
+    accountPreferenceStore,
+    isSwitchingEnabledForSurface: params.accountSwitchingEnabled,
   });
   const selectedAccount = requireSelectedAccountContext(selectedAccountContext);
 
