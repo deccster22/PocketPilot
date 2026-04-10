@@ -22,6 +22,7 @@ Event Ledger is the memory spine beneath:
 - Since Last Checked
 - Reorientation
 - monthly / quarterly summaries
+- Year in Review
 - summary archive
 - asset narrative
 - review surfaces
@@ -61,6 +62,7 @@ Each event should carry:
 - Reorientation assembler
 - Summary generator
 - Monthly / quarterly summary builder
+- Year in Review builder
 - Summary archive assembler
 - Asset narrative generator
 - Event Ledger view model
@@ -74,6 +76,7 @@ Each event should carry:
 - no merging user reflection into canonical event truth
 - no scorecard or analytics-theatre reshaping inside ledger consumers
 - no app-side rebuilding of summary archive cards from raw ledger rows
+- no app-side rebuilding of annual debrief items from raw ledger rows
 
 ## 7. Architecture responsibilities
 

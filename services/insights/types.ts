@@ -141,6 +141,33 @@ export type PeriodSummaryVM = {
   availability: PeriodSummaryAvailability;
 };
 
+export type AnnualReviewPeriod = 'LAST_YEAR';
+
+export type YearInReviewItem = {
+  label: string;
+  value: string;
+  emphasis: 'NEUTRAL' | 'SHIFT' | 'CONTEXT';
+};
+
+export type YearInReviewAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_PERIOD_SELECTED' | 'INSUFFICIENT_HISTORY' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      period: AnnualReviewPeriod;
+      title: string;
+      summary: string;
+      items: ReadonlyArray<YearInReviewItem>;
+      limitations: ReadonlyArray<string>;
+    };
+
+export type YearInReviewVM = {
+  generatedAt: string | null;
+  availability: YearInReviewAvailability;
+};
+
 export type SummaryArchiveEntry = {
   archiveId: string;
   period: ReflectionPeriod;

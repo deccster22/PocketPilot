@@ -111,6 +111,13 @@ Monthly and quarterly summaries should arrive as prepared period briefings:
 - limited to a few stronger notes plus honest limitations
 - never assembled into KPI dashboards or report cards in `app/`
 
+Year in Review should arrive as one prepared annual debrief:
+
+- shaped in `services/`
+- scoped to the last completed calendar year
+- limited to a short framing summary, a few prepared debrief items, and honest limitations
+- never assembled into a social-share recap, KPI wall, or performance review in `app/`
+
 Summary archive should arrive as prepared summary stubs:
 
 - shaped in `services/`

@@ -1,8 +1,12 @@
-import type { ReflectionPeriod } from '@/services/insights/types';
+import type { AnnualReviewPeriod, ReflectionPeriod } from '@/services/insights/types';
 
 export type ReflectionPeriodWindow = {
   startAtMs: number;
   endAtMs: number;
+};
+
+export type AnnualReviewWindow = ReflectionPeriodWindow & {
+  year: number;
 };
 
 const MONTH_NAMES = [
@@ -68,6 +72,28 @@ export function createReflectionPeriodWindow(
 
 export function formatReflectionPeriodTitle(period: ReflectionPeriod): string {
   return period === 'LAST_MONTH' ? 'Last month' : 'Last quarter';
+}
+
+export function resolveAnnualReviewPeriod(): AnnualReviewPeriod {
+  return 'LAST_YEAR';
+}
+
+export function createAnnualReviewWindow(
+  _period: AnnualReviewPeriod,
+  generatedAt: string,
+): AnnualReviewWindow {
+  const now = new Date(generatedAt);
+  const reviewYear = now.getUTCFullYear() - 1;
+
+  return {
+    startAtMs: Date.UTC(reviewYear, 0, 1),
+    endAtMs: Date.UTC(reviewYear + 1, 0, 1),
+    year: reviewYear,
+  };
+}
+
+export function formatAnnualReviewTitle(period: AnnualReviewPeriod, generatedAt: string): string {
+  return `${createAnnualReviewWindow(period, generatedAt).year} in review`;
 }
 
 export function formatSummaryArchiveCoveredRangeLabel(
