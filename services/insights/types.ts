@@ -141,4 +141,28 @@ export type PeriodSummaryVM = {
   availability: PeriodSummaryAvailability;
 };
 
+export type SummaryArchiveEntry = {
+  archiveId: string;
+  period: ReflectionPeriod;
+  title: string;
+  summary: string;
+  coveredRangeLabel: string;
+  generatedAtLabel: string | null;
+};
+
+export type SummaryArchiveAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ARCHIVED_SUMMARIES' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      entries: ReadonlyArray<SummaryArchiveEntry>;
+    };
+
+export type SummaryArchiveVM = {
+  generatedAt: string | null;
+  availability: SummaryArchiveAvailability;
+};
+
 export type InsightsHistorySurface = 'INSIGHTS_SCREEN' | 'SNAPSHOT' | 'DASHBOARD' | 'TRADE_HUB';

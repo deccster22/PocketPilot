@@ -111,6 +111,14 @@ Monthly and quarterly summaries should arrive as prepared period briefings:
 - limited to a few stronger notes plus honest limitations
 - never assembled into KPI dashboards or report cards in `app/`
 
+Summary archive should arrive as prepared summary stubs:
+
+- shaped in `services/`
+- ordered as a quiet record shelf
+- explicit about covered period and prepared date labels
+- kept separate from raw ledger browsing
+- never derived into analytics theatre or report cards in `app/`
+
 ## 9. Relationship to Log and Journal
 
 Event Ledger = canonical structured truth.
