@@ -126,6 +126,14 @@ Summary archive should arrive as prepared summary stubs:
 - kept separate from raw ledger browsing
 - never derived into analytics theatre or report cards in `app/`
 
+Reflection exports should arrive as prepared export contracts:
+
+- shaped in `services/`
+- explicit about format, covered period, and timezone labeling
+- profile-aware in availability without changing canonical event truth
+- event-level only when the user explicitly chooses the ledger export path
+- never widened into provider/runtime diagnostics or app-side report shaping
+
 ## 9. Relationship to Log and Journal
 
 Event Ledger = canonical structured truth.

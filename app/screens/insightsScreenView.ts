@@ -31,6 +31,8 @@ export type InsightsScreenViewData = {
   summaryArchiveActionSummary: string | null;
   yearInReviewActionLabel: string | null;
   yearInReviewActionSummary: string | null;
+  exportActionLabel: string | null;
+  exportActionSummary: string | null;
   sections: InsightsHistorySectionViewData[];
 };
 
@@ -55,6 +57,7 @@ export function createInsightsScreenViewData(
     hasSummaries?: boolean;
     hasSummaryArchive?: boolean;
     hasYearInReview?: boolean;
+    hasExport?: boolean;
   },
 ): InsightsScreenViewData | null {
   if (!vm) {
@@ -83,6 +86,10 @@ export function createInsightsScreenViewData(
       yearInReviewActionLabel: params?.hasYearInReview ? 'Open Year in Review' : null,
       yearInReviewActionSummary: params?.hasYearInReview
         ? 'Open a calm annual debrief for the last completed calendar year when you want a wider reflection.'
+        : null,
+      exportActionLabel: params?.hasExport ? 'Prepare export' : null,
+      exportActionSummary: params?.hasExport
+        ? 'Review calm export options for the reflection material that is already ready under Insights.'
         : null,
       sections: [],
     };
@@ -113,6 +120,10 @@ export function createInsightsScreenViewData(
     yearInReviewActionLabel: params?.hasYearInReview ? 'Open Year in Review' : null,
     yearInReviewActionSummary: params?.hasYearInReview
       ? 'Open a calm annual debrief for the last completed calendar year when you want a wider reflection.'
+      : null,
+    exportActionLabel: params?.hasExport ? 'Prepare export' : null,
+    exportActionSummary: params?.hasExport
+      ? 'Review calm export options for the reflection material that is already ready under Insights.'
       : null,
     sections: vm.availability.sections.map((section) => ({
       id: section.id,

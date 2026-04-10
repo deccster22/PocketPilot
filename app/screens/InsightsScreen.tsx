@@ -4,18 +4,22 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
 import { InsightsArchiveScreen } from '@/app/screens/InsightsArchiveScreen';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
+import { InsightsExportScreen } from '@/app/screens/InsightsExportScreen';
 import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
 import { InsightsSummaryScreen } from '@/app/screens/InsightsSummaryScreen';
 import { InsightsYearInReviewScreen } from '@/app/screens/InsightsYearInReviewScreen';
 import { createInsightsScreenViewData } from '@/app/screens/insightsScreenView';
+import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { fetchExportOptionsVM } from '@/services/insights/fetchExportOptionsVM';
 import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
 import { fetchPeriodSummaryVM } from '@/services/insights/fetchPeriodSummaryVM';
+import { fetchPreparedExportRequest } from '@/services/insights/fetchPreparedExportRequest';
 import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
 import { fetchSummaryArchiveVM } from '@/services/insights/fetchSummaryArchiveVM';
 import { fetchYearInReviewVM } from '@/services/insights/fetchYearInReviewVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
-import type { ReflectionPeriod } from '@/services/insights/types';
+import type { ExportFormat, ExportOptionsVM, PreparedExportRequestVM, ReflectionPeriod } from '@/services/insights/types';
 
 type InsightsRoute =
   | 'HOME'
@@ -23,13 +27,69 @@ type InsightsRoute =
   | 'REFLECTION'
   | 'SUMMARY'
   | 'SUMMARY_ARCHIVE'
-  | 'YEAR_IN_REVIEW';
+  | 'YEAR_IN_REVIEW'
+  | 'EXPORT';
 
 const DEFAULT_SUMMARY_PERIOD: ReflectionPeriod = 'LAST_MONTH';
+const EXPORT_TIMEZONE_LABEL = 'UTC';
+
+type ExportSelectionState = {
+  profile: UserProfile;
+  format: ExportFormat | null;
+  optionsVM: ExportOptionsVM;
+  requestVM: PreparedExportRequestVM;
+};
+
+function resolvePreferredExportFormat(
+  exportOptionsVM: ExportOptionsVM,
+  preferredFormat: ExportFormat | null,
+): ExportFormat | null {
+  if (exportOptionsVM.availability.status === 'UNAVAILABLE') {
+    return null;
+  }
+
+  if (preferredFormat) {
+    const matchingOption = exportOptionsVM.availability.options.find(
+      (option) => option.format === preferredFormat && option.isAvailable,
+    );
+
+    if (matchingOption) {
+      return matchingOption.format;
+    }
+  }
+
+  return exportOptionsVM.availability.options.find((option) => option.isAvailable)?.format ?? null;
+}
 
 export function InsightsScreen() {
   const [screenNowMs] = useState(() => Date.now());
   const nowProvider = () => screenNowMs;
+  function createExportState(params: {
+    profile: UserProfile;
+    preferredFormat: ExportFormat | null;
+    period: ReflectionPeriod;
+  }): ExportSelectionState {
+    const optionsVM = fetchExportOptionsVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+      profile: params.profile,
+    });
+    const format = resolvePreferredExportFormat(optionsVM, params.preferredFormat);
+
+    return {
+      profile: params.profile,
+      format,
+      optionsVM,
+      requestVM: fetchPreparedExportRequest({
+        surface: 'INSIGHTS_SCREEN',
+        nowProvider,
+        profile: params.profile,
+        format,
+        period: params.period,
+        timezoneLabel: EXPORT_TIMEZONE_LABEL,
+      }),
+    };
+  }
   const [route, setRoute] = useState<InsightsRoute>('HOME');
   const [selectedSummaryPeriod, setSelectedSummaryPeriod] =
     useState<ReflectionPeriod>(DEFAULT_SUMMARY_PERIOD);
@@ -70,15 +130,38 @@ export function InsightsScreen() {
       period: DEFAULT_SUMMARY_PERIOD,
     }),
   );
+  const [exportState, setExportState] = useState<ExportSelectionState>(() =>
+    createExportState({
+      profile: DEFAULT_USER_PROFILE,
+      preferredFormat: 'PDF_SUMMARY',
+      period: DEFAULT_SUMMARY_PERIOD,
+    }),
+  );
   const screenView = createInsightsScreenViewData(historyVM, {
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
     hasReflection: historyVM.availability.status === 'AVAILABLE',
     hasSummaries: true,
     hasSummaryArchive: true,
     hasYearInReview: true,
+    hasExport: true,
   });
 
-  function openSummaryPeriod(period: ReflectionPeriod) {
+  function refreshExportState(params: {
+    profile?: UserProfile;
+    preferredFormat?: ExportFormat | null;
+    period?: ReflectionPeriod;
+  }) {
+    setExportState(
+      createExportState({
+        profile: params.profile ?? exportState.profile,
+        preferredFormat:
+          params.preferredFormat === undefined ? exportState.format : params.preferredFormat,
+        period: params.period ?? selectedSummaryPeriod,
+      }),
+    );
+  }
+
+  function selectInsightsPeriod(period: ReflectionPeriod) {
     setSelectedSummaryPeriod(period);
     setSummaryVM(
       fetchPeriodSummaryVM({
@@ -87,6 +170,13 @@ export function InsightsScreen() {
         period,
       }),
     );
+    refreshExportState({
+      period,
+    });
+  }
+
+  function openSummaryPeriod(period: ReflectionPeriod) {
+    selectInsightsPeriod(period);
     setRoute('SUMMARY');
   }
 
@@ -146,6 +236,30 @@ export function InsightsScreen() {
   if (route === 'YEAR_IN_REVIEW') {
     return (
       <InsightsYearInReviewScreen yearInReviewVM={yearInReviewVM} onBack={() => setRoute('HOME')} />
+    );
+  }
+
+  if (route === 'EXPORT') {
+    return (
+      <InsightsExportScreen
+        exportOptionsVM={exportState.optionsVM}
+        preparedExportRequestVM={exportState.requestVM}
+        selectedProfile={exportState.profile}
+        selectedPeriod={selectedSummaryPeriod}
+        selectedFormat={exportState.format}
+        onSelectProfile={(profile) =>
+          refreshExportState({
+            profile,
+          })
+        }
+        onSelectPeriod={selectInsightsPeriod}
+        onSelectFormat={(format) =>
+          refreshExportState({
+            preferredFormat: format,
+          })
+        }
+        onBack={() => setRoute('HOME')}
+      />
     );
   }
 
@@ -246,6 +360,19 @@ export function InsightsScreen() {
               <Text style={styles.archiveButtonSummary}>
                 {screenView.yearInReviewActionSummary}
               </Text>
+            ) : null}
+          </Pressable>
+        ) : null}
+
+        {screenView.exportActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setRoute('EXPORT')}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.exportActionLabel}</Text>
+            {screenView.exportActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>{screenView.exportActionSummary}</Text>
             ) : null}
           </Pressable>
         ) : null}

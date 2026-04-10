@@ -43,6 +43,7 @@ describe('createInsightsScreenViewData', () => {
           hasSummaries: true,
           hasSummaryArchive: true,
           hasYearInReview: true,
+          hasExport: true,
         },
       ),
     ).toEqual({
@@ -67,6 +68,9 @@ describe('createInsightsScreenViewData', () => {
       yearInReviewActionLabel: 'Open Year in Review',
       yearInReviewActionSummary:
         'Open a calm annual debrief for the last completed calendar year when you want a wider reflection.',
+      exportActionLabel: 'Prepare export',
+      exportActionSummary:
+        'Review calm export options for the reflection material that is already ready under Insights.',
       sections: [
         {
           id: 'recent-history',
@@ -106,6 +110,7 @@ describe('createInsightsScreenViewData', () => {
           hasSummaries: true,
           hasSummaryArchive: true,
           hasYearInReview: true,
+          hasExport: true,
         },
       ),
     ).toEqual({
@@ -128,6 +133,9 @@ describe('createInsightsScreenViewData', () => {
       yearInReviewActionLabel: 'Open Year in Review',
       yearInReviewActionSummary:
         'Open a calm annual debrief for the last completed calendar year when you want a wider reflection.',
+      exportActionLabel: 'Prepare export',
+      exportActionSummary:
+        'Review calm export options for the reflection material that is already ready under Insights.',
       sections: [],
     });
   });
@@ -145,8 +153,9 @@ describe('createInsightsScreenViewData', () => {
     expect(source).toMatch(/hasSummaries/);
     expect(source).toMatch(/hasSummaryArchive/);
     expect(source).toMatch(/hasYearInReview/);
+    expect(source).toMatch(/hasExport/);
     expect(source).not.toMatch(
-      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchReflectionComparisonVM|fetchSummaryArchiveVM|fetchYearInReviewVM|createYearInReviewVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchReflectionComparisonVM|fetchSummaryArchiveVM|fetchYearInReviewVM|fetchExportOptionsVM|fetchPreparedExportRequest|createYearInReviewVM|createExportOptionsVM|createPreparedExportRequest|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
     );
   });
 

@@ -1,3 +1,5 @@
+import type { UserProfile } from '@/core/profile/types';
+
 export type InsightsEventKind = 'ALIGNMENT' | 'VOLATILITY' | 'STATE_CHANGE' | 'CONTEXT' | 'OTHER';
 
 export type EventHistoryEntry = {
@@ -166,6 +168,64 @@ export type YearInReviewAvailability =
 export type YearInReviewVM = {
   generatedAt: string | null;
   availability: YearInReviewAvailability;
+};
+
+export type ExportFormat = 'PDF_SUMMARY' | 'CSV_SUMMARY' | 'CSV_EVENT_LEDGER';
+
+export type ExportOption = {
+  format: ExportFormat;
+  label: string;
+  description: string;
+  isAvailable: boolean;
+  unavailableReason?: string;
+};
+
+export type ExportOptionsAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_EXPORTABLE_CONTENT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      options: ReadonlyArray<ExportOption>;
+    };
+
+export type ExportOptionsVM = {
+  generatedAt: string | null;
+  profile: UserProfile;
+  availability: ExportOptionsAvailability;
+};
+
+export type PreparedExportSummaryItem = {
+  label: string;
+  value: string;
+};
+
+export type PreparedExportRequest = {
+  format: ExportFormat;
+  title: string;
+  coveredRangeLabel: string | null;
+  timezoneLabel: string;
+  payloadSummary: ReadonlyArray<PreparedExportSummaryItem>;
+};
+
+export type ExportRequestAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_EXPORT_SELECTED'
+        | 'UNSUPPORTED_FORMAT'
+        | 'INSUFFICIENT_CONTENT'
+        | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      request: PreparedExportRequest;
+    };
+
+export type PreparedExportRequestVM = {
+  generatedAt: string | null;
+  availability: ExportRequestAvailability;
 };
 
 export type SummaryArchiveEntry = {
