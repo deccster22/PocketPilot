@@ -72,6 +72,22 @@ describe('fetchDashboardData', () => {
           strategyId: 'strategy-a',
         },
       },
+      aggregatePortfolioContext: {
+        status: 'AVAILABLE',
+        portfolio: {
+          totalValue: 16_500,
+          currency: 'USD',
+          accountCount: 3,
+          assets: [
+            {
+              symbol: 'BTC',
+              amount: 0.17,
+              value: 10_200,
+              weightPct: 61.81818181818181,
+            },
+          ],
+        },
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Watchful',
@@ -157,6 +173,7 @@ describe('fetchDashboardData', () => {
       profile: 'ADVANCED',
       nowProvider,
       accountSwitchingEnabled: true,
+      aggregatePortfolioEnabled: true,
     });
     expect(result.scan.accountId).toBe('acct-live');
     expect(result.accountContext).toEqual({
@@ -167,6 +184,22 @@ describe('fetchDashboardData', () => {
         selectionMode: 'PRIMARY_FALLBACK',
         baseCurrency: 'USD',
         strategyId: 'strategy-a',
+      },
+    });
+    expect(result.aggregatePortfolioContext).toEqual({
+      status: 'AVAILABLE',
+      portfolio: {
+        totalValue: 16_500,
+        currency: 'USD',
+        accountCount: 3,
+        assets: [
+          {
+            symbol: 'BTC',
+            amount: 0.17,
+            value: 10_200,
+            weightPct: 61.81818181818181,
+          },
+        ],
       },
     });
     expect(result.orientationContext).toEqual({

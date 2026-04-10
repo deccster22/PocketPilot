@@ -150,6 +150,11 @@ function createSnapshotSurface(): SnapshotSurfaceVM {
 }
 
 function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): DashboardSurfaceVM {
+  const aggregatePortfolioContext = overrides.aggregatePortfolioContext ?? {
+    status: 'UNAVAILABLE' as const,
+    reason: 'NOT_ENABLED_FOR_SURFACE' as const,
+  };
+
   return {
     accountContext: {
       status: 'AVAILABLE',
@@ -191,6 +196,7 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
       reason: 'NO_EXPLANATION_TARGET',
     },
     ...overrides,
+    aggregatePortfolioContext,
   };
 }
 

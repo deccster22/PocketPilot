@@ -1,4 +1,4 @@
-# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2)
+# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2 + PX-MA3)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
@@ -34,6 +34,7 @@ Dashboard also has a surface VM with one optional explanation seam:
 ```ts
 {
   accountContext: SelectedAccountAvailability,
+  aggregatePortfolioContext: AggregatePortfolioAvailability,
   model: DashboardSurfaceModel,
   scan: ForegroundScanResult,
   explanation: ExplanationAvailability
@@ -48,7 +49,7 @@ P6-A2 adds one additional prepared input on the same screen helper path:
 ## Service Path
 Dashboard continues to use its own upstream preparation seam:
 - `services/upstream/fetchSurfaceContext.ts` assembles shared deterministic truth, including selected-account context.
-- `services/dashboard/dashboardDataService.ts` prepares Dashboard-owned upstream inputs from that shared truth.
+- `services/dashboard/dashboardDataService.ts` prepares Dashboard-owned upstream inputs from that shared truth, including one optional aggregate holdings / exposure lane.
 - `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and Dashboard explanation VM.
 - `services/dashboard/fetchDashboardExplanationVM.ts` selects the prime explanation target and calls the canonical explanation builder.
 - `services/messages/fetchMessagePolicyVM.ts` consumes the prepared Dashboard surface and decides whether a Dashboard-only `REFERRAL` note is eligible.
@@ -99,8 +100,8 @@ The Dashboard why note still does not show:
 - urgency language
 - predictive wording
 
-## Account Context Cue And Controls (PX-MA1 + PX-MA2)
-Dashboard keeps the same account-context cue, but PX-MA2 lets it deepen carefully when the prepared seam says switching is honestly available.
+## Account Context Cue, Controls, And Aggregate Holdings (PX-MA1 + PX-MA2 + PX-MA3)
+Dashboard keeps the same account-context cue, PX-MA2 lets it deepen carefully when the prepared switching seam says switching is honestly available, and PX-MA3 adds one separate subordinate aggregate holdings section when the prepared aggregate seam is honestly available.
 
 Rules:
 - render the cue only when the prepared selected-account seam is `AVAILABLE`
@@ -116,13 +117,32 @@ Rules:
 PX-MA2 still does not allow:
 - all-accounts strategy state
 - aggregate fit state
-- aggregate holdings or exposure views
 - cross-surface switcher rollout everywhere
 - broad account-management UI
+
+PX-MA3 adds:
+- one small subordinate aggregate holdings section
+- total value and combined holdings / exposure context only
+- service-owned aggregation with app-side rendering only
+
+PX-MA3 rules:
+- render the aggregate section only when the prepared aggregate seam is `AVAILABLE`
+- keep it compact, calm, and visually subordinate to the Focus zones
+- phrase it as portfolio or exposure context only
+- do not imply that the Dashboard is now in all-accounts strategy mode
+- do not let `app/` derive holdings aggregation, portfolio totals, or aggregate weights locally
+
+PX-MA3 still does not allow:
+- all-accounts strategy alignment
+- aggregate fit summaries
+- aggregate alert or message truth
+- aggregate risk or execution truth
+- broad portfolio-dashboard sprawl
 
 Why Dashboard first:
 - Dashboard is already account-scoped in canon and safer than disturbing Snapshot's sacred compactness
 - the cue now makes account context controllable as well as legible
+- the new holdings card gives one safe aggregate portfolio proof path without changing strategy truth
 - it proves the shared service seam while keeping product posture calm and explicit
 
 ## Dashboard Referral Note (P6-A2)
@@ -169,7 +189,7 @@ Profile shaping changes density only. It does not change the deterministic ranki
 - `DashboardModel` is the internal prioritised bucket model: `prime`, `secondary`, `background`.
 - `DashboardSurfaceModel` is the presentation-facing contract: `primeZone`, `secondaryZone`, `deepZone`, plus `meta`.
 - The mapping from `background` to `deepZone` happens in `services/dashboard/createDashboardSurfaceModel.ts`.
-- `app/screens/dashboardScreenView.ts` may format prepared items for display text, but it does not reprioritise or re-bucket them.
+- `app/screens/dashboardScreenView.ts` may format prepared items and aggregate holdings display text, but it does not reprioritise, re-bucket, or aggregate them.
 - `app/components/ExplanationCard.tsx` renders prepared explanation data only; it does not build lineage or confidence wording locally.
 
 ## Snapshot Separation

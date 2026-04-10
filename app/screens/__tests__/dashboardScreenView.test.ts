@@ -40,6 +40,34 @@ function createSurface(): DashboardSurfaceVM {
         ],
       },
     },
+    aggregatePortfolioContext: {
+      status: 'AVAILABLE',
+      portfolio: {
+        totalValue: 16_500,
+        currency: 'USD',
+        accountCount: 3,
+        assets: [
+          {
+            symbol: 'BTC',
+            amount: 0.17,
+            value: 10_200,
+            weightPct: 61.81818181818181,
+          },
+          {
+            symbol: 'ETH',
+            amount: 2.25,
+            value: 4_200,
+            weightPct: 25.454545454545453,
+          },
+          {
+            symbol: 'SOL',
+            amount: 80,
+            value: 2_100,
+            weightPct: 12.727272727272727,
+          },
+        ],
+      },
+    },
     model: {
       primeZone: {
         items: [
@@ -149,6 +177,27 @@ describe('createDashboardScreenViewData', () => {
           ],
         },
       },
+      aggregatePortfolio: {
+        visible: true,
+        title: 'Aggregate holdings',
+        summary:
+          'Across 3 accounts | Portfolio exposure only; strategy truth stays on the current account.',
+        totalValueText: 'USD 16500.00 total',
+        assets: [
+          {
+            symbol: 'BTC',
+            summary: '0.17 units | USD 10200.00 | 61.8% weight',
+          },
+          {
+            symbol: 'ETH',
+            summary: '2.25 units | USD 4200.00 | 25.5% weight',
+          },
+          {
+            symbol: 'SOL',
+            summary: '80 units | USD 2100.00 | 12.7% weight',
+          },
+        ],
+      },
       message: {
         visible: false,
       },
@@ -216,7 +265,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).not.toMatch(
-      /portfolioValue|selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability/,
+      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext/,
     );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
@@ -226,6 +275,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).not.toMatch(
       /createExplanationSummary|signalsTriggered|eventId|providerId|metadata/,
     );
+    expect(source).not.toMatch(/strategyFit|aggregate alignment|aggregate fit/i);
   });
 
   it('passes through the prepared Dashboard referral without classifying it locally', () => {
@@ -332,6 +382,51 @@ describe('createDashboardScreenViewData', () => {
     });
   });
 
+  it('keeps aggregate holdings subordinate and portfolio-only', () => {
+    const view = createDashboardScreenViewData(createSurface());
+
+    expect(view?.aggregatePortfolio).toEqual({
+      visible: true,
+      title: 'Aggregate holdings',
+      summary:
+        'Across 3 accounts | Portfolio exposure only; strategy truth stays on the current account.',
+      totalValueText: 'USD 16500.00 total',
+      assets: [
+        {
+          symbol: 'BTC',
+          summary: '0.17 units | USD 10200.00 | 61.8% weight',
+        },
+        {
+          symbol: 'ETH',
+          summary: '2.25 units | USD 4200.00 | 25.5% weight',
+        },
+        {
+          symbol: 'SOL',
+          summary: '80 units | USD 2100.00 | 12.7% weight',
+        },
+      ],
+    });
+    expect(JSON.stringify(view?.aggregatePortfolio)).not.toMatch(
+      /watchful|aligned|needs review|fit|execution|risk/i,
+    );
+  });
+
+  it('hides aggregate holdings when the prepared aggregate seam is unavailable', () => {
+    expect(
+      createDashboardScreenViewData({
+        ...createSurface(),
+        aggregatePortfolioContext: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_AGGREGATABLE_PORTFOLIO_DATA',
+        },
+      }),
+    ).toMatchObject({
+      aggregatePortfolio: {
+        visible: false,
+      },
+    });
+  });
+
   it('hides the explanation card when the prepared explanation is unavailable', () => {
     expect(
       createDashboardScreenViewData({
@@ -344,6 +439,10 @@ describe('createDashboardScreenViewData', () => {
             baseCurrency: 'USD',
             strategyId: 'momentum_basics',
           },
+        },
+        aggregatePortfolioContext: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_AGGREGATABLE_PORTFOLIO_DATA',
         },
         model: {
           primeZone: { items: [] },
@@ -363,6 +462,9 @@ describe('createDashboardScreenViewData', () => {
         },
       }),
     ).toMatchObject({
+      aggregatePortfolio: {
+        visible: false,
+      },
       message: {
         visible: false,
       },

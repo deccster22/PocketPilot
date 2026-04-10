@@ -61,6 +61,7 @@ Start with:
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.
+- Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { DashboardAccountSwitcher } from '@/app/components/DashboardAccountSwitcher';
+import { DashboardAggregatePortfolioCard } from '@/app/components/DashboardAggregatePortfolioCard';
 import { ExplanationCard } from '@/app/components/ExplanationCard';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import {
@@ -164,6 +165,13 @@ export function DashboardScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Why</Text>
             <ExplanationCard explanation={screenView.explanation} />
+          </View>
+        ) : null}
+        {screenView?.aggregatePortfolio.visible ? (
+          <View style={styles.section}>
+            <DashboardAggregatePortfolioCard
+              aggregatePortfolio={screenView.aggregatePortfolio}
+            />
           </View>
         ) : null}
         <DashboardZone

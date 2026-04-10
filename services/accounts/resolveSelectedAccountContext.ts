@@ -43,7 +43,9 @@ function normaliseAccountCandidate(
   return {
     accountId,
     displayName: normaliseOptionalText(account.displayName) ?? accountId,
-    portfolioValue: normalisePortfolioValue(account.portfolioValue),
+    portfolioValue: normalisePortfolioValue(
+      account.portfolioValue ?? account.portfolio?.totalValue,
+    ),
     isPrimary: account.isPrimary === true,
     baseCurrency: normaliseOptionalText(account.baseCurrency),
     strategyId: normaliseOptionalText(account.strategyId),
@@ -142,4 +144,3 @@ export function resolveSelectedAccountContext(params: {
     account: toSelectedAccountContext(fallbackAccount, 'HIGHEST_VALUE_FALLBACK'),
   };
 }
-
