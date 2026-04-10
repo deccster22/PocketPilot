@@ -33,19 +33,22 @@ describe('createInsightsScreenViewData', () => {
             viewedAt: '2026-04-02T00:00:00.000Z',
             newestEventAt: '2026-04-03T00:00:00.000Z',
             newItemCount: 1,
-            summary: 'Since you last viewed Insights, 1 newer interpreted history note is available.',
+            summary:
+              'Since you last viewed Insights, 1 newer interpreted history note is available.',
           },
         },
         {
           hasArchive: true,
           hasReflection: true,
+          hasSummaries: true,
         },
       ),
     ).toEqual({
       title: 'Insights',
       summary:
         'A quiet shelf of meaningful interpreted changes. It stays selective, factual, and optional.',
-      continuityNote: 'Since you last viewed Insights, 1 newer interpreted history note is available.',
+      continuityNote:
+        'Since you last viewed Insights, 1 newer interpreted history note is available.',
       availabilityMessage: null,
       archiveActionLabel: 'View deeper history',
       archiveActionSummary:
@@ -53,6 +56,9 @@ describe('createInsightsScreenViewData', () => {
       reflectionActionLabel: 'Compare recent history',
       reflectionActionSummary:
         'Place two interpreted slices side by side when you want a brief sense of what changed.',
+      summaryActionLabel: 'View period summaries',
+      summaryActionSummary:
+        'Open a calm monthly or quarterly readback built from interpreted history.',
       sections: [
         {
           id: 'recent-history',
@@ -73,30 +79,39 @@ describe('createInsightsScreenViewData', () => {
 
   it('shows a minimal honest unavailable state when interpreted history is not ready yet', () => {
     expect(
-      createInsightsScreenViewData({
-        generatedAt: '2026-04-03T00:00:00.000Z',
-        availability: {
-          status: 'UNAVAILABLE',
-          reason: 'INSUFFICIENT_INTERPRETED_HISTORY',
+      createInsightsScreenViewData(
+        {
+          generatedAt: '2026-04-03T00:00:00.000Z',
+          availability: {
+            status: 'UNAVAILABLE',
+            reason: 'INSUFFICIENT_INTERPRETED_HISTORY',
+          },
+          continuity: {
+            state: 'NO_HISTORY',
+            viewedAt: '2026-04-02T00:00:00.000Z',
+            newestEventAt: null,
+            newItemCount: 0,
+            summary: null,
+          },
         },
-        continuity: {
-          state: 'NO_HISTORY',
-          viewedAt: '2026-04-02T00:00:00.000Z',
-          newestEventAt: null,
-          newItemCount: 0,
-          summary: null,
+        {
+          hasSummaries: true,
         },
-      }),
+      ),
     ).toEqual({
       title: 'Insights',
       summary:
         'A quiet shelf of meaningful interpreted changes. It stays selective, factual, and optional.',
       continuityNote: null,
-      availabilityMessage: 'Insights will appear once there is a little more interpreted history to review.',
+      availabilityMessage:
+        'Insights will appear once there is a little more interpreted history to review.',
       archiveActionLabel: null,
       archiveActionSummary: null,
       reflectionActionLabel: null,
       reflectionActionSummary: null,
+      summaryActionLabel: 'View period summaries',
+      summaryActionSummary:
+        'Open a calm monthly or quarterly readback built from interpreted history.',
       sections: [],
     });
   });
@@ -111,8 +126,9 @@ describe('createInsightsScreenViewData', () => {
     expect(source).toMatch(/vm\.continuity\.summary/);
     expect(source).toMatch(/hasArchive/);
     expect(source).toMatch(/hasReflection/);
+    expect(source).toMatch(/hasSummaries/);
     expect(source).not.toMatch(
-      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchReflectionComparisonVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchReflectionComparisonVM|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
     );
   });
 

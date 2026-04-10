@@ -16,6 +16,10 @@ describe('insights placement', () => {
       join(process.cwd(), 'app', 'screens', 'InsightsReflectionScreen.tsx'),
       'utf8',
     );
+    const insightsSummaryScreenSource = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'InsightsSummaryScreen.tsx'),
+      'utf8',
+    );
     const dashboardScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'DashboardScreen.tsx'),
       'utf8',
@@ -34,13 +38,15 @@ describe('insights placement', () => {
     expect(appSource).toMatch(/activeTab/);
     expect(insightsScreenSource).toMatch(/fetchInsightsHistoryVM/);
     expect(insightsScreenSource).toMatch(/fetchInsightsArchiveVM/);
+    expect(insightsScreenSource).toMatch(/fetchPeriodSummaryVM/);
     expect(insightsScreenSource).toMatch(/fetchReflectionComparisonVM/);
     expect(insightsScreenSource).toMatch(/markInsightsHistoryViewed/);
     expect(insightsScreenSource).toMatch(/InsightsDetailScreen/);
     expect(insightsScreenSource).toMatch(/InsightsReflectionScreen/);
+    expect(insightsScreenSource).toMatch(/InsightsSummaryScreen/);
     expect(insightsScreenSource).toMatch(/EventHistoryCard/);
     expect(insightsScreenSource).not.toMatch(
-      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createReflectionComparisonVM|createSinceLastChecked|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createPeriodSummaryVM|createReflectionComparisonVM|createSinceLastChecked|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(insightsDetailScreenSource).toMatch(/createInsightsDetailScreenViewData/);
     expect(insightsDetailScreenSource).toMatch(/InsightsDetailCard/);
@@ -51,6 +57,11 @@ describe('insights placement', () => {
     expect(insightsReflectionScreenSource).toMatch(/ReflectionSummaryCard/);
     expect(insightsReflectionScreenSource).not.toMatch(
       /fetchReflectionComparisonVM|createReflectionComparisonVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
+    );
+    expect(insightsSummaryScreenSource).toMatch(/createInsightsSummaryScreenViewData/);
+    expect(insightsSummaryScreenSource).toMatch(/selectedPeriod/);
+    expect(insightsSummaryScreenSource).not.toMatch(
+      /fetchPeriodSummaryVM|createPeriodSummaryVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(dashboardScreenSource).not.toMatch(/EventHistoryCard|fetchInsightsHistoryVM/);
     expect(snapshotScreenSource).not.toMatch(/EventHistoryCard|fetchInsightsHistoryVM/);

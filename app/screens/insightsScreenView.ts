@@ -1,7 +1,4 @@
-import type {
-  InsightsHistoryVM,
-  InsightsHistoryWithContinuityVM,
-} from '@/services/insights/types';
+import type { InsightsHistoryVM, InsightsHistoryWithContinuityVM } from '@/services/insights/types';
 
 import { formatInsightsEventKind, formatInsightsTimestamp } from './insightsViewFormatting';
 
@@ -28,13 +25,14 @@ export type InsightsScreenViewData = {
   archiveActionSummary: string | null;
   reflectionActionLabel: string | null;
   reflectionActionSummary: string | null;
+  summaryActionLabel: string | null;
+  summaryActionSummary: string | null;
   sections: InsightsHistorySectionViewData[];
 };
 
-function formatAvailabilityMessage(reason: Extract<
-  InsightsHistoryVM['availability'],
-  { status: 'UNAVAILABLE' }
->['reason']): string {
+function formatAvailabilityMessage(
+  reason: Extract<InsightsHistoryVM['availability'], { status: 'UNAVAILABLE' }>['reason'],
+): string {
   switch (reason) {
     case 'NO_EVENT_HISTORY':
       return 'No interpreted event history is available yet.';
@@ -50,6 +48,7 @@ export function createInsightsScreenViewData(
   params?: {
     hasArchive?: boolean;
     hasReflection?: boolean;
+    hasSummaries?: boolean;
   },
 ): InsightsScreenViewData | null {
   if (!vm) {
@@ -67,6 +66,10 @@ export function createInsightsScreenViewData(
       archiveActionSummary: null,
       reflectionActionLabel: null,
       reflectionActionSummary: null,
+      summaryActionLabel: params?.hasSummaries ? 'View period summaries' : null,
+      summaryActionSummary: params?.hasSummaries
+        ? 'Open a calm monthly or quarterly readback built from interpreted history.'
+        : null,
       sections: [],
     };
   }
@@ -84,6 +87,10 @@ export function createInsightsScreenViewData(
     reflectionActionLabel: params?.hasReflection ? 'Compare recent history' : null,
     reflectionActionSummary: params?.hasReflection
       ? 'Place two interpreted slices side by side when you want a brief sense of what changed.'
+      : null,
+    summaryActionLabel: params?.hasSummaries ? 'View period summaries' : null,
+    summaryActionSummary: params?.hasSummaries
+      ? 'Open a calm monthly or quarterly readback built from interpreted history.'
       : null,
     sections: vm.availability.sections.map((section) => ({
       id: section.id,

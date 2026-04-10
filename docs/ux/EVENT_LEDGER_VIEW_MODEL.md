@@ -1,28 +1,32 @@
 ---
-title: "EVENT_LEDGER_VIEW_MODEL"
-status: "draft"
-owner: "founder"
-doc_class: "ux-spec"
-purpose: "Canonical PocketPilot documentation artifact"
+title: 'EVENT_LEDGER_VIEW_MODEL'
+status: 'draft'
+owner: 'founder'
+doc_class: 'ux-spec'
+purpose: 'Canonical PocketPilot documentation artifact'
 depends_on: []
 related_docs: []
-canonical_path: "/docs/ux/EVENT_LEDGER_VIEW_MODEL.md"
+canonical_path: '/docs/ux/EVENT_LEDGER_VIEW_MODEL.md'
 ---
 
 # EVENT_LEDGER_VIEW_MODEL.md
 
 ## Purpose
+
 Defines how Event Ledger should be exposed to users in product surfaces without turning canonical event memory into noise, blame, or raw developer logs.
 
 ## 1. Product role
+
 Event Ledger is the memory spine for market events and user action events.
 The **view model** is the user-facing layer that decides:
+
 - how entries are grouped
 - how much context is shown
 - how system truth and user meaning remain distinct
 - how ledger surfaces support reflection without moralizing
 
 ## 2. Non-negotiables
+
 - Event Ledger is canonical memory, not optional note-taking
 - stores both market and user action events
 - contextualizes, not moralizes
@@ -31,7 +35,9 @@ The **view model** is the user-facing layer that decides:
 - no report-card framing
 
 ## 3. Canonical entry model
+
 User-facing ledger views should be built from canonical event data such as:
+
 - event id
 - class (`market` / `user_action`)
 - account
@@ -45,20 +51,27 @@ User-facing ledger views should be built from canonical event data such as:
 The view layer may format or group these, but must not distort them.
 
 ## 4. Primary view modes
+
 ### Chronological stream
+
 Default history-oriented view.
 
 ### Grouped cluster view
+
 Groups related events into one narrative block or period cluster.
 
 ### Filtered strategy view
+
 Shows events through the currently selected strategy.
 
 ### Action-context view
+
 Shows user actions with surrounding event context.
 
 ## 5. What a ledger entry should show
+
 A good ledger row / card should help the user answer:
+
 - what happened
 - when
 - for which strategy / account / asset
@@ -66,6 +79,7 @@ A good ledger row / card should help the user answer:
 - whether this was a market event or a user action
 
 ## 6. What a ledger entry should not show by default
+
 - raw provider payloads
 - developer-shape internals
 - every microscopic signal
@@ -73,7 +87,9 @@ A good ledger row / card should help the user answer:
 - pseudo-performance labels
 
 ## 7. Relationship to user action events
+
 User action events should be shown with:
+
 - strategy active at the time
 - alignment state
 - signal context
@@ -83,17 +99,28 @@ User action events should be shown with:
 This is what later allows reflection summaries to compare aligned vs outside-strategy actions without shaming language.
 
 ## 8. Relationship to summaries
+
 Since Last Checked, Reorientation, summaries, and reviews should be **built from** Event Ledger.
 They should not compete with or replace it.
 Ledger is the memory spine; summaries are the readable condensation layer.
 
+Monthly and quarterly summaries should arrive as prepared period briefings:
+
+- shaped in `services/`
+- calm and descriptive in tone
+- limited to a few stronger notes plus honest limitations
+- never assembled into KPI dashboards or report cards in `app/`
+
 ## 9. Relationship to Log and Journal
+
 Event Ledger = canonical structured truth.
 Log / Journal = optional user-authored meaning.
 These must stay visually and conceptually distinct in any combined view.
 
 ## 10. Filtering rules
+
 Ledger views should support filters such as:
+
 - strategy
 - account
 - symbol
@@ -104,6 +131,7 @@ Ledger views should support filters such as:
 Filtering should increase clarity, not become a query-builder hobby.
 
 ## 11. Anti-patterns to block
+
 - raw event-dump UX
 - blame-oriented action history
 - mixing system truth and user feeling into one voice
@@ -111,6 +139,7 @@ Filtering should increase clarity, not become a query-builder hobby.
 - flattening market and user events until context disappears
 
 ## 12. Practical decision test
+
 1. Does this make the memory layer more understandable?
 2. Does it preserve canonical event truth?
 3. Does it help the user connect events and actions without moralizing?
@@ -118,7 +147,9 @@ Filtering should increase clarity, not become a query-builder hobby.
 5. Can later summaries build cleanly from this?
 
 ## 13. Relationship to other docs
+
 Sits beside:
+
 - `LOG_AND_JOURNAL_MODEL.md`
 - `ASSET_NARRATIVE_MODEL.md`
 - `EVENT_SYSTEM.md`
