@@ -1,4 +1,4 @@
-# Multi-Account Model (PX-MA1 + PX-MA2)
+# Multi-Account Model (PX-MA1 + PX-MA2 + PX-MA3)
 
 ## Purpose
 
@@ -6,13 +6,16 @@ PX-MA1 adds PocketPilot's first thin multi-account integrity seam.
 
 PX-MA2 builds on that seam with one explicit switching path and one explicit primary-account preference path.
 
-The goal is still not full multi-account product rollout. The goal is to keep one selected-account truth explicit, deterministic, reusable, and now intentionally controllable without leaking account management into `app/`.
+PX-MA3 builds on the same seam with one canonical aggregate holdings / exposure lane that stays explicitly separate from selected-account strategy truth.
+
+The goal is still not full multi-account product rollout. The goal is to keep one selected-account truth explicit, deterministic, reusable, intentionally controllable, and now cleanly separable from one small aggregate portfolio context lane without leaking account management into `app/`.
 
 PocketPilot rules preserved here:
 
 - selected-account truth is owned by `services/`
 - explicit account switching remains owned by `services/`
 - primary-account preference remains owned by `services/`
+- aggregate holdings / exposure shaping remains owned by `services/`
 - strategy alignment, fit, alerts, risk, and execution support remain account-scoped
 - Dashboard remains account-scoped
 - no aggregated global strategy alignment
@@ -90,6 +93,46 @@ type AccountPreferenceState = {
 
 The current repo implementation keeps that store session-scoped in `services/accounts/accountPreferenceStore.ts`. Later durable device persistence can attach to the same seam without moving resolution or validation rules into `app/`.
 
+PX-MA3 adds one separate aggregate portfolio contract:
+
+```ts
+type AggregatePortfolioAsset = {
+  symbol: string;
+  amount: number | null;
+  value: number | null;
+  weightPct: number | null;
+};
+
+type AggregatePortfolioContext = {
+  totalValue: number | null;
+  currency: string | null;
+  accountCount: number;
+  assets: ReadonlyArray<AggregatePortfolioAsset>;
+};
+
+type AggregatePortfolioAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_ACCOUNTS_AVAILABLE'
+        | 'NO_AGGREGATABLE_PORTFOLIO_DATA'
+        | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      portfolio: AggregatePortfolioContext;
+    };
+```
+
+Rules:
+
+- this seam is portfolio-context only
+- no aggregate alignment fields
+- no aggregate fit fields
+- no aggregate alert, message, risk, or execution fields
+- no provider/runtime diagnostics
+- no app-owned aggregation
+
 ## Resolution Order
 
 `services/accounts/resolveSelectedAccountContext.ts` is the canonical resolver.
@@ -146,6 +189,21 @@ Dashboard tap
 -> next fetchSelectedAccountContext
 ```
 
+PX-MA3 adds one separate aggregate path:
+
+```text
+AccountContextCandidate[]
+-> createAggregatePortfolioContext
+-> fetchAggregatePortfolioContext
+-> fetchSurfaceContext
+-> Dashboard aggregate holdings proof path
+```
+
+The two lanes stay separate on purpose:
+
+- selected-account truth continues to drive alignment, fit, alerts, risk, and execution support
+- aggregate portfolio context may describe total value and combined holdings only
+
 ## Account-Scoped Enforcement Rules
 
 PX-MA1 makes the scope boundary explicit through `services/accounts/enforceAccountScopedTruth.ts`.
@@ -157,8 +215,9 @@ Current enforcement intent:
 - Dashboard events and explanation context must stay on the selected account
 - alert/message truth must stay on the selected account
 - risk and execution-support seams must stay on the selected account
+- aggregate portfolio context must not feed back into selected-account strategy interpretation
 
-PocketPilot may later add aggregate holdings or exposure views, but that future work must not become aggregate strategy truth.
+PX-MA3 now lands the first aggregate holdings / exposure seam, but that work still must not become aggregate strategy truth.
 
 ## Proof Path
 
@@ -171,6 +230,14 @@ PX-MA2 deepens that same proof path carefully:
 - one explicit switch action
 - one explicit primary-account preference action
 - no management-panel sprawl
+
+PX-MA3 adds one more subordinate proof path on the same surface:
+
+- one small aggregate holdings section
+- portfolio and exposure context only
+- no aggregate strategy status
+- no aggregate fit status
+- no aggregate warning theatre
 
 Why Dashboard first:
 
@@ -194,7 +261,15 @@ PX-MA1 does not add:
 PX-MA2 still does not add:
 
 - broad account-management settings
-- aggregate holdings or exposure views
 - cross-surface switching rollout everywhere
 - account comparison analytics
 - aggregated strategy or fit truth
+
+PX-MA3 still does not add:
+
+- aggregate strategy dashboards
+- aggregate fit surfaces
+- aggregate alerts or messages
+- aggregate risk or execution truth
+- broad account-management rollout
+- comparison suites or exports

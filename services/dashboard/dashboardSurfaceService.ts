@@ -13,6 +13,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type DashboardSurfaceVM = {
   accountContext: Awaited<ReturnType<typeof fetchDashboardData>>['accountContext'];
+  aggregatePortfolioContext: Awaited<ReturnType<typeof fetchDashboardData>>['aggregatePortfolioContext'];
   model: DashboardSurfaceModel;
   scan: ForegroundScanResult;
   explanation: ExplanationAvailability;
@@ -49,6 +50,7 @@ export async function fetchDashboardSurfaceVM(params: {
 
   return {
     accountContext: dashboardData.accountContext,
+    aggregatePortfolioContext: dashboardData.aggregatePortfolioContext,
     model: surfaceModel,
     scan: dashboardData.scan,
     explanation: fetchDashboardExplanationVM({

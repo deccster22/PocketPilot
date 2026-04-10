@@ -30,10 +30,12 @@ import {
   requireSelectedAccountContext,
   scopeOrientationContextToSelectedAccount,
 } from '@/services/accounts/enforceAccountScopedTruth';
+import { fetchAggregatePortfolioContext } from '@/services/accounts/fetchAggregatePortfolioContext';
 import { fetchSelectedAccountContext } from '@/services/accounts/fetchSelectedAccountContext';
 import type {
   AccountContextCandidate,
   AccountPreferenceStore,
+  AggregatePortfolioAvailability,
   SelectedAccountAvailability,
 } from '@/services/accounts/types';
 import {
@@ -64,6 +66,22 @@ const SURFACE_ACCOUNTS: ReadonlyArray<AccountContextCandidate> = [
     isPrimary: true,
     baseCurrency: 'USD',
     strategyId: 'momentum_basics',
+    portfolio: {
+      totalValue: 10_000,
+      currency: 'USD',
+      positions: [
+        {
+          symbol: 'BTC',
+          amount: 0.12,
+          value: 7_200,
+        },
+        {
+          symbol: 'ETH',
+          amount: 1.5,
+          value: 2_800,
+        },
+      ],
+    },
   },
   {
     id: 'acct-basic',
@@ -71,6 +89,22 @@ const SURFACE_ACCOUNTS: ReadonlyArray<AccountContextCandidate> = [
     portfolioValue: 6_500,
     baseCurrency: 'USD',
     strategyId: 'dip_buying',
+    portfolio: {
+      totalValue: 6_500,
+      currency: 'USD',
+      positions: [
+        {
+          symbol: 'BTC',
+          amount: 0.05,
+          value: 3_000,
+        },
+        {
+          symbol: 'SOL',
+          amount: 80,
+          value: 3_500,
+        },
+      ],
+    },
   },
   {
     id: 'acct-manual',
@@ -78,11 +112,28 @@ const SURFACE_ACCOUNTS: ReadonlyArray<AccountContextCandidate> = [
     portfolioValue: 4_250,
     baseCurrency: 'USD',
     strategyId: 'data_quality',
+    portfolio: {
+      totalValue: 4_250,
+      currency: 'USD',
+      positions: [
+        {
+          symbol: 'ETH',
+          amount: 0.75,
+          value: 1_400,
+        },
+        {
+          symbol: 'DOGE',
+          amount: 5_000,
+          value: 2_850,
+        },
+      ],
+    },
   },
 ];
 
 export type SurfaceContext = {
   selectedAccountContext: SelectedAccountAvailability;
+  aggregatePortfolioContext: AggregatePortfolioAvailability;
   portfolioValue: number;
   change24h: number;
   strategyAlignment: string;
@@ -114,6 +165,7 @@ export async function fetchSurfaceContext(params: {
   selectedAccountId?: string | null;
   accountPreferenceStore?: Pick<AccountPreferenceStore, 'load'>;
   accountSwitchingEnabled?: boolean;
+  aggregatePortfolioEnabled?: boolean;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   eventLedger?: EventLedgerService;
@@ -140,6 +192,10 @@ export async function fetchSurfaceContext(params: {
     selectedAccountId: params.selectedAccountId,
     accountPreferenceStore,
     isSwitchingEnabledForSurface: params.accountSwitchingEnabled,
+  });
+  const aggregatePortfolioContext = await fetchAggregatePortfolioContext({
+    accounts,
+    isEnabledForSurface: params.aggregatePortfolioEnabled,
   });
   const selectedAccount = requireSelectedAccountContext(selectedAccountContext);
 
@@ -261,6 +317,7 @@ export async function fetchSurfaceContext(params: {
 
   return {
     selectedAccountContext,
+    aggregatePortfolioContext,
     portfolioValue,
     change24h,
     strategyAlignment,

@@ -3,6 +3,18 @@ export type AccountSelectionMode =
   | 'PRIMARY_FALLBACK'
   | 'HIGHEST_VALUE_FALLBACK';
 
+export type AccountPortfolioPositionCandidate = {
+  symbol: string;
+  amount?: number | null;
+  value?: number | null;
+};
+
+export type AccountPortfolioSnapshotCandidate = {
+  totalValue?: number | null;
+  currency?: string | null;
+  positions?: ReadonlyArray<AccountPortfolioPositionCandidate> | null;
+};
+
 export type AccountContextCandidate = {
   id: string;
   displayName?: string | null;
@@ -10,6 +22,7 @@ export type AccountContextCandidate = {
   isPrimary?: boolean;
   baseCurrency?: string | null;
   strategyId?: string | null;
+  portfolio?: AccountPortfolioSnapshotCandidate | null;
 };
 
 export type SelectedAccountContext = {
@@ -72,4 +85,31 @@ export type SelectedAccountAvailability =
       status: 'AVAILABLE';
       account: SelectedAccountContext;
       switching?: AccountSwitchingAvailability;
+    };
+
+export type AggregatePortfolioAsset = {
+  symbol: string;
+  amount: number | null;
+  value: number | null;
+  weightPct: number | null;
+};
+
+export type AggregatePortfolioContext = {
+  totalValue: number | null;
+  currency: string | null;
+  accountCount: number;
+  assets: ReadonlyArray<AggregatePortfolioAsset>;
+};
+
+export type AggregatePortfolioAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_ACCOUNTS_AVAILABLE'
+        | 'NO_AGGREGATABLE_PORTFOLIO_DATA'
+        | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      portfolio: AggregatePortfolioContext;
     };

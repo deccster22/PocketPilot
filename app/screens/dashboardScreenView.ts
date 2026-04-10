@@ -48,6 +48,23 @@ export type DashboardScreenAccountSwitcherViewData =
       options: DashboardScreenAccountSwitchOptionViewData[];
     };
 
+export type DashboardScreenAggregatePortfolioAssetViewData = {
+  symbol: string;
+  summary: string;
+};
+
+export type DashboardScreenAggregatePortfolioViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+      totalValueText: string | null;
+      assets: DashboardScreenAggregatePortfolioAssetViewData[];
+    };
+
 export type DashboardScreenZoneItemViewData = {
   title: string;
   subtitle: string;
@@ -74,6 +91,7 @@ export type DashboardScreenMessageViewData =
 export type DashboardScreenViewData = {
   profileLabel: string;
   accountContext: DashboardScreenAccountContextViewData;
+  aggregatePortfolio: DashboardScreenAggregatePortfolioViewData;
   message: DashboardScreenMessageViewData;
   primeZone: DashboardScreenZoneViewData;
   secondaryZone: DashboardScreenZoneViewData;
@@ -161,6 +179,63 @@ function createAccountSwitcherViewData(
       summary: formatAccountSwitchOptionSummary(option),
       isSelected: option.isSelected,
       isPrimary: option.isPrimary,
+    })),
+  };
+}
+
+function formatDecimal(value: number, fractionDigits: number): string {
+  return value.toFixed(fractionDigits).replace(/\.?0+$/, '');
+}
+
+function formatCurrencyValue(value: number, currency: string | null): string {
+  const formattedValue = value.toFixed(2);
+  return currency ? `${currency} ${formattedValue}` : formattedValue;
+}
+
+function createAggregateAssetSummary(params: {
+  amount: number | null;
+  value: number | null;
+  weightPct: number | null;
+  currency: string | null;
+}): string {
+  const parts = [
+    params.amount === null ? null : `${formatDecimal(params.amount, 4)} units`,
+    params.value === null ? null : formatCurrencyValue(params.value, params.currency),
+    params.weightPct === null ? null : `${params.weightPct.toFixed(1)}% weight`,
+  ].filter((value): value is string => value !== null);
+
+  return parts.join(' | ');
+}
+
+function createAggregatePortfolioViewData(
+  aggregatePortfolioContext: DashboardSurfaceVM['aggregatePortfolioContext'],
+): DashboardScreenAggregatePortfolioViewData {
+  if (aggregatePortfolioContext.status !== 'AVAILABLE') {
+    return {
+      visible: false,
+    };
+  }
+
+  const { portfolio } = aggregatePortfolioContext;
+
+  return {
+    visible: true,
+    title: 'Aggregate holdings',
+    summary: `Across ${portfolio.accountCount} ${
+      portfolio.accountCount === 1 ? 'account' : 'accounts'
+    } | Portfolio exposure only; strategy truth stays on the current account.`,
+    totalValueText:
+      portfolio.totalValue === null
+        ? null
+        : `${formatCurrencyValue(portfolio.totalValue, portfolio.currency)} total`,
+    assets: portfolio.assets.slice(0, 3).map((asset) => ({
+      symbol: asset.symbol,
+      summary: createAggregateAssetSummary({
+        amount: asset.amount,
+        value: asset.value,
+        weightPct: asset.weightPct,
+        currency: portfolio.currency,
+      }),
     })),
   };
 }
@@ -290,6 +365,7 @@ export function createDashboardScreenViewData(
   return {
     profileLabel: surface.model.meta.profile,
     accountContext: createAccountContextViewData(surface.accountContext),
+    aggregatePortfolio: createAggregatePortfolioViewData(surface.aggregatePortfolioContext),
     message: createDashboardMessageViewData(messagePolicy),
     primeZone: {
       title: 'Prime Zone',

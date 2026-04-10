@@ -49,6 +49,22 @@ describe('fetchDashboardSurfaceVM', () => {
           strategyId: 'strategy-a',
         },
       },
+      aggregatePortfolioContext: {
+        status: 'AVAILABLE',
+        portfolio: {
+          totalValue: 16_500,
+          currency: 'USD',
+          accountCount: 3,
+          assets: [
+            {
+              symbol: 'BTC',
+              amount: 0.17,
+              value: 10_200,
+              weightPct: 61.81818181818181,
+            },
+          ],
+        },
+      },
       scan: {
         accountId: 'acct-live',
         symbols: ['BTC'],
@@ -143,6 +159,22 @@ describe('fetchDashboardSurfaceVM', () => {
         strategyId: 'strategy-a',
       },
     });
+    expect(result.aggregatePortfolioContext).toEqual({
+      status: 'AVAILABLE',
+      portfolio: {
+        totalValue: 16_500,
+        currency: 'USD',
+        accountCount: 3,
+        assets: [
+          {
+            symbol: 'BTC',
+            amount: 0.17,
+            value: 10_200,
+            weightPct: 61.81818181818181,
+          },
+        ],
+      },
+    });
     expect(result.scan.accountId).toBe('acct-live');
     expect(result.model).toEqual({
       primeZone: {
@@ -210,6 +242,22 @@ describe('fetchDashboardSurfaceVM', () => {
           strategyId: 'strategy-a',
         },
       },
+      aggregatePortfolioContext: {
+        status: 'AVAILABLE',
+        portfolio: {
+          totalValue: 16_500,
+          currency: 'USD',
+          accountCount: 3,
+          assets: [
+            {
+              symbol: 'BTC',
+              amount: 0.17,
+              value: 10_200,
+              weightPct: 61.81818181818181,
+            },
+          ],
+        },
+      },
       scan: {
         accountId: 'acct-live',
       } as never,
@@ -270,6 +318,22 @@ describe('fetchDashboardSurfaceVM', () => {
           selectionMode: 'EXPLICIT',
           baseCurrency: 'USD',
           strategyId: 'strategy-b',
+        },
+      },
+      aggregatePortfolioContext: {
+        status: 'AVAILABLE',
+        portfolio: {
+          totalValue: 16_500,
+          currency: 'USD',
+          accountCount: 3,
+          assets: [
+            {
+              symbol: 'BTC',
+              amount: 0.17,
+              value: 10_200,
+              weightPct: 61.81818181818181,
+            },
+          ],
         },
       },
       scan: {

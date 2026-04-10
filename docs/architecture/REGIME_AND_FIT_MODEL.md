@@ -23,17 +23,19 @@ This document exists to keep that lane honest until any future regime work is ex
 - broader context may stabilise interpretation, but it must not silently override selected-account truth
 - `UNKNOWN` or `UNAVAILABLE` is better than invented macro confidence
 
-## PX-MA1 / PX-MA2 Scope Preservation
+## PX-MA1 / PX-MA2 / PX-MA3 Scope Preservation
 
-PX-MA1 and PX-MA2 make one important rule explicit for this lane:
+PX-MA1, PX-MA2, and PX-MA3 make one important rule explicit for this lane:
 
 - `PreparedContextInputs` must be built from selected-account scoped events and orientation context only
 - explicit account switching may change which selected account is active, but it still must pass through the same service-owned seam before Strategy Fit or 30,000 ft consume it
+- aggregate holdings / exposure views may now exist separately, but they must not feed aggregate portfolio context into fit or broader-context truth
 
 That means:
 
 - no aggregated global fit
 - no cross-account stress leakage into Strategy Fit
+- no aggregate holdings card becoming aggregate regime commentary
 - no app-side account derivation for broader-context views
 
 ## Not Yet Present

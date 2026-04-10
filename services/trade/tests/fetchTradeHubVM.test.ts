@@ -50,6 +50,10 @@ describe('fetchTradeHubVM', () => {
           strategyId: 'momentum_basics',
         },
       },
+      aggregatePortfolioContext: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',
