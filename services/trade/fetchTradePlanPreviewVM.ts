@@ -2,11 +2,12 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
+import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
-import type { TradePlanPreview } from '@/services/trade/types';
+import type { RiskBasis, TradePlanPreview } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
@@ -19,6 +20,7 @@ export type TradePlanPreviewVM = {
 export async function fetchTradePlanPreviewVM(params: {
   profile: UserProfile;
   selectedPlanId?: string;
+  selectedRiskBasis?: RiskBasis | null;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   eventLedger?: EventLedgerService;
@@ -47,9 +49,20 @@ export async function fetchTradePlanPreviewVM(params: {
     profile: params.profile,
     selectedPlanId: params.selectedPlanId,
   });
+  const risk = createPreparedTradeRiskLane({
+    plan: selectedPlan,
+    requestedBasis: params.selectedRiskBasis,
+    accountContext:
+      upstream.selectedAccountContext.status === 'AVAILABLE'
+        ? {
+            portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
+            baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
+          }
+        : null,
+  });
 
   return {
-    preview: selectedPlan ? createTradePlanPreview(selectedPlan) : null,
+    preview: selectedPlan ? createTradePlanPreview(selectedPlan, risk) : null,
     selectedPlanId: selectedPlan?.planId ?? null,
     scan: upstream.scan,
   };

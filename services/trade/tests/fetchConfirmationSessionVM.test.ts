@@ -25,6 +25,11 @@ function createEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
     pctChange: 0.04,
     metadata: {
       hidden: true,
+      preparedRiskReferences: {
+        entryPrice: 100,
+        stopPrice: 95,
+        targetPrice: 112,
+      },
     },
     ...overrides,
   };
@@ -84,6 +89,7 @@ describe('fetchConfirmationSessionVM', () => {
           strategyId: 'momentum_basics',
         },
       },
+      selectedAccountPortfolioValue: 10_000,
       aggregatePortfolioContext: {
         status: 'UNAVAILABLE',
         reason: 'NOT_ENABLED_FOR_SURFACE',
@@ -204,8 +210,8 @@ describe('fetchConfirmationSessionVM', () => {
       },
       preparedRiskReferences: {
         entryPrice: 100,
-        stopPrice: null,
-        targetPrice: null,
+        stopPrice: 95,
+        targetPrice: 112,
       },
       preview: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
@@ -232,6 +238,56 @@ describe('fetchConfirmationSessionVM', () => {
         placeholders: {
           orderPreviewAvailable: false,
           executionPreviewAvailable: false,
+        },
+        risk: {
+          activeBasis: 'ACCOUNT_PERCENT',
+          activeBasisLabel: 'Account %',
+          basisAvailability: {
+            status: 'AVAILABLE',
+            selectedBasis: 'ACCOUNT_PERCENT',
+            options: [
+              {
+                basis: 'ACCOUNT_PERCENT',
+                label: 'Account %',
+                isSelected: true,
+              },
+              {
+                basis: 'FIXED_CURRENCY',
+                label: 'Fixed currency',
+                isSelected: false,
+              },
+              {
+                basis: 'POSITION_PERCENT',
+                label: 'Position %',
+                isSelected: false,
+              },
+            ],
+          },
+          context: {
+            status: 'AVAILABLE',
+            basis: 'ACCOUNT_PERCENT',
+            headline: 'Account % risk frame',
+            summary:
+              'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+            items: [
+              {
+                label: 'Risk per trade',
+                value: '0.50%',
+              },
+              {
+                label: 'Max loss at cap',
+                value: '$50.00',
+              },
+              {
+                label: 'Position cap used',
+                value: '10.00%',
+              },
+              {
+                label: 'Prepared price path',
+                value: '$100.00 entry to $95.00 stop',
+              },
+            ],
+          },
         },
       },
       shell: {
@@ -287,6 +343,7 @@ describe('fetchConfirmationSessionVM', () => {
             completed: false,
             acknowledged: false,
             required: true,
+            acknowledgementLabel: undefined,
           },
           {
             stepId: 'confirm-intent',
@@ -460,5 +517,28 @@ describe('fetchConfirmationSessionVM', () => {
     expect(serviceSource).not.toMatch(/snapshotService/);
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
+  });
+
+  it('changes the prepared risk frame without changing execution capability or default blocking posture', async () => {
+    mockUpstreamContext();
+
+    const accountPercentSession = await fetchConfirmationSessionVM({
+      profile: 'ADVANCED',
+      selectedRiskBasis: 'ACCOUNT_PERCENT',
+    });
+    const fixedCurrencySession = await fetchConfirmationSessionVM({
+      profile: 'ADVANCED',
+      selectedRiskBasis: 'FIXED_CURRENCY',
+    });
+
+    expect(fixedCurrencySession.session.executionCapability).toEqual(
+      accountPercentSession.session.executionCapability,
+    );
+    expect(fixedCurrencySession.session.flow).toEqual(accountPercentSession.session.flow);
+    expect(fixedCurrencySession.session.preview?.risk.activeBasis).toBe('FIXED_CURRENCY');
+    expect(fixedCurrencySession.session.preview?.risk.context?.items[0]).toEqual({
+      label: 'Risk per trade',
+      value: '$50.00',
+    });
   });
 });

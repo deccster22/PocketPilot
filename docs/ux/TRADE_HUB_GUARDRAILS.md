@@ -32,6 +32,8 @@ Trade Hub may:
 - present prepared `ProtectionPlan` values
 - provide SL / TP calculator access
 - show position size, max loss, and risk / reward outputs
+- expose one calm, explicit risk-basis selector when the prepared contract supports it
+- show prepared risk-per-trade context that explains framing without pushing action
 - present readiness / constraints / rationale
 - expose confirmation-safe quick actions where allowed
 - adapt execution path by platform capability
@@ -54,6 +56,9 @@ Expected prepared data:
 - rationale
 - constraints
 - readiness state
+- risk basis availability
+- selected risk basis
+- prepared risk-per-trade context
 - confirmation metadata
 - capability path type
 
@@ -113,6 +118,7 @@ The UI renders the prepared path only. It should not contain hidden execution lo
 - one-tap execution drift
 - urgency leakage
 - hidden enforcement drift
+- hidden risk-basis switching
 - broad educational clutter
 - silent logic in presentation layer
 - action surfaces that look faster than they are trustworthy

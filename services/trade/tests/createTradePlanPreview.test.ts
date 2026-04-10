@@ -1,5 +1,5 @@
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
-import type { ProtectionPlan } from '@/services/trade/types';
+import type { PreparedTradeRiskLane, ProtectionPlan } from '@/services/trade/types';
 
 function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
   return {
@@ -26,9 +26,52 @@ function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
   };
 }
 
+function createRiskLane(overrides: Partial<PreparedTradeRiskLane> = {}): PreparedTradeRiskLane {
+  return {
+    activeBasis: 'ACCOUNT_PERCENT',
+    activeBasisLabel: 'Account %',
+    basisAvailability: {
+      status: 'AVAILABLE',
+      selectedBasis: 'ACCOUNT_PERCENT',
+      options: [
+        {
+          basis: 'ACCOUNT_PERCENT',
+          label: 'Account %',
+          isSelected: true,
+        },
+        {
+          basis: 'FIXED_CURRENCY',
+          label: 'Fixed currency',
+          isSelected: false,
+        },
+        {
+          basis: 'POSITION_PERCENT',
+          label: 'Position %',
+          isSelected: false,
+        },
+      ],
+    },
+    context: {
+      status: 'UNAVAILABLE',
+      basis: 'ACCOUNT_PERCENT',
+      headline: 'Account % risk frame unavailable',
+      summary:
+        'PocketPilot can frame this basis once prepared entry, stop, and position-cap context are all available.',
+      items: [
+        {
+          label: 'Needed',
+          value: 'Prepared entry, prepared stop, and a prepared position cap',
+        },
+      ],
+      reason: 'MISSING_PRICE_REFERENCES',
+    },
+    ...overrides,
+  };
+}
+
 describe('createTradePlanPreview', () => {
   it('creates the confirmation-safe preview model shape from a protection plan', () => {
-    expect(createTradePlanPreview(createPlan())).toEqual({
+    expect(createTradePlanPreview(createPlan(), createRiskLane())).toEqual({
       planId: 'plan-btc',
       headline: {
         intentType: 'ACCUMULATE',
@@ -54,6 +97,7 @@ describe('createTradePlanPreview', () => {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      risk: createRiskLane(),
     });
   });
 
@@ -74,8 +118,9 @@ describe('createTradePlanPreview', () => {
       },
     });
 
-    const first = createTradePlanPreview(plan);
-    const second = createTradePlanPreview(plan);
+    const risk = createRiskLane();
+    const first = createTradePlanPreview(plan, risk);
+    const second = createTradePlanPreview(plan, risk);
 
     expect(first).toEqual(second);
     expect(first).not.toHaveProperty('accountId');
@@ -90,6 +135,44 @@ describe('createTradePlanPreview', () => {
           entryPrice: 101,
           stopPrice: 95,
           targetPrice: 112,
+        },
+      }),
+      createRiskLane({
+        activeBasis: 'FIXED_CURRENCY',
+        activeBasisLabel: 'Fixed currency',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'FIXED_CURRENCY',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: false,
+            },
+            {
+              basis: 'FIXED_CURRENCY',
+              label: 'Fixed currency',
+              isSelected: true,
+            },
+            {
+              basis: 'POSITION_PERCENT',
+              label: 'Position %',
+              isSelected: false,
+            },
+          ],
+        },
+        context: {
+          status: 'AVAILABLE',
+          basis: 'FIXED_CURRENCY',
+          headline: 'Fixed-currency risk frame',
+          summary:
+            'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+          items: [
+            {
+              label: 'Risk per trade',
+              value: '$50.00',
+            },
+          ],
         },
       }),
     );

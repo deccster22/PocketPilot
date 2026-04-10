@@ -133,6 +133,7 @@ const SURFACE_ACCOUNTS: ReadonlyArray<AccountContextCandidate> = [
 
 export type SurfaceContext = {
   selectedAccountContext: SelectedAccountAvailability;
+  selectedAccountPortfolioValue?: number | null;
   aggregatePortfolioContext: AggregatePortfolioAvailability;
   portfolioValue: number;
   change24h: number;
@@ -157,6 +158,18 @@ function formatAlignmentState(alignmentState: AlignmentState): string {
     default:
       return 'Aligned';
   }
+}
+
+function resolveAccountPortfolioValue(
+  accounts: ReadonlyArray<AccountContextCandidate>,
+  accountId: string,
+): number | null {
+  const account = accounts.find((candidate) => candidate.id === accountId);
+  const portfolioValue = account?.portfolioValue ?? account?.portfolio?.totalValue;
+
+  return typeof portfolioValue === 'number' && Number.isFinite(portfolioValue) && portfolioValue > 0
+    ? portfolioValue
+    : null;
 }
 
 export async function fetchSurfaceContext(params: {
@@ -317,6 +330,7 @@ export async function fetchSurfaceContext(params: {
 
   return {
     selectedAccountContext,
+    selectedAccountPortfolioValue: resolveAccountPortfolioValue(accounts, selectedAccount.accountId),
     aggregatePortfolioContext,
     portfolioValue,
     change24h,

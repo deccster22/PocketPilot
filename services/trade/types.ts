@@ -12,6 +12,62 @@ export type PreparedTradePlanRiskReferences = {
   targetPrice: number | null;
 };
 
+export type RiskBasis = 'ACCOUNT_PERCENT' | 'FIXED_CURRENCY' | 'POSITION_PERCENT';
+
+export type RiskBasisOption = {
+  basis: RiskBasis;
+  label: string;
+  isSelected: boolean;
+};
+
+export type RiskBasisAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_SUPPORTED_RISK_BASIS' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      selectedBasis: RiskBasis;
+      options: ReadonlyArray<RiskBasisOption>;
+    };
+
+export type RiskBasisSelectionResult =
+  | {
+      status: 'UNAVAILABLE';
+      availability: Extract<RiskBasisAvailability, { status: 'UNAVAILABLE' }>;
+    }
+  | {
+      status: 'REJECTED';
+      requestedBasis: string;
+      reason: 'REQUESTED_BASIS_NOT_SUPPORTED';
+      availability: Extract<RiskBasisAvailability, { status: 'AVAILABLE' }>;
+      selectedBasis: RiskBasis;
+    }
+  | {
+      status: 'APPLIED';
+      availability: Extract<RiskBasisAvailability, { status: 'AVAILABLE' }>;
+      selectedBasis: RiskBasis;
+    };
+
+export type RiskPerTradeContext = {
+  status: 'AVAILABLE' | 'UNAVAILABLE';
+  basis: RiskBasis;
+  headline: string;
+  summary: string;
+  items: ReadonlyArray<{
+    label: string;
+    value: string;
+  }>;
+  reason?: 'MISSING_ACCOUNT_VALUE' | 'MISSING_POSITION_CAP' | 'MISSING_PRICE_REFERENCES';
+};
+
+export type PreparedTradeRiskLane = {
+  activeBasis: RiskBasis | null;
+  activeBasisLabel: string | null;
+  basisAvailability: RiskBasisAvailability;
+  context: RiskPerTradeContext | null;
+};
+
 export type ProtectionPlan = {
   planId: string;
   accountId: string;
@@ -51,6 +107,7 @@ export type TradeHubPlanCard = {
 export type TradeHubSurfaceModel = {
   primaryPlan: TradeHubPlanCard | null;
   alternativePlans: TradeHubPlanCard[];
+  risk: PreparedTradeRiskLane;
   meta: {
     hasPrimaryPlan: boolean;
     profile: UserProfile;
@@ -84,6 +141,7 @@ export type TradePlanPreview = {
     orderPreviewAvailable: boolean;
     executionPreviewAvailable: boolean;
   };
+  risk: PreparedTradeRiskLane;
 };
 
 export type AccountCapabilityContext = {

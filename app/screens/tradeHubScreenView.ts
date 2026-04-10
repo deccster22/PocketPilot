@@ -20,6 +20,22 @@ export type TradeHubScreenPlanViewData = {
   supportingEventsText: string;
 };
 
+export type TradeHubRiskViewData = {
+  selectedBasisLabel: string;
+  statusText: string;
+  headline: string;
+  summary: string;
+  options: ReadonlyArray<{
+    basis: 'ACCOUNT_PERCENT' | 'FIXED_CURRENCY' | 'POSITION_PERCENT';
+    label: string;
+    isSelected: boolean;
+  }>;
+  items: ReadonlyArray<{
+    label: string;
+    value: string;
+  }>;
+};
+
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
@@ -32,9 +48,10 @@ export type TradeHubScreenViewData = {
         visible: true;
         kind: MessagePolicyKind;
         priority: MessagePriority;
-        title: string;
-        summary: string;
-      };
+      title: string;
+      summary: string;
+    };
+  risk: TradeHubRiskViewData | null;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
@@ -96,6 +113,35 @@ function createTradeHubMessageViewData(
   };
 }
 
+function createTradeHubRiskViewData(surface: TradeHubSurfaceModel): TradeHubRiskViewData | null {
+  if (
+    surface.risk.basisAvailability.status !== 'AVAILABLE' ||
+    surface.risk.context === null ||
+    surface.risk.activeBasisLabel === null
+  ) {
+    return null;
+  }
+
+  return {
+    selectedBasisLabel: surface.risk.activeBasisLabel,
+    statusText:
+      surface.risk.context.status === 'AVAILABLE'
+        ? 'Prepared risk context available'
+        : 'Prepared risk context unavailable',
+    headline: surface.risk.context.headline,
+    summary: surface.risk.context.summary,
+    options: surface.risk.basisAvailability.options.map((option) => ({
+      basis: option.basis,
+      label: option.label,
+      isSelected: option.isSelected,
+    })),
+    items: surface.risk.context.items.map((item) => ({
+      label: item.label,
+      value: item.value,
+    })),
+  };
+}
+
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
   messagePolicy?: MessagePolicyAvailability | null,
@@ -111,6 +157,7 @@ export function createTradeHubScreenViewData(
       ? 'Every action remains confirmation-safe and non-executing in this phase.'
       : 'Confirmation rules are not required.',
     message: createTradeHubMessageViewData(messagePolicy),
+    risk: createTradeHubRiskViewData(surface),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),
   };

@@ -23,6 +23,11 @@ function createEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
     pctChange: 0.04,
     metadata: {
       hidden: true,
+      preparedRiskReferences: {
+        entryPrice: 100,
+        stopPrice: 95,
+        targetPrice: 112,
+      },
     },
     ...overrides,
   };
@@ -50,6 +55,7 @@ describe('fetchTradeHubVM', () => {
           strategyId: 'momentum_basics',
         },
       },
+      selectedAccountPortfolioValue: 10_000,
       aggregatePortfolioContext: {
         status: 'UNAVAILABLE',
         reason: 'NOT_ENABLED_FOR_SURFACE',
@@ -145,6 +151,7 @@ describe('fetchTradeHubVM', () => {
 
     const result = await fetchTradeHubVM({
       profile: 'ADVANCED',
+      selectedRiskBasis: 'FIXED_CURRENCY',
       nowProvider,
     });
 
@@ -172,6 +179,56 @@ describe('fetchTradeHubVM', () => {
         actionState: 'READY',
       },
       alternativePlans: [],
+      risk: {
+        activeBasis: 'FIXED_CURRENCY',
+        activeBasisLabel: 'Fixed currency',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'FIXED_CURRENCY',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: false,
+            },
+            {
+              basis: 'FIXED_CURRENCY',
+              label: 'Fixed currency',
+              isSelected: true,
+            },
+            {
+              basis: 'POSITION_PERCENT',
+              label: 'Position %',
+              isSelected: false,
+            },
+          ],
+        },
+        context: {
+          status: 'AVAILABLE',
+          basis: 'FIXED_CURRENCY',
+          headline: 'Fixed-currency risk frame',
+          summary:
+            'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+          items: [
+            {
+              label: 'Risk per trade',
+              value: '$50.00',
+            },
+            {
+              label: 'Position cap value',
+              value: '$1,000.00',
+            },
+            {
+              label: 'Position cap used',
+              value: '10.00%',
+            },
+            {
+              label: 'Prepared price path',
+              value: '$100.00 entry to $95.00 stop',
+            },
+          ],
+        },
+      },
       meta: {
         hasPrimaryPlan: true,
         profile: 'ADVANCED',
