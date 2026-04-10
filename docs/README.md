@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-10
+Last Updated: 2026-04-11
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-10
+**Last updated:** 2026-04-11
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -57,6 +57,7 @@ Start with:
 - Execution-aware. Execution venue truth beats synthetic purity.
 - Calm in tone. No urgency language, volatility theatre, dopamine loops, or shame.
 - User-directed. No hidden automation or silent control shifts.
+- Calm reflection only. Monthly, quarterly, and other Insights summaries stay descriptive and non-moralizing.
 - Explicit risk framing. Selected risk basis must stay legible and flow through prepared Trade Hub summaries.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.

@@ -4,18 +4,25 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
 import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
+import { InsightsSummaryScreen } from '@/app/screens/InsightsSummaryScreen';
 import { createInsightsScreenViewData } from '@/app/screens/insightsScreenView';
 import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
+import { fetchPeriodSummaryVM } from '@/services/insights/fetchPeriodSummaryVM';
 import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
+import type { ReflectionPeriod } from '@/services/insights/types';
 
-type InsightsRoute = 'HOME' | 'DETAIL' | 'REFLECTION';
+type InsightsRoute = 'HOME' | 'DETAIL' | 'REFLECTION' | 'SUMMARY';
+
+const DEFAULT_SUMMARY_PERIOD: ReflectionPeriod = 'LAST_MONTH';
 
 export function InsightsScreen() {
   const [screenNowMs] = useState(() => Date.now());
   const nowProvider = () => screenNowMs;
   const [route, setRoute] = useState<InsightsRoute>('HOME');
+  const [selectedSummaryPeriod, setSelectedSummaryPeriod] =
+    useState<ReflectionPeriod>(DEFAULT_SUMMARY_PERIOD);
   const [historyVM] = useState(() =>
     fetchInsightsHistoryVM({
       surface: 'INSIGHTS_SCREEN',
@@ -34,9 +41,17 @@ export function InsightsScreen() {
       nowProvider,
     }),
   );
+  const [summaryVM, setSummaryVM] = useState(() =>
+    fetchPeriodSummaryVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+      period: DEFAULT_SUMMARY_PERIOD,
+    }),
+  );
   const screenView = createInsightsScreenViewData(historyVM, {
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
     hasReflection: historyVM.availability.status === 'AVAILABLE',
+    hasSummaries: true,
   });
 
   useEffect(() => {
@@ -69,6 +84,26 @@ export function InsightsScreen() {
 
   if (route === 'REFLECTION') {
     return <InsightsReflectionScreen reflectionVM={reflectionVM} onBack={() => setRoute('HOME')} />;
+  }
+
+  if (route === 'SUMMARY') {
+    return (
+      <InsightsSummaryScreen
+        summaryVM={summaryVM}
+        selectedPeriod={selectedSummaryPeriod}
+        onSelectPeriod={(period) => {
+          setSelectedSummaryPeriod(period);
+          setSummaryVM(
+            fetchPeriodSummaryVM({
+              surface: 'INSIGHTS_SCREEN',
+              nowProvider,
+              period,
+            }),
+          );
+        }}
+        onBack={() => setRoute('HOME')}
+      />
+    );
   }
 
   return (
@@ -125,6 +160,19 @@ export function InsightsScreen() {
             <Text style={styles.archiveButtonText}>{screenView.reflectionActionLabel}</Text>
             {screenView.reflectionActionSummary ? (
               <Text style={styles.archiveButtonSummary}>{screenView.reflectionActionSummary}</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
+
+        {screenView.summaryActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setRoute('SUMMARY')}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.summaryActionLabel}</Text>
+            {screenView.summaryActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>{screenView.summaryActionSummary}</Text>
             ) : null}
           </Pressable>
         ) : null}
