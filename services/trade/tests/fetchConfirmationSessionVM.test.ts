@@ -289,6 +289,19 @@ describe('fetchConfirmationSessionVM', () => {
             ],
           },
         },
+        positionSizing: {
+          status: 'AVAILABLE',
+          output: {
+            sizeLabel: 'Position size (Account %)',
+            sizeValue: '10 units at $1,000.00 cap',
+            maxLossLabel: 'Max loss at stop',
+            maxLossValue: '$50.00',
+            notes: [
+              'Prepared entry $100.00 to stop $95.00.',
+              'Support-only readout; no order path is opened here.',
+            ],
+          },
+        },
       },
       shell: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',

@@ -90,6 +90,10 @@ function createSession(params?: {
         executionPreviewAvailable: false,
       },
       risk: createPreviewRisk(),
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
     },
     shell:
       params?.planId === null

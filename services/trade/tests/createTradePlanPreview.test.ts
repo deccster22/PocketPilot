@@ -20,7 +20,11 @@ function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
     constraints: {
       maxPositionSize: 0.1,
     },
-    preparedRiskReferences: null,
+    preparedRiskReferences: {
+      entryPrice: 100,
+      stopPrice: 95,
+      targetPrice: 112,
+    },
     createdAt: 100,
     ...overrides,
   };
@@ -71,7 +75,12 @@ function createRiskLane(overrides: Partial<PreparedTradeRiskLane> = {}): Prepare
 
 describe('createTradePlanPreview', () => {
   it('creates the confirmation-safe preview model shape from a protection plan', () => {
-    expect(createTradePlanPreview(createPlan(), createRiskLane())).toEqual({
+    expect(
+      createTradePlanPreview(createPlan(), createRiskLane(), {
+        portfolioValue: 10_000,
+        baseCurrency: 'USD',
+      }),
+    ).toEqual({
       planId: 'plan-btc',
       headline: {
         intentType: 'ACCUMULATE',
@@ -98,6 +107,19 @@ describe('createTradePlanPreview', () => {
         executionPreviewAvailable: false,
       },
       risk: createRiskLane(),
+      positionSizing: {
+        status: 'AVAILABLE',
+        output: {
+          sizeLabel: 'Position size (Account %)',
+          sizeValue: '10 units at $1,000.00 cap',
+          maxLossLabel: 'Max loss at stop',
+          maxLossValue: '$50.00',
+          notes: [
+            'Prepared entry $100.00 to stop $95.00.',
+            'Support-only readout; no order path is opened here.',
+          ],
+        },
+      },
     });
   });
 
@@ -119,8 +141,12 @@ describe('createTradePlanPreview', () => {
     });
 
     const risk = createRiskLane();
-    const first = createTradePlanPreview(plan, risk);
-    const second = createTradePlanPreview(plan, risk);
+    const accountContext = {
+      portfolioValue: 10_000,
+      baseCurrency: 'USD',
+    };
+    const first = createTradePlanPreview(plan, risk, accountContext);
+    const second = createTradePlanPreview(plan, risk, accountContext);
 
     expect(first).toEqual(second);
     expect(first).not.toHaveProperty('accountId');
@@ -175,6 +201,10 @@ describe('createTradePlanPreview', () => {
           ],
         },
       }),
+      {
+        portfolioValue: 10_000,
+        baseCurrency: 'USD',
+      },
     );
 
     expect(preview).not.toHaveProperty('preparedRiskReferences');
