@@ -4,27 +4,28 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 import { defaultInsightsExportDispatchAdapter } from '@/providers/insightsExportDispatchProvider';
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
 import { InsightsArchiveScreen } from '@/app/screens/InsightsArchiveScreen';
+import { InsightsCompareScreen } from '@/app/screens/InsightsCompareScreen';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
 import { InsightsExportScreen } from '@/app/screens/InsightsExportScreen';
 import { InsightsJournalScreen } from '@/app/screens/InsightsJournalScreen';
-import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
 import { InsightsSummaryScreen } from '@/app/screens/InsightsSummaryScreen';
 import { InsightsYearInReviewScreen } from '@/app/screens/InsightsYearInReviewScreen';
 import { createInsightsScreenViewData } from '@/app/screens/insightsScreenView';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { fetchComparisonWindowVM } from '@/services/insights/fetchComparisonWindowVM';
 import { fetchExportOptionsVM } from '@/services/insights/fetchExportOptionsVM';
 import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
 import { fetchJournalEntryVM } from '@/services/insights/fetchJournalEntryVM';
 import { fetchPeriodSummaryVM } from '@/services/insights/fetchPeriodSummaryVM';
 import { fetchPreparedExportRequest } from '@/services/insights/fetchPreparedExportRequest';
-import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
 import { fetchSummaryArchiveVM } from '@/services/insights/fetchSummaryArchiveVM';
 import { fetchYearInReviewVM } from '@/services/insights/fetchYearInReviewVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
 import { saveJournalEntry } from '@/services/insights/saveJournalEntry';
 import { dispatchExportRequest } from '@/services/insights/dispatchExportRequest';
 import type {
+  ComparisonWindow,
   ExportFormat,
   ExportOptionsVM,
   JournalEntryContext,
@@ -39,12 +40,13 @@ type InsightsRoute =
   | 'HOME'
   | 'DETAIL'
   | 'JOURNAL'
-  | 'REFLECTION'
+  | 'COMPARE'
   | 'SUMMARY'
   | 'SUMMARY_ARCHIVE'
   | 'YEAR_IN_REVIEW'
   | 'EXPORT';
 
+const DEFAULT_COMPARISON_WINDOW: ComparisonWindow = 'LAST_90_DAYS_VS_PREVIOUS_90_DAYS';
 const DEFAULT_SUMMARY_PERIOD: ReflectionPeriod = 'LAST_MONTH';
 const EXPORT_TIMEZONE_LABEL = 'UTC';
 
@@ -144,10 +146,13 @@ export function InsightsScreen() {
       nowProvider,
     }),
   );
-  const [reflectionVM] = useState(() =>
-    fetchReflectionComparisonVM({
+  const [selectedComparisonWindow, setSelectedComparisonWindow] =
+    useState<ComparisonWindow>(DEFAULT_COMPARISON_WINDOW);
+  const [comparisonWindowVM, setComparisonWindowVM] = useState(() =>
+    fetchComparisonWindowVM({
       surface: 'INSIGHTS_SCREEN',
       nowProvider,
+      window: DEFAULT_COMPARISON_WINDOW,
     }),
   );
   const [journalVM, setJournalVM] = useState<JournalEntryVM>(() =>
@@ -178,7 +183,7 @@ export function InsightsScreen() {
   const screenView = createInsightsScreenViewData(historyVM, {
     hasJournal: true,
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
-    hasReflection: historyVM.availability.status === 'AVAILABLE',
+    hasReflection: true,
     hasSummaries: true,
     hasSummaryArchive: true,
     hasYearInReview: true,
@@ -239,6 +244,17 @@ export function InsightsScreen() {
   function openSummaryPeriod(period: ReflectionPeriod) {
     selectInsightsPeriod(period);
     setRoute('SUMMARY');
+  }
+
+  function selectComparisonWindow(window: ComparisonWindow) {
+    setSelectedComparisonWindow(window);
+    setComparisonWindowVM(
+      fetchComparisonWindowVM({
+        surface: 'INSIGHTS_SCREEN',
+        nowProvider,
+        window,
+      }),
+    );
   }
 
   useEffect(() => {
@@ -307,8 +323,15 @@ export function InsightsScreen() {
     );
   }
 
-  if (route === 'REFLECTION') {
-    return <InsightsReflectionScreen reflectionVM={reflectionVM} onBack={() => setRoute('HOME')} />;
+  if (route === 'COMPARE') {
+    return (
+      <InsightsCompareScreen
+        comparisonVM={comparisonWindowVM}
+        selectedWindow={selectedComparisonWindow}
+        onSelectWindow={selectComparisonWindow}
+        onBack={() => setRoute('HOME')}
+      />
+    );
   }
 
   if (route === 'SUMMARY') {
@@ -465,7 +488,7 @@ export function InsightsScreen() {
         {screenView.reflectionActionLabel ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => setRoute('REFLECTION')}
+            onPress={() => setRoute('COMPARE')}
             style={styles.archiveButton}
           >
             <Text style={styles.archiveButtonText}>{screenView.reflectionActionLabel}</Text>

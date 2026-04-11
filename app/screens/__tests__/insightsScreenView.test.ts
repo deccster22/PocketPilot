@@ -60,9 +60,9 @@ describe('createInsightsScreenViewData', () => {
       archiveActionLabel: 'View deeper history',
       archiveActionSummary:
         'Open a slightly deeper interpreted archive when you want a little more context.',
-      reflectionActionLabel: 'Compare recent history',
+      reflectionActionLabel: 'Compare windows',
       reflectionActionSummary:
-        'Place two interpreted slices side by side when you want a brief sense of what changed.',
+        'Open one bounded comparison against the prior matching window when you want a calm sense of what changed.',
       summaryActionLabel: 'View period summaries',
       summaryActionSummary:
         'Open a calm monthly or quarterly readback built from interpreted history.',
@@ -112,6 +112,7 @@ describe('createInsightsScreenViewData', () => {
         },
         {
           hasJournal: true,
+          hasReflection: true,
           hasSummaries: true,
           hasSummaryArchive: true,
           hasYearInReview: true,
@@ -130,8 +131,9 @@ describe('createInsightsScreenViewData', () => {
         'Keep a small optional note connected to this reflection lane when you want extra context in your own words.',
       archiveActionLabel: null,
       archiveActionSummary: null,
-      reflectionActionLabel: null,
-      reflectionActionSummary: null,
+      reflectionActionLabel: 'Compare windows',
+      reflectionActionSummary:
+        'Open one bounded comparison against the prior matching window when you want a calm sense of what changed.',
       summaryActionLabel: 'View period summaries',
       summaryActionSummary:
         'Open a calm monthly or quarterly readback built from interpreted history.',
@@ -164,7 +166,7 @@ describe('createInsightsScreenViewData', () => {
     expect(source).toMatch(/hasYearInReview/);
     expect(source).toMatch(/hasExport/);
     expect(source).not.toMatch(
-      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchReflectionComparisonVM|fetchSummaryArchiveVM|fetchYearInReviewVM|fetchExportOptionsVM|fetchPreparedExportRequest|createYearInReviewVM|createExportOptionsVM|createPreparedExportRequest|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|fetchInsightsHistoryVM|fetchPeriodSummaryVM|fetchComparisonWindowVM|fetchSummaryArchiveVM|fetchYearInReviewVM|fetchExportOptionsVM|fetchPreparedExportRequest|createYearInReviewVM|createExportOptionsVM|createPreparedExportRequest|createInsightsContinuity|createSinceLastChecked|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
     );
   });
 

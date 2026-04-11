@@ -8,12 +8,12 @@ describe('insights placement', () => {
       join(process.cwd(), 'app', 'screens', 'InsightsScreen.tsx'),
       'utf8',
     );
-    const insightsDetailScreenSource = readFileSync(
-      join(process.cwd(), 'app', 'screens', 'InsightsDetailScreen.tsx'),
+    const insightsCompareScreenSource = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'InsightsCompareScreen.tsx'),
       'utf8',
     );
-    const insightsReflectionScreenSource = readFileSync(
-      join(process.cwd(), 'app', 'screens', 'InsightsReflectionScreen.tsx'),
+    const insightsDetailScreenSource = readFileSync(
+      join(process.cwd(), 'app', 'screens', 'InsightsDetailScreen.tsx'),
       'utf8',
     );
     const insightsSummaryScreenSource = readFileSync(
@@ -53,9 +53,9 @@ describe('insights placement', () => {
     expect(appSource).toMatch(/Insights/);
     expect(appSource).toMatch(/activeTab/);
     expect(insightsScreenSource).toMatch(/fetchInsightsHistoryVM/);
+    expect(insightsScreenSource).toMatch(/fetchComparisonWindowVM/);
     expect(insightsScreenSource).toMatch(/fetchInsightsArchiveVM/);
     expect(insightsScreenSource).toMatch(/fetchPeriodSummaryVM/);
-    expect(insightsScreenSource).toMatch(/fetchReflectionComparisonVM/);
     expect(insightsScreenSource).toMatch(/fetchSummaryArchiveVM/);
     expect(insightsScreenSource).toMatch(/fetchYearInReviewVM/);
     expect(insightsScreenSource).toMatch(/fetchExportOptionsVM/);
@@ -65,25 +65,25 @@ describe('insights placement', () => {
     expect(insightsScreenSource).toMatch(/updateJournalEntry/);
     expect(insightsScreenSource).toMatch(/markInsightsHistoryViewed/);
     expect(insightsScreenSource).toMatch(/InsightsArchiveScreen/);
+    expect(insightsScreenSource).toMatch(/InsightsCompareScreen/);
     expect(insightsScreenSource).toMatch(/InsightsDetailScreen/);
     expect(insightsScreenSource).toMatch(/InsightsExportScreen/);
     expect(insightsScreenSource).toMatch(/InsightsJournalScreen/);
-    expect(insightsScreenSource).toMatch(/InsightsReflectionScreen/);
     expect(insightsScreenSource).toMatch(/InsightsSummaryScreen/);
     expect(insightsScreenSource).toMatch(/InsightsYearInReviewScreen/);
     expect(insightsScreenSource).toMatch(/EventHistoryCard/);
     expect(insightsScreenSource).not.toMatch(
-      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createPeriodSummaryVM|createReflectionComparisonVM|createSummaryArchiveVM|createYearInReviewVM|createExportOptionsVM|createPreparedExportRequest|createSinceLastChecked|resolveJournalContext|createJournalEntryStoreKey|createReflectionPeriodWindow|createAnnualReviewWindow|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
+      /createInsightsHistoryVM|createInsightsContinuity|createInsightsArchiveVM|createPeriodSummaryVM|createComparisonWindowVM|createSummaryArchiveVM|createYearInReviewVM|createExportOptionsVM|createPreparedExportRequest|createSinceLastChecked|resolveJournalContext|createJournalEntryStoreKey|createReflectionPeriodWindow|createAnnualReviewWindow|setLastViewedTimestamp|INSIGHTS_LAST_VIEWED_SURFACE_ID|eventLedgerQueries|eventLedgerService|signalsTriggered|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(insightsDetailScreenSource).toMatch(/createInsightsDetailScreenViewData/);
     expect(insightsDetailScreenSource).toMatch(/InsightsDetailCard/);
     expect(insightsDetailScreenSource).not.toMatch(
       /fetchInsightsArchiveVM|createInsightsArchiveVM|eventLedger|eventId|strategyId|providerId|metadata|unread|inbox|badge/,
     );
-    expect(insightsReflectionScreenSource).toMatch(/createInsightsReflectionScreenViewData/);
-    expect(insightsReflectionScreenSource).toMatch(/ReflectionSummaryCard/);
-    expect(insightsReflectionScreenSource).not.toMatch(
-      /fetchReflectionComparisonVM|createReflectionComparisonVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
+    expect(insightsCompareScreenSource).toMatch(/createInsightsCompareScreenViewData/);
+    expect(insightsCompareScreenSource).toMatch(/selectedWindow/);
+    expect(insightsCompareScreenSource).not.toMatch(
+      /fetchComparisonWindowVM|createComparisonWindowVM|eventLedger|eventId|strategyId|providerId|metadata|score|unread|inbox|badge/,
     );
     expect(insightsSummaryScreenSource).toMatch(/createInsightsSummaryScreenViewData/);
     expect(insightsSummaryScreenSource).toMatch(/selectedPeriod/);

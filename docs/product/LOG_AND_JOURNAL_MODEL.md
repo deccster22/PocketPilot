@@ -11,6 +11,7 @@ Reflection should help users remember what mattered, not make them perform self-
 ## Reflection ladder
 
 - Event Ledger is canonical structured truth.
+- Compare-window reflections are service-owned bounded comparisons built from interpreted history.
 - Monthly and quarterly summaries are service-owned calm period readbacks built from interpreted history.
 - Summary Archive is the calm service-owned shelf where prepared period readbacks can be revisited later.
 - Year in Review is one calm service-owned annual debrief built from the last completed calendar year.
@@ -46,6 +47,7 @@ Deeper, slower, and more reflective.
 - not required for core product use
 - separate from canonical ledger truth
 - monthly / quarterly summaries stay calm and service-owned
+- compare-window reflections stay calm, bounded, service-owned, and non-moralizing
 - Year in Review stays calm, service-owned, and descriptive rather than evaluative
 - summary archive stays service-owned, descriptive, and browseable without theatre
 - reflection exports stay service-owned, explicit about coverage, timezone-labeled, and profile-aware
@@ -60,6 +62,13 @@ Deeper, slower, and more reflective.
 - give one honest month or quarter readback when interpreted history is ready
 - highlight what changed across a meaningful period without making the user feel graded
 - stay narrower than Year in Review and lighter than journaling
+
+## What compare-window reflections are for
+
+- give one bounded side-by-side comparison such as last 90 days versus the prior 90 days, last quarter versus the quarter before, or last year versus the year before when interpreted history is ready
+- keep compare-window selection and shaping in `services/` rather than turning `app/` into a review engine
+- support calm comparison without turning reflection into grading, prediction, or analytics theatre
+- stay honest when a requested boundary, such as before-versus-after strategy change, is not yet supported by the interpreted history spine
 
 ## What summary archive is for
 

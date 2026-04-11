@@ -80,8 +80,10 @@ export function createInsightsScreenViewData(
         : null,
       archiveActionLabel: null,
       archiveActionSummary: null,
-      reflectionActionLabel: null,
-      reflectionActionSummary: null,
+      reflectionActionLabel: params?.hasReflection ? 'Compare windows' : null,
+      reflectionActionSummary: params?.hasReflection
+        ? 'Open one bounded comparison against the prior matching window when you want a calm sense of what changed.'
+        : null,
       summaryActionLabel: params?.hasSummaries ? 'View period summaries' : null,
       summaryActionSummary: params?.hasSummaries
         ? 'Open a calm monthly or quarterly readback built from interpreted history.'
@@ -116,9 +118,9 @@ export function createInsightsScreenViewData(
     archiveActionSummary: params?.hasArchive
       ? 'Open a slightly deeper interpreted archive when you want a little more context.'
       : null,
-    reflectionActionLabel: params?.hasReflection ? 'Compare recent history' : null,
+    reflectionActionLabel: params?.hasReflection ? 'Compare windows' : null,
     reflectionActionSummary: params?.hasReflection
-      ? 'Place two interpreted slices side by side when you want a brief sense of what changed.'
+      ? 'Open one bounded comparison against the prior matching window when you want a calm sense of what changed.'
       : null,
     summaryActionLabel: params?.hasSummaries ? 'View period summaries' : null,
     summaryActionSummary: params?.hasSummaries

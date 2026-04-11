@@ -82,39 +82,48 @@ export type InsightsArchiveVM = {
   selectedSectionId: string | null;
 };
 
-export type ReflectionComparisonWindow = {
-  id: string;
-  title: string;
-  startAt: string | null;
-  endAt: string | null;
+export type ComparisonWindow =
+  | 'LAST_90_DAYS_VS_PREVIOUS_90_DAYS'
+  | 'LAST_QUARTER_VS_PREVIOUS_QUARTER'
+  | 'LAST_YEAR_VS_PREVIOUS_YEAR'
+  | 'BEFORE_STRATEGY_CHANGE_VS_AFTER_STRATEGY_CHANGE';
+
+export type ComparisonItem = {
+  label: string;
+  value: string;
+  emphasis: 'NEUTRAL' | 'SHIFT' | 'CONTEXT';
 };
 
-export type ReflectionSummaryItem = {
-  title: string;
-  summary: string;
-  emphasis: 'SHIFT' | 'STABLE' | 'CONTEXT';
-};
-
-export type ReflectionComparisonAvailability =
+export type ComparisonWindowAvailability =
   | {
       status: 'UNAVAILABLE';
       reason:
-        | 'NO_COMPARABLE_HISTORY'
-        | 'INSUFFICIENT_INTERPRETED_HISTORY'
+        | 'NO_WINDOW_SELECTED'
+        | 'INSUFFICIENT_HISTORY'
+        | 'UNSUPPORTED_WINDOW'
         | 'NOT_ENABLED_FOR_SURFACE';
     }
   | {
       status: 'AVAILABLE';
-      leftWindow: ReflectionComparisonWindow;
-      rightWindow: ReflectionComparisonWindow;
-      items: ReadonlyArray<ReflectionSummaryItem>;
+      window: ComparisonWindow;
+      title: string;
+      summary: string;
+      items: ReadonlyArray<ComparisonItem>;
       limitations: ReadonlyArray<string>;
     };
 
-export type ReflectionComparisonVM = {
+export type ComparisonWindowVM = {
   generatedAt: string | null;
-  availability: ReflectionComparisonAvailability;
+  availability: ComparisonWindowAvailability;
 };
+
+export type ReflectionComparisonWindow = ComparisonWindow;
+
+export type ReflectionSummaryItem = ComparisonItem;
+
+export type ReflectionComparisonAvailability = ComparisonWindowAvailability;
+
+export type ReflectionComparisonVM = ComparisonWindowVM;
 
 export type ReflectionPeriod = 'LAST_MONTH' | 'LAST_QUARTER';
 
