@@ -116,6 +116,22 @@ export type PositionSizingAvailability =
       output: PositionSizingOutput;
     };
 
+export type RiskInputGuidance = {
+  title: string;
+  summary: string;
+  items: ReadonlyArray<string>;
+};
+
+export type RiskInputGuidanceAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_GUIDANCE_NEEDED' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      guidance: RiskInputGuidance;
+    };
+
 export type PreparedTradeRiskLane = {
   activeBasis: RiskBasis | null;
   activeBasisLabel: string | null;
@@ -199,6 +215,7 @@ export type TradePlanPreview = {
   };
   risk: PreparedTradeRiskLane;
   positionSizing: PositionSizingAvailability;
+  riskInputGuidance?: RiskInputGuidanceAvailability;
 };
 
 export type AccountCapabilityContext = {

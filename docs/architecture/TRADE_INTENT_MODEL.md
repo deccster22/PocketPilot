@@ -98,6 +98,10 @@ P5-R2 adds source-tagged prepared references plus optional prepared quote entry 
 P5-R3 adds `preparedRiskReferences` to the selected-plan ownership seam so honest prepared plan entry, stop, and target references can reach that same risk tool without becoming execution-prefill behavior.
 P5-R4 adds one canonical producer helper in `services/trade/` so those prepared references are populated only when grouped plan context already expresses them honestly.
 P5-R5 keeps that same handoff and producer contract but allows service-owned strategy/event context to publish optional stop or target references when scoped confirmed event interpretation can support them honestly.
+P5-R6 adds explicit risk-basis selector plus one prepared risk-per-trade context seam for calm risk framing without turning the lane into advice.
+P5-R7 adds one canonical prepared sizing/max-loss contract so the same selected-plan context can produce explicit size and max-loss output without moving math into `app/`.
+P5-R8 adds one canonical account-scoped preferred risk-basis seam so the lane can start from a saved per-account preference without inventing a settings maze or silent default.
+P5-R9 adds `RiskInputGuidanceAvailability` to the selected-plan preview seam so the lane can explain thin or unsupported risk inputs calmly without turning Trade Hub into a validation wall.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:

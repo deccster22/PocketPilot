@@ -31,6 +31,8 @@ Possible core objects:
 - `RiskPerTradeContext`
 - `PositionSizingOutput`
 - `PositionSizingAvailability`
+- `RiskInputGuidance`
+- `RiskInputGuidanceAvailability`
 - `ReadinessState`
 
 ## 4. Responsibilities
@@ -42,6 +44,7 @@ Possible core objects:
 - provide consistent max loss / position sizing / risk-reward logic
 - shape one canonical prepared sizing/max-loss output from the same service-owned inputs
 - prepare risk-per-trade context without turning it into advice
+- prepare one calm risk-input guidance note when sizing / max-loss context is thin or unsupported
 - expose readiness constraints without silently overriding the user
 
 ## 5. Invariants
@@ -51,6 +54,7 @@ Possible core objects:
 - support-not-enforcement unless future policy explicitly changes that
 - selected risk basis must flow through prepared summaries
 - account-level preferred basis may seed the selected basis, but it must remain explicit in the prepared contract
+- unsupported or incomplete risk-input guidance must stay support-first and non-enforcing by default
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -72,11 +76,13 @@ Possible core objects:
 - account-scope tests
 - consumer contract tests
 - sizing-output availability tests
+- unsupported / incomplete guidance tests
 - support-vs-enforcement boundary tests
 
 ## 9. Relationship to other docs
 Sits beside:
 - `TRADE_INTENT_MODEL.md`
 - `TRADE_HUB_RUNTIME_MODEL.md`
+- `TRADE_HUB_GUARDRAILS.md`
 - `TRADE_HUB_GUARDRAILS.md`
 - position sizing / SL / TP knowledge docs
