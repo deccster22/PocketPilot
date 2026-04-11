@@ -111,6 +111,14 @@ Monthly and quarterly summaries should arrive as prepared period briefings:
 - limited to a few stronger notes plus honest limitations
 - never assembled into KPI dashboards or report cards in `app/`
 
+Compare-window reflections should arrive as prepared bounded briefings:
+
+- shaped in `services/`
+- explicit about which approved window is being compared
+- limited to one short framing summary, a few prepared comparison items, and honest limitations
+- willing to say a requested boundary is unsupported or thin rather than inventing comparison theatre
+- never assembled into scoreboards, charts-for-the-sake-of-charts, or local comparison logic in `app/`
+
 Year in Review should arrive as one prepared annual debrief:
 
 - shaped in `services/`

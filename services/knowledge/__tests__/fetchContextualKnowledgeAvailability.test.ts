@@ -181,18 +181,10 @@ describe('fetchContextualKnowledgeAvailability', () => {
       generatedAt: '2026-04-09T00:00:00.000Z',
       availability: {
         status: 'AVAILABLE',
-        leftWindow: {
-          id: 'earlier',
-          title: 'Earlier',
-          startAt: '2026-03-01T00:00:00.000Z',
-          endAt: '2026-03-31T23:59:59.000Z',
-        },
-        rightWindow: {
-          id: 'recent',
-          title: 'Recent',
-          startAt: '2026-04-01T00:00:00.000Z',
-          endAt: '2026-04-09T00:00:00.000Z',
-        },
+        window: 'LAST_90_DAYS_VS_PREVIOUS_90_DAYS',
+        title: 'Last 90 days compared with the previous 90 days',
+        summary:
+          'Compared with the previous 90 days, the last 90 days leaned more on price shifts than on measured pullbacks.',
         items: [],
         limitations: [],
       },

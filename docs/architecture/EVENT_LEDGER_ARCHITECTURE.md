@@ -21,6 +21,7 @@ Event Ledger is the memory spine beneath:
 
 - Since Last Checked
 - Reorientation
+- compare-window reflection
 - monthly / quarterly summaries
 - Year in Review
 - summary archive
@@ -61,6 +62,7 @@ Each event should carry:
 - Since Last Checked assembler
 - Reorientation assembler
 - Summary generator
+- Compare-window builder
 - Monthly / quarterly summary builder
 - Year in Review builder
 - Summary archive assembler
@@ -77,6 +79,7 @@ Each event should carry:
 - no view-layer mutation of event meaning
 - no merging user reflection into canonical event truth
 - no scorecard or analytics-theatre reshaping inside ledger consumers
+- no app-side compare-window selection shaping or prepared comparison-item assembly from raw ledger rows
 - no app-side rebuilding of summary archive cards from raw ledger rows
 - no app-side rebuilding of annual debrief items from raw ledger rows
 - no app-side shaping of reflection export options or prepared export payloads
