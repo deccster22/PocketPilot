@@ -4,37 +4,52 @@ import { join } from 'node:path';
 import type { MessagePolicyAvailability } from '@/services/messages/types';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 
+function unavailableMessagePolicy(): MessagePolicyAvailability {
+  return {
+    status: 'UNAVAILABLE',
+    reason: 'NO_MESSAGE',
+    rationale: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_RATIONALE_AVAILABLE',
+    },
+  };
+}
+
 describe('createTradeHubScreenViewData', () => {
   it('reads the prepared Trade Hub surface contract without re-prioritising it', () => {
-    const view = createTradeHubScreenViewData({
-      primaryPlan: {
-        planId: 'primary-plan',
-        intentType: 'ACCUMULATE',
-        symbol: 'BTC',
-        alignment: 'ALIGNED',
-        certainty: 'HIGH',
-        summary: 'Accumulation setup is supported by confirmed momentum building. Focus symbol: BTC.',
-        supportingEventCount: 2,
-        actionState: 'READY',
-      },
-      alternativePlans: [
-        {
-          planId: 'alt-plan',
-          intentType: 'HOLD',
-          symbol: 'ETH',
-          alignment: 'NEUTRAL',
-          certainty: 'MEDIUM',
-          summary: 'Hold for now while price movement is monitored without a clearer setup.',
-          supportingEventCount: 1,
-          actionState: 'CAUTION',
+    const view = createTradeHubScreenViewData(
+      {
+        primaryPlan: {
+          planId: 'primary-plan',
+          intentType: 'ACCUMULATE',
+          symbol: 'BTC',
+          alignment: 'ALIGNED',
+          certainty: 'HIGH',
+          summary:
+            'Accumulation setup is supported by confirmed momentum building. Focus symbol: BTC.',
+          supportingEventCount: 2,
+          actionState: 'READY',
         },
-      ],
-      meta: {
-        hasPrimaryPlan: true,
-        profile: 'ADVANCED',
-        requiresConfirmation: true,
+        alternativePlans: [
+          {
+            planId: 'alt-plan',
+            intentType: 'HOLD',
+            symbol: 'ETH',
+            alignment: 'NEUTRAL',
+            certainty: 'MEDIUM',
+            summary: 'Hold for now while price movement is monitored without a clearer setup.',
+            supportingEventCount: 1,
+            actionState: 'CAUTION',
+          },
+        ],
+        meta: {
+          hasPrimaryPlan: true,
+          profile: 'ADVANCED',
+          requiresConfirmation: true,
+        },
       },
-    });
+      unavailableMessagePolicy(),
+    );
 
     expect(view).toEqual({
       profileLabel: 'ADVANCED',
@@ -74,12 +89,15 @@ describe('createTradeHubScreenViewData', () => {
 
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
+    expect(source).toMatch(/messagePolicy\.rationale/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
-    expect(source).not.toMatch(/createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/);
+    expect(source).not.toMatch(
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
+    );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
   });
 
-  it('passes through the prepared guarded-stop note without classifying it locally', () => {
+  it('passes through the prepared guarded-stop note and rationale without classifying it locally', () => {
     const messagePolicy: MessagePolicyAvailability = {
       status: 'AVAILABLE',
       messages: [
@@ -93,6 +111,18 @@ describe('createTradeHubScreenViewData', () => {
           dismissible: false,
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+        rationale: {
+          title: 'Why this is here',
+          summary:
+            'Shown as a guarded stop because Trade Hub should keep the current boundary visible instead of carrying the path further.',
+          items: [
+            'Trade Hub keeps the plan visible as read-only context when the path cannot continue here.',
+            'The note is informational only and does not start an order path.',
+          ],
+        },
+      },
     };
 
     expect(
@@ -116,6 +146,7 @@ describe('createTradeHubScreenViewData', () => {
         title: 'Protected path unavailable',
         summary:
           'Account capabilities do not support a protected execution path for this plan. Trade Hub will keep the plan visible as a read-only framing note instead of carrying the action path further.',
+        rationale: messagePolicy.rationale,
       },
     });
     expect(JSON.stringify(messagePolicy)).not.toMatch(/badge|unread|notification|urgent|popup/);

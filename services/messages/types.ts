@@ -53,17 +53,37 @@ export type PreparedMessage = {
   dismissible: boolean;
 };
 
+export type MessageRationale = {
+  title: string;
+  summary: string;
+  items: ReadonlyArray<string>;
+};
+
+export type MessageRationaleAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_RATIONALE_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      rationale: MessageRationale;
+    };
+
+export type MessagePolicyUnavailableReason =
+  | 'NO_MESSAGE'
+  | 'NOT_ENABLED_FOR_SURFACE'
+  | 'INSUFFICIENT_INTERPRETED_CONTEXT';
+
 export type MessagePolicyAvailability =
   | {
       status: 'UNAVAILABLE';
-      reason:
-        | 'NO_MESSAGE'
-        | 'NOT_ENABLED_FOR_SURFACE'
-        | 'INSUFFICIENT_INTERPRETED_CONTEXT';
+      reason: MessagePolicyUnavailableReason;
+      rationale: MessageRationaleAvailability;
     }
   | {
       status: 'AVAILABLE';
       messages: ReadonlyArray<PreparedMessage>;
+      rationale: MessageRationaleAvailability;
     };
 
 export type MessagePolicyReferralInput = {

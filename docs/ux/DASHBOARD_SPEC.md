@@ -43,6 +43,10 @@ P6-A2 adds one additional prepared input on the same screen helper path:
 - one optional `MessagePolicyAvailability` result from `services/messages/fetchMessagePolicyVM`
 - it is still rendered inline and only through prepared service output
 - it does not change the Dashboard surface model contract itself
+P6-A5 adds one optional prepared rationale on that same message-policy result:
+- it stays subordinate to the referral note
+- it remains compact and inline
+- it does not turn Dashboard into a troubleshooting or notification surface
 
 ## Service Path
 Dashboard continues to use its own upstream preparation seam:
@@ -51,6 +55,7 @@ Dashboard continues to use its own upstream preparation seam:
 - `services/dashboard/dashboardSurfaceService.ts` shapes the stable app-facing `DashboardSurfaceModel` and Dashboard explanation VM.
 - `services/dashboard/fetchDashboardExplanationVM.ts` selects the prime explanation target and calls the canonical explanation builder.
 - `services/messages/fetchMessagePolicyVM.ts` consumes the prepared Dashboard surface and decides whether a Dashboard-only `REFERRAL` note is eligible.
+- `services/messages/createPreparedMessageRationale.ts` may attach one calm explanation for why that referral posture appeared.
 
 This keeps Dashboard separate from Snapshot service flow while preserving the same app-facing contract.
 
@@ -108,6 +113,8 @@ Rules:
 - do not turn it into an alert wall, popup, badge, or contextual knowledge rail
 - use it only as a calm routing or fit note
 - keep missing or empty Dashboard context distinct from referral-worthy context
+- if rationale is available, render one small inline "why this is here" treatment only
+- rationale must not expose raw scoring, raw signals, provider/runtime state, or user advice
 
 The app path remains:
 - `services/messages/fetchMessagePolicyVM`

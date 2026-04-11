@@ -25,6 +25,10 @@ P6-A2 adds one optional message-policy note above the same prepared surface:
 - one inline `MessagePolicyAvailability` result from `services/messages/fetchMessagePolicyVM`
 - it remains separate from the `TradeHubSurfaceModel` contract and from confirmation/readiness/execution seams
 - it does not add notification mechanics or order behavior
+P6-A5 adds one optional prepared rationale on that same message-policy result:
+- it stays inside the existing inline note posture
+- it explains the boundary calmly without becoming a debug panel
+- it does not add settings or delivery mechanics
 
 ## Surface Contract
 
@@ -484,6 +488,8 @@ Rules:
 - keep it calm, explicit, and inline
 - do not restyle it like a punitive warning, outage banner, or execution CTA
 - keep it distinct from confirmation-shell, readiness, submission-intent, and adapter-result wording
+- if rationale is available, render one small inline "why this is here" treatment only
+- rationale must not expose capability internals beyond the user-facing boundary already chosen by services
 
 The current rollout uses guarded stop only when the selected confirmation session has no protected execution path.
 That preserves the line between:

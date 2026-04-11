@@ -1,24 +1,25 @@
-# Message Policy Model (P6-A1 + P6-A2 + P6-A3 + P6-A4)
+# Message Policy Model (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5)
 
 ## Purpose
 P6-A1 added PocketPilot's canonical message-policy seam.
 P6-A2 reused that seam for Dashboard `REFERRAL` and Trade Hub `GUARDED_STOP`.
-P6-A3 added explicit profile-sensitivity and keep, downgrade, or suppress tuning.
-P6-A4 keeps the same seam and improves the interpreted alert-input quality available to it.
+P6-A3 added explicit profile sensitivity and keep, downgrade, or suppress tuning.
+P6-A4 improved the interpreted inputs feeding the same seam.
+P6-A5 adds one canonical user-visible rationale seam on top of that same policy path.
 
-The result is still one policy seam, not a notification platform.
+The result is still one policy system, not a notification platform.
 
 Goals:
-- keep product messaging service-owned
-- keep semantic message families explicit
-- improve alert-versus-briefing truth with richer interpreted context
-- preserve calm posture and foreground-only behavior
+- keep message-family meaning explicit and service-owned
+- keep message posture deterministic once inputs are supplied
+- explain why the current message posture exists without leaking mechanics
 - keep `app/` on prepared contracts only
+- keep rollout inline, compact, and calm
 
-P6-A1 through P6-A4 do not add push, inbox, unread state, badges, background jobs, popup choreography, or urgency ladders.
+P6-A1 through P6-A5 do not add push, inbox, unread state, badges, background jobs, generic toast infrastructure, or user-editable sensitivity settings.
 
-## Canonical Contract
-The canonical message-policy contract lives in `services/messages/types.ts`.
+## Canonical Contracts
+The canonical contracts live in `services/messages/types.ts`.
 
 ```ts
 type MessagePolicyKind =
@@ -27,13 +28,6 @@ type MessagePolicyKind =
   | 'REORIENTATION'
   | 'REFERRAL'
   | 'GUARDED_STOP'
-
-type MessageSensitivityProfile = 'GUIDED' | 'BALANCED' | 'DIRECT'
-
-type AlertThresholdDecision =
-  | 'KEEP_AS_ALERT'
-  | 'DOWNGRADE_TO_BRIEFING'
-  | 'SUPPRESS'
 
 type PreparedMessageInputContext = {
   subjectLabel: string | null
@@ -48,21 +42,45 @@ type PreparedMessageInputContext = {
   hasSinceLastCheckedContext: boolean
   hasReorientationContext: boolean
 }
+
+type MessageRationale = {
+  title: string
+  summary: string
+  items: readonly string[]
+}
+
+type MessageRationaleAvailability =
+  | {
+      status: 'UNAVAILABLE'
+      reason: 'NO_RATIONALE_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE'
+    }
+  | {
+      status: 'AVAILABLE'
+      rationale: MessageRationale
+    }
+
+type MessagePolicyAvailability =
+  | {
+      status: 'UNAVAILABLE'
+      reason: 'NO_MESSAGE' | 'NOT_ENABLED_FOR_SURFACE' | 'INSUFFICIENT_INTERPRETED_CONTEXT'
+      rationale: MessageRationaleAvailability
+    }
+  | {
+      status: 'AVAILABLE'
+      messages: readonly PreparedMessage[]
+      rationale: MessageRationaleAvailability
+    }
 ```
 
 Rules:
-- `kind` remains explicit and never inferred by `app/`
-- `surface` remains explicit and service-owned
-- `PreparedMessageInputContext` is internal policy input, not a UI contract
-- richer inputs stay compact and interpreted rather than becoming a bag of raw event payloads
-- no push-delivery metadata exists here
-- no unread, badge, inbox, engagement, or reminder fields exist here
-- no raw IDs, provider diagnostics, runtime metadata, or signal arrays leak here
+- `kind` remains explicit and must never be inferred by `app/`
+- `PreparedMessageInputContext` remains internal service policy input, not a UI contract
+- `MessageRationale` is user-facing copy, not an engineering trace
+- rationale explains posture, not mechanics
+- no raw IDs, provider diagnostics, runtime facts, score readouts, or signal arrays leak into rationale
 
 ## Data Flow
 The message-policy seam still sits above interpreted service-owned inputs rather than app-owned heuristics.
-
-Snapshot now uses the existing orientation and briefing spine plus one prepared-input helper:
 
 ```text
 EventLedger
@@ -74,12 +92,12 @@ EventLedger
 -> SnapshotBriefingState
 -> createPreparedMessageInputs
 -> createMessagePolicyVM
--> applyMessageProfileTuning
+-> createPreparedMessageRationale
 -> MessagePolicyAvailability
 -> Snapshot message zone
 ```
 
-The canonical fetch path remains unchanged in shape:
+The canonical fetch path remains one entry seam:
 
 ```text
 fetchSnapshotSurfaceVM
@@ -98,30 +116,11 @@ fetchConfirmationSessionVM
 -> TradeHubScreen
 ```
 
-`app/` renders the prepared contract only.
-It does not decide whether something is a briefing, alert, reorientation prompt, referral, or guarded stop.
-It also does not derive richer alert inputs locally.
-
-## Prepared Alert Inputs
-P6-A4 adds one explicit helper: `services/messages/createPreparedMessageInputs.ts`.
-
-It derives compact interpreted alert context from existing service-owned seams:
-- latest relevant interpreted event
-- Since Last Checked summary count
-- Snapshot briefing state
-- reorientation summary availability
-
-The helper intentionally focuses on a few high-trust inputs:
-- `subjectScope`: whether the interpreted change is one symbol, a small symbol cluster, or portfolio-level
-- `eventFamily`: compact grouping for price change, momentum, pullback, or non-alertable context
-- `confirmationSupport`: whether the change is estimated/thin, confirmed standalone, or confirmed with interpreted continuity support
-- `changeStrength`: one interpreted scale from thin to strong
-
-This is meant to clarify meaning, not amplify noise.
-It does not create a second interpretation engine and does not turn multiple weak hints into automatic alert escalation.
+`app/` renders the prepared message plus prepared rationale only.
+It does not classify message families, build rationale text, re-derive tuned inputs, or expose raw runtime facts.
 
 ## Threshold And Sensitivity Rules
-`services/messages/applyMessageProfileTuning.ts` still tunes only prepared alert candidates and does not rewrite the broader family model.
+`services/messages/applyMessageProfileTuning.ts` still tunes only prepared alert candidates.
 
 Sensitivity mapping stays explicit:
 - `BEGINNER` -> `GUIDED`
@@ -129,69 +128,90 @@ Sensitivity mapping stays explicit:
 - `ADVANCED` -> `DIRECT`
 
 Alert threshold decisions stay explicit:
-- `KEEP_AS_ALERT`: the interpreted change is strong enough for Snapshot's narrow alert posture
-- `DOWNGRADE_TO_BRIEFING`: the change deserves a calm inline note but not alert treatment
-- `SUPPRESS`: interpreted context is too thin, too broad, or too middling to justify a message
+- `KEEP_AS_ALERT`
+- `DOWNGRADE_TO_BRIEFING`
+- `SUPPRESS`
 
-P6-A4 tuning posture:
+Current posture:
 - strong, single-symbol, confirmed change can remain an `ALERT`
-- meaningful but not fully strong change needs clearer support before advanced profile keeps it as an alert
-- multi-symbol scope stays conservative and does not become a louder alert by default
-- beginner still prefers quieter treatment
-- thin or estimated context still resolves to no message rather than filler copy
+- meaningful but not fully strong change can stay a `BRIEFING`
+- broader multi-symbol context stays conservative
+- thin or estimated context still suppresses to no message
+- `REORIENTATION`, `REFERRAL`, and `GUARDED_STOP` keep their separate meanings and precedence
 
-The richer inputs can confirm suppression just as easily as they can preserve an alert.
+P6-A5 does not change those family rules.
+It explains the chosen posture after the same service-owned pass decides it.
 
-## Classification Rules
-P6-A1 through P6-A4 keep semantic families primary.
+## Rationale Shaping Rules
+`services/messages/createPreparedMessageRationale.ts` is the one canonical rationale builder.
 
+It should explain:
+- why this message family surfaced
+- why a change stayed a briefing instead of becoming an alert where relevant
+- why the note is compact and inline on the current surface
+
+It should not explain:
+- raw event names
+- confidence or percent thresholds
+- provider or broker facts
+- runtime degradation details
+- what action the user should take
+
+Copy posture rules:
+- calm
+- compact
+- explanatory
+- non-debuggy
+- non-moralizing
+
+Good rationale examples:
+- "Shown as a briefing because the change is meaningful but not strong enough for an alert."
+- "Shown as a referral because Dashboard has useful context, but Snapshot is the steadier first read right now."
+- "Shown as a guarded stop because Trade Hub should keep the current boundary visible instead of carrying the path further."
+
+## Family Rules
 ### Reorientation
 - Snapshot-visible reorientation becomes a `REORIENTATION` message
-- existing dismissal behavior stays intact
-- dismissed reorientation does not fall through to a noisier replacement message
-- richer alert inputs do not rewrite reorientation into another family
+- the rationale explains return-after-gap posture, not hidden event mechanics
+- dismissed reorientation does not fall through to a louder replacement message
 
 ### Briefing
 - `SINCE_LAST_CHECKED` stays a `BRIEFING`
-- downgraded alert-worthy change may remain a calm `BRIEFING` when richer context says alert treatment would be too loud
-- briefing remains quieter than alerting
-- briefing is still derived from interpreted history or interpreted change, not raw event arrays
+- tuned alert candidates may downgrade to `BRIEFING`
+- rationale explains why the posture stayed quieter than alert treatment
 
 ### Alert
 - alerting stays stricter than "anything changed"
-- only interpreted meaningful-change families are eligible
-- single-symbol scope remains the preferred subject shape for inline alert treatment
-- richer confirmation support can preserve an alert for history-backed borderline change
-- broader or thinner context still suppresses or downgrades rather than inflating alert volume
+- rationale can explain that the change is focused enough for Snapshot's alert posture
+- rationale remains compact and still points back to Snapshot rather than becoming a second detail surface
 
 ### Referral
-- referral remains a separate family for better-handled-elsewhere guidance
-- referral is not a guarded stop and not a missing-data error
-- richer Snapshot alert inputs do not blur Dashboard referral into alerting
+- referral remains a better-fit routing note, not a stop or alert
+- rationale explains why Snapshot is the steadier first read
 
 ### Guarded Stop
-- guarded stop remains the strongest stop-style family
-- it still expresses that PocketPilot should not continue a path with the current context
-- it is not framed as punishment, urgency, or outage theatre
-- richer Snapshot alert inputs do not weaken or rename this boundary
+- guarded stop remains the strongest stop-style family in this seam
+- rationale explains the visible boundary without framing it as punishment or outage theatre
 
 ## Surface Discipline
-P6-A4 keeps rollout deliberately narrow.
+P6-A5 keeps rollout deliberately narrow.
 
 That means:
-- Snapshot may show `REORIENTATION`, `BRIEFING`, or a tuned inline `ALERT`
-- Dashboard may show a quiet `REFERRAL` note only
-- Trade Hub may show a calm `GUARDED_STOP` note only
-- no other surfaces gain message-center behavior in this phase
+- Snapshot may show one message plus one optional inline rationale treatment
+- Dashboard may show one `REFERRAL` note plus one optional inline rationale treatment
+- Trade Hub may show one `GUARDED_STOP` note plus one optional inline rationale treatment
+- if rationale is unavailable, surfaces render nothing extra
 
-Availability rules stay explicit:
-- `AVAILABLE` when a prepared message is eligible for the requested surface
-- `NOT_ENABLED_FOR_SURFACE` when a prepared message exists but belongs elsewhere
-- `NO_MESSAGE` when context exists but does not justify messaging after tuning
-- `INSUFFICIENT_INTERPRETED_CONTEXT` when service-owned context is too thin to classify
+No surface gains:
+- push delivery
+- inbox or unread mechanics
+- notification-center behavior
+- badge counts
+- settings UI
+- background work
 
 ## Non-Goals Preserved
-P6-A1 through P6-A4 do not add:
+P6-A1 through P6-A5 do not add:
 - push notifications
 - notification-center plumbing
 - inbox or unread state
@@ -199,6 +219,5 @@ P6-A1 through P6-A4 do not add:
 - badge counts
 - urgency ladders
 - user-editable threshold settings
-- broad per-surface message rollouts
-- AI-generated messaging
+- raw diagnostics disclosure
 - app-owned copy assembly

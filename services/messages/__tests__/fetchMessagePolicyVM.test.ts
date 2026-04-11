@@ -215,6 +215,17 @@ function createConfirmationSessionVm(
   };
 }
 
+function availableRationale(summary: string, items: string[]) {
+  return {
+    status: 'AVAILABLE' as const,
+    rationale: {
+      title: 'Why this is here',
+      summary,
+      items,
+    },
+  };
+}
+
 describe('fetchMessagePolicyVM', () => {
   const mockFetchDashboardSurfaceVM = jest.mocked(fetchDashboardSurfaceVM);
   const mockFetchSnapshotSurfaceVM = jest.mocked(fetchSnapshotSurfaceVM);
@@ -247,6 +258,13 @@ describe('fetchMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        "Shown as an alert because the change is focused enough for Snapshot's alert posture.",
+        [
+          'The change is focused enough to keep visible without crowding the surface.',
+          'The note stays compact so it points back to Snapshot instead of becoming a stream of messages.',
+        ],
+      ),
     });
   });
 
@@ -293,6 +311,9 @@ describe('fetchMessagePolicyVM', () => {
           surface: 'SNAPSHOT',
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+      },
     });
   });
 
@@ -342,6 +363,13 @@ describe('fetchMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        "Shown as an alert because the change is focused enough for Snapshot's alert posture.",
+        [
+          'Recent continuity supports keeping it visible without turning it into a feed item.',
+          'The note stays compact so it points back to Snapshot instead of becoming a stream of messages.',
+        ],
+      ),
     });
   });
 
@@ -369,6 +397,13 @@ describe('fetchMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a briefing because PocketPilot keeps this kind of change quieter until the picture settles a bit more.',
+        [
+          'The change is focused enough to keep visible without crowding the surface.',
+          'Snapshot keeps the fuller review space, so this note stays brief on purpose.',
+        ],
+      ),
     });
   });
 
@@ -396,6 +431,13 @@ describe('fetchMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a referral because Dashboard has useful context, but Snapshot is the steadier first read right now.',
+        [
+          'Snapshot is the surface PocketPilot uses for a calmer first look when top focus is still forming.',
+          'Routing notes stay compact instead of turning into alerts.',
+        ],
+      ),
     });
   });
 
@@ -422,6 +464,9 @@ describe('fetchMessagePolicyVM', () => {
           surface: 'DASHBOARD',
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+      },
     });
   });
 
@@ -448,6 +493,13 @@ describe('fetchMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a guarded stop because Trade Hub should keep the current boundary visible instead of carrying the path further.',
+        [
+          'Trade Hub keeps the plan visible as read-only context when the path cannot continue here.',
+          'The note is informational only and does not start an order path.',
+        ],
+      ),
     });
     expect(JSON.stringify(result)).not.toMatch(/providerId|eventId|strategyId|unread|badge|urgent/);
   });
@@ -479,6 +531,9 @@ describe('fetchMessagePolicyVM', () => {
           surface: 'TRADE_HUB',
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+      },
     });
   });
 });

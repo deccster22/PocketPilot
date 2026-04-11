@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import { MessageRationaleNote } from '@/app/components/MessageRationaleNote';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
 import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
@@ -510,6 +511,7 @@ export function TradeHubScreen() {
           <View style={styles.noteCard}>
             <Text style={styles.noteTitle}>{screenView.message.title}</Text>
             <Text style={styles.noteSummary}>{screenView.message.summary}</Text>
+            <MessageRationaleNote rationale={screenView.message.rationale} />
           </View>
         ) : null}
 

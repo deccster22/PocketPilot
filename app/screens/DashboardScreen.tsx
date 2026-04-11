@@ -2,6 +2,7 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ExplanationCard } from '@/app/components/ExplanationCard';
+import { MessageRationaleNote } from '@/app/components/MessageRationaleNote';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import {
   createDashboardScreenViewData,
@@ -87,6 +88,7 @@ export function DashboardScreen() {
           <View style={styles.noteCard}>
             <Text style={styles.noteTitle}>{screenView.message.title}</Text>
             <Text style={styles.noteSummary}>{screenView.message.summary}</Text>
+            <MessageRationaleNote rationale={screenView.message.rationale} />
           </View>
         ) : null}
         <DashboardZone

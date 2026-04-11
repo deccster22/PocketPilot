@@ -10,6 +10,7 @@ import type {
   MessagePolicyAvailability,
   MessagePolicyKind,
   MessagePriority,
+  MessageRationaleAvailability,
 } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
@@ -34,6 +35,7 @@ export type DashboardScreenMessageViewData =
       priority: MessagePriority;
       title: string;
       summary: string;
+      rationale: MessageRationaleAvailability;
     };
 
 export type DashboardScreenViewData = {
@@ -121,6 +123,7 @@ function createDashboardMessageViewData(
       priority: messagePolicy.messages[0].priority,
       title: messagePolicy.messages[0].title,
       summary: messagePolicy.messages[0].summary,
+      rationale: messagePolicy.rationale,
     };
   }
 

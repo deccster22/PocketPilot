@@ -71,6 +71,24 @@ function createTradeHubContext(
   };
 }
 
+function availableRationale(summary: string, items: string[]) {
+  return {
+    status: 'AVAILABLE' as const,
+    rationale: {
+      title: 'Why this is here',
+      summary,
+      items,
+    },
+  };
+}
+
+function unavailableRationale(reason: 'NO_RATIONALE_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE') {
+  return {
+    status: 'UNAVAILABLE' as const,
+    reason,
+  };
+}
+
 describe('createMessagePolicyVM', () => {
   it('keeps reorientation distinct from alert-worthy change and prefers the prepared reorientation note', () => {
     const result = createMessagePolicyVM({
@@ -133,6 +151,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: true,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a reorientation because you are returning after a meaningful gap and Snapshot should help you regain context first.',
+        [
+          'It stays separate from alerts so the surface can help you get your bearings first.',
+          'The note stays compact because Snapshot already holds the fuller view.',
+        ],
+      ),
     });
     expect(JSON.stringify(result)).not.toMatch(
       /evt-hidden-alert|strategy_should_not_leak|raw_signal_id|notification|badge|unread|urgent/,
@@ -164,6 +189,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        "Shown as an alert because the change is focused enough for Snapshot's alert posture.",
+        [
+          'The change is focused enough to keep visible without crowding the surface.',
+          'The note stays compact so it points back to Snapshot instead of becoming a stream of messages.',
+        ],
+      ),
     });
     expect(JSON.stringify(result)).not.toMatch(/evt-price-move-2|dip_buying|dip_signal/);
   });
@@ -193,6 +225,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        "Shown as an alert because the change is focused enough for Snapshot's alert posture.",
+        [
+          'Recent continuity supports keeping it visible without turning it into a feed item.',
+          'The note stays compact so it points back to Snapshot instead of becoming a stream of messages.',
+        ],
+      ),
     });
   });
 
@@ -222,6 +261,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a briefing because PocketPilot keeps this kind of change quieter until the picture settles a bit more.',
+        [
+          'The change is focused enough to keep visible without crowding the surface.',
+          'Snapshot keeps the fuller review space, so this note stays brief on purpose.',
+        ],
+      ),
     });
     expect(JSON.stringify(result)).not.toMatch(/evt-price-move-beginner|raw_signal_should_not_leak/);
   });
@@ -253,6 +299,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a briefing because the context is broader than PocketPilot uses for an alert.',
+        [
+          'The context spans more than one symbol, so PocketPilot keeps the posture quiet.',
+          'Snapshot keeps the fuller review space, so this note stays brief on purpose.',
+        ],
+      ),
     });
   });
 
@@ -279,6 +332,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a referral because Dashboard has useful context, but Snapshot is the steadier first read right now.',
+        [
+          'Snapshot is the surface PocketPilot uses for a calmer first look when top focus is still forming.',
+          'Routing notes stay compact instead of turning into alerts.',
+        ],
+      ),
     });
     expect(guardedStopResult).toEqual({
       status: 'AVAILABLE',
@@ -293,6 +353,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a guarded stop because Trade Hub should keep the current boundary visible instead of carrying the path further.',
+        [
+          'Trade Hub keeps the plan visible as read-only context when the path cannot continue here.',
+          'The note is informational only and does not start an order path.',
+        ],
+      ),
     });
     expect(JSON.stringify({ referralResult, guardedStopResult })).not.toMatch(
       /notification|badge|unread|urgent|toast|popup/,
@@ -310,6 +377,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_MESSAGE',
+      rationale: unavailableRationale('NO_RATIONALE_AVAILABLE'),
     });
   });
 
@@ -325,6 +393,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_MESSAGE',
+      rationale: unavailableRationale('NO_RATIONALE_AVAILABLE'),
     });
     expect(
       createMessagePolicyVM({
@@ -338,6 +407,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_MESSAGE',
+      rationale: unavailableRationale('NO_RATIONALE_AVAILABLE'),
     });
   });
 
@@ -350,6 +420,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_SURFACE',
+      rationale: unavailableRationale('NOT_ENABLED_FOR_SURFACE'),
     });
   });
 
@@ -378,6 +449,13 @@ describe('createMessagePolicyVM', () => {
           dismissible: false,
         },
       ],
+      rationale: availableRationale(
+        'Shown as a briefing because the change is meaningful but not strong enough for an alert.',
+        [
+          'The change is focused enough to keep visible without crowding the surface.',
+          'Snapshot keeps the fuller review space, so this note stays brief on purpose.',
+        ],
+      ),
     });
   });
 
@@ -394,6 +472,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_MESSAGE',
+      rationale: unavailableRationale('NO_RATIONALE_AVAILABLE'),
     });
   });
 
@@ -412,6 +491,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_MESSAGE',
+      rationale: unavailableRationale('NO_RATIONALE_AVAILABLE'),
     });
   });
 
@@ -423,6 +503,7 @@ describe('createMessagePolicyVM', () => {
     ).toEqual({
       status: 'UNAVAILABLE',
       reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+      rationale: unavailableRationale('NO_RATIONALE_AVAILABLE'),
     });
   });
 

@@ -108,6 +108,18 @@ describe('fetchContextualKnowledgeAvailability', () => {
           dismissible: true,
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+        rationale: {
+          title: 'Why this is here',
+          summary:
+            'Shown as a referral because Dashboard has useful context, but Snapshot is the steadier first read right now.',
+          items: [
+            'Snapshot is the surface PocketPilot uses for a calmer first look when top focus is still forming.',
+            'Routing notes stay compact instead of turning into alerts.',
+          ],
+        },
+      },
     };
 
     expect(

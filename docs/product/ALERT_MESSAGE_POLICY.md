@@ -1,15 +1,16 @@
-# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4)
+# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5)
 
 ## Why This Exists
-PocketPilot already had calm briefing and reorientation groundwork, but `P6` still needed one explicit product spine for messaging.
+PocketPilot already had calm briefing and reorientation groundwork, but `P6` needed one explicit product spine for messaging.
 
 P6-A1 created that spine.
 P6-A2 reused it for narrow Dashboard and Trade Hub rollout.
 P6-A3 made alert treatment profile-aware.
-P6-A4 now improves the interpreted input quality feeding that same seam.
+P6-A4 improved the interpreted input quality feeding the seam.
+P6-A5 adds one compact explanation layer so PocketPilot can say why the current message posture surfaced.
 
-The point is still not to make PocketPilot louder.
-The point is to make message treatment clearer, calmer, and more truthful.
+The goal is still not to make PocketPilot louder.
+The goal is to make message treatment clearer, calmer, and easier to trust.
 
 ## Message Families
 PocketPilot still uses five explicit message families:
@@ -33,21 +34,21 @@ Important distinctions:
 PocketPilot messaging must preserve:
 - calm over urgency
 - interpretation over raw signal leakage
-- user control over automation theatre
-- knowledge that empowers without gatekeeping
+- user trust over delivery-platform theatre
+- compact explanation over debug-style disclosure
 
-That means P6-A1 through P6-A4 still reject:
+That means P6-A1 through P6-A5 still reject:
 - push mechanics
 - unread counters
 - badge-count theatre
-- manipulative urgency
+- inbox or notification-center systems
+- generic toast or banner infrastructure
 - guilt framing
-- "toast everything" behavior
-- background delivery
+- user-editable sensitivity settings
 
 ## Richer Inputs Without Noise Inflation
-P6-A4 adds one service-owned prepared alert-input helper.
-It is explicit, bounded, and not user-editable in this phase.
+P6-A4 added one service-owned prepared alert-input helper.
+It remains explicit, bounded, and not user-editable in this phase.
 
 Current prepared inputs include:
 - clearer subject scope
@@ -64,6 +65,32 @@ Current posture:
 
 Richer inputs tune treatment.
 They do not rewrite the meaning of the message families.
+
+## User-Visible Rationale
+P6-A5 adds one optional user-visible rationale seam for surfaced messages only.
+
+It is:
+- calm
+- compact
+- explanatory
+- inline
+- service-owned
+
+It can explain:
+- why this note is a briefing, alert, referral, guarded stop, or reorientation message
+- why the posture stayed subdued where relevant
+- why the note belongs on the current surface
+
+It does not explain:
+- raw signals
+- score readouts
+- provider/runtime diagnostics
+- advice about what the user should do
+
+Typical examples:
+- "Shown as a briefing because the change is meaningful but not strong enough for an alert."
+- "Shown as a referral because Dashboard has useful context, but Snapshot is the steadier first read right now."
+- "Shown as a guarded stop because Trade Hub should keep the current boundary visible instead of carrying the path further."
 
 ## Current Consumer Surfaces
 Snapshot remains the main consumer for tuned alert behavior.
@@ -85,12 +112,13 @@ Dashboard and Trade Hub continue their existing P6-A2 rollout only:
 
 Those surfaces still:
 - consume prepared policy only
+- consume prepared rationale only
 - stay inline
 - avoid popup, badge, or inbox mechanics
 - avoid urgency theatre
 
 ## Threshold Posture
-P6-A4 keeps alerting narrower than "anything changed."
+P6-A4 and P6-A5 keep alerting narrower than "anything changed."
 
 Current tuning principles:
 - confirmed interpreted change is still required for alert treatment
@@ -100,12 +128,13 @@ Current tuning principles:
 - middling or thin context should suppress to no message
 - stronger stop and routing families stay semantically separate
 
-This gives PocketPilot fewer, better-shaped messages rather than broader message coverage.
+This gives PocketPilot fewer, better-shaped messages rather than broader coverage.
+Rationale then explains the chosen posture without widening the delivery model.
 
 ## What Future P6 Work Can Build On
 Later `P6` phases can build on this foundation by adding:
-- other high-trust interpreted inputs on the same seam
-- more explicit surface eligibility where a natural inline home exists
-- deeper calm copy refinement for existing families
+- more explicit rationale on other existing inline message surfaces
+- deeper calm copy refinement for current families
+- additional surface eligibility only where a natural inline home already exists
 
 Those future phases should extend the same message-policy seam rather than inventing a separate notification stack.
