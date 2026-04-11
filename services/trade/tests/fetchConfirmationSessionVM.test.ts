@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MarketEvent } from '@/core/types/marketEvent';
+import { createInMemoryPreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
@@ -534,14 +535,22 @@ describe('fetchConfirmationSessionVM', () => {
 
   it('changes the prepared risk frame without changing execution capability or default blocking posture', async () => {
     mockUpstreamContext();
+    const preferredRiskBasisStore = createInMemoryPreferredRiskBasisStore([
+      {
+        accountId: 'acct-live',
+        riskBasis: 'ACCOUNT_PERCENT',
+      },
+    ]);
 
     const accountPercentSession = await fetchConfirmationSessionVM({
       profile: 'ADVANCED',
       selectedRiskBasis: 'ACCOUNT_PERCENT',
+      preferredRiskBasisStore,
     });
     const fixedCurrencySession = await fetchConfirmationSessionVM({
       profile: 'ADVANCED',
       selectedRiskBasis: 'FIXED_CURRENCY',
+      preferredRiskBasisStore,
     });
 
     expect(fixedCurrencySession.session.executionCapability).toEqual(

@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder` + `PreferredRiskBasisResolver`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -34,6 +34,7 @@ Prepared plan in, bounded action path out.
 - `confirmationRequirements`
 - `riskBasisAvailability`
 - `selectedRiskBasis`
+- `preferredRiskBasisAvailability`
 - `riskPerTradeContext`
 - `positionSizing`
 - `boundedKnowledgeLinks[]`
@@ -61,6 +62,10 @@ Produces canonical plan options.
 
 ### Risk basis selector
 Determines which explicit risk bases are supported on the surface and preserves user-selected basis state without silent fallback in the app layer.
+It also seeds the prepared lane from one account-level preferred basis when the service layer has honestly saved one.
+
+### Preferred risk basis resolver
+Resolves the saved account-level preferred basis through the service-owned seam without introducing silent cross-account fallback.
 
 ### Risk-per-trade context builder
 Builds one calm prepared framing from selected basis, prepared plan references, and current selected-account context where honest.

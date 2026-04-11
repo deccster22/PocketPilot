@@ -24,10 +24,12 @@ function getSelectedBasisLabel(
 export function createPreparedTradeRiskLane(params: {
   plan: ProtectionPlan | null;
   requestedBasis?: RiskBasis | null;
+  preferredBasis?: RiskBasis | null;
   accountContext?: AccountRiskContext | null;
 }): PreparedTradeRiskLane {
+  const requestedBasis = params.requestedBasis ?? params.preferredBasis ?? null;
   const selection = selectRiskBasis({
-    requestedBasis: params.requestedBasis,
+    requestedBasis,
     isEnabledForSurface: params.plan !== null,
   });
 

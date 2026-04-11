@@ -84,6 +84,11 @@ describe('createTradeHubScreenViewData', () => {
           hasPrimaryPlan: true,
           profile: 'ADVANCED',
           requiresConfirmation: true,
+          preferredRiskBasisAvailability: {
+            status: 'AVAILABLE',
+            accountId: 'acct-live',
+            preferredBasis: 'FIXED_CURRENCY',
+          },
         },
       },
       unavailableMessagePolicy(),
@@ -98,6 +103,7 @@ describe('createTradeHubScreenViewData', () => {
       },
       risk: {
         selectedBasisLabel: 'Fixed currency',
+        preferredRiskBasisText: 'Usual basis for this account: Fixed currency',
         statusText: 'Prepared risk context available',
         headline: 'Fixed-currency risk frame',
         summary:
@@ -159,12 +165,25 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).toMatch(/messagePolicy\.rationale/);
     expect(source).toMatch(/surface\.risk\.basisAvailability\.status !== 'AVAILABLE'/);
+    expect(source).toMatch(/surface\.meta\.preferredRiskBasisAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
       /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);
+    expect(source).not.toMatch(
+      /updatePreferredRiskBasis|preferredRiskBasisStore|normalisePreferredRiskBasisState|createInMemoryPreferredRiskBasisStore/,
+    );
+  });
+
+  it('keeps preferred-basis persistence routed through the screen component service seam, not a screen-owned store', () => {
+    const source = readFileSync(join(process.cwd(), 'app', 'screens', 'TradeHubScreen.tsx'), 'utf8');
+
+    expect(source).toMatch(/updatePreferredRiskBasis/);
+    expect(source).not.toMatch(
+      /preferredRiskBasisStore|normalisePreferredRiskBasisState|createInMemoryPreferredRiskBasisStore/,
+    );
   });
 
   it('passes through the prepared guarded-stop note and rationale without classifying it locally', () => {
@@ -213,6 +232,10 @@ describe('createTradeHubScreenViewData', () => {
             hasPrimaryPlan: false,
             profile: 'ADVANCED',
             requiresConfirmation: true,
+            preferredRiskBasisAvailability: {
+              status: 'UNAVAILABLE',
+              reason: 'NO_ACCOUNT_CONTEXT',
+            },
           },
         },
         messagePolicy,

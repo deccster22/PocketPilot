@@ -4,7 +4,9 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
+import { fetchPreferredRiskBasis } from '@/services/trade/fetchPreferredRiskBasis';
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
+import type { PreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
 import type { RiskBasis, TradePlanPreview } from '@/services/trade/types';
@@ -27,6 +29,7 @@ export async function fetchTradePlanPreviewVM(params: {
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
+  preferredRiskBasisStore?: Pick<PreferredRiskBasisStore, 'load'>;
 }): Promise<TradePlanPreviewVM> {
   const upstream = await fetchSurfaceContext({
     profile: params.profile,
@@ -56,9 +59,21 @@ export async function fetchTradePlanPreviewVM(params: {
           baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
         }
       : null;
+  const preferredRiskBasisAvailability = await fetchPreferredRiskBasis({
+    accountId:
+      upstream.selectedAccountContext.status === 'AVAILABLE'
+        ? upstream.selectedAccountContext.account.accountId
+        : null,
+    isEnabledForSurface: selectedPlan !== null,
+    preferredRiskBasisStore: params.preferredRiskBasisStore,
+  });
   const risk = createPreparedTradeRiskLane({
     plan: selectedPlan,
     requestedBasis: params.selectedRiskBasis,
+    preferredBasis:
+      preferredRiskBasisAvailability.status === 'AVAILABLE'
+        ? preferredRiskBasisAvailability.preferredBasis
+        : null,
     accountContext: selectedAccountSizingContext,
   });
 

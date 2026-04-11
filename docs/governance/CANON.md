@@ -105,7 +105,6 @@ Strategy alignment, meaningful events, and action-support logic must be derived 
 
 - Risk basis should remain explicit and legible
 - Any user-selected risk basis must flow into `ProtectionPlan` and related summaries
-- Prepared sizing and max-loss outputs may be derived from that same plan and basis, but they stay informational and non-enforcing
 
 ### 8. ProtectionPlan Object
 
@@ -137,7 +136,6 @@ type ProtectionPlan = {
 ```
 
 - Calculator logic is platform-independent
-- Prepared sizing/max-loss shaping stays in services and does not become a hidden enforcement layer
 - Execution layer adapts per platform capability
 - Bracket/OCO supported -> single API flow
 - Separate orders required -> post-trade guided sequence

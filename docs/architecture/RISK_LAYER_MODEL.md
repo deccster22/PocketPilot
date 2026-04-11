@@ -36,6 +36,7 @@ Possible core objects:
 ## 4. Responsibilities
 - calculate structured risk context
 - keep selected risk basis explicit and legible
+- remember one preferred basis per account through a service-owned seam
 - prepare bounded review outputs for Trade Hub
 - support stop loss / take profit explanation
 - provide consistent max loss / position sizing / risk-reward logic
@@ -49,6 +50,7 @@ Possible core objects:
 - confidence-honest
 - support-not-enforcement unless future policy explicitly changes that
 - selected risk basis must flow through prepared summaries
+- account-level preferred basis may seed the selected basis, but it must remain explicit in the prepared contract
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -62,6 +64,7 @@ Possible core objects:
 - duplicated risk math in presentation layers
 - raw constraint leakage without explanation
 - "discipline scoring" disguised as risk support
+- hidden preferred-basis switching in app code
 
 ## 8. Testing expectations
 - calculation correctness tests
