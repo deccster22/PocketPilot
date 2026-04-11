@@ -170,6 +170,76 @@ export type YearInReviewVM = {
   availability: YearInReviewAvailability;
 };
 
+export type JournalContextType = 'PERIOD_SUMMARY' | 'YEAR_IN_REVIEW' | 'GENERAL_REFLECTION';
+
+export type JournalEntryContext =
+  | {
+      contextType: 'GENERAL_REFLECTION';
+    }
+  | {
+      contextType: 'PERIOD_SUMMARY';
+      period: ReflectionPeriod | null;
+    }
+  | {
+      contextType: 'YEAR_IN_REVIEW';
+      period?: AnnualReviewPeriod | null;
+    };
+
+export type JournalEntry = {
+  entryId: string;
+  contextType: JournalContextType;
+  contextId: string | null;
+  title: string;
+  linkageLabel: string | null;
+  body: string;
+  updatedAtLabel: string | null;
+};
+
+export type JournalEntryAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NOT_ENABLED_FOR_SURFACE' | 'NO_JOURNAL_CONTEXT';
+    }
+  | {
+      status: 'AVAILABLE';
+      entry: JournalEntry | null;
+    };
+
+export type JournalEntryVM = {
+  generatedAt: string | null;
+  title: string | null;
+  linkageLabel: string | null;
+  availability: JournalEntryAvailability;
+};
+
+export type JournalEntrySaveResult =
+  | {
+      status: 'SAVED';
+      entry: JournalEntry;
+    }
+  | {
+      status: 'REJECTED';
+      reason:
+        | 'EMPTY_BODY'
+        | 'ENTRY_ALREADY_EXISTS'
+        | 'NOT_ENABLED_FOR_SURFACE'
+        | 'NO_JOURNAL_CONTEXT';
+    };
+
+export type JournalEntryUpdateResult =
+  | {
+      status: 'UPDATED';
+      entry: JournalEntry;
+    }
+  | {
+      status: 'REJECTED';
+      reason:
+        | 'EMPTY_BODY'
+        | 'ENTRY_NOT_FOUND'
+        | 'NOT_ENABLED_FOR_SURFACE'
+        | 'NO_JOURNAL_CONTEXT';
+    };
+
 export type ExportFormat = 'PDF_SUMMARY' | 'CSV_SUMMARY' | 'CSV_EVENT_LEDGER';
 
 export type ExportOption = {

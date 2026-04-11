@@ -18,6 +18,7 @@ function YearInReviewItemCard(params: { item: YearInReviewItemViewData }) {
 
 export function InsightsYearInReviewScreen(params: {
   yearInReviewVM: YearInReviewVM | null;
+  onOpenJournal?: () => void;
   onBack: () => void;
 }) {
   const screenView = createInsightsYearInReviewScreenViewData(params.yearInReviewVM);
@@ -64,6 +65,20 @@ export function InsightsYearInReviewScreen(params: {
               </Text>
             ))}
           </View>
+        ) : null}
+
+        {params.onOpenJournal ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={params.onOpenJournal}
+            style={styles.journalButton}
+          >
+            <Text style={styles.journalButtonText}>Open note for this review</Text>
+            <Text style={styles.journalButtonSummary}>
+              Keep a small optional note tied to this annual review if you want a little more of
+              your own context.
+            </Text>
+          </Pressable>
         ) : null}
       </ScrollView>
     </SafeAreaView>
@@ -175,6 +190,24 @@ const styles = StyleSheet.create({
   limitationText: {
     fontSize: 12,
     lineHeight: 18,
+    color: '#475569',
+  },
+  journalButton: {
+    gap: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    padding: 14,
+  },
+  journalButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  journalButtonSummary: {
+    fontSize: 13,
+    lineHeight: 19,
     color: '#475569',
   },
 });

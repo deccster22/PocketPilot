@@ -59,6 +59,7 @@ Start with:
 - User-directed. No hidden automation or silent control shifts.
 - Calm reflection only. Monthly, quarterly, annual, and archived Insights readbacks stay descriptive and non-moralizing.
 - Reflection exports stay explicit and service-owned. Export options must state what they contain, remain profile-aware, and keep internal diagnostics out of user-facing output.
+- Journal notes stay optional and small. The first Insights journal lane remains text-only, context-linked, service-owned, and free of reminders, scorekeeping, or AI commentary.
 - Explicit risk framing. Selected risk basis must stay legible and flow through prepared Trade Hub summaries.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.

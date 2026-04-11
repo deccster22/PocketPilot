@@ -15,7 +15,8 @@ Reflection should help users remember what mattered, not make them perform self-
 - Summary Archive is the calm service-owned shelf where prepared period readbacks can be revisited later.
 - Year in Review is one calm service-owned annual debrief built from the last completed calendar year.
 - Export foundation is one calm service-owned preparation seam for reflection output that is already ready under Insights.
-- Log and Journal remain optional user-authored meaning layers for later phases.
+- Journal groundwork now adds one calm service-owned note subsection under Insights with explicit fetch / save / update seams.
+- Log remains a later phase; journal scope is still intentionally narrow.
 
 These layers should stay related without collapsing into one mixed voice.
 
@@ -47,6 +48,9 @@ Deeper, slower, and more reflective.
 - Year in Review stays calm, service-owned, and descriptive rather than evaluative
 - summary archive stays service-owned, descriptive, and browseable without theatre
 - reflection exports stay service-owned, explicit about coverage, timezone-labeled, and profile-aware
+- the first journal lane stays service-owned, text-only, context-linked, and optional
+- journal save / update stays explicit and user-authored
+- no reminders, no AI commentary, and no behavior scoring
 - no scorecards, streaks, or performance theatre
 
 ## What monthly / quarterly summaries are for
@@ -75,11 +79,19 @@ Deeper, slower, and more reflective.
 - keep period selection explicit and timezone labeling visible for CSV-oriented exports
 - stay narrower than a report center, export-management suite, or journaling workflow
 
+## What the journal groundwork is for
+
+- support one small optional note attached to a calm reflection context under Insights
+- keep journal linkage, availability, and saved-note shaping in `services/`
+- keep `app/` on prepared journal contracts rather than local context derivation
+- preserve the user's own wording without rewriting, judging, or coaching it
+- stay narrower than a general-purpose notes app, reminder system, or analytics product
+
 ## What this family is not
 
 - not a mini report card
 - not a giant export digest or export-management center
-- not freeform journaling in this phase
+- not a full notes app in this phase
 - not a guilt loop
 - not a behavior-scoring system
 
@@ -94,4 +106,6 @@ Deeper, slower, and more reflective.
 - performance-style annual recaps
 - archive-as-dashboard drift
 - export-center drift
+- reminder-driven journaling
+- note-center drift
 - AI-generated reflection commentary
