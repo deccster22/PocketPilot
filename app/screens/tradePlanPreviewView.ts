@@ -1,4 +1,20 @@
-import type { TradeHubActionState, TradePlanPreview } from '@/services/trade/types';
+import type {
+  PositionSizingAvailability,
+  PositionSizingUnavailableReason,
+  TradeHubActionState,
+  TradePlanPreview,
+} from '@/services/trade/types';
+
+export type TradePlanSizingViewData = {
+  statusText: string;
+  headline: string;
+  summary: string;
+  details: ReadonlyArray<{
+    label: string;
+    value: string;
+  }>;
+  notes: ReadonlyArray<string>;
+};
 
 export type TradePlanPreviewViewData = {
   planId: string;
@@ -19,6 +35,7 @@ export type TradePlanPreviewViewData = {
     label: string;
     value: string;
   }>;
+  positionSizing: TradePlanSizingViewData;
 };
 
 function formatIntentLabel(intentType: TradePlanPreview['headline']['intentType']): string {
@@ -57,6 +74,49 @@ function formatConstraintsText(preview: TradePlanPreview): string {
   }
 
   return parts.join(' | ');
+}
+
+function createPositionSizingViewData(
+  sizing: PositionSizingAvailability,
+): TradePlanSizingViewData {
+  if (sizing.status === 'AVAILABLE') {
+    return {
+      statusText: 'Prepared sizing available',
+      headline: sizing.output.sizeLabel,
+      summary: 'Shows the prepared position size and stop-based max loss from this selected plan.',
+      details: [
+        {
+          label: 'Position size',
+          value: sizing.output.sizeValue,
+        },
+        {
+          label: sizing.output.maxLossLabel,
+          value: sizing.output.maxLossValue,
+        },
+      ],
+      notes: [...sizing.output.notes],
+    };
+  }
+
+  const summaryByReason: Record<PositionSizingUnavailableReason, string> = {
+    INSUFFICIENT_INPUTS:
+      'PocketPilot can frame this readout once the prepared plan carries enough entry, stop, cap, and account context.',
+    NOT_ENABLED_FOR_SURFACE: 'Position sizing is not enabled on this surface yet.',
+    UNSUPPORTED_RISK_BASIS: 'Position sizing cannot frame the selected risk basis yet.',
+  };
+
+  return {
+    statusText: 'Prepared sizing unavailable',
+    headline: 'Position sizing unavailable',
+    summary: summaryByReason[sizing.reason],
+    details: [
+      {
+        label: 'Needed',
+        value: 'Prepared entry, prepared stop, a prepared position cap, and current account value',
+      },
+    ],
+    notes: ['Support-only readout; no order path is opened here.'],
+  };
 }
 
 export function createTradePlanPreviewViewData(
@@ -98,5 +158,6 @@ export function createTradePlanPreviewViewData(
         label: item.label,
         value: item.value,
       })) ?? [],
+    positionSizing: createPositionSizingViewData(preview.positionSizing),
   };
 }

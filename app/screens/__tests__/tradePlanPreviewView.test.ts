@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { createTradePlanPreviewViewData } from '@/app/screens/tradePlanPreviewView';
 
 describe('createTradePlanPreviewViewData', () => {
@@ -70,6 +73,19 @@ describe('createTradePlanPreviewViewData', () => {
           ],
         },
       },
+      positionSizing: {
+        status: 'AVAILABLE',
+        output: {
+          sizeLabel: 'Position size (Account %)',
+          sizeValue: '10 units at $1,000.00 cap',
+          maxLossLabel: 'Max loss at stop',
+          maxLossValue: '$50.00',
+          notes: [
+            'Prepared entry $100.00 to stop $95.00.',
+            'Support-only readout; no order path is opened here.',
+          ],
+        },
+      },
     });
 
     expect(view).toEqual({
@@ -97,6 +113,25 @@ describe('createTradePlanPreviewViewData', () => {
           value: '$50.00',
         },
       ],
+      positionSizing: {
+        statusText: 'Prepared sizing available',
+        headline: 'Position size (Account %)',
+        summary: 'Shows the prepared position size and stop-based max loss from this selected plan.',
+        details: [
+          {
+            label: 'Position size',
+            value: '10 units at $1,000.00 cap',
+          },
+          {
+            label: 'Max loss at stop',
+            value: '$50.00',
+          },
+        ],
+        notes: [
+          'Prepared entry $100.00 to stop $95.00.',
+          'Support-only readout; no order path is opened here.',
+        ],
+      },
       confirmationText:
         'This is a framed plan preview only. A future confirmation step is still required.',
       placeholderText: 'Order and execution previews are placeholder-only in this phase.',
@@ -105,5 +140,14 @@ describe('createTradePlanPreviewViewData', () => {
 
   it('returns null when no prepared preview is available', () => {
     expect(createTradePlanPreviewViewData(null)).toBeNull();
+  });
+
+  it('keeps position-sizing math out of the app view helper', () => {
+    const source = readFileSync(join(process.cwd(), 'app', 'screens', 'tradePlanPreviewView.ts'), 'utf8');
+
+    expect(source).not.toMatch(/Math\.abs/);
+    expect(source).not.toMatch(/positionValue\s*\/\s*entryPrice/);
+    expect(source).not.toMatch(/maxLoss\s*\/\s*accountValue/);
+    expect(source).toMatch(/createPositionSizingViewData/);
   });
 });

@@ -29,6 +29,8 @@ Possible core objects:
 - `MaxLossModel`
 - `RiskBasisAvailability`
 - `RiskPerTradeContext`
+- `PositionSizingOutput`
+- `PositionSizingAvailability`
 - `ReadinessState`
 
 ## 4. Responsibilities
@@ -37,6 +39,7 @@ Possible core objects:
 - prepare bounded review outputs for Trade Hub
 - support stop loss / take profit explanation
 - provide consistent max loss / position sizing / risk-reward logic
+- shape one canonical prepared sizing/max-loss output from the same service-owned inputs
 - prepare risk-per-trade context without turning it into advice
 - expose readiness constraints without silently overriding the user
 
@@ -65,6 +68,7 @@ Possible core objects:
 - explicit-basis selection tests
 - account-scope tests
 - consumer contract tests
+- sizing-output availability tests
 - support-vs-enforcement boundary tests
 
 ## 9. Relationship to other docs

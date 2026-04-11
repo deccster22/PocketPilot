@@ -49,20 +49,23 @@ export async function fetchTradePlanPreviewVM(params: {
     profile: params.profile,
     selectedPlanId: params.selectedPlanId,
   });
+  const selectedAccountSizingContext =
+    upstream.selectedAccountContext.status === 'AVAILABLE'
+      ? {
+          portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
+          baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
+        }
+      : null;
   const risk = createPreparedTradeRiskLane({
     plan: selectedPlan,
     requestedBasis: params.selectedRiskBasis,
-    accountContext:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? {
-            portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
-            baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
-          }
-        : null,
+    accountContext: selectedAccountSizingContext,
   });
 
   return {
-    preview: selectedPlan ? createTradePlanPreview(selectedPlan, risk) : null,
+    preview: selectedPlan
+      ? createTradePlanPreview(selectedPlan, risk, selectedAccountSizingContext)
+      : null,
     selectedPlanId: selectedPlan?.planId ?? null,
     scan: upstream.scan,
   };

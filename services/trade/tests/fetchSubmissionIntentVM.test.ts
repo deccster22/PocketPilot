@@ -91,6 +91,10 @@ function createSession(pathType: 'BRACKET' | 'GUIDED_SEQUENCE', acknowledged = t
         executionPreviewAvailable: false,
       },
       risk: createPreviewRisk(),
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
     },
     shell: {
       planId: 'plan-btc',

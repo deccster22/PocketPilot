@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -35,6 +35,7 @@ Prepared plan in, bounded action path out.
 - `riskBasisAvailability`
 - `selectedRiskBasis`
 - `riskPerTradeContext`
+- `positionSizing`
 - `boundedKnowledgeLinks[]`
 - `rationaleSummary`
 
@@ -64,6 +65,9 @@ Determines which explicit risk bases are supported on the surface and preserves 
 ### Risk-per-trade context builder
 Builds one calm prepared framing from selected basis, prepared plan references, and current selected-account context where honest.
 
+### Prepared sizing output builder
+Builds one calm prepared position-sizing and max-loss readout from the selected basis, prepared plan references, and current selected-account context where honest.
+
 ### Capability mapper
 Determines valid execution path by venue / platform constraints.
 
@@ -79,6 +83,7 @@ Ensures required confirmation steps remain intact.
 - confirmation-required tests
 - risk-basis explicitness tests
 - prepared risk-context recomputation tests
+- prepared sizing-output availability tests
 - profile visibility tests
 - knowledge-link boundary tests
 

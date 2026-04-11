@@ -3,11 +3,16 @@ import type {
   ProtectionPlan,
   TradePlanPreview,
 } from '@/services/trade/types';
+import { createPositionSizingOutput } from '@/services/trade/createPositionSizingOutput';
 import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
 
 export function createTradePlanPreview(
   plan: ProtectionPlan,
   risk: PreparedTradeRiskLane,
+  accountContext?: {
+    portfolioValue: number | null;
+    baseCurrency: string | null;
+  } | null,
 ): TradePlanPreview {
   return {
     planId: plan.planId,
@@ -40,5 +45,10 @@ export function createTradePlanPreview(
       executionPreviewAvailable: false,
     },
     risk,
+    positionSizing: createPositionSizingOutput({
+      plan,
+      risk,
+      accountContext: accountContext ?? null,
+    }),
   };
 }

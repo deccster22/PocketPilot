@@ -61,6 +61,29 @@ export type RiskPerTradeContext = {
   reason?: 'MISSING_ACCOUNT_VALUE' | 'MISSING_POSITION_CAP' | 'MISSING_PRICE_REFERENCES';
 };
 
+export type PositionSizingOutput = {
+  sizeLabel: string;
+  sizeValue: string;
+  maxLossLabel: string;
+  maxLossValue: string;
+  notes: ReadonlyArray<string>;
+};
+
+export type PositionSizingUnavailableReason =
+  | 'INSUFFICIENT_INPUTS'
+  | 'UNSUPPORTED_RISK_BASIS'
+  | 'NOT_ENABLED_FOR_SURFACE';
+
+export type PositionSizingAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: PositionSizingUnavailableReason;
+    }
+  | {
+      status: 'AVAILABLE';
+      output: PositionSizingOutput;
+    };
+
 export type PreparedTradeRiskLane = {
   activeBasis: RiskBasis | null;
   activeBasisLabel: string | null;
@@ -142,6 +165,7 @@ export type TradePlanPreview = {
     executionPreviewAvailable: boolean;
   };
   risk: PreparedTradeRiskLane;
+  positionSizing: PositionSizingAvailability;
 };
 
 export type AccountCapabilityContext = {

@@ -113,6 +113,10 @@ function createSession(
         executionPreviewAvailable: false,
       },
       risk: createPreviewRisk(),
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
     },
     shell: createShell(pathType),
     flow: null,

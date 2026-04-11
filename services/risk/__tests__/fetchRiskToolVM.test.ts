@@ -84,6 +84,10 @@ function createConfirmationSession(
         executionPreviewAvailable: false,
       },
       risk: createPreviewRisk(),
+      positionSizing: {
+        status: 'UNAVAILABLE' as const,
+        reason: 'INSUFFICIENT_INPUTS' as const,
+      },
     },
     shell: {
       planId: 'plan-btc',
