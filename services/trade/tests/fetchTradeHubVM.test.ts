@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MarketEvent } from '@/core/types/marketEvent';
+import { createInMemoryPreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
@@ -43,6 +44,12 @@ describe('fetchTradeHubVM', () => {
   it('builds a prepared trade hub surface from shared upstream truth', async () => {
     const upstreamEvent = createEvent();
     const nowProvider = () => 1_700_000_000_100;
+    const preferredRiskBasisStore = createInMemoryPreferredRiskBasisStore([
+      {
+        accountId: 'acct-live',
+        riskBasis: 'POSITION_PERCENT',
+      },
+    ]);
 
     mockFetchSurfaceContext.mockResolvedValue({
       selectedAccountContext: {
@@ -151,8 +158,8 @@ describe('fetchTradeHubVM', () => {
 
     const result = await fetchTradeHubVM({
       profile: 'ADVANCED',
-      selectedRiskBasis: 'FIXED_CURRENCY',
       nowProvider,
+      preferredRiskBasisStore,
     });
 
     expect(mockFetchSurfaceContext).toHaveBeenCalledWith({
@@ -180,11 +187,11 @@ describe('fetchTradeHubVM', () => {
       },
       alternativePlans: [],
       risk: {
-        activeBasis: 'FIXED_CURRENCY',
-        activeBasisLabel: 'Fixed currency',
+        activeBasis: 'POSITION_PERCENT',
+        activeBasisLabel: 'Position %',
         basisAvailability: {
           status: 'AVAILABLE',
-          selectedBasis: 'FIXED_CURRENCY',
+          selectedBasis: 'POSITION_PERCENT',
           options: [
             {
               basis: 'ACCOUNT_PERCENT',
@@ -194,29 +201,29 @@ describe('fetchTradeHubVM', () => {
             {
               basis: 'FIXED_CURRENCY',
               label: 'Fixed currency',
-              isSelected: true,
+              isSelected: false,
             },
             {
               basis: 'POSITION_PERCENT',
               label: 'Position %',
-              isSelected: false,
+              isSelected: true,
             },
           ],
         },
         context: {
           status: 'AVAILABLE',
-          basis: 'FIXED_CURRENCY',
-          headline: 'Fixed-currency risk frame',
+          basis: 'POSITION_PERCENT',
+          headline: 'Position % risk frame',
           summary:
-            'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+            'Shows the capped loss from this prepared plan as a share of the capped position value using prepared references only.',
           items: [
             {
               label: 'Risk per trade',
-              value: '$50.00',
+              value: '5.00%',
             },
             {
-              label: 'Position cap value',
-              value: '$1,000.00',
+              label: 'Max loss at cap',
+              value: '$50.00',
             },
             {
               label: 'Position cap used',
@@ -233,6 +240,11 @@ describe('fetchTradeHubVM', () => {
         hasPrimaryPlan: true,
         profile: 'ADVANCED',
         requiresConfirmation: true,
+        preferredRiskBasisAvailability: {
+          status: 'AVAILABLE',
+          accountId: 'acct-live',
+          preferredBasis: 'POSITION_PERCENT',
+        },
       },
     });
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MarketEvent } from '@/core/types/marketEvent';
+import { createInMemoryPreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { fetchTradePlanPreviewVM } from '@/services/trade/fetchTradePlanPreviewVM';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
@@ -370,6 +371,12 @@ describe('fetchTradePlanPreviewVM', () => {
 
     const result = await fetchTradePlanPreviewVM({
       profile: 'ADVANCED',
+      preferredRiskBasisStore: createInMemoryPreferredRiskBasisStore([
+        {
+          accountId: 'acct-live',
+          riskBasis: 'POSITION_PERCENT',
+        },
+      ]),
     });
 
     expect(result.selectedPlanId).toBe(
@@ -380,17 +387,17 @@ describe('fetchTradePlanPreviewVM', () => {
       symbol: 'BTC',
       actionState: 'READY',
     });
-    expect(result.preview?.risk.activeBasis).toBe('ACCOUNT_PERCENT');
+    expect(result.preview?.risk.activeBasis).toBe('POSITION_PERCENT');
     expect(result.preview?.risk.context).toEqual({
       status: 'AVAILABLE',
-      basis: 'ACCOUNT_PERCENT',
-      headline: 'Account % risk frame',
+      basis: 'POSITION_PERCENT',
+      headline: 'Position % risk frame',
       summary:
-        'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+        'Shows the capped loss from this prepared plan as a share of the capped position value using prepared references only.',
       items: [
         {
           label: 'Risk per trade',
-          value: '0.50%',
+          value: '5.00%',
         },
         {
           label: 'Max loss at cap',

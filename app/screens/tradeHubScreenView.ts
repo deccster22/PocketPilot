@@ -23,6 +23,7 @@ export type TradeHubScreenPlanViewData = {
 
 export type TradeHubRiskViewData = {
   selectedBasisLabel: string;
+  preferredRiskBasisText: string;
   statusText: string;
   headline: string;
   summary: string;
@@ -57,6 +58,32 @@ export type TradeHubScreenViewData = {
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
+
+function formatPreferredRiskBasisText(surface: TradeHubSurfaceModel): string {
+  const preferredRiskBasisAvailability = surface.meta.preferredRiskBasisAvailability;
+
+  if (preferredRiskBasisAvailability.status === 'UNAVAILABLE') {
+    switch (preferredRiskBasisAvailability.reason) {
+      case 'NO_ACCOUNT_CONTEXT':
+        return 'No account context is available to remember a usual basis.';
+      default:
+        return 'Preferred basis is not enabled for this surface.';
+    }
+  }
+
+  if (preferredRiskBasisAvailability.preferredBasis === null) {
+    return 'Usual basis for this account: not saved yet.';
+  }
+
+  const preferredLabel =
+    surface.risk.basisAvailability.status === 'AVAILABLE'
+      ? surface.risk.basisAvailability.options.find(
+          (option) => option.basis === preferredRiskBasisAvailability.preferredBasis,
+        )?.label ?? preferredRiskBasisAvailability.preferredBasis
+      : preferredRiskBasisAvailability.preferredBasis;
+
+  return `Usual basis for this account: ${preferredLabel}`;
+}
 
 function formatIntentLabel(plan: TradeHubPlanCard): string {
   switch (plan.intentType) {
@@ -127,6 +154,7 @@ function createTradeHubRiskViewData(surface: TradeHubSurfaceModel): TradeHubRisk
 
   return {
     selectedBasisLabel: surface.risk.activeBasisLabel,
+    preferredRiskBasisText: formatPreferredRiskBasisText(surface),
     statusText:
       surface.risk.context.status === 'AVAILABLE'
         ? 'Prepared risk context available'

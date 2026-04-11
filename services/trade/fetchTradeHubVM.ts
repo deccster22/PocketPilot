@@ -5,6 +5,8 @@ import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
+import { fetchPreferredRiskBasis } from '@/services/trade/fetchPreferredRiskBasis';
+import type { PreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
 import type { RiskBasis, TradeHubSurfaceModel } from '@/services/trade/types';
@@ -26,6 +28,7 @@ export async function fetchTradeHubVM(params: {
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
+  preferredRiskBasisStore?: Pick<PreferredRiskBasisStore, 'load'>;
 }): Promise<TradeHubVM> {
   const upstream = await fetchSurfaceContext({
     profile: params.profile,
@@ -48,9 +51,21 @@ export async function fetchTradeHubVM(params: {
     profile: params.profile,
     selectedPlanId: params.selectedPlanId ?? undefined,
   });
+  const preferredRiskBasisAvailability = await fetchPreferredRiskBasis({
+    accountId:
+      upstream.selectedAccountContext.status === 'AVAILABLE'
+        ? upstream.selectedAccountContext.account.accountId
+        : null,
+    isEnabledForSurface: selectedPlan !== null,
+    preferredRiskBasisStore: params.preferredRiskBasisStore,
+  });
   const risk = createPreparedTradeRiskLane({
     plan: selectedPlan,
     requestedBasis: params.selectedRiskBasis,
+    preferredBasis:
+      preferredRiskBasisAvailability.status === 'AVAILABLE'
+        ? preferredRiskBasisAvailability.preferredBasis
+        : null,
     accountContext:
       upstream.selectedAccountContext.status === 'AVAILABLE'
         ? {
@@ -65,6 +80,7 @@ export async function fetchTradeHubVM(params: {
       profile: params.profile,
       protectionPlans,
       risk,
+      preferredRiskBasisAvailability,
     }),
     scan: upstream.scan,
   };

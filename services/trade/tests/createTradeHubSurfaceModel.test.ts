@@ -136,6 +136,10 @@ describe('createTradeHubSurfaceModel', () => {
         hasPrimaryPlan: true,
         profile: 'BEGINNER',
         requiresConfirmation: true,
+        preferredRiskBasisAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_ACCOUNT_CONTEXT',
+        },
       },
     });
   });
@@ -231,6 +235,10 @@ describe('createTradeHubSurfaceModel', () => {
         hasPrimaryPlan: false,
         profile: 'ADVANCED',
         requiresConfirmation: true,
+        preferredRiskBasisAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_ACCOUNT_CONTEXT',
+        },
       },
     });
   });

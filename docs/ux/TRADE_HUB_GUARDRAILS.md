@@ -24,6 +24,7 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 - no casino behavior
 - capability-aware execution paths
 - account-scoped truth
+- account-level preferred risk basis may seed the lane, but it must stay explicit and service-owned
 - bounded explanatory content
 - strategy / risk / regime layers must not collapse into a silent override engine
 
@@ -33,6 +34,7 @@ Trade Hub may:
 - provide SL / TP calculator access
 - show position size, max loss, and risk / reward outputs
 - expose one calm, explicit risk-basis selector when the prepared contract supports it
+- show one calm account-level preferred-basis starting point when it exists
 - show prepared risk-per-trade context that explains framing without pushing action
 - present readiness / constraints / rationale
 - expose confirmation-safe quick actions where allowed
@@ -45,6 +47,8 @@ Trade Hub must not:
 - pressure users with urgency copy
 - force education before use
 - behave like a slot machine with buttons
+- hide a preferred basis behind a global default
+- mutate preferred-basis state in app-owned persistence code
 
 ## 5. ProtectionPlan posture
 `ProtectionPlan` is the main logic object behind action framing.

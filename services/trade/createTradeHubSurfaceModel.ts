@@ -1,6 +1,7 @@
 import type { UserProfile } from '@/core/profile/types';
 import type {
   PreparedTradeRiskLane,
+  PreferredRiskBasisAvailability,
   ProtectionPlan,
   ProtectionPlanIntentType,
   TradeHubActionState,
@@ -32,6 +33,11 @@ const ALTERNATIVE_LIMIT_BY_PROFILE: Record<UserProfile, number> = {
   BEGINNER: 1,
   MIDDLE: 2,
   ADVANCED: 3,
+};
+
+const UNAVAILABLE_PREFERRED_RISK_BASIS: PreferredRiskBasisAvailability = {
+  status: 'UNAVAILABLE',
+  reason: 'NO_ACCOUNT_CONTEXT',
 };
 
 function createPlanCard(plan: ProtectionPlan): TradeHubPlanCard {
@@ -78,6 +84,7 @@ export function createTradeHubSurfaceModel(params: {
   profile: UserProfile;
   protectionPlans: ReadonlyArray<ProtectionPlan>;
   risk: PreparedTradeRiskLane;
+  preferredRiskBasisAvailability?: PreferredRiskBasisAvailability;
 }): TradeHubSurfaceModel {
   const planCards = sortPlanCards(params.protectionPlans.map(createPlanCard));
   const primaryPlan = planCards[0] ?? null;
@@ -91,6 +98,8 @@ export function createTradeHubSurfaceModel(params: {
       hasPrimaryPlan: primaryPlan !== null,
       profile: params.profile,
       requiresConfirmation: true,
+      preferredRiskBasisAvailability:
+        params.preferredRiskBasisAvailability ?? UNAVAILABLE_PREFERRED_RISK_BASIS,
     },
   };
 }

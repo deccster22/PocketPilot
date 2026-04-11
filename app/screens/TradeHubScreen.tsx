@@ -29,6 +29,7 @@ import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadin
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
+import { updatePreferredRiskBasis } from '@/services/trade/updatePreferredRiskBasis';
 import type { MessagePolicyAvailability } from '@/services/messages/types';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type { RiskToolVM } from '@/services/risk/types';
@@ -191,6 +192,15 @@ export function TradeHubScreen() {
       isMounted = false;
     };
   }, [profile, baselineScan, selectedPlanId, selectedRiskBasis]);
+
+  const preferredRiskBasisAccountId =
+    surfaceModel?.meta.preferredRiskBasisAvailability.status === 'AVAILABLE'
+      ? surfaceModel.meta.preferredRiskBasisAvailability.accountId
+      : null;
+
+  useEffect(() => {
+    setSelectedRiskBasis(undefined);
+  }, [preferredRiskBasisAccountId]);
 
   const screenView = useMemo(
     () => createTradeHubScreenViewData(surfaceModel, messagePolicy),
@@ -484,6 +494,11 @@ export function TradeHubScreen() {
 
   function handleSelectRiskBasis(basis: RiskBasis) {
     setSelectedRiskBasis(basis);
+
+    void updatePreferredRiskBasis({
+      accountId: preferredRiskBasisAccountId,
+      riskBasis: basis,
+    }).catch(() => undefined);
   }
 
   function handleRiskToolInputChange(field: keyof RiskToolInputFormState, value: string) {
@@ -562,6 +577,7 @@ export function TradeHubScreen() {
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Prepared risk framing</Text>
               <Text style={styles.cardTitle}>{screenView.risk.selectedBasisLabel}</Text>
+              <Text style={styles.cardMeta}>{screenView.risk.preferredRiskBasisText}</Text>
               <Text style={styles.cardMeta}>{screenView.risk.statusText}</Text>
               <Text style={styles.cardMeta}>{screenView.risk.headline}</Text>
               <View style={styles.toggleRow}>

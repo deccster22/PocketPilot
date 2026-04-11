@@ -9,9 +9,11 @@ import { createConfirmationFlowActions } from '@/services/trade/createConfirmati
 import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { normalisePreparedRiskReferences } from '@/services/trade/createPreparedRiskReferences';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
+import { fetchPreferredRiskBasis } from '@/services/trade/fetchPreferredRiskBasis';
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
 import { getAccountCapabilities } from '@/services/trade/getAccountCapabilities';
+import type { PreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { resolveExecutionCapability } from '@/services/trade/resolveExecutionCapability';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
@@ -40,6 +42,7 @@ export async function fetchConfirmationSessionVM(params: {
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
   lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
+  preferredRiskBasisStore?: Pick<PreferredRiskBasisStore, 'load'>;
 }): Promise<ConfirmationSessionVM> {
   const upstream = await fetchSurfaceContext({
     profile: params.profile,
@@ -69,23 +72,36 @@ export async function fetchConfirmationSessionVM(params: {
           baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
         }
       : null;
+  const selectedPlan =
+    params.selectedPlanId === undefined
+      ? resolveSelectedTradePlan({
+          protectionPlans,
+          profile: params.profile,
+          selectedPlanId: params.selectedPlanId,
+        })
+      : resolveSessionPlan({
+          planId: params.selectedPlanId,
+          protectionPlans,
+          profile: params.profile,
+        });
+  const preferredRiskBasisAvailability = await fetchPreferredRiskBasis({
+    accountId:
+      upstream.selectedAccountContext.status === 'AVAILABLE'
+        ? upstream.selectedAccountContext.account.accountId
+        : null,
+    isEnabledForSurface: selectedPlan !== null,
+    preferredRiskBasisStore: params.preferredRiskBasisStore,
+  });
   let currentSession = await buildConfirmationSession({
-    plan:
-      params.selectedPlanId === undefined
-        ? resolveSelectedTradePlan({
-            protectionPlans,
-            profile: params.profile,
-            selectedPlanId: params.selectedPlanId,
-          })
-        : resolveSessionPlan({
-            planId: params.selectedPlanId,
-            protectionPlans,
-            profile: params.profile,
-            }),
+    plan: selectedPlan,
     capabilityCache,
     selectedAccount,
     selectedRiskBasis: params.selectedRiskBasis,
     selectedAccountRiskContext,
+    preferredBasis:
+      preferredRiskBasisAvailability.status === 'AVAILABLE'
+        ? preferredRiskBasisAvailability.preferredBasis
+        : null,
   });
 
   const actions: ConfirmationSessionActions = {
@@ -150,6 +166,10 @@ export async function fetchConfirmationSessionVM(params: {
         selectedAccount,
         selectedRiskBasis: params.selectedRiskBasis,
         selectedAccountRiskContext,
+        preferredBasis:
+          preferredRiskBasisAvailability.status === 'AVAILABLE'
+            ? preferredRiskBasisAvailability.preferredBasis
+            : null,
       });
 
       return currentSession;
@@ -184,6 +204,7 @@ async function buildConfirmationSession(params: {
     portfolioValue: number | null;
     baseCurrency: string | null;
   } | null;
+  preferredBasis?: RiskBasis | null;
 }): Promise<ConfirmationSession> {
   if (!params.plan) {
     return {
@@ -200,6 +221,7 @@ async function buildConfirmationSession(params: {
   const risk = createPreparedTradeRiskLane({
     plan: params.plan,
     requestedBasis: params.selectedRiskBasis,
+    preferredBasis: params.preferredBasis,
     accountContext: params.selectedAccountRiskContext,
   });
   const preview = createTradePlanPreview(params.plan, risk);

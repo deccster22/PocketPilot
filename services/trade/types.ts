@@ -14,6 +14,38 @@ export type PreparedTradePlanRiskReferences = {
 
 export type RiskBasis = 'ACCOUNT_PERCENT' | 'FIXED_CURRENCY' | 'POSITION_PERCENT';
 
+export type PreferredRiskBasis = {
+  accountId: string;
+  riskBasis: RiskBasis;
+};
+
+export type PreferredRiskBasisAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ACCOUNT_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      accountId: string;
+      preferredBasis: RiskBasis | null;
+    };
+
+export type PreferredRiskBasisUpdateResult =
+  | {
+      status: 'UPDATED';
+      accountId: string;
+      riskBasis: RiskBasis;
+    }
+  | {
+      status: 'UNCHANGED';
+      accountId: string;
+      riskBasis: RiskBasis;
+    }
+  | {
+      status: 'REJECTED';
+      reason: 'NO_ACCOUNT_CONTEXT' | 'UNSUPPORTED_RISK_BASIS';
+    };
+
 export type RiskBasisOption = {
   basis: RiskBasis;
   label: string;
@@ -112,6 +144,7 @@ export type TradeHubSurfaceModel = {
     hasPrimaryPlan: boolean;
     profile: UserProfile;
     requiresConfirmation: boolean;
+    preferredRiskBasisAvailability: PreferredRiskBasisAvailability;
   };
 };
 

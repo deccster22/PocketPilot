@@ -22,7 +22,7 @@ const RISK_BASIS_OPTIONS: ReadonlyArray<{
   },
 ];
 
-function isRiskBasis(value: unknown): value is RiskBasis {
+export function isRiskBasis(value: unknown): value is RiskBasis {
   return RISK_BASIS_OPTIONS.some((option) => option.basis === value);
 }
 
