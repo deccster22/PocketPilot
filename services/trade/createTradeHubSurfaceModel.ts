@@ -1,5 +1,6 @@
 import type { UserProfile } from '@/core/profile/types';
 import type {
+  GuardrailPreferencesAvailability,
   PreparedTradeRiskLane,
   PreferredRiskBasisAvailability,
   ProtectionPlan,
@@ -36,6 +37,11 @@ const ALTERNATIVE_LIMIT_BY_PROFILE: Record<UserProfile, number> = {
 };
 
 const UNAVAILABLE_PREFERRED_RISK_BASIS: PreferredRiskBasisAvailability = {
+  status: 'UNAVAILABLE',
+  reason: 'NO_ACCOUNT_CONTEXT',
+};
+
+const UNAVAILABLE_GUARDRAIL_PREFERENCES: GuardrailPreferencesAvailability = {
   status: 'UNAVAILABLE',
   reason: 'NO_ACCOUNT_CONTEXT',
 };
@@ -85,6 +91,7 @@ export function createTradeHubSurfaceModel(params: {
   protectionPlans: ReadonlyArray<ProtectionPlan>;
   risk: PreparedTradeRiskLane;
   preferredRiskBasisAvailability?: PreferredRiskBasisAvailability;
+  guardrailPreferencesAvailability?: GuardrailPreferencesAvailability;
 }): TradeHubSurfaceModel {
   const planCards = sortPlanCards(params.protectionPlans.map(createPlanCard));
   const primaryPlan = planCards[0] ?? null;
@@ -100,6 +107,8 @@ export function createTradeHubSurfaceModel(params: {
       requiresConfirmation: true,
       preferredRiskBasisAvailability:
         params.preferredRiskBasisAvailability ?? UNAVAILABLE_PREFERRED_RISK_BASIS,
+      guardrailPreferencesAvailability:
+        params.guardrailPreferencesAvailability ?? UNAVAILABLE_GUARDRAIL_PREFERENCES,
     },
   };
 }

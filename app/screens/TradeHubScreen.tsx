@@ -24,6 +24,7 @@ import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import { fetchRiskToolVM } from '@/services/risk/fetchRiskToolVM';
 import { fetchExecutionAdapterResponseVM } from '@/services/trade/fetchExecutionAdapterResponseVM';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
+import { updateGuardrailPreferences } from '@/services/trade/updateGuardrailPreferences';
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
@@ -37,6 +38,7 @@ import type {
   ExecutionAdapterAttemptResult,
   ExecutionPreviewVM,
   ExecutionReadiness,
+  GuardrailPreferences,
   RiskBasis,
   SubmissionIntentResult,
   TradeHubSurfaceModel,
@@ -101,6 +103,14 @@ type RiskToolInputFormState = {
   riskPercent: string;
 };
 
+type GuardrailPreferenceKey = 'riskLimitPerTrade' | 'dailyLossThreshold' | 'cooldownAfterLoss';
+
+const GUARDRAIL_PRESET_LABELS: Record<GuardrailPreferenceKey, string> = {
+  riskLimitPerTrade: '2%',
+  dailyLossThreshold: '4%',
+  cooldownAfterLoss: '1 day',
+};
+
 function RiskToolInputField(props: {
   label: string;
   placeholder: string;
@@ -134,6 +144,64 @@ function parseNumericInput(value: string): number | null {
   return Number.isFinite(parsedValue) ? parsedValue : null;
 }
 
+function updateGuardrailPreferenceValue(
+  preferences: GuardrailPreferences,
+  key: GuardrailPreferenceKey,
+): GuardrailPreferences {
+  switch (key) {
+    case 'riskLimitPerTrade':
+      return {
+        ...preferences,
+        riskLimitPerTrade: preferences.riskLimitPerTrade.isEnabled
+          ? {
+              isEnabled: false,
+              thresholdLabel: null,
+            }
+          : {
+              isEnabled: true,
+              thresholdLabel: GUARDRAIL_PRESET_LABELS.riskLimitPerTrade,
+            },
+      };
+    case 'dailyLossThreshold':
+      return {
+        ...preferences,
+        dailyLossThreshold: preferences.dailyLossThreshold.isEnabled
+          ? {
+              isEnabled: false,
+              thresholdLabel: null,
+            }
+          : {
+              isEnabled: true,
+              thresholdLabel: GUARDRAIL_PRESET_LABELS.dailyLossThreshold,
+            },
+      };
+    default:
+      return {
+        ...preferences,
+        cooldownAfterLoss: preferences.cooldownAfterLoss.isEnabled
+          ? {
+              isEnabled: false,
+              windowLabel: null,
+            }
+          : {
+              isEnabled: true,
+              windowLabel: GUARDRAIL_PRESET_LABELS.cooldownAfterLoss,
+            },
+      };
+  }
+}
+
+function formatGuardrailPreferenceActionText(
+  key: GuardrailPreferenceKey,
+  isEnabled: boolean,
+): string {
+  if (isEnabled) {
+    return 'Turn off';
+  }
+
+  return `Set ${GUARDRAIL_PRESET_LABELS[key]}`;
+}
+
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
@@ -150,6 +218,7 @@ export function TradeHubScreen() {
     useState<ExecutionAdapterAttemptResult | null>(null);
   const [riskToolVm, setRiskToolVm] = useState<RiskToolVM | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
+  const [guardrailPreferencesRefreshNonce, setGuardrailPreferencesRefreshNonce] = useState(0);
   const [riskToolInput, setRiskToolInput] = useState<RiskToolInputFormState>({
     entryPrice: '',
     stopPrice: '',
@@ -191,7 +260,7 @@ export function TradeHubScreen() {
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan, selectedPlanId, selectedRiskBasis]);
+  }, [guardrailPreferencesRefreshNonce, profile, baselineScan, selectedPlanId, selectedRiskBasis]);
 
   const preferredRiskBasisAccountId =
     surfaceModel?.meta.preferredRiskBasisAvailability.status === 'AVAILABLE'
@@ -501,6 +570,25 @@ export function TradeHubScreen() {
     }).catch(() => undefined);
   }
 
+  function handleToggleGuardrailPreference(key: GuardrailPreferenceKey) {
+    const availability = surfaceModel?.meta.guardrailPreferencesAvailability;
+
+    if (availability?.status !== 'AVAILABLE') {
+      return;
+    }
+
+    void updateGuardrailPreferences({
+      accountId: availability.accountId,
+      preferences: updateGuardrailPreferenceValue(availability.preferences, key),
+    })
+      .then((result) => {
+        if (result.status !== 'REJECTED') {
+          setGuardrailPreferencesRefreshNonce((current) => current + 1);
+        }
+      })
+      .catch(() => undefined);
+  }
+
   function handleRiskToolInputChange(field: keyof RiskToolInputFormState, value: string) {
     setRiskToolInput((currentInput) => ({
       ...currentInput,
@@ -609,9 +697,54 @@ export function TradeHubScreen() {
                   );
                 })}
               </View>
-            </View>
+              </View>
           ) : (
             <Text style={styles.emptyState}>Risk basis is not available right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Guardrail Preferences</Text>
+          <Text style={styles.supportText}>
+            {screenView?.guardrailPreferences.summaryText ??
+              'Optional guardrails stay off by default until an account is available.'}
+          </Text>
+          {screenView?.guardrailPreferences ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Optional, explicit, account-scoped</Text>
+              <Text style={styles.cardTitle}>{screenView.guardrailPreferences.statusText}</Text>
+              <Text style={styles.cardMeta}>{screenView.guardrailPreferences.accountText}</Text>
+              {screenView.guardrailPreferences.items.length ? (
+                screenView.guardrailPreferences.items.map((item) => (
+                  <View key={item.key} style={styles.guardrailItem}>
+                    <Text style={styles.cardMeta}>{item.label}</Text>
+                    <Text style={styles.cardSummary}>{item.stateText}</Text>
+                    <Text style={styles.cardMeta}>{item.detailText}</Text>
+                    {screenView.guardrailPreferences.canEdit ? (
+                      <Pressable
+                        accessibilityRole="button"
+                        onPress={() => handleToggleGuardrailPreference(item.key)}
+                        style={({ pressed }) => [
+                          styles.stepButton,
+                          styles.guardrailButton,
+                          pressed ? styles.stepButtonPressed : null,
+                        ]}
+                      >
+                        <Text style={styles.stepButtonText}>
+                          {formatGuardrailPreferenceActionText(item.key, item.isEnabled)}
+                        </Text>
+                      </Pressable>
+                    ) : null}
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.emptyState}>
+                  No account context is available to remember guardrails yet.
+                </Text>
+              )}
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No guardrail preferences are prepared right now.</Text>
           )}
         </View>
 
@@ -1088,6 +1221,15 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     gap: 2,
+  },
+  guardrailItem: {
+    gap: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+    paddingTop: 10,
+  },
+  guardrailButton: {
+    alignSelf: 'flex-start',
   },
   stepRow: {
     gap: 6,

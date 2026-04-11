@@ -25,6 +25,7 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 - capability-aware execution paths
 - account-scoped truth
 - account-level preferred risk basis may seed the lane, but it must stay explicit and service-owned
+- optional guardrail preferences may exist, but they must stay explicit, account-scoped, off by default, and non-blocking unless a future phase says otherwise
 - bounded explanatory content
 - strategy / risk / regime layers must not collapse into a silent override engine
 
@@ -35,6 +36,7 @@ Trade Hub may:
 - show one calm prepared sizing/max-loss output, including position size, max loss, and existing risk / reward framing
 - expose one calm, explicit risk-basis selector when the prepared contract supports it
 - show one calm account-level preferred-basis starting point when it exists
+- show one calm optional guardrail-preferences summary and edit path when the prepared service contract supports it
 - show prepared risk-per-trade context that explains framing without pushing action
 - show one calm prepared risk-input guidance note when sizing context is thin or unsupported
 - present readiness / constraints / rationale
@@ -49,8 +51,10 @@ Trade Hub must not:
 - force education before use
 - behave like a slot machine with buttons
 - hide a preferred basis behind a global default
+- hide guardrail preferences behind a global default or auto-blocking default-on posture
 - turn incomplete-input guidance into a block, validator, or troubleshooting wall
 - mutate preferred-basis state in app-owned persistence code
+- mutate guardrail-preference state in app-owned persistence code
 
 ## 5. ProtectionPlan posture
 `ProtectionPlan` is the main logic object behind action framing.
@@ -122,15 +126,19 @@ The UI renders the prepared path only. It should not contain hidden execution lo
 - certainty wording tests
 - non-directive beginner-copy tests
 - calm guidance-placement tests
+- optional guardrail preference summary tests
+- no-enforcement-by-default tests for guardrail preferences
 
 ## 11. Anti-patterns to block
 - one-tap execution drift
 - urgency leakage
 - hidden enforcement drift
 - hidden risk-basis switching
+- hidden guardrail blocking
 - broad educational clutter
 - silent logic in presentation layer
 - action surfaces that look faster than they are trustworthy
+- fear-language or compliance-theatre language
 
 ## 12. Relationship to other docs
 Sits beside:

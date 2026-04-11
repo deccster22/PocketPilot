@@ -33,18 +33,23 @@ Possible core objects:
 - `PositionSizingAvailability`
 - `RiskInputGuidance`
 - `RiskInputGuidanceAvailability`
+- `GuardrailPreferences`
+- `GuardrailPreferencesAvailability`
+- `GuardrailPreferencesUpdateResult`
 - `ReadinessState`
 
 ## 4. Responsibilities
 - calculate structured risk context
 - keep selected risk basis explicit and legible
 - remember one preferred basis per account through a service-owned seam
+- remember optional guardrail preferences per account through a service-owned seam
 - prepare bounded review outputs for Trade Hub
 - support stop loss / take profit explanation
 - provide consistent max loss / position sizing / risk-reward logic
 - shape one canonical prepared sizing/max-loss output from the same service-owned inputs
 - prepare risk-per-trade context without turning it into advice
 - prepare one calm risk-input guidance note when sizing / max-loss context is thin or unsupported
+- keep guardrail preferences opt-in, explicit, and off by default
 - expose readiness constraints without silently overriding the user
 
 ## 5. Invariants
@@ -55,6 +60,7 @@ Possible core objects:
 - selected risk basis must flow through prepared summaries
 - account-level preferred basis may seed the selected basis, but it must remain explicit in the prepared contract
 - unsupported or incomplete risk-input guidance must stay support-first and non-enforcing by default
+- guardrail preferences must stay explicit, account-scoped, and non-blocking by default
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -69,6 +75,8 @@ Possible core objects:
 - raw constraint leakage without explanation
 - "discipline scoring" disguised as risk support
 - hidden preferred-basis switching in app code
+- hidden guardrail blocking or punitive default-on behavior
+- app-owned guardrail persistence logic
 
 ## 8. Testing expectations
 - calculation correctness tests

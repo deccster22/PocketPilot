@@ -140,6 +140,10 @@ describe('createTradeHubSurfaceModel', () => {
           status: 'UNAVAILABLE',
           reason: 'NO_ACCOUNT_CONTEXT',
         },
+        guardrailPreferencesAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_ACCOUNT_CONTEXT',
+        },
       },
     });
   });
@@ -236,6 +240,10 @@ describe('createTradeHubSurfaceModel', () => {
         profile: 'ADVANCED',
         requiresConfirmation: true,
         preferredRiskBasisAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_ACCOUNT_CONTEXT',
+        },
+        guardrailPreferencesAvailability: {
           status: 'UNAVAILABLE',
           reason: 'NO_ACCOUNT_CONTEXT',
         },
