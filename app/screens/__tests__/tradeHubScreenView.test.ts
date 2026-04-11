@@ -42,6 +42,44 @@ describe('createTradeHubScreenViewData', () => {
             actionState: 'CAUTION',
           },
         ],
+        risk: {
+          activeBasis: 'FIXED_CURRENCY',
+          activeBasisLabel: 'Fixed currency',
+          basisAvailability: {
+            status: 'AVAILABLE',
+            selectedBasis: 'FIXED_CURRENCY',
+            options: [
+              {
+                basis: 'ACCOUNT_PERCENT',
+                label: 'Account %',
+                isSelected: false,
+              },
+              {
+                basis: 'FIXED_CURRENCY',
+                label: 'Fixed currency',
+                isSelected: true,
+              },
+              {
+                basis: 'POSITION_PERCENT',
+                label: 'Position %',
+                isSelected: false,
+              },
+            ],
+          },
+          context: {
+            status: 'AVAILABLE',
+            basis: 'FIXED_CURRENCY',
+            headline: 'Fixed-currency risk frame',
+            summary:
+              'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+            items: [
+              {
+                label: 'Risk per trade',
+                value: '$50.00',
+              },
+            ],
+          },
+        },
         meta: {
           hasPrimaryPlan: true,
           profile: 'ADVANCED',
@@ -57,6 +95,36 @@ describe('createTradeHubScreenViewData', () => {
       confirmationText: 'Every action remains confirmation-safe and non-executing in this phase.',
       message: {
         visible: false,
+      },
+      risk: {
+        selectedBasisLabel: 'Fixed currency',
+        statusText: 'Prepared risk context available',
+        headline: 'Fixed-currency risk frame',
+        summary:
+          'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+        options: [
+          {
+            basis: 'ACCOUNT_PERCENT',
+            label: 'Account %',
+            isSelected: false,
+          },
+          {
+            basis: 'FIXED_CURRENCY',
+            label: 'Fixed currency',
+            isSelected: true,
+          },
+          {
+            basis: 'POSITION_PERCENT',
+            label: 'Position %',
+            isSelected: false,
+          },
+        ],
+        items: [
+          {
+            label: 'Risk per trade',
+            value: '$50.00',
+          },
+        ],
       },
       primaryPlan: {
         planId: 'primary-plan',
@@ -90,11 +158,13 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).toMatch(/messagePolicy\.rationale/);
+    expect(source).toMatch(/surface\.risk\.basisAvailability\.status !== 'AVAILABLE'/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
       /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
+    expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);
   });
 
   it('passes through the prepared guarded-stop note and rationale without classifying it locally', () => {
@@ -130,6 +200,15 @@ describe('createTradeHubScreenViewData', () => {
         {
           primaryPlan: null,
           alternativePlans: [],
+          risk: {
+            activeBasis: null,
+            activeBasisLabel: null,
+            basisAvailability: {
+              status: 'UNAVAILABLE',
+              reason: 'NOT_ENABLED_FOR_SURFACE',
+            },
+            context: null,
+          },
           meta: {
             hasPrimaryPlan: false,
             profile: 'ADVANCED',

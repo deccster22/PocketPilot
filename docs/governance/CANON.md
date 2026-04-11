@@ -2,7 +2,7 @@
 Title: PocketPilot - CANON
 Version: 0.5
 Source: docs/source/PocketPilot_CANON.pdf
-Last Updated: 2026-04-08
+Last Updated: 2026-04-09
 ---
 
 # PocketPilot - CANON v0.5
@@ -276,7 +276,7 @@ type KnowledgeNode = {
 };
 ```
 
-- Knowledge now has a baseline landed foundation, but it still supports guardrails and orientation without gating features
+- Knowledge now has a landed baseline through library, topic-detail, and contextual-eligibility seams, but it still supports guardrails and orientation without gating features
 - Beginner access should be stable and obvious
 - Intermediate access should include contextual links during drift or ambiguity
 - Advanced access should remain available without constant surfacing
@@ -293,7 +293,7 @@ PocketPilot avoids signal overproduction by filtering output through Strategy ->
 
 ### 19. Strategy Preview / Strategy Navigator
 
-PocketPilot now has a first landed foundation for this exploratory feature family. Current implementation may use `Strategy Preview` as the visible exploratory surface label while `Strategy Navigator` remains the canonical internal family name.
+PocketPilot now has a prepared first-wave foundation for this exploratory feature family through `P9-S1` to `P9-S5`. Current implementation may use `Strategy Preview` as the visible exploratory surface label while `Strategy Navigator` remains the canonical internal family name.
 
 - Shows how interpreted events would appear
 - Shows how alerts behave
@@ -412,7 +412,7 @@ Baseline knowledge foundation now exists, but the governing posture does not cha
 
 ## Development Workstream Phasing
 
-Since v0.5, several subphases and cross-cutting groundwork families have landed. In particular, `P5-R1` to `P5-R5`, `P6-A1` to `P6-A4`, `PX-C1` and `PX-C2`, `P7-K1`, `P8-I1` to `P8-I4`, `P9-S1`, `PX-E1` and `PX-E2`, and `PX-API1` to `PX-API5` are now part of repo reality.
+Since v0.5, several subphases and cross-cutting groundwork families have landed. In particular, `P5-R1` to `P5-R5`, `P6-A1` to `P6-A4`, `PX-C1`, `PX-C2`, and `PX-MA1`, `P7-K1` to `P7-K3`, `P8-I1` to `P8-I4`, `P9-S1` to `P9-S5`, `PX-E1` and `PX-E2`, and `PX-API1` to `PX-API5` are now part of repo reality.
 
 `docs/phases/PHASE_MAP.md` is the canonical taxonomy and implementation-status reconciliation document for landed subphases and PX sequencing. PX families remain cross-cutting and do not imply completion of numbered product families.
 
@@ -428,9 +428,9 @@ Since v0.5, several subphases and cross-cutting groundwork families have landed.
 ### Current Families / Partial Foundations
 
 - P6: Alerts, reorientation, and message policy family; groundwork now exists through the `P6-R*` and `P6-A*` lanes, but the broader family remains incomplete
-- P7: Knowledge baseline family; first foundation landed through `P7-K1`
+- P7: Knowledge baseline family; foundation, topic-detail, and contextual-eligibility seams now exist through `P7-K1` to `P7-K3`
 - P8: Insights, Event Ledger, Since Last Checked, and reflection family; early foundations landed through `P8-I1` to `P8-I4`
-- P9: Pattern Navigator / Strategy Navigator / richer explanation family; first Preview foundation landed through `P9-S1`, while `PX-E*` remains groundwork rather than proof of full `P9` completion
+- P9: Pattern Navigator / Strategy Navigator / richer explanation family; a prepared first wave now exists through `P9-S1` to `P9-S5`, while `PX-E*` remains groundwork rather than proof of full `P9` completion
 
 ### Later Families
 
@@ -463,7 +463,7 @@ v0.4 retained decisions remain valid unless explicitly superseded below.
 - `P6D1`: Message policy is a canonical service-owned seam with distinct message-family meaning. `BRIEFING`, `ALERT`, `REORIENTATION`, `REFERRAL`, and `GUARDED_STOP` must not be collapsed or inferred locally in `app/`.
 - `PXD1`: Prepared service-owned seams and VMs are the preferred product pattern across Snapshot, Dashboard, Trade Hub, Insights, broader context, and Preview surfaces. `app/` remains a renderer of prepared interpretation, not a local interpretation engine.
 - `PXD2`: Strategy Fit and 30,000 ft are one descriptive, opt-in context lane. They remain secondary to alignment and must not drift into recommendation, urgency, or regime-override behavior.
-- `P9D1`: Strategy Preview / Strategy Navigator now has a first landed foundation. Visible labeling may use Strategy Preview, but the family remains simulated, descriptive, non-directive, and non-executional.
+- `P9D1`: Strategy Preview / Strategy Navigator now has a prepared first-wave foundation through `P9-S1` to `P9-S5`. Visible labeling may use Strategy Preview, but the family remains simulated, descriptive, non-directive, and non-executional.
 
 Historical implementation reporting continues in `docs/phases/PHASE_MAP.md`; CANON remains the doctrine and architecture source of truth.
 

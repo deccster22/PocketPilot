@@ -1,4 +1,4 @@
-# Strategy Preview (P9-S1, P9-S2)
+# Strategy Preview (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
 
 ## Why This Exists
 
@@ -9,6 +9,8 @@ It exists so a user can:
 - pick one strategy
 - pick one simulated scenario
 - see how PocketPilot would shift Snapshot, Dashboard, events, and alerts under that lens
+- see one short contrast note about what changes for that strategy in this kind of scenario
+- see one short explanation of why that strategy notices the scenario the way it does
 - optionally open one or two relevant knowledge topics if they want a clearer frame
 
 The point is orientation, not persuasion.
@@ -23,6 +25,27 @@ The point is orientation, not persuasion.
 - non-directive
 - calm
 - optional in its knowledge follow-through
+
+`P9-S3` keeps the same posture while adding one thin explanation layer that remains:
+
+- simulated
+- worldview-oriented
+- subordinate to the preview
+- free of recommendation language
+
+`P9-S4` keeps the same posture while adding one thin scenario-contrast layer that remains:
+
+- simulated
+- descriptive
+- subordinate to the preview
+- free of prediction or action language
+
+`P9-S5` keeps the same posture while compacting the surface around the same prepared content so that:
+
+- the main preview focus stays dominant
+- explanation and contrast stay supportive rather than rival sections
+- knowledge follow-through stays clearly optional
+- no new logic family is introduced
 
 It is not:
 
@@ -41,7 +64,10 @@ The surface remains intentionally thin:
 - one strategy selection rail
 - one finite scenario rail
 - one prepared preview card
-- one small optional preview-to-knowledge section when the service-owned selector says it is honestly relevant
+- one dominant preview-focus block inside that preview card
+- one compact detail stack for Dashboard shift, Market events, and Alert posture
+- one small optional supporting-context shelf that groups explanation and scenario contrast when the service-owned seams say they are honestly available
+- one small optional helpful-next-reading section when the service-owned selector says it is honestly relevant
 
 The prepared preview explains:
 
@@ -49,6 +75,18 @@ The prepared preview explains:
 - which Dashboard items would gain or lose emphasis
 - what interpreted MarketEvents would matter
 - how the alert posture would broadly feel
+
+The optional explanation section explains:
+
+- what the strategy is noticing in this simulated backdrop
+- why those conditions matter to that strategy
+- what kind of interpreted MarketEvents become more relevant through that worldview
+
+The optional contrast section explains:
+
+- what is different about this scenario for that strategy
+- what the strategy pays more attention to here
+- what becomes less central here
 
 The optional follow-through explains:
 
@@ -63,6 +101,8 @@ Strategy Preview copy must:
 - describe interpretation shifts rather than outcomes
 - lower anxiety by showing how PocketPilot thinks
 - acknowledge when a picture is mixed, thin, or still settling
+- show how emphasis changes without turning the surface into a simulator
+- explain worldview without turning into a strategy coach
 
 Strategy Preview copy must not:
 
@@ -70,8 +110,11 @@ Strategy Preview copy must not:
 - imply likely profit
 - imply live readiness
 - claim certainty
+- imply a predicted scenario outcome
 - use urgency language
 - turn the knowledge follow-through into homework
+- turn the explanation section into prediction or advice
+- turn the contrast section into a strategy-versus-strategy battle card
 
 ## Knowledge Follow-Through Rules
 
@@ -94,25 +137,32 @@ That path must not become:
 
 ## Deliberate Omissions
 
-`P9-S2` still does not add:
+`P9-S5` still does not add:
 
 - live quotes
 - broker integration
 - execution handoff
+- real-time market simulation
 - scenario editing
+- a full simulator sandbox
+- AI commentary
 - onboarding orchestration
 - prediction scoring
 - full knowledge recommendation coverage across Snapshot, Dashboard, Trade Hub, or Insights
 
 ## Relationship To Roadmap
 
-Strategy Preview is now the first visible `P9` lane with two linked rungs:
+Strategy Preview is now the first visible `P9` lane with five linked rungs:
 
 - `P9-S1` established the simulated preview contract
 - `P9-S2` adds the optional knowledge follow-through contract
+- `P9-S3` adds one optional preview explanation layer inside the same prepared VM
+- `P9-S4` adds one optional scenario-contrast layer and richer interpreted scenario traits inside that same prepared VM
+- `P9-S5` compacts that same prepared surface so the main preview stays readable as subordinate shelves accumulate
 
 Later `P9` work can deepen this mode, but it should keep the same product promise:
 
 - show how PocketPilot would interpret
+- show what changes in this scenario without telling the user what to do
+- show why the strategy cares without telling the user what to do
 - keep knowledge easy to reach and easy to ignore
-- avoid telling the user what to do

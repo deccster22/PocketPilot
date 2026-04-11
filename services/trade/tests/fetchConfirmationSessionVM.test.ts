@@ -25,6 +25,11 @@ function createEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
     pctChange: 0.04,
     metadata: {
       hidden: true,
+      preparedRiskReferences: {
+        entryPrice: 100,
+        stopPrice: 95,
+        targetPrice: 112,
+      },
     },
     ...overrides,
   };
@@ -74,6 +79,21 @@ describe('fetchConfirmationSessionVM', () => {
     const latestRelevantEvent = overrides.latestRelevantEvent ?? btcEvent;
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      },
+      selectedAccountPortfolioValue: 10_000,
+      aggregatePortfolioContext: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',
@@ -190,8 +210,8 @@ describe('fetchConfirmationSessionVM', () => {
       },
       preparedRiskReferences: {
         entryPrice: 100,
-        stopPrice: null,
-        targetPrice: null,
+        stopPrice: 95,
+        targetPrice: 112,
       },
       preview: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
@@ -218,6 +238,56 @@ describe('fetchConfirmationSessionVM', () => {
         placeholders: {
           orderPreviewAvailable: false,
           executionPreviewAvailable: false,
+        },
+        risk: {
+          activeBasis: 'ACCOUNT_PERCENT',
+          activeBasisLabel: 'Account %',
+          basisAvailability: {
+            status: 'AVAILABLE',
+            selectedBasis: 'ACCOUNT_PERCENT',
+            options: [
+              {
+                basis: 'ACCOUNT_PERCENT',
+                label: 'Account %',
+                isSelected: true,
+              },
+              {
+                basis: 'FIXED_CURRENCY',
+                label: 'Fixed currency',
+                isSelected: false,
+              },
+              {
+                basis: 'POSITION_PERCENT',
+                label: 'Position %',
+                isSelected: false,
+              },
+            ],
+          },
+          context: {
+            status: 'AVAILABLE',
+            basis: 'ACCOUNT_PERCENT',
+            headline: 'Account % risk frame',
+            summary:
+              'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+            items: [
+              {
+                label: 'Risk per trade',
+                value: '0.50%',
+              },
+              {
+                label: 'Max loss at cap',
+                value: '$50.00',
+              },
+              {
+                label: 'Position cap used',
+                value: '10.00%',
+              },
+              {
+                label: 'Prepared price path',
+                value: '$100.00 entry to $95.00 stop',
+              },
+            ],
+          },
         },
       },
       shell: {
@@ -273,6 +343,7 @@ describe('fetchConfirmationSessionVM', () => {
             completed: false,
             acknowledged: false,
             required: true,
+            acknowledgementLabel: undefined,
           },
           {
             stepId: 'confirm-intent',
@@ -364,7 +435,7 @@ describe('fetchConfirmationSessionVM', () => {
     expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
   });
 
-  it('switches the selected plan and recomputes the prepared session deterministically', async () => {
+  it('keeps risk and execution support scoped to the selected account even when another-account plan id is requested', async () => {
     mockUpstreamContext();
 
     const first = await fetchConfirmationSessionVM({
@@ -380,22 +451,15 @@ describe('fetchConfirmationSessionVM', () => {
       'acct-basic:momentum_basics:ETH:HOLD:acct-basic:momentum_basics:signal:ETH:200',
     );
 
-    expect(switched.planId).toBe(
-      'acct-basic:momentum_basics:ETH:HOLD:acct-basic:momentum_basics:signal:ETH:200',
-    );
-    expect(switched.preview?.headline).toEqual({
-      intentType: 'HOLD',
-      symbol: 'ETH',
-      actionState: 'WAIT',
+    expect(switched).toEqual({
+      planId: null,
+      accountId: null,
+      executionCapability: null,
+      preparedRiskReferences: null,
+      preview: null,
+      shell: null,
+      flow: null,
     });
-    expect(switched.preparedRiskReferences).toBeNull();
-    expect(switched.shell?.confirmation).toEqual({
-      requiresConfirmation: true,
-      pathType: 'GUIDED_SEQUENCE',
-      stepsLabel: 'Review separate order steps',
-      executionAvailable: false,
-    });
-    expect(switched.flow?.planId).toBe(switched.planId);
   });
 
   it('recomputes acknowledgement state through the session API and resets back to the initial session', async () => {
@@ -453,5 +517,28 @@ describe('fetchConfirmationSessionVM', () => {
     expect(serviceSource).not.toMatch(/snapshotService/);
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
+  });
+
+  it('changes the prepared risk frame without changing execution capability or default blocking posture', async () => {
+    mockUpstreamContext();
+
+    const accountPercentSession = await fetchConfirmationSessionVM({
+      profile: 'ADVANCED',
+      selectedRiskBasis: 'ACCOUNT_PERCENT',
+    });
+    const fixedCurrencySession = await fetchConfirmationSessionVM({
+      profile: 'ADVANCED',
+      selectedRiskBasis: 'FIXED_CURRENCY',
+    });
+
+    expect(fixedCurrencySession.session.executionCapability).toEqual(
+      accountPercentSession.session.executionCapability,
+    );
+    expect(fixedCurrencySession.session.flow).toEqual(accountPercentSession.session.flow);
+    expect(fixedCurrencySession.session.preview?.risk.activeBasis).toBe('FIXED_CURRENCY');
+    expect(fixedCurrencySession.session.preview?.risk.context?.items[0]).toEqual({
+      label: 'Risk per trade',
+      value: '$50.00',
+    });
   });
 });

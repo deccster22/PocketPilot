@@ -23,6 +23,11 @@ function createEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
     pctChange: 0.04,
     metadata: {
       hidden: true,
+      preparedRiskReferences: {
+        entryPrice: 100,
+        stopPrice: 95,
+        targetPrice: 112,
+      },
     },
     ...overrides,
   };
@@ -50,6 +55,21 @@ describe('fetchTradePlanPreviewVM', () => {
     });
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      },
+      selectedAccountPortfolioValue: 10_000,
+      aggregatePortfolioContext: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',
@@ -150,6 +170,7 @@ describe('fetchTradePlanPreviewVM', () => {
       profile: 'ADVANCED',
       selectedPlanId:
         'acct-live:momentum_basics:ETH:HOLD:acct-live:momentum_basics:signal:ETH:200',
+      selectedRiskBasis: 'POSITION_PERCENT',
     });
 
     expect(result.selectedPlanId).toBe(
@@ -180,6 +201,45 @@ describe('fetchTradePlanPreviewVM', () => {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      risk: {
+        activeBasis: 'POSITION_PERCENT',
+        activeBasisLabel: 'Position %',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'POSITION_PERCENT',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: false,
+            },
+            {
+              basis: 'FIXED_CURRENCY',
+              label: 'Fixed currency',
+              isSelected: false,
+            },
+            {
+              basis: 'POSITION_PERCENT',
+              label: 'Position %',
+              isSelected: true,
+            },
+          ],
+        },
+        context: {
+          status: 'UNAVAILABLE',
+          basis: 'POSITION_PERCENT',
+          headline: 'Position % risk frame unavailable',
+          summary:
+            'PocketPilot can frame this basis once the prepared plan carries an explicit position cap.',
+          items: [
+            {
+              label: 'Needed',
+              value: 'A prepared position cap from the current plan',
+            },
+          ],
+          reason: 'MISSING_POSITION_CAP',
+        },
+      },
     });
     expect(JSON.stringify(result.preview)).not.toContain('hidden-signal');
     expect(JSON.stringify(result.preview)).not.toContain('hidden');
@@ -197,6 +257,21 @@ describe('fetchTradePlanPreviewVM', () => {
     });
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'momentum_basics',
+        },
+      },
+      selectedAccountPortfolioValue: 10_000,
+      aggregatePortfolioContext: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Aligned',
@@ -304,6 +379,32 @@ describe('fetchTradePlanPreviewVM', () => {
       intentType: 'ACCUMULATE',
       symbol: 'BTC',
       actionState: 'READY',
+    });
+    expect(result.preview?.risk.activeBasis).toBe('ACCOUNT_PERCENT');
+    expect(result.preview?.risk.context).toEqual({
+      status: 'AVAILABLE',
+      basis: 'ACCOUNT_PERCENT',
+      headline: 'Account % risk frame',
+      summary:
+        'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+      items: [
+        {
+          label: 'Risk per trade',
+          value: '0.50%',
+        },
+        {
+          label: 'Max loss at cap',
+          value: '$50.00',
+        },
+        {
+          label: 'Position cap used',
+          value: '10.00%',
+        },
+        {
+          label: 'Prepared price path',
+          value: '$100.00 entry to $95.00 stop',
+        },
+      ],
     });
   });
 

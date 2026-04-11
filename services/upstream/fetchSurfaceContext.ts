@@ -23,6 +23,21 @@ import {
   summarizeAlignment,
   type EventStream,
 } from '@/services/events/eventStream';
+import { defaultAccountPreferenceStore } from '@/services/accounts/accountPreferenceStore';
+import {
+  enforceAccountScopedTruth,
+  filterAccountScopedItems,
+  requireSelectedAccountContext,
+  scopeOrientationContextToSelectedAccount,
+} from '@/services/accounts/enforceAccountScopedTruth';
+import { fetchAggregatePortfolioContext } from '@/services/accounts/fetchAggregatePortfolioContext';
+import { fetchSelectedAccountContext } from '@/services/accounts/fetchSelectedAccountContext';
+import type {
+  AccountContextCandidate,
+  AccountPreferenceStore,
+  AggregatePortfolioAvailability,
+  SelectedAccountAvailability,
+} from '@/services/accounts/types';
 import {
   createOrientationContext,
   type OrientationContext,
@@ -43,9 +58,83 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 
 const SURFACE_SYMBOLS = ['BTC', 'ETH', 'SOL', 'DOGE'] as const;
 
-const SURFACE_ACCOUNTS = [{ id: 'acct-live', portfolioValue: 10_000, isPrimary: true }];
+const SURFACE_ACCOUNTS: ReadonlyArray<AccountContextCandidate> = [
+  {
+    id: 'acct-live',
+    displayName: 'Live account',
+    portfolioValue: 10_000,
+    isPrimary: true,
+    baseCurrency: 'USD',
+    strategyId: 'momentum_basics',
+    portfolio: {
+      totalValue: 10_000,
+      currency: 'USD',
+      positions: [
+        {
+          symbol: 'BTC',
+          amount: 0.12,
+          value: 7_200,
+        },
+        {
+          symbol: 'ETH',
+          amount: 1.5,
+          value: 2_800,
+        },
+      ],
+    },
+  },
+  {
+    id: 'acct-basic',
+    displayName: 'Basic account',
+    portfolioValue: 6_500,
+    baseCurrency: 'USD',
+    strategyId: 'dip_buying',
+    portfolio: {
+      totalValue: 6_500,
+      currency: 'USD',
+      positions: [
+        {
+          symbol: 'BTC',
+          amount: 0.05,
+          value: 3_000,
+        },
+        {
+          symbol: 'SOL',
+          amount: 80,
+          value: 3_500,
+        },
+      ],
+    },
+  },
+  {
+    id: 'acct-manual',
+    displayName: 'Manual account',
+    portfolioValue: 4_250,
+    baseCurrency: 'USD',
+    strategyId: 'data_quality',
+    portfolio: {
+      totalValue: 4_250,
+      currency: 'USD',
+      positions: [
+        {
+          symbol: 'ETH',
+          amount: 0.75,
+          value: 1_400,
+        },
+        {
+          symbol: 'DOGE',
+          amount: 5_000,
+          value: 2_850,
+        },
+      ],
+    },
+  },
+];
 
 export type SurfaceContext = {
+  selectedAccountContext: SelectedAccountAvailability;
+  selectedAccountPortfolioValue?: number | null;
+  aggregatePortfolioContext: AggregatePortfolioAvailability;
   portfolioValue: number;
   change24h: number;
   strategyAlignment: string;
@@ -71,8 +160,25 @@ function formatAlignmentState(alignmentState: AlignmentState): string {
   }
 }
 
+function resolveAccountPortfolioValue(
+  accounts: ReadonlyArray<AccountContextCandidate>,
+  accountId: string,
+): number | null {
+  const account = accounts.find((candidate) => candidate.id === accountId);
+  const portfolioValue = account?.portfolioValue ?? account?.portfolio?.totalValue;
+
+  return typeof portfolioValue === 'number' && Number.isFinite(portfolioValue) && portfolioValue > 0
+    ? portfolioValue
+    : null;
+}
+
 export async function fetchSurfaceContext(params: {
   profile: UserProfile;
+  accounts?: ReadonlyArray<AccountContextCandidate>;
+  selectedAccountId?: string | null;
+  accountPreferenceStore?: Pick<AccountPreferenceStore, 'load'>;
+  accountSwitchingEnabled?: boolean;
+  aggregatePortfolioEnabled?: boolean;
   baselineScan?: ForegroundScanResult;
   nowProvider?: () => number;
   eventLedger?: EventLedgerService;
@@ -91,6 +197,20 @@ export async function fetchSurfaceContext(params: {
     nowProvider,
   });
   const primaryProvider = createQuoteBrokerProvider(broker, 'execution');
+  const accounts = params.accounts ?? SURFACE_ACCOUNTS;
+  const accountPreferenceStore =
+    params.accountPreferenceStore ?? defaultAccountPreferenceStore;
+  const selectedAccountContext = await fetchSelectedAccountContext({
+    accounts,
+    selectedAccountId: params.selectedAccountId,
+    accountPreferenceStore,
+    isSwitchingEnabledForSurface: params.accountSwitchingEnabled,
+  });
+  const aggregatePortfolioContext = await fetchAggregatePortfolioContext({
+    accounts,
+    isEnabledForSurface: params.aggregatePortfolioEnabled,
+  });
+  const selectedAccount = requireSelectedAccountContext(selectedAccountContext);
 
   const scan = await runForegroundScan(
     {
@@ -107,30 +227,51 @@ export async function fetchSurfaceContext(params: {
       getInstrumentation: () => broker.instrumentation,
     },
     {
-      accounts: SURFACE_ACCOUNTS,
+      accounts: [...accounts],
+      selectedAccountId: selectedAccount.accountId,
       symbols: [...SURFACE_SYMBOLS],
       baselineQuotes: params.baselineScan?.quotes,
     },
   );
+  const scopedScan = enforceAccountScopedTruth({
+    label: 'Selected account scan',
+    selectedAccount,
+    accountIds: [scan.accountId],
+    value: scan,
+  });
 
   const strategies = resolveActiveStrategies({ profile: params.profile });
   const strategyNowMs = nowProvider();
   const signals = runStrategies({
-    scan,
+    scan: scopedScan,
     baselineScan: params.baselineScan,
     strategies,
     nowMs: strategyNowMs,
   });
-  const marketEvents = createMarketEvents({
-    accountId: scan.accountId,
-    quotesBySymbol: scan.quotes,
-    pctChangeBySymbol: scan.pctChangeBySymbol,
-    signals,
+  const scopedMarketEvents = filterAccountScopedItems({
+    selectedAccount,
+    items: createMarketEvents({
+      accountId: scopedScan.accountId,
+      quotesBySymbol: scopedScan.quotes,
+      pctChangeBySymbol: scopedScan.pctChangeBySymbol,
+      signals,
+    }),
   });
-  const eventStream = createEventStream({
-    accountId: scan.accountId,
-    timestamp: strategyNowMs,
-    events: marketEvents,
+  const marketEvents = enforceAccountScopedTruth({
+    label: 'Strategy alignment',
+    selectedAccount,
+    accountIds: scopedMarketEvents.map((event) => event.accountId),
+    value: scopedMarketEvents,
+  });
+  const eventStream = enforceAccountScopedTruth({
+    label: 'Event stream',
+    selectedAccount,
+    accountIds: [selectedAccount.accountId, ...marketEvents.map((event) => event.accountId)],
+    value: createEventStream({
+      accountId: selectedAccount.accountId,
+      timestamp: strategyNowMs,
+      events: marketEvents,
+    }),
   });
   eventLedger.appendEvents(eventStream.events);
 
@@ -138,20 +279,20 @@ export async function fetchSurfaceContext(params: {
     params.lastViewedTimestamp ??
     lastViewedState.getLastViewedTimestamp({
       surfaceId: SNAPSHOT_LAST_VIEWED_SURFACE_ID,
-      accountId: scan.accountId,
+      accountId: selectedAccount.accountId,
     });
   const sinceLastChecked =
     resolvedLastViewedTimestamp === undefined
       ? undefined
       : createSinceLastChecked({
           sinceTimestamp: resolvedLastViewedTimestamp,
-          accountId: scan.accountId,
+          accountId: selectedAccount.accountId,
           eventQueries: eventLedgerQueries,
         });
 
-  const prices = Object.values(scan.quotes).map((quote) => quote.price);
+  const prices = Object.values(scopedScan.quotes).map((quote) => quote.price);
   const portfolioValue = prices.reduce((sum, price) => sum + price, 0);
-  const changeValues = Object.values(scan.pctChangeBySymbol ?? {});
+  const changeValues = Object.values(scopedScan.pctChangeBySymbol ?? {});
   const change24h =
     changeValues.length > 0
       ? changeValues.reduce((sum, change) => sum + change, 0) / changeValues.length
@@ -162,20 +303,41 @@ export async function fetchSurfaceContext(params: {
     STRATEGY_BUNDLES.find((bundle) => bundle.id === defaultBundleId)?.name ?? 'Unknown bundle';
 
   const strategyAlignment = formatAlignmentState(summarizeAlignment(eventStream.events));
-  const orientationContext = createOrientationContext({
-    accountId: scan.accountId,
-    currentEvents: eventStream.events,
-    strategyAlignment,
-    sinceLastChecked,
+  const scopedOrientationContext = scopeOrientationContextToSelectedAccount({
+    selectedAccount,
+    orientationContext: createOrientationContext({
+      accountId: selectedAccount.accountId,
+      currentEvents: eventStream.events,
+      strategyAlignment,
+      sinceLastChecked,
+    }),
+  });
+  const orientationContext = enforceAccountScopedTruth({
+    label: 'Orientation context',
+    selectedAccount,
+    accountIds: [
+      selectedAccount.accountId,
+      scopedOrientationContext.currentState.latestRelevantEvent?.accountId,
+      ...scopedOrientationContext.historyContext.eventsSinceLastViewed.map(
+        (event) => event.accountId,
+      ),
+      ...(scopedOrientationContext.historyContext.sinceLastChecked?.events ?? []).map(
+        (event) => event.accountId,
+      ),
+    ],
+    value: scopedOrientationContext,
   });
 
   return {
+    selectedAccountContext,
+    selectedAccountPortfolioValue: resolveAccountPortfolioValue(accounts, selectedAccount.accountId),
+    aggregatePortfolioContext,
     portfolioValue,
     change24h,
     strategyAlignment,
     bundleName,
     eventLedger,
-    scan,
+    scan: scopedScan,
     signals,
     marketEvents,
     eventStream,

@@ -13,6 +13,16 @@ jest.mock('@/services/strategy/runStrategiesService');
 
 describe('snapshotService market event integration', () => {
   const defaultProfile: UserProfile = 'BEGINNER';
+  const testAccounts = [
+    {
+      id: 'acct-test',
+      displayName: 'Test account',
+      portfolioValue: 12_500,
+      isPrimary: true,
+      baseCurrency: 'USD',
+      strategyId: 'data_quality',
+    },
+  ] as const;
   const mockRunForegroundScan = jest.mocked(runForegroundScan);
   const mockResolveActiveStrategies = jest.mocked(resolveActiveStrategies);
   const mockRunStrategies = jest.mocked(runStrategies);
@@ -131,6 +141,7 @@ describe('snapshotService market event integration', () => {
 
     const result = await fetchSnapshotVM({
       profile: defaultProfile,
+      accounts: testAccounts,
       nowProvider: () => 1_700_000_000_100,
       eventLedger: ledger,
     });
@@ -218,6 +229,7 @@ describe('snapshotService market event integration', () => {
 
     const result = await fetchSnapshotVM({
       profile: defaultProfile,
+      accounts: testAccounts,
       nowProvider: () => 1_700_000_000_100,
       includeDebugObservatory: true,
       eventLedger: ledger,
@@ -270,6 +282,7 @@ describe('snapshotService market event integration', () => {
 
     const result = await fetchSnapshotVM({
       profile: defaultProfile,
+      accounts: testAccounts,
       nowProvider: () => 1_700_000_000_100,
       eventLedger: ledger,
       lastViewedTimestamp: 1_700_000_000_001,
@@ -337,6 +350,7 @@ describe('snapshotService market event integration', () => {
 
     const result = await fetchSnapshotVM({
       profile: defaultProfile,
+      accounts: testAccounts,
       nowProvider: () => 1_700_000_000_100,
       eventLedger: ledger,
       lastViewedState,
@@ -361,6 +375,7 @@ describe('snapshotService market event integration', () => {
 
     const result = await fetchSnapshotVM({
       profile: 'ADVANCED',
+      accounts: testAccounts,
       nowProvider: () => 1_700_000_000_100,
       lastViewedTimestamp: 1_700_000_000_001,
     });
@@ -379,6 +394,7 @@ describe('snapshotService market event integration', () => {
 
     const result = await fetchSnapshotVM({
       profile: 'ADVANCED',
+      accounts: testAccounts,
       nowProvider: () => 1_700_000_000_100,
     });
 

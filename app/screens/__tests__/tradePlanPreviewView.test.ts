@@ -28,6 +28,48 @@ describe('createTradePlanPreviewViewData', () => {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      risk: {
+        activeBasis: 'ACCOUNT_PERCENT',
+        activeBasisLabel: 'Account %',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'ACCOUNT_PERCENT',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: true,
+            },
+            {
+              basis: 'FIXED_CURRENCY',
+              label: 'Fixed currency',
+              isSelected: false,
+            },
+            {
+              basis: 'POSITION_PERCENT',
+              label: 'Position %',
+              isSelected: false,
+            },
+          ],
+        },
+        context: {
+          status: 'AVAILABLE',
+          basis: 'ACCOUNT_PERCENT',
+          headline: 'Account % risk frame',
+          summary:
+            'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+          items: [
+            {
+              label: 'Risk per trade',
+              value: '0.50%',
+            },
+            {
+              label: 'Max loss at cap',
+              value: '$50.00',
+            },
+          ],
+        },
+      },
     });
 
     expect(view).toEqual({
@@ -40,6 +82,21 @@ describe('createTradePlanPreviewViewData', () => {
       rationaleTraceText: '2 supporting events | primary event event-1',
       readinessText: 'aligned alignment | high certainty',
       constraintsText: 'Confirmation required | max position size 0.1',
+      riskBasisText: 'Risk basis: Account %',
+      riskStatusText: 'Prepared risk context available',
+      riskHeadline: 'Account % risk frame',
+      riskSummary:
+        'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+      riskItems: [
+        {
+          label: 'Risk per trade',
+          value: '0.50%',
+        },
+        {
+          label: 'Max loss at cap',
+          value: '$50.00',
+        },
+      ],
       confirmationText:
         'This is a framed plan preview only. A future confirmation step is still required.',
       placeholderText: 'Order and execution previews are placeholder-only in this phase.',

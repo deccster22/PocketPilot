@@ -3,7 +3,7 @@
 - Title: PocketPilot Documentation Map
 - Version: v2
 - Source file: `docs/source/PocketPilot Documentation Map v3.pdf`
-- Last updated: 2026-04-08
+- Last updated: 2026-04-09
 
 File: `docs/founder/PocketPilot Documentation Map`
 
@@ -285,8 +285,8 @@ Historical knowledge.
   - Operational Expansion: Near Future
 - `PROFILE_SYSTEM.md`
   - Status: Architecture
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `KNOWLEDGE_NODE_MODEL.md`
   - Status: Architecture
   - Maturity: To be developed
@@ -400,44 +400,36 @@ Historical knowledge.
   - Operational Expansion: Later Phase
 - `SNAPSHOT_VISION.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `PROFILE_EXPLANATION_MODEL.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `LOG_AND_JOURNAL_MODEL.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `ASSET_NARRATIVE_MODEL.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `KNOWLEDGE_LAYER.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `AI_EXPLANATION_LAYER.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `RELEVANCE_PRINCIPLE.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `NOTIFICATION_PHILOSOPHY.md`
   - Status: Product
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
-  - [Editor note: PDF includes inline note "most important missing pieces".]
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `DESIGN_DECISIONS.md`
   - Status: Product
   - Maturity: To be developed
@@ -448,20 +440,20 @@ Historical knowledge.
   - Maturity: To be developed
   - Operational Expansion: Near Future
 
-#### `/behaviour rules`
+#### `/behaviours`
 
 - `SIGNAL_EXPOSURE.md`
   - Status: Behavioural
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `CONFIDENCE_LANGUAGE.md`
   - Status: Behavioural
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
+  - Maturity: Active
+  - Operational Expansion: progressive
 - `NOTIFICATION_SYSTEM.md`
   - Status: Behavioural
-  - Maturity: To be developed
-  - Operational Expansion: Near Future
+  - Maturity: Active
+  - Operational Expansion: progressive
 
 #### `/strategies`
 

@@ -29,7 +29,7 @@ describe('strategy navigator placement', () => {
     expect(strategyNavigatorScreenSource).toMatch(/StrategyPreviewCard/);
     expect(strategyNavigatorScreenSource).toMatch(/fetchKnowledgeTopicDetailVM/);
     expect(strategyNavigatorScreenSource).not.toMatch(
-      /createStrategyNavigatorVM|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|ContextualKnowledgeCard|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
+      /createStrategyNavigatorVM|createStrategyPreviewContrast|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|ContextualKnowledgeCard|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
     );
     expect(dashboardScreenSource).not.toMatch(/StrategyPreviewCard|fetchStrategyNavigatorVM/);
     expect(tradeHubScreenSource).not.toMatch(/StrategyPreviewCard|fetchStrategyNavigatorVM/);

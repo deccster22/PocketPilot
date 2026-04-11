@@ -1,8 +1,11 @@
-# Strategy Navigator Spec (P9-S1, P9-S2)
+# Strategy Navigator Spec (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
 
 ## Purpose
 
 Strategy Navigator should feel like a quiet briefing simulator with one gentle next step.
+`P9-S3` adds one calm why shelf inside that same briefing card.
+`P9-S4` adds one calm scenario-contrast shelf inside that same briefing card.
+`P9-S5` compacts that same card so the preview focus stays primary, supporting context stays lighter, and optional reading stays clearly optional.
 
 It should help a user compare strategy lenses without:
 
@@ -17,7 +20,11 @@ It should help a user compare strategy lenses without:
 - one top-level Preview destination in this phase
 - app renders prepared strategy and scenario options only
 - app renders one prepared preview card only
+- app may render one small prepared scenario-contrast section inside that preview card only when services mark it available
+- app may render one small prepared explanation section inside that preview card only when services mark it available
 - app may render one small prepared knowledge follow-through section inside that preview card only when services mark it available
+- app may group prepared explanation and contrast into one lighter supporting-context shelf
+- app may present prepared knowledge follow-through as one clearly optional helpful-next-reading shelf
 - unavailable state stays honest and minimal
 - no execution CTA
 - no wizard flow
@@ -26,13 +33,16 @@ It should help a user compare strategy lenses without:
 
 ## Initial Layout
 
-The `P9-S2` layout remains intentionally plain:
+The `P9-S5` layout remains intentionally compact:
 
 1. Title and short calming summary
 2. Strategy selector
 3. Scenario selector
 4. Preview card or honest unavailable state
-5. Optional related-reading section inside the preview card
+5. One dominant main-preview-focus block inside the preview card
+6. One compact supporting detail stack for Dashboard shift, Market events, and Alert posture
+7. One optional supporting-context shelf for explanation and scenario contrast
+8. One optional helpful-next-reading shelf
 
 This is enough for orientation.
 The first surface still does not need a full multi-panel transformation.
@@ -50,11 +60,12 @@ The first surface still does not need a full multi-panel transformation.
 The preview card should show:
 
 - the selected strategy and scenario
-- one Snapshot emphasis line
-- a short Dashboard shift list
-- a short MarketEvents-that-matter list
-- one alert-posture line
-- zero or a few optional related-reading items
+- one dominant Snapshot emphasis line
+- a short compact Dashboard shift list
+- a short compact MarketEvents-that-matter list
+- one alert-posture line in the same supporting detail stack
+- zero or one light supporting-context shelf that groups prepared explanation and prepared scenario contrast
+- zero or a few optional helpful-next-reading items
 
 The card should not show:
 
@@ -65,11 +76,55 @@ The card should not show:
 - celebratory or alarmist styling
 - markdown content blocks
 
+## Preview Contrast Guidance
+
+The optional contrast section should feel like:
+
+- "What changes in this scenario"
+- "What this strategy pays more attention to here"
+- "What fades into the background here"
+
+It should stay:
+
+- short
+- calm
+- descriptive
+- subordinate to the preview
+
+It should not feel like:
+
+- "Which strategy wins"
+- "Most likely outcome"
+- "Best setup now"
+- "Strategy battle"
+
+## Preview Explanation Guidance
+
+The optional explanation section should feel like:
+
+- "Why this strategy cares here"
+- "What this lens is noticing"
+- "Why that matters for this worldview"
+
+It should stay:
+
+- short
+- calm
+- educational
+- subordinate to the preview
+
+It should not feel like:
+
+- "What to do next"
+- "Expected move"
+- "Best strategy here"
+- "Simulated outcome score"
+
 ## Knowledge Follow-Through Guidance
 
 The optional section should feel like:
 
-- "Core concepts behind this preview"
+- "Helpful next reading"
 - "Related strategy reading"
 - "Read next if helpful"
 
@@ -101,7 +156,7 @@ Avoid:
 
 Future `P9` UX may introduce richer transformations, context links, or deeper explanation shelves.
 
-`P9-S1` and `P9-S2` should still remain the reference for the core mood:
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, and `P9-S5` should still remain the reference for the core mood:
 
 - calm
 - exploratory

@@ -1,16 +1,21 @@
-# Strategy Navigator Model (P9-S1, P9-S2)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
 
 ## Purpose
 
 `services/strategyNavigator/` owns PocketPilot's canonical Strategy Navigator lane.
 
 `P9-S1` established the first simulated preview seam.
-`P9-S2` deepens that same seam with one service-owned preview-to-knowledge follow-through path.
+`P9-S2` deepened that same seam with one service-owned preview-to-knowledge follow-through path.
+`P9-S3` adds one service-owned preview-explanation layer that explains why a strategy reacts to the simulated scenario the way it does.
+`P9-S4` deepens the finite scenario layer with interpreted scenario traits plus one service-owned scenario-contrast seam that explains what changes for that strategy in this kind of simulated backdrop.
+`P9-S5` keeps those same service-owned seams and adds one render-only compaction pass in `app/` so the existing prepared preview stays calm as subordinate shelves accumulate.
 
 The lane now exists to:
 
 - let a user choose one strategy and one finite simulated scenario
 - show how PocketPilot would reinterpret the same backdrop through that strategy
+- show how that strategy's emphasis changes versus calmer or alternative conditions for that same scenario family
+- explain why that simulated backdrop matters to the selected strategy in calm worldview terms
 - optionally offer a small set of prepared knowledge next steps if the user wants more context
 - stay calm, descriptive, educational, and non-directive
 
@@ -31,10 +36,17 @@ type StrategyPreviewScenarioId =
   | 'MIXED_REVERSAL'
   | 'RANGE_COMPRESSION';
 
+type StrategyPreviewScenarioTraits = {
+  volatilityState: string | null;
+  structureState: string | null;
+  conditionState: string | null;
+};
+
 type StrategyPreviewScenario = {
   scenarioId: StrategyPreviewScenarioId;
   title: string;
   summary: string;
+  traits?: StrategyPreviewScenarioTraits;
 };
 
 type StrategyPreviewFocus = {
@@ -43,6 +55,38 @@ type StrategyPreviewFocus = {
   eventHighlights: readonly string[];
   alertPosture: string;
 };
+
+type StrategyPreviewExplanation = {
+  title: string;
+  summary: string;
+  bullets: readonly string[];
+};
+
+type StrategyPreviewExplanationAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_EXPLANATION_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      content: StrategyPreviewExplanation;
+    };
+
+type StrategyPreviewContrast = {
+  title: string;
+  summary: string;
+  bullets: readonly string[];
+};
+
+type StrategyPreviewContrastAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_CONTRAST_AVAILABLE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      content: StrategyPreviewContrast;
+    };
 
 type StrategyPreviewKnowledgeLink = {
   topicId: string;
@@ -87,6 +131,8 @@ type StrategyNavigatorVM = {
   strategyOptions: readonly StrategyPreviewStrategyOption[];
   scenarios: readonly StrategyPreviewScenario[];
   availability: StrategyPreviewAvailability;
+  explanation: StrategyPreviewExplanationAvailability;
+  contrast: StrategyPreviewContrastAvailability;
   knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };
 ```
@@ -94,7 +140,10 @@ type StrategyNavigatorVM = {
 Rules:
 
 - one canonical preview contract
+- one canonical preview-explanation contract
+- one canonical preview-contrast contract
 - one canonical preview-to-knowledge follow-through contract
+- no second preview VM family just for compaction
 - one selected strategy at a time
 - one finite scenario catalog
 - no execution fields
@@ -106,10 +155,16 @@ Rules:
 
 The current canonical service path is:
 
-`core strategy catalog -> strategyPreviewScenarios -> createStrategyNavigatorVM -> selectStrategyPreviewKnowledge -> fetchStrategyNavigatorVM`
+`core strategy catalog -> strategyPreviewScenarios -> createStrategyNavigatorVM -> fetchStrategyNavigatorVM`
 
 `fetchStrategyNavigatorVM` is the single app-facing entry point.
 `app/` consumes the prepared VM through `StrategyNavigatorScreen`.
+
+Within `createStrategyNavigatorVM`, the same service-owned lane now calls:
+
+- `createStrategyPreviewExplanation`
+- `createStrategyPreviewContrast`
+- `selectStrategyPreviewKnowledge`
 
 ## Preview Rules
 
@@ -126,6 +181,75 @@ The preview must not answer:
 - whether the strategy is likely to profit
 - whether the user is ready to execute
 - what a broker or adapter would do next
+
+## P9-S5 Surface Compaction Rules
+
+`P9-S5` does not widen the service contract.
+It only clarifies how `app/screens/strategyNavigatorScreenView.ts` may group and order already-prepared content for rendering.
+
+The compaction pass may:
+
+- keep one dominant main-preview-focus block
+- keep one stable supporting-detail order for Dashboard shift, Market events, and Alert posture
+- group explanation plus contrast into one lighter supporting-context shelf
+- present knowledge follow-through as one clearly optional helpful-next-reading shelf
+- drop subordinate shelves cleanly when services return them unavailable
+
+The compaction pass may not:
+
+- derive new preview meaning locally
+- create new explanation, contrast, or knowledge-selection logic
+- widen the fetch seam
+- create a second preview contract family
+
+## Preview Contrast Rules
+
+`P9-S4` adds one subordinate contrast shelf inside the same Strategy Navigator VM.
+
+The contrast answers three questions only:
+
+- what is different about this scenario for the selected strategy
+- what the strategy pays more attention to here
+- what becomes less central here
+
+The contrast must:
+
+- stay short, calm, and educational
+- reuse the finite scenario catalog and interpreted scenario traits
+- describe emphasis shifts rather than outcomes
+- remain subordinate to the preview itself
+- return `UNAVAILABLE` honestly when the seam does not have enough prepared context
+
+The contrast must not:
+
+- imply a recommendation or readiness state
+- promise that the scenario resolves a certain way
+- expose raw signal lists, provider diagnostics, or runtime metadata
+- turn Strategy Preview into a live simulator or broad strategy battle surface
+
+## Preview Explanation Rules
+
+`P9-S3` adds one subordinate explanation shelf inside the same Strategy Navigator VM.
+
+The explanation answers three questions only:
+
+- what the strategy is noticing in the simulated backdrop
+- why those conditions matter to that strategy's worldview
+- which interpreted MarketEvents become more relevant through that lens
+
+The explanation must:
+
+- stay short, calm, and educational
+- reuse prepared preview focus rather than create a second simulator
+- describe interpretation priorities rather than outcomes
+- return `UNAVAILABLE` honestly when the seam does not have enough prepared context
+
+The explanation must not:
+
+- advise action
+- imply forecast confidence
+- expose raw signal lists, provider diagnostics, or runtime metadata
+- turn Strategy Preview into a generic explanation system for other surfaces
 
 ## Knowledge Follow-Through Rules
 
@@ -159,7 +283,10 @@ The selector must not:
 
 - render prepared strategy and scenario options
 - render prepared preview sections
+- render prepared preview-contrast content when `contrast.status === 'AVAILABLE'`
+- render prepared preview-explanation content when `explanation.status === 'AVAILABLE'`
 - render prepared knowledge follow-through items when `knowledgeFollowThrough.status === 'AVAILABLE'`
+- group prepared sections into a calmer render hierarchy for focus, supporting context, and optional reading
 - open prepared topic detail by `topicId`
 - format simple display labels and timestamps
 
@@ -168,6 +295,8 @@ The selector must not:
 - import the strategy catalog directly
 - shape scenario meaning locally
 - derive event importance locally
+- derive preview contrast wording locally
+- derive preview explanation wording locally
 - derive knowledge relevance locally
 - read markdown files or docs paths
 - build recommendation or execution language
@@ -185,12 +314,28 @@ Instead, preview-specific follow-through now lives inside `services/strategyNavi
 
 That keeps the preview lane cohesive while still consuming the shared canonical knowledge catalog.
 
+## Relationship To Explanation
+
+`PX-E1` and `PX-E2` still own Dashboard's generic interpreted explanation seam in `services/explanation/`.
+
+`P9-S3` intentionally does not move Strategy Preview onto that Dashboard-owned contract.
+Instead, preview-specific explanation now lives inside `services/strategyNavigator/` because this surface needs:
+
+- simulated scenario awareness
+- strategy-worldview wording
+- prepared preview-focus reuse
+
+That keeps Strategy Preview explanatory without turning the shared Dashboard why seam into a cross-surface catch-all.
+
 ## Relationship To Later Work
 
-`P9-S1` and `P9-S2` are the first two rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, and `P9-S5` are the first five rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 
+- richer scenario framing when the finite starter catalog proves stable
+- deeper scenario contrast depth when the current contrast seam proves useful
+- richer explanation depth when the current preview explanation proves useful
 - richer surface transformations when the product has a stronger reason for them
 - broader or deeper knowledge integration when the current follow-through proves useful
 - more nuanced interpreted scenarios when the starter catalog has proven stable

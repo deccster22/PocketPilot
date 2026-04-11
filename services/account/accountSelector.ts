@@ -1,25 +1,21 @@
-export type Account = {
-  id: string;
-  portfolioValue: number;
-  isPrimary?: boolean;
-};
+import {
+  requireSelectedAccountContext,
+} from '@/services/accounts/enforceAccountScopedTruth';
+import { resolveSelectedAccountContext } from '@/services/accounts/resolveSelectedAccountContext';
+import type { AccountContextCandidate } from '@/services/accounts/types';
 
-export function selectExecutionAccount(accounts: Account[]): string {
-  if (accounts.length === 0) {
-    throw new Error('No accounts available');
-  }
+export type Account = AccountContextCandidate;
 
-  const primaryAccounts = accounts.filter((account) => account.isPrimary === true);
+export function selectExecutionAccount(
+  accounts: Account[],
+  selectedAccountId?: string | null,
+): string {
+  const selectedAccount = requireSelectedAccountContext(
+    resolveSelectedAccountContext({
+      accounts,
+      selectedAccountId,
+    }),
+  );
 
-  if (primaryAccounts.length === 1) {
-    return primaryAccounts[0].id;
-  }
-
-  return accounts.reduce((selected, current) => {
-    if (current.portfolioValue > selected.portfolioValue) {
-      return current;
-    }
-
-    return selected;
-  }).id;
+  return selectedAccount.accountId;
 }

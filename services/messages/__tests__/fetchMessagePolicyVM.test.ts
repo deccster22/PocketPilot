@@ -150,7 +150,22 @@ function createSnapshotSurface(): SnapshotSurfaceVM {
 }
 
 function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): DashboardSurfaceVM {
+  const aggregatePortfolioContext = overrides.aggregatePortfolioContext ?? {
+    status: 'UNAVAILABLE' as const,
+    reason: 'NOT_ENABLED_FOR_SURFACE' as const,
+  };
+
   return {
+    accountContext: {
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-1',
+        displayName: 'Primary account',
+        selectionMode: 'PRIMARY_FALLBACK',
+        baseCurrency: 'USD',
+        strategyId: 'momentum_basics',
+      },
+    },
     model: {
       primeZone: { items: [] },
       secondaryZone: {
@@ -181,6 +196,7 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
       reason: 'NO_EXPLANATION_TARGET',
     },
     ...overrides,
+    aggregatePortfolioContext,
   };
 }
 

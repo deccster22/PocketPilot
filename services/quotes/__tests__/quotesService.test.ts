@@ -327,4 +327,43 @@ describe('fetchQuotes', () => {
       }),
     );
   });
+
+  it('uses an explicit selected account when one is supplied', async () => {
+    const accounts: Account[] = [
+      { id: 'acct-1', portfolioValue: 2_500 },
+      { id: 'acct-2', portfolioValue: 9_500, isPrimary: true },
+    ];
+
+    const getQuotesForSymbols = jest.fn(async (): Promise<ProviderRouterResult> =>
+      createRouterResult({
+        NVDA: {
+          symbol: 'NVDA',
+          price: 100,
+          source: 'acct-1',
+          timestamp: nowMs,
+          estimated: false,
+        },
+      }),
+    );
+
+    const result = await fetchQuotes(
+      { getQuotesForSymbols, nowProvider: () => nowMs },
+      {
+        accounts,
+        selectedAccountId: 'acct-1',
+        symbols: ['NVDA'],
+        context: {
+          role: 'execution',
+          budgetClass: 'CALM',
+        },
+      },
+    );
+
+    expect(result.accountId).toBe('acct-1');
+    expect(getQuotesForSymbols).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accountId: 'acct-1',
+      }),
+    );
+  });
 });

@@ -2,7 +2,7 @@
 
 - Title: PocketPilot Architecture Overview
 - Source file: `docs/source/PocketPilot Architecture Overview.pdf`
-- Last updated: 2026-04-08
+- Last updated: 2026-04-09
 
 File: `docs/founder/ARCHITECTURE_OVERVIEW.md`
 
@@ -17,13 +17,13 @@ Provider Router
   v
 QuoteBroker
   v
-Market Event Engine
+Selected Account Context
   v
-Strategy Engine
+Interpreted Event + Strategy Services
   v
-Orientation Layer
+Prepared Service Contracts
   v
-User Interface
+User Interface (render only)
 ```
 
 ## Market Providers
@@ -72,9 +72,20 @@ For implementation-constraining runtime doctrine, read:
 - `docs/architecture/QUOTE_BROKER.md`
 - `docs/governance/API_GOVERNANCE.md`
 
-## Market Event Engine
+## Selected Account Context
 
-Transforms raw data into meaningful events.
+Resolves which account's truth downstream services should use.
+
+Responsibilities:
+
+- preserve account-scoped alignment, fit, alerts, risk, and action support
+- keep single-account mode implicit and quiet
+- prevent global strategy aggregation drift
+- provide one selected-account seam for prepared surface consumers
+
+## Interpreted Event + Strategy Services
+
+Transform raw data into meaningful events and account-scoped strategy context.
 
 Examples:
 
@@ -83,26 +94,21 @@ Examples:
 - MomentumAlignment
 - StrategySignal
 
-Events are stored in the Event Ledger.
+These services own canonical interpreted truth such as:
 
-## Strategy Engine
+- `MarketEvent`
+- Event Ledger and query seams
+- Strategy Status
+- orientation / fit / message inputs
+- action-support and readiness context
 
-Evaluates events against strategy frameworks.
+Events are stored in the Event Ledger and shaped in `services/`, not in `app/`.
 
-Outputs:
+## Prepared Service Contracts
 
-- forming
-- developing
-- confirming
-- resolved
+PocketPilot now relies on service-owned prepared contracts and VMs for the main product surfaces.
 
-These states drive alerts and dashboard interpretation.
-
-## Orientation Layer
-
-Translates strategy states into human-readable insight.
-
-It now reaches users through prepared service-owned seams and surfaces such as:
+Examples:
 
 - Snapshot
 - Dashboard
@@ -110,7 +116,12 @@ It now reaches users through prepared service-owned seams and surfaces such as:
 - Insights / Since Last Checked
 - 30,000 ft View
 - Strategy Preview / Navigator
-- message-policy and context seams as prepared intermediates
+- message-policy and diagnostics seams
+
+The important rule is the seam:
+
+`services/` own truth and assemble prepared contracts.
+`app/` renders those prepared contracts.
 
 ## User Interface
 
@@ -121,5 +132,5 @@ Adaptive interface shaped by:
 - relevance filtering
 
 The UI does not interpret signals directly.
-PocketPilot increasingly relies on prepared service-owned contracts and VMs, with `app/` rendering prepared output rather than deriving interpretation locally.
-It presents the output of the Orientation Layer.
+It does not rank raw events, infer notification meaning, or rebuild risk / readiness logic locally.
+It presents the output of the prepared service layer.

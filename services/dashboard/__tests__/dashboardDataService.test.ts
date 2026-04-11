@@ -62,6 +62,32 @@ describe('fetchDashboardData', () => {
     const nowProvider = () => 1_700_000_000_100;
 
     mockFetchSurfaceContext.mockResolvedValue({
+      selectedAccountContext: {
+        status: 'AVAILABLE',
+        account: {
+          accountId: 'acct-live',
+          displayName: 'Live account',
+          selectionMode: 'PRIMARY_FALLBACK',
+          baseCurrency: 'USD',
+          strategyId: 'strategy-a',
+        },
+      },
+      aggregatePortfolioContext: {
+        status: 'AVAILABLE',
+        portfolio: {
+          totalValue: 16_500,
+          currency: 'USD',
+          accountCount: 3,
+          assets: [
+            {
+              symbol: 'BTC',
+              amount: 0.17,
+              value: 10_200,
+              weightPct: 61.81818181818181,
+            },
+          ],
+        },
+      },
       portfolioValue: 300,
       change24h: 0.02,
       strategyAlignment: 'Watchful',
@@ -146,8 +172,36 @@ describe('fetchDashboardData', () => {
     expect(mockFetchSurfaceContext).toHaveBeenCalledWith({
       profile: 'ADVANCED',
       nowProvider,
+      accountSwitchingEnabled: true,
+      aggregatePortfolioEnabled: true,
     });
     expect(result.scan.accountId).toBe('acct-live');
+    expect(result.accountContext).toEqual({
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-live',
+        displayName: 'Live account',
+        selectionMode: 'PRIMARY_FALLBACK',
+        baseCurrency: 'USD',
+        strategyId: 'strategy-a',
+      },
+    });
+    expect(result.aggregatePortfolioContext).toEqual({
+      status: 'AVAILABLE',
+      portfolio: {
+        totalValue: 16_500,
+        currency: 'USD',
+        accountCount: 3,
+        assets: [
+          {
+            symbol: 'BTC',
+            amount: 0.17,
+            value: 10_200,
+            weightPct: 61.81818181818181,
+          },
+        ],
+      },
+    });
     expect(result.orientationContext).toEqual({
       profile: 'ADVANCED',
       assets: [],

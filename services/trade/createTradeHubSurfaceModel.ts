@@ -1,5 +1,6 @@
 import type { UserProfile } from '@/core/profile/types';
 import type {
+  PreparedTradeRiskLane,
   ProtectionPlan,
   ProtectionPlanIntentType,
   TradeHubActionState,
@@ -76,6 +77,7 @@ function sortPlanCards(cards: ReadonlyArray<TradeHubPlanCard>): TradeHubPlanCard
 export function createTradeHubSurfaceModel(params: {
   profile: UserProfile;
   protectionPlans: ReadonlyArray<ProtectionPlan>;
+  risk: PreparedTradeRiskLane;
 }): TradeHubSurfaceModel {
   const planCards = sortPlanCards(params.protectionPlans.map(createPlanCard));
   const primaryPlan = planCards[0] ?? null;
@@ -84,6 +86,7 @@ export function createTradeHubSurfaceModel(params: {
   return {
     primaryPlan,
     alternativePlans: planCards.slice(1, 1 + alternativeLimit),
+    risk: params.risk,
     meta: {
       hasPrimaryPlan: primaryPlan !== null,
       profile: params.profile,

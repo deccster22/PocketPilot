@@ -1,4 +1,9 @@
 import type { UserProfile } from '@/core/profile/types';
+import type {
+  AccountSelectionMode,
+  AccountSwitchingAvailability,
+  SwitchableAccountOption,
+} from '@/services/accounts/types';
 import {
   fetchDashboardSurfaceVM,
   type DashboardSurfaceVM,
@@ -13,6 +18,53 @@ import type {
   MessageRationaleAvailability,
 } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
+
+export type DashboardScreenAccountContextViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+      switcher: DashboardScreenAccountSwitcherViewData;
+    };
+
+export type DashboardScreenAccountSwitchOptionViewData = {
+  accountId: string;
+  title: string;
+  summary: string | null;
+  isSelected: boolean;
+  isPrimary: boolean;
+};
+
+export type DashboardScreenAccountSwitcherViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+      options: DashboardScreenAccountSwitchOptionViewData[];
+    };
+
+export type DashboardScreenAggregatePortfolioAssetViewData = {
+  symbol: string;
+  summary: string;
+};
+
+export type DashboardScreenAggregatePortfolioViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+      totalValueText: string | null;
+      assets: DashboardScreenAggregatePortfolioAssetViewData[];
+    };
 
 export type DashboardScreenZoneItemViewData = {
   title: string;
@@ -40,6 +92,8 @@ export type DashboardScreenMessageViewData =
 
 export type DashboardScreenViewData = {
   profileLabel: string;
+  accountContext: DashboardScreenAccountContextViewData;
+  aggregatePortfolio: DashboardScreenAggregatePortfolioViewData;
   message: DashboardScreenMessageViewData;
   primeZone: DashboardScreenZoneViewData;
   secondaryZone: DashboardScreenZoneViewData;
@@ -63,6 +117,130 @@ export type DashboardScreenViewData = {
             };
       };
 };
+
+function formatSelectionMode(selectionMode: AccountSelectionMode): string {
+  switch (selectionMode) {
+    case 'EXPLICIT':
+      return 'Explicit account context';
+    case 'PRIMARY_FALLBACK':
+      return 'Primary-account context';
+    default:
+      return 'Highest-value fallback context';
+  }
+}
+
+function createAccountContextViewData(
+  accountContext: DashboardSurfaceVM['accountContext'],
+): DashboardScreenAccountContextViewData {
+  if (accountContext.status !== 'AVAILABLE') {
+    return {
+      visible: false,
+    };
+  }
+
+  return {
+    visible: true,
+    title: `Current account: ${accountContext.account.displayName}`,
+    summary: [
+      formatSelectionMode(accountContext.account.selectionMode),
+      accountContext.account.baseCurrency
+        ? `${accountContext.account.baseCurrency} base currency`
+        : null,
+      accountContext.account.strategyId
+        ? `Strategy ${accountContext.account.strategyId}`
+        : null,
+    ]
+      .filter((value): value is string => Boolean(value))
+      .join(' | '),
+    switcher: createAccountSwitcherViewData(accountContext.switching),
+  };
+}
+
+function formatAccountSwitchOptionSummary(
+  option: SwitchableAccountOption,
+): string | null {
+  return option.strategyId ? `Strategy ${option.strategyId}` : null;
+}
+
+function createAccountSwitcherViewData(
+  switchingAvailability?: AccountSwitchingAvailability,
+): DashboardScreenAccountSwitcherViewData {
+  if (switchingAvailability?.status !== 'AVAILABLE') {
+    return {
+      visible: false,
+    };
+  }
+
+  return {
+    visible: true,
+    title: 'Account context controls',
+    summary: 'Switch deliberately or mark one primary fallback.',
+    options: switchingAvailability.options.map((option) => ({
+      accountId: option.accountId,
+      title: option.displayName,
+      summary: formatAccountSwitchOptionSummary(option),
+      isSelected: option.isSelected,
+      isPrimary: option.isPrimary,
+    })),
+  };
+}
+
+function formatDecimal(value: number, fractionDigits: number): string {
+  return value.toFixed(fractionDigits).replace(/\.?0+$/, '');
+}
+
+function formatCurrencyValue(value: number, currency: string | null): string {
+  const formattedValue = value.toFixed(2);
+  return currency ? `${currency} ${formattedValue}` : formattedValue;
+}
+
+function createAggregateAssetSummary(params: {
+  amount: number | null;
+  value: number | null;
+  weightPct: number | null;
+  currency: string | null;
+}): string {
+  const parts = [
+    params.amount === null ? null : `${formatDecimal(params.amount, 4)} units`,
+    params.value === null ? null : formatCurrencyValue(params.value, params.currency),
+    params.weightPct === null ? null : `${params.weightPct.toFixed(1)}% weight`,
+  ].filter((value): value is string => value !== null);
+
+  return parts.join(' | ');
+}
+
+function createAggregatePortfolioViewData(
+  aggregatePortfolioContext: DashboardSurfaceVM['aggregatePortfolioContext'],
+): DashboardScreenAggregatePortfolioViewData {
+  if (aggregatePortfolioContext.status !== 'AVAILABLE') {
+    return {
+      visible: false,
+    };
+  }
+
+  const { portfolio } = aggregatePortfolioContext;
+
+  return {
+    visible: true,
+    title: 'Aggregate holdings',
+    summary: `Across ${portfolio.accountCount} ${
+      portfolio.accountCount === 1 ? 'account' : 'accounts'
+    } | Portfolio exposure only; strategy truth stays on the current account.`,
+    totalValueText:
+      portfolio.totalValue === null
+        ? null
+        : `${formatCurrencyValue(portfolio.totalValue, portfolio.currency)} total`,
+    assets: portfolio.assets.slice(0, 3).map((asset) => ({
+      symbol: asset.symbol,
+      summary: createAggregateAssetSummary({
+        amount: asset.amount,
+        value: asset.value,
+        weightPct: asset.weightPct,
+        currency: portfolio.currency,
+      }),
+    })),
+  };
+}
 
 function formatEventTypeLabel(item: DashboardItem): string {
   switch (item.eventType) {
@@ -189,6 +367,8 @@ export function createDashboardScreenViewData(
 
   return {
     profileLabel: surface.model.meta.profile,
+    accountContext: createAccountContextViewData(surface.accountContext),
+    aggregatePortfolio: createAggregatePortfolioViewData(surface.aggregatePortfolioContext),
     message: createDashboardMessageViewData(messagePolicy),
     primeZone: {
       title: 'Prime Zone',

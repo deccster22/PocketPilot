@@ -18,19 +18,42 @@ export type StrategyNavigatorScenarioOptionViewData = {
   selected: boolean;
 };
 
-export type StrategyPreviewCardViewData = {
-  strategyTitle: string;
-  scenarioTitle: string;
-  scenarioSummary: string;
-  snapshotHeadline: string;
-  dashboardFocus: ReadonlyArray<string>;
-  eventHighlights: ReadonlyArray<string>;
-  alertPosture: string;
-  knowledgeItems: ReadonlyArray<{
+export type StrategyPreviewMainSectionViewData = {
+  sectionId: 'DASHBOARD_FOCUS' | 'EVENT_HIGHLIGHTS' | 'ALERT_POSTURE';
+  label: string;
+  body: string | null;
+  items: ReadonlyArray<string>;
+};
+
+export type StrategyPreviewSupportingSectionViewData = {
+  sectionId: 'EXPLANATION' | 'CONTRAST';
+  label: string;
+  title: string;
+  summary: string;
+  bullets: ReadonlyArray<string>;
+};
+
+export type StrategyPreviewKnowledgeSectionViewData = {
+  title: string;
+  summary: string;
+  items: ReadonlyArray<{
     topicId: string;
     title: string;
     reason: string;
   }>;
+};
+
+export type StrategyPreviewCardViewData = {
+  strategyTitle: string;
+  scenarioTitle: string;
+  scenarioSummary: string;
+  focus: {
+    label: string;
+    headline: string;
+  };
+  mainSections: ReadonlyArray<StrategyPreviewMainSectionViewData>;
+  supportingSections: ReadonlyArray<StrategyPreviewSupportingSectionViewData>;
+  knowledgeSection: StrategyPreviewKnowledgeSectionViewData | null;
 };
 
 export type StrategyNavigatorScreenViewData = {
@@ -76,6 +99,60 @@ function formatAvailabilityMessage(
   }
 }
 
+function createPreviewMainSections(
+  focus: Extract<StrategyNavigatorVM['availability'], { status: 'AVAILABLE' }>['focus'],
+): StrategyPreviewCardViewData['mainSections'] {
+  const sections: StrategyPreviewMainSectionViewData[] = [
+    {
+      sectionId: 'DASHBOARD_FOCUS',
+      label: 'Dashboard shift',
+      body: null,
+      items: focus.dashboardFocus,
+    },
+    {
+      sectionId: 'EVENT_HIGHLIGHTS',
+      label: 'Market events that would matter',
+      body: null,
+      items: focus.eventHighlights,
+    },
+    {
+      sectionId: 'ALERT_POSTURE',
+      label: 'Alert posture',
+      body: focus.alertPosture,
+      items: [],
+    },
+  ];
+
+  return sections.filter((section) => section.items.length > 0 || section.body);
+}
+
+function createPreviewSupportingSections(params: {
+  explanation: StrategyPreviewCardViewData['supportingSections'][number] | null;
+  contrast: StrategyPreviewCardViewData['supportingSections'][number] | null;
+}): StrategyPreviewCardViewData['supportingSections'] {
+  return [params.explanation, params.contrast].filter(
+    (section): section is StrategyPreviewCardViewData['supportingSections'][number] => section !== null,
+  );
+}
+
+function createPreviewKnowledgeSection(
+  knowledgeItems: ReadonlyArray<{
+    topicId: string;
+    title: string;
+    reason: string;
+  }>,
+): StrategyPreviewCardViewData['knowledgeSection'] {
+  if (knowledgeItems.length === 0) {
+    return null;
+  }
+
+  return {
+    title: 'Helpful next reading',
+    summary: 'Optional if you want a little more context without leaving the simulated lane.',
+    items: knowledgeItems,
+  };
+}
+
 export function createStrategyNavigatorScreenViewData(
   vm: StrategyNavigatorVM | null,
 ): StrategyNavigatorScreenViewData | null {
@@ -113,6 +190,8 @@ export function createStrategyNavigatorScreenViewData(
   }
 
   const selectedStrategy = strategyOptions.find((strategy) => strategy.strategyId === availability.strategyId);
+  const contrast = vm.contrast.status === 'AVAILABLE' ? vm.contrast.content : null;
+  const explanation = vm.explanation.status === 'AVAILABLE' ? vm.explanation.content : null;
   const knowledgeItems =
     vm.knowledgeFollowThrough?.status === 'AVAILABLE' ? vm.knowledgeFollowThrough.items : [];
 
@@ -129,11 +208,32 @@ export function createStrategyNavigatorScreenViewData(
       strategyTitle: selectedStrategy?.title ?? 'Selected strategy',
       scenarioTitle: availability.scenario.title,
       scenarioSummary: availability.scenario.summary,
-      snapshotHeadline: availability.focus.snapshotHeadline,
-      dashboardFocus: availability.focus.dashboardFocus,
-      eventHighlights: availability.focus.eventHighlights,
-      alertPosture: availability.focus.alertPosture,
-      knowledgeItems,
+      focus: {
+        label: 'Main preview focus',
+        headline: availability.focus.snapshotHeadline,
+      },
+      mainSections: createPreviewMainSections(availability.focus),
+      supportingSections: createPreviewSupportingSections({
+        explanation: explanation
+          ? {
+              sectionId: 'EXPLANATION',
+              label: 'Why this strategy cares here',
+              title: explanation.title,
+              summary: explanation.summary,
+              bullets: explanation.bullets,
+            }
+          : null,
+        contrast: contrast
+          ? {
+              sectionId: 'CONTRAST',
+              label: 'Scenario contrast',
+              title: contrast.title,
+              summary: contrast.summary,
+              bullets: contrast.bullets,
+            }
+          : null,
+      }),
+      knowledgeSection: createPreviewKnowledgeSection(knowledgeItems),
     },
   };
 }

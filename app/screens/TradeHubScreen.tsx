@@ -36,6 +36,7 @@ import type {
   ExecutionAdapterAttemptResult,
   ExecutionPreviewVM,
   ExecutionReadiness,
+  RiskBasis,
   SubmissionIntentResult,
   TradeHubSurfaceModel,
 } from '@/services/trade/types';
@@ -135,6 +136,8 @@ function parseNumericInput(value: string): number | null {
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | undefined>();
+  const [selectedRiskBasis, setSelectedRiskBasis] = useState<RiskBasis | undefined>();
   const [messagePolicy, setMessagePolicy] = useState<MessagePolicyAvailability | null>(null);
   const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
     null,
@@ -156,9 +159,18 @@ export function TradeHubScreen() {
   });
 
   useEffect(() => {
+    setSelectedPlanId(undefined);
+  }, [profile]);
+
+  useEffect(() => {
     let isMounted = true;
 
-    fetchTradeHubVM({ profile, baselineScan })
+    fetchTradeHubVM({
+      profile,
+      baselineScan,
+      selectedPlanId,
+      selectedRiskBasis,
+    })
       .then((tradeHub) => {
         if (!isMounted) {
           return;
@@ -178,7 +190,7 @@ export function TradeHubScreen() {
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan]);
+  }, [profile, baselineScan, selectedPlanId, selectedRiskBasis]);
 
   const screenView = useMemo(
     () => createTradeHubScreenViewData(surfaceModel, messagePolicy),
@@ -231,7 +243,12 @@ export function TradeHubScreen() {
   useEffect(() => {
     let isMounted = true;
 
-    fetchConfirmationSessionVM({ profile, baselineScan })
+    fetchConfirmationSessionVM({
+      profile,
+      baselineScan,
+      selectedPlanId,
+      selectedRiskBasis,
+    })
       .then((result) => {
         if (!isMounted) {
           return;
@@ -251,7 +268,7 @@ export function TradeHubScreen() {
     return () => {
       isMounted = false;
     };
-  }, [profile, baselineScan]);
+  }, [profile, baselineScan, selectedPlanId, selectedRiskBasis]);
 
   useEffect(() => {
     let isMounted = true;
@@ -462,27 +479,11 @@ export function TradeHubScreen() {
   }
 
   function handleSelectPlan(planId: string) {
-    const currentVm = confirmationSessionVm;
+    setSelectedPlanId(planId);
+  }
 
-    if (!currentVm) {
-      return;
-    }
-
-    currentVm.actions
-      .selectPlan(planId)
-      .then((session) => {
-        setConfirmationSessionVm((latestVm) =>
-          latestVm && latestVm.actions === currentVm.actions
-            ? {
-                ...latestVm,
-                session,
-              }
-            : latestVm,
-        );
-      })
-      .catch(() => {
-        setConfirmationSessionVm((latestVm) => latestVm);
-      });
+  function handleSelectRiskBasis(basis: RiskBasis) {
+    setSelectedRiskBasis(basis);
   }
 
   function handleRiskToolInputChange(field: keyof RiskToolInputFormState, value: string) {
@@ -523,7 +524,10 @@ export function TradeHubScreen() {
             <TradeHubPlanCard
               title="Primary Plan"
               plan={screenView.primaryPlan}
-              selected={confirmationSessionVm?.session.planId === screenView.primaryPlan.planId}
+              selected={
+                (selectedPlanId ?? confirmationSessionVm?.session.planId) ===
+                screenView.primaryPlan.planId
+              }
               onPress={() => handleSelectPlan(screenView.primaryPlan.planId)}
             />
           ) : (
@@ -539,12 +543,59 @@ export function TradeHubScreen() {
                 key={plan.planId}
                 title="Alternative Plan"
                 plan={plan}
-                selected={confirmationSessionVm?.session.planId === plan.planId}
+                selected={(selectedPlanId ?? confirmationSessionVm?.session.planId) === plan.planId}
                 onPress={() => handleSelectPlan(plan.planId)}
               />
             ))
           ) : (
             <Text style={styles.emptyState}>No alternative plans are prepared.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Risk Basis</Text>
+          <Text style={styles.supportText}>
+            {screenView?.risk?.summary ??
+              'Risk framing appears when a prepared plan can carry an explicit basis.'}
+          </Text>
+          {screenView?.risk ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Prepared risk framing</Text>
+              <Text style={styles.cardTitle}>{screenView.risk.selectedBasisLabel}</Text>
+              <Text style={styles.cardMeta}>{screenView.risk.statusText}</Text>
+              <Text style={styles.cardMeta}>{screenView.risk.headline}</Text>
+              <View style={styles.toggleRow}>
+                {screenView.risk.options.map((option) => {
+                  const isSelected =
+                    (selectedRiskBasis ?? confirmationSessionVm?.session.preview?.risk.activeBasis) ===
+                    option.basis || (!selectedRiskBasis && option.isSelected);
+
+                  return (
+                    <Pressable
+                      key={option.basis}
+                      accessibilityRole="button"
+                      onPress={() => handleSelectRiskBasis(option.basis)}
+                      style={({ pressed }) => [
+                        styles.toggleButton,
+                        isSelected ? styles.selectedToggleButton : null,
+                        pressed ? styles.stepButtonPressed : null,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.toggleButtonText,
+                          isSelected ? styles.selectedToggleButtonText : null,
+                        ]}
+                      >
+                        {option.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>Risk basis is not available right now.</Text>
           )}
         </View>
 
@@ -561,6 +612,15 @@ export function TradeHubScreen() {
               <Text style={styles.cardMeta}>{previewView.readinessText}</Text>
               <Text style={styles.cardMeta}>{previewView.constraintsText}</Text>
               <Text style={styles.cardMeta}>{previewView.rationaleTraceText}</Text>
+              <Text style={styles.cardMeta}>{previewView.riskBasisText}</Text>
+              <Text style={styles.cardMeta}>{previewView.riskStatusText}</Text>
+              <Text style={styles.cardMeta}>{previewView.riskHeadline}</Text>
+              <Text style={styles.cardMeta}>{previewView.riskSummary}</Text>
+              {previewView.riskItems.map((item) => (
+                <Text key={`${item.label}:${item.value}`} style={styles.cardMeta}>
+                  {item.label}: {item.value}
+                </Text>
+              ))}
               <Text style={styles.cardMeta}>{previewView.confirmationText}</Text>
               <Text style={styles.cardMeta}>{previewView.placeholderText}</Text>
               <Text style={styles.cardId}>Plan: {previewView.planId}</Text>
@@ -913,6 +973,31 @@ const styles = StyleSheet.create({
   },
   selectedCard: {
     borderColor: '#2563eb',
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  toggleButton: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  selectedToggleButton: {
+    borderColor: '#475569',
+    backgroundColor: '#e2e8f0',
+  },
+  toggleButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#334155',
+  },
+  selectedToggleButtonText: {
+    color: '#0f172a',
   },
   cardEyebrow: {
     fontSize: 12,

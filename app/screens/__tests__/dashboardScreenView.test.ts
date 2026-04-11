@@ -10,6 +10,64 @@ import {
 
 function createSurface(): DashboardSurfaceVM {
   return {
+    accountContext: {
+      status: 'AVAILABLE',
+      account: {
+        accountId: 'acct-1',
+        displayName: 'Primary account',
+        selectionMode: 'PRIMARY_FALLBACK',
+        baseCurrency: 'USD',
+        strategyId: 'momentum_basics',
+      },
+      switching: {
+        status: 'AVAILABLE',
+        selectedAccountId: 'acct-1',
+        options: [
+          {
+            accountId: 'acct-1',
+            displayName: 'Primary account',
+            strategyId: 'momentum_basics',
+            isPrimary: true,
+            isSelected: true,
+          },
+          {
+            accountId: 'acct-2',
+            displayName: 'Backup account',
+            strategyId: 'dip_buying',
+            isPrimary: false,
+            isSelected: false,
+          },
+        ],
+      },
+    },
+    aggregatePortfolioContext: {
+      status: 'AVAILABLE',
+      portfolio: {
+        totalValue: 16_500,
+        currency: 'USD',
+        accountCount: 3,
+        assets: [
+          {
+            symbol: 'BTC',
+            amount: 0.17,
+            value: 10_200,
+            weightPct: 61.81818181818181,
+          },
+          {
+            symbol: 'ETH',
+            amount: 2.25,
+            value: 4_200,
+            weightPct: 25.454545454545453,
+          },
+          {
+            symbol: 'SOL',
+            amount: 80,
+            value: 2_100,
+            weightPct: 12.727272727272727,
+          },
+        ],
+      },
+    },
     model: {
       primeZone: {
         items: [
@@ -65,7 +123,8 @@ function createSurface(): DashboardSurfaceVM {
       status: 'AVAILABLE' as const,
       explanation: {
         title: 'Why BTC is in focus',
-        summary: 'BTC is in focus because momentum is strengthening in the current interpreted picture.',
+        summary:
+          'BTC is in focus because momentum is strengthening in the current interpreted picture.',
         contextNote:
           'The current state remains watchful, so this stays active without reading as settled.',
         confidence: 'MODERATE' as const,
@@ -75,7 +134,8 @@ function createSurface(): DashboardSurfaceVM {
           {
             kind: 'MARKET_EVENT' as const,
             label: 'BTC momentum context',
-            detail: 'BTC remains in focus because momentum is strengthening in the current interpreted picture.',
+            detail:
+              'BTC remains in focus because momentum is strengthening in the current interpreted picture.',
             timestamp: '2026-04-01T00:00:00.000Z',
           },
         ],
@@ -102,6 +162,53 @@ describe('createDashboardScreenViewData', () => {
 
     expect(view).toEqual({
       profileLabel: 'ADVANCED',
+      accountContext: {
+        visible: true,
+        title: 'Current account: Primary account',
+        summary: 'Primary-account context | USD base currency | Strategy momentum_basics',
+        switcher: {
+          visible: true,
+          title: 'Account context controls',
+          summary: 'Switch deliberately or mark one primary fallback.',
+          options: [
+            {
+              accountId: 'acct-1',
+              title: 'Primary account',
+              summary: 'Strategy momentum_basics',
+              isSelected: true,
+              isPrimary: true,
+            },
+            {
+              accountId: 'acct-2',
+              title: 'Backup account',
+              summary: 'Strategy dip_buying',
+              isSelected: false,
+              isPrimary: false,
+            },
+          ],
+        },
+      },
+      aggregatePortfolio: {
+        visible: true,
+        title: 'Aggregate holdings',
+        summary:
+          'Across 3 accounts | Portfolio exposure only; strategy truth stays on the current account.',
+        totalValueText: 'USD 16500.00 total',
+        assets: [
+          {
+            symbol: 'BTC',
+            summary: '0.17 units | USD 10200.00 | 61.8% weight',
+          },
+          {
+            symbol: 'ETH',
+            summary: '2.25 units | USD 4200.00 | 25.5% weight',
+          },
+          {
+            symbol: 'SOL',
+            summary: '80 units | USD 2100.00 | 12.7% weight',
+          },
+        ],
+      },
       message: {
         visible: false,
       },
@@ -138,7 +245,8 @@ describe('createDashboardScreenViewData', () => {
       explanation: {
         visible: true,
         title: 'Why BTC is in focus',
-        summary: 'BTC is in focus because momentum is strengthening in the current interpreted picture.',
+        summary:
+          'BTC is in focus because momentum is strengthening in the current interpreted picture.',
         confidenceText: 'Support: Moderate',
         confidenceNote:
           'Confidence is moderate because more than one prepared input supports this interpretation. It reflects evidence support, not a guaranteed outcome.',
@@ -158,21 +266,28 @@ describe('createDashboardScreenViewData', () => {
     });
   });
 
-  it('keeps the screen helper on the prepared message-policy and explanation contracts only', () => {
+  it('keeps the screen helper on the prepared account, message-policy, and explanation contracts only', () => {
     const source = readFileSync(
       join(process.cwd(), 'app', 'screens', 'dashboardScreenView.ts'),
       'utf8',
     );
 
+    expect(source).toMatch(/accountContext\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).toMatch(/messagePolicy\.rationale/);
+    expect(source).not.toMatch(
+      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext/,
+    );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
     expect(source).not.toMatch(
       /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
     );
-    expect(source).not.toMatch(/createExplanationSummary|signalsTriggered|eventId|providerId|metadata/);
+    expect(source).not.toMatch(
+      /createExplanationSummary|signalsTriggered|eventId|providerId|metadata/,
+    );
+    expect(source).not.toMatch(/strategyFit|aggregate alignment|aggregate fit/i);
   });
 
   it('passes through the prepared Dashboard referral and rationale without classifying it locally', () => {
@@ -249,10 +364,109 @@ describe('createDashboardScreenViewData', () => {
     expect(createDashboardScreenViewData(null)).toBeNull();
   });
 
+  it('hides the account-context cue when the prepared account seam is unavailable', () => {
+    expect(
+      createDashboardScreenViewData({
+        ...createSurface(),
+        accountContext: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_VALID_ACCOUNT_CONTEXT',
+        },
+      }),
+    ).toMatchObject({
+      accountContext: {
+        visible: false,
+      },
+    });
+  });
+
+  it('keeps the account cue passive when switching is unavailable', () => {
+    const surface = createSurface();
+
+    expect(
+      createDashboardScreenViewData({
+        ...surface,
+        accountContext: {
+          ...surface.accountContext,
+          switching: {
+            status: 'UNAVAILABLE',
+            reason: 'SINGLE_ACCOUNT_ONLY',
+          },
+        },
+      }),
+    ).toMatchObject({
+      accountContext: {
+        visible: true,
+        switcher: {
+          visible: false,
+        },
+      },
+    });
+  });
+
+  it('keeps aggregate holdings subordinate and portfolio-only', () => {
+    const view = createDashboardScreenViewData(createSurface());
+
+    expect(view?.aggregatePortfolio).toEqual({
+      visible: true,
+      title: 'Aggregate holdings',
+      summary:
+        'Across 3 accounts | Portfolio exposure only; strategy truth stays on the current account.',
+      totalValueText: 'USD 16500.00 total',
+      assets: [
+        {
+          symbol: 'BTC',
+          summary: '0.17 units | USD 10200.00 | 61.8% weight',
+        },
+        {
+          symbol: 'ETH',
+          summary: '2.25 units | USD 4200.00 | 25.5% weight',
+        },
+        {
+          symbol: 'SOL',
+          summary: '80 units | USD 2100.00 | 12.7% weight',
+        },
+      ],
+    });
+    expect(JSON.stringify(view?.aggregatePortfolio)).not.toMatch(
+      /watchful|aligned|needs review|fit|execution|risk/i,
+    );
+  });
+
+  it('hides aggregate holdings when the prepared aggregate seam is unavailable', () => {
+    expect(
+      createDashboardScreenViewData({
+        ...createSurface(),
+        aggregatePortfolioContext: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_AGGREGATABLE_PORTFOLIO_DATA',
+        },
+      }),
+    ).toMatchObject({
+      aggregatePortfolio: {
+        visible: false,
+      },
+    });
+  });
+
   it('hides the explanation card when the prepared explanation is unavailable', () => {
     expect(
       createDashboardScreenViewData(
         {
+          accountContext: {
+            status: 'AVAILABLE',
+            account: {
+              accountId: 'acct-1',
+              displayName: 'Primary account',
+              selectionMode: 'EXPLICIT',
+              baseCurrency: 'USD',
+              strategyId: 'momentum_basics',
+            },
+          },
+          aggregatePortfolioContext: {
+            status: 'UNAVAILABLE',
+            reason: 'NO_AGGREGATABLE_PORTFOLIO_DATA',
+          },
           model: {
             primeZone: { items: [] },
             secondaryZone: { items: [] },
@@ -273,6 +487,9 @@ describe('createDashboardScreenViewData', () => {
         unavailableMessagePolicy(),
       ),
     ).toMatchObject({
+      aggregatePortfolio: {
+        visible: false,
+      },
       message: {
         visible: false,
       },
