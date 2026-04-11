@@ -637,6 +637,21 @@ export function TradeHubScreen() {
                   {item.label}: {item.value}
                 </Text>
               ))}
+              {previewView.riskInputGuidance.status === 'AVAILABLE' ? (
+                <View style={styles.noteCard}>
+                  <Text style={styles.noteTitle}>
+                    {previewView.riskInputGuidance.guidance.title}
+                  </Text>
+                  <Text style={styles.noteSummary}>
+                    {previewView.riskInputGuidance.guidance.summary}
+                  </Text>
+                  {previewView.riskInputGuidance.guidance.items.map((item) => (
+                    <Text key={item} style={styles.cardMeta}>
+                      {item}
+                    </Text>
+                  ))}
+                </View>
+              ) : null}
               <Text style={styles.cardMeta}>{previewView.positionSizing.statusText}</Text>
               <Text style={styles.cardMeta}>{previewView.positionSizing.headline}</Text>
               <Text style={styles.cardSummary}>{previewView.positionSizing.summary}</Text>

@@ -62,6 +62,7 @@ Start with:
 - Journal notes stay optional and small. The first Insights journal lane remains text-only, context-linked, service-owned, and free of reminders, scorekeeping, or AI commentary; export follow-through stays narrow and explicit where it is honestly supported.
 - Explicit risk framing. Selected risk basis must stay legible and flow through prepared Trade Hub summaries and sizing outputs.
 - Account-level preferred risk basis stays service-owned and explicit. Trade Hub may start from a saved per-account basis, but the screen never invents or silently stores one.
+- Prepared risk-input guidance stays service-owned, calm, and non-enforcing when sizing context is thin or unsupported.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.

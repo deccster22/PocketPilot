@@ -29,6 +29,10 @@ P6-A5 adds one optional prepared rationale on that same message-policy result:
 - it stays inside the existing inline note posture
 - it explains the boundary calmly without becoming a debug panel
 - it does not add settings or delivery mechanics
+P5-R9 adds one optional risk-input guidance note inside the selected-plan preview:
+- it explains thin or unsupported sizing context calmly and explicitly
+- it stays service-owned and non-enforcing
+- it does not add troubleshooting flows or validation walls
 
 ## Surface Contract
 
@@ -175,11 +179,21 @@ The preview contract shape is:
   placeholders: {
     orderPreviewAvailable: boolean,
     executionPreviewAvailable: boolean
+  },
+  riskInputGuidance: {
+    status: 'UNAVAILABLE' | 'AVAILABLE',
+    reason?: 'NO_GUIDANCE_NEEDED' | 'NOT_ENABLED_FOR_SURFACE',
+    guidance?: {
+      title: string,
+      summary: string,
+      items: string[]
+    }
   }
 }
 ```
 
 The preview is for future confirmation UI scaffolding. It expands exactly one selected plan into safe detail without adding execution behavior.
+When available, the risk-input guidance note stays subordinate to the main preview and explains what the prepared sizing lane still needs without turning into enforcement or troubleshooting theatre.
 
 Trade Hub confirmation consumers also consume a prepared `TradePlanConfirmationShell` from `services/trade/`.
 

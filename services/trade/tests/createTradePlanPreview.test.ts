@@ -120,6 +120,10 @@ describe('createTradePlanPreview', () => {
           ],
         },
       },
+      riskInputGuidance: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_GUIDANCE_NEEDED',
+      },
     });
   });
 

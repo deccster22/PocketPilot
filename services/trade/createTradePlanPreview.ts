@@ -4,6 +4,7 @@ import type {
   TradePlanPreview,
 } from '@/services/trade/types';
 import { createPositionSizingOutput } from '@/services/trade/createPositionSizingOutput';
+import { createRiskInputGuidance } from '@/services/trade/createRiskInputGuidance';
 import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
 
 export function createTradePlanPreview(
@@ -14,6 +15,12 @@ export function createTradePlanPreview(
     baseCurrency: string | null;
   } | null,
 ): TradePlanPreview {
+  const positionSizing = createPositionSizingOutput({
+    plan,
+    risk,
+    accountContext: accountContext ?? null,
+  });
+
   return {
     planId: plan.planId,
     headline: {
@@ -45,10 +52,12 @@ export function createTradePlanPreview(
       executionPreviewAvailable: false,
     },
     risk,
-    positionSizing: createPositionSizingOutput({
+    positionSizing,
+    riskInputGuidance: createRiskInputGuidance({
       plan,
       risk,
       accountContext: accountContext ?? null,
+      positionSizing,
     }),
   };
 }

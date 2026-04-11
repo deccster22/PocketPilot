@@ -36,6 +36,7 @@ Trade Hub may:
 - expose one calm, explicit risk-basis selector when the prepared contract supports it
 - show one calm account-level preferred-basis starting point when it exists
 - show prepared risk-per-trade context that explains framing without pushing action
+- show one calm prepared risk-input guidance note when sizing context is thin or unsupported
 - present readiness / constraints / rationale
 - expose confirmation-safe quick actions where allowed
 - adapt execution path by platform capability
@@ -48,6 +49,7 @@ Trade Hub must not:
 - force education before use
 - behave like a slot machine with buttons
 - hide a preferred basis behind a global default
+- turn incomplete-input guidance into a block, validator, or troubleshooting wall
 - mutate preferred-basis state in app-owned persistence code
 
 ## 5. ProtectionPlan posture
@@ -64,6 +66,7 @@ Expected prepared data:
 - selected risk basis
 - prepared sizing/max-loss output
 - prepared risk-per-trade context
+- prepared risk-input guidance when the lane is incomplete
 - confirmation metadata
 - capability path type
 
@@ -118,6 +121,7 @@ The UI renders the prepared path only. It should not contain hidden execution lo
 - capability-path contract tests
 - certainty wording tests
 - non-directive beginner-copy tests
+- calm guidance-placement tests
 
 ## 11. Anti-patterns to block
 - one-tap execution drift
