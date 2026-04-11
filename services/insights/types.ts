@@ -271,12 +271,74 @@ export type PreparedExportSummaryItem = {
   value: string;
 };
 
+export type ExportDispatchAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'DISPATCH_NOT_SUPPORTED' | 'INSUFFICIENT_CONTENT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      format: ExportFormat;
+      fileLabel: string;
+      canShare: boolean;
+      journalFollowThroughLabel: string | null;
+    };
+
+export type PreparedExportDocumentRow = {
+  label: string;
+  value: string;
+  emphasis: 'NEUTRAL' | 'SHIFT' | 'CONTEXT';
+};
+
+export type PreparedExportDocumentSection = {
+  title: string;
+  summary: string | null;
+  rows: ReadonlyArray<PreparedExportDocumentRow>;
+};
+
+export type PreparedExportJournalReference = {
+  title: string;
+  linkageLabel: string | null;
+  updatedAtLabel: string | null;
+  body: string;
+};
+
+export type PreparedExportLedgerRow = {
+  timestampLabel: string;
+  timezoneLabel: string;
+  eventClass: 'MARKET' | 'USER_ACTION';
+  eventLabel: string;
+  accountLabel: string;
+  symbol: string | null;
+  strategyLabel: string | null;
+  alignmentLabel: string | null;
+  certaintyLabel: string | null;
+  priceLabel: string | null;
+  percentChangeLabel: string | null;
+};
+
+export type PreparedExportDocument =
+  | {
+      kind: 'SUMMARY';
+      sections: ReadonlyArray<PreparedExportDocumentSection>;
+      limitationNotes: ReadonlyArray<string>;
+      journalReference: PreparedExportJournalReference | null;
+    }
+  | {
+      kind: 'EVENT_LEDGER';
+      rows: ReadonlyArray<PreparedExportLedgerRow>;
+      journalReference: null;
+    };
+
 export type PreparedExportRequest = {
   format: ExportFormat;
   title: string;
   coveredRangeLabel: string | null;
   timezoneLabel: string;
   payloadSummary: ReadonlyArray<PreparedExportSummaryItem>;
+  dispatchAvailability: ExportDispatchAvailability;
+  journalReferenceIncluded: boolean;
+  document: PreparedExportDocument;
 };
 
 export type ExportRequestAvailability =
@@ -297,6 +359,24 @@ export type PreparedExportRequestVM = {
   generatedAt: string | null;
   availability: ExportRequestAvailability;
 };
+
+export type PreparedExportDispatchResult =
+  | {
+      status: 'UNAVAILABLE';
+      reason:
+        | 'NO_EXPORT_SELECTED'
+        | 'UNSUPPORTED_FORMAT'
+        | 'DISPATCH_NOT_SUPPORTED'
+        | 'DISPATCH_FAILED'
+        | 'INSUFFICIENT_CONTENT';
+    }
+  | {
+      status: 'AVAILABLE';
+      fileLabel: string;
+      mimeType: string;
+      timezoneLabel: string;
+      journalReferenceIncluded: boolean;
+    };
 
 export type SummaryArchiveEntry = {
   archiveId: string;

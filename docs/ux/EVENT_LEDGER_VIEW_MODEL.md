@@ -129,9 +129,11 @@ Summary archive should arrive as prepared summary stubs:
 Reflection exports should arrive as prepared export contracts:
 
 - shaped in `services/`
-- explicit about format, covered period, and timezone labeling
+- explicit about format, covered period, timezone labeling, and dispatch availability
 - profile-aware in availability without changing canonical event truth
+- created only from one explicit user action in the Insights export path
 - event-level only when the user explicitly chooses the ledger export path
+- journal-aware follow-through appears only where the current reflection context and chosen export format can support it honestly
 - never widened into provider/runtime diagnostics or app-side report shaping
 
 Journal notes should arrive as prepared journal-entry contracts:

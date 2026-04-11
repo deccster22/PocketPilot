@@ -1,4 +1,5 @@
 import type { EventLedgerEntry, UserActionEvent } from '@/core/types/eventLedger';
+import type { JournalEntry } from '@/services/insights/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
 import { createPreparedExportRequest } from '@/services/insights/createPreparedExportRequest';
 
@@ -78,8 +79,20 @@ function createReflectionHistory(): EventLedgerEntry[] {
   ];
 }
 
+function createLinkedJournalEntry(): JournalEntry {
+  return {
+    entryId: 'journal:PERIOD_SUMMARY:2026-03',
+    contextType: 'PERIOD_SUMMARY',
+    contextId: '2026-03',
+    title: 'Summary note',
+    linkageLabel: 'Linked to March 2026 summary',
+    body: 'A slower month still felt steadier once the pullback settled.',
+    updatedAtLabel: 'Updated 2026-04-14 09:30 UTC',
+  };
+}
+
 describe('createPreparedExportRequest', () => {
-  it('prepares a calm PDF summary request with explicit coverage and timezone labeling', () => {
+  it('prepares a calm PDF summary request with explicit dispatch availability and journal follow-through', () => {
     const result = createPreparedExportRequest({
       generatedAt: '2026-04-15T00:00:00.000Z',
       profile: 'BEGINNER',
@@ -87,6 +100,8 @@ describe('createPreparedExportRequest', () => {
       format: 'PDF_SUMMARY',
       period: 'LAST_MONTH',
       timezoneLabel: 'Australia/Sydney',
+      linkedJournalEntry: createLinkedJournalEntry(),
+      includeJournalReference: true,
     });
 
     expect(result.availability.status).toBe('AVAILABLE');
@@ -95,40 +110,135 @@ describe('createPreparedExportRequest', () => {
       throw new Error('Expected PDF summary request to be available.');
     }
 
-    expect(result.availability.request).toEqual({
+    expect(result.availability.request).toEqual(
+      expect.objectContaining({
+        format: 'PDF_SUMMARY',
+        title: 'Last month reflection summary',
+        coveredRangeLabel: 'Covered period: March 2026',
+        timezoneLabel: 'Australia/Sydney',
+        journalReferenceIncluded: true,
+        dispatchAvailability: {
+          status: 'AVAILABLE',
+          format: 'PDF_SUMMARY',
+          fileLabel: 'last-month-reflection-summary-2026-04-15.pdf',
+          canShare: false,
+          journalFollowThroughLabel: 'Include linked summary note',
+        },
+        payloadSummary: expect.arrayContaining([
+          {
+            label: 'Journal note',
+            value: 'Includes the linked summary note as a final PDF section.',
+          },
+        ]),
+        document: {
+          kind: 'SUMMARY',
+          sections: expect.arrayContaining([
+            expect.objectContaining({
+              title: 'Last month',
+              summary: expect.stringContaining('Last month'),
+            }),
+            expect.objectContaining({
+              title: '2025 in review',
+            }),
+          ]),
+          limitationNotes: expect.arrayContaining([
+            'This summary is drawn from a lighter stretch of interpreted history, so it stays brief.',
+          ]),
+          journalReference: {
+            title: 'Summary note',
+            linkageLabel: 'Linked to March 2026 summary',
+            updatedAtLabel: 'Updated 2026-04-14 09:30 UTC',
+            body: 'A slower month still felt steadier once the pullback settled.',
+          },
+        },
+      }),
+    );
+  });
+
+  it('does not auto-include journal linkage unless the PDF request explicitly selects it', () => {
+    const pdfResult = createPreparedExportRequest({
+      generatedAt: '2026-04-15T00:00:00.000Z',
+      profile: 'BEGINNER',
+      history: createReflectionHistory(),
       format: 'PDF_SUMMARY',
-      title: 'Last month reflection summary',
-      coveredRangeLabel: 'Covered period: March 2026',
-      timezoneLabel: 'Australia/Sydney',
-      payloadSummary: [
-        {
-          label: 'Contains',
-          value:
-            'A calm formatted cover plus the selected prepared summary, its key notes, and any honest limitation notes.',
-        },
-        {
-          label: 'Selected period',
-          value: 'Last month with 3 prepared notes.',
-        },
-        {
-          label: 'Archive source',
-          value: 'Matches the prepared archive entry labeled "Last month" on the Insights shelf.',
-        },
-        {
-          label: 'Wider context',
-          value:
-            'Also carries a short 2025 in review appendix when you want a broader reflection frame.',
-        },
-        {
-          label: 'Limitations',
-          value: '1 limitation note remains visible in the export.',
-        },
-        {
-          label: 'Excludes',
-          value:
-            'Internal diagnostics, provider details, raw signal codes, and runtime metadata stay out.',
-        },
-      ],
+      period: 'LAST_MONTH',
+      timezoneLabel: 'UTC',
+      linkedJournalEntry: createLinkedJournalEntry(),
+      includeJournalReference: false,
+    });
+
+    expect(pdfResult.availability.status).toBe('AVAILABLE');
+
+    if (pdfResult.availability.status !== 'AVAILABLE') {
+      throw new Error('Expected PDF summary request to be available.');
+    }
+
+    expect(pdfResult.availability.request.journalReferenceIncluded).toBe(false);
+    expect(pdfResult.availability.request.dispatchAvailability).toEqual({
+      status: 'AVAILABLE',
+      format: 'PDF_SUMMARY',
+      fileLabel: 'last-month-reflection-summary-2026-04-15.pdf',
+      canShare: false,
+      journalFollowThroughLabel: 'Include linked summary note',
+    });
+    expect(pdfResult.availability.request.document).toEqual(
+      expect.objectContaining({
+        kind: 'SUMMARY',
+        journalReference: null,
+      }),
+    );
+    expect(pdfResult.availability.request.payloadSummary).toContainEqual({
+      label: 'Journal note',
+      value: 'Keeps the linked summary note out unless you choose to include it.',
+    });
+
+    const csvResult = createPreparedExportRequest({
+      generatedAt: '2026-04-15T00:00:00.000Z',
+      profile: 'ADVANCED',
+      history: createReflectionHistory(),
+      format: 'CSV_SUMMARY',
+      period: 'LAST_MONTH',
+      timezoneLabel: 'UTC',
+      linkedJournalEntry: createLinkedJournalEntry(),
+      includeJournalReference: true,
+    });
+
+    expect(csvResult.availability.status).toBe('AVAILABLE');
+
+    if (csvResult.availability.status !== 'AVAILABLE') {
+      throw new Error('Expected CSV summary request to be available.');
+    }
+
+    expect(csvResult.availability.request.journalReferenceIncluded).toBe(false);
+    expect(csvResult.availability.request.dispatchAvailability).toEqual({
+      status: 'AVAILABLE',
+      format: 'CSV_SUMMARY',
+      fileLabel: 'last-month-reflection-summary-2026-04-15.csv',
+      canShare: false,
+      journalFollowThroughLabel: null,
+    });
+  });
+
+  it('returns explicit dispatch unavailability when file creation is not enabled', () => {
+    const result = createPreparedExportRequest({
+      generatedAt: '2026-04-15T00:00:00.000Z',
+      profile: 'BEGINNER',
+      history: createReflectionHistory(),
+      format: 'PDF_SUMMARY',
+      period: 'LAST_MONTH',
+      timezoneLabel: 'UTC',
+      dispatchSupported: false,
+    });
+
+    expect(result.availability.status).toBe('AVAILABLE');
+
+    if (result.availability.status !== 'AVAILABLE') {
+      throw new Error('Expected PDF summary request to remain previewable.');
+    }
+
+    expect(result.availability.request.dispatchAvailability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'DISPATCH_NOT_SUPPORTED',
     });
   });
 
@@ -145,31 +255,90 @@ describe('createPreparedExportRequest', () => {
     expect(result.availability.status).toBe('AVAILABLE');
 
     if (result.availability.status !== 'AVAILABLE') {
-      throw new Error('Expected event ledger request to be available.');
+      throw new Error('Expected event-ledger request to be available.');
     }
 
-    expect(result.availability.request).toEqual({
-      format: 'CSV_EVENT_LEDGER',
-      title: 'Last month event ledger (CSV)',
-      coveredRangeLabel: 'Covered period: March 2026',
-      timezoneLabel: 'UTC',
-      payloadSummary: [
-        {
-          label: 'Contains',
-          value: '3 ledger rows from the selected period: 2 market and 1 user action.',
+    expect(result.availability.request).toEqual(
+      expect.objectContaining({
+        format: 'CSV_EVENT_LEDGER',
+        title: 'Last month event ledger (CSV)',
+        coveredRangeLabel: 'Covered period: March 2026',
+        timezoneLabel: 'UTC',
+        journalReferenceIncluded: false,
+        dispatchAvailability: {
+          status: 'AVAILABLE',
+          format: 'CSV_EVENT_LEDGER',
+          fileLabel: 'last-month-event-ledger-2026-04-15.csv',
+          canShare: false,
+          journalFollowThroughLabel: null,
         },
-        {
-          label: 'Columns',
-          value:
-            'Timestamp, event class, event type or action type, account, symbol, strategy, alignment, certainty, price, and percent change when present.',
+        payloadSummary: [
+          {
+            label: 'Contains',
+            value: '3 ledger rows from the selected period: 2 market and 1 user action.',
+          },
+          {
+            label: 'Columns',
+            value:
+              'Timestamp, timezone, event class, event label, account, symbol, strategy, alignment, certainty, price, and percent change when present.',
+          },
+          {
+            label: 'Timezone',
+            value: 'Each row keeps UTC visible alongside the exported timestamp.',
+          },
+          {
+            label: 'Excludes',
+            value:
+              'Provider diagnostics, raw signal codes, confidence scores, and metadata payloads stay out of this export path.',
+          },
+        ],
+        document: {
+          kind: 'EVENT_LEDGER',
+          journalReference: null,
+          rows: [
+            {
+              timestampLabel: '2026-03-10 00:00',
+              timezoneLabel: 'UTC',
+              eventClass: 'MARKET',
+              eventLabel: 'Price Movement',
+              accountLabel: 'acct-1',
+              symbol: 'BTC',
+              strategyLabel: 'strategy-alpha',
+              alignmentLabel: 'Watchful',
+              certaintyLabel: 'Confirmed',
+              priceLabel: '100.00',
+              percentChangeLabel: '3.00%',
+            },
+            {
+              timestampLabel: '2026-03-14 00:00',
+              timezoneLabel: 'UTC',
+              eventClass: 'MARKET',
+              eventLabel: 'Dip Detected',
+              accountLabel: 'acct-1',
+              symbol: 'ETH',
+              strategyLabel: 'strategy-alpha',
+              alignmentLabel: 'Watchful',
+              certaintyLabel: 'Confirmed',
+              priceLabel: '100.00',
+              percentChangeLabel: '3.00%',
+            },
+            {
+              timestampLabel: '2026-03-16 00:00',
+              timezoneLabel: 'UTC',
+              eventClass: 'USER_ACTION',
+              eventLabel: 'Note Recorded',
+              accountLabel: 'acct-1',
+              symbol: null,
+              strategyLabel: null,
+              alignmentLabel: null,
+              certaintyLabel: null,
+              priceLabel: null,
+              percentChangeLabel: null,
+            },
+          ],
         },
-        {
-          label: 'Excludes',
-          value:
-            'Provider diagnostics, raw signal codes, confidence scores, and metadata payloads stay out of this export foundation.',
-        },
-      ],
-    });
+      }),
+    );
     expect(JSON.stringify(result)).not.toMatch(
       /providerId|broker:live|raw_signal_code|runtimeState|privateRuntimeFlag|urgent|should have|scorecard|win rate|predict|advice/i,
     );

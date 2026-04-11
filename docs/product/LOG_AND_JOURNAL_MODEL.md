@@ -16,6 +16,7 @@ Reflection should help users remember what mattered, not make them perform self-
 - Year in Review is one calm service-owned annual debrief built from the last completed calendar year.
 - Export foundation is one calm service-owned preparation seam for reflection output that is already ready under Insights.
 - Journal groundwork now adds one calm service-owned note subsection under Insights with explicit fetch / save / update seams.
+- Export dispatch now adds one calm service-owned file-creation seam plus one narrow journal-aware follow-through path where the current summary context and export format honestly support it.
 - Log remains a later phase; journal scope is still intentionally narrow.
 
 These layers should stay related without collapsing into one mixed voice.
@@ -50,6 +51,7 @@ Deeper, slower, and more reflective.
 - reflection exports stay service-owned, explicit about coverage, timezone-labeled, and profile-aware
 - the first journal lane stays service-owned, text-only, context-linked, and optional
 - journal save / update stays explicit and user-authored
+- journal-aware export follow-through stays explicit, optional, and narrow
 - no reminders, no AI commentary, and no behavior scoring
 - no scorecards, streaks, or performance theatre
 
@@ -71,12 +73,14 @@ Deeper, slower, and more reflective.
 - answer what stood out across the year without turning reflection into a brag reel or report card
 - stay narrower than exports, journaling expansion, or a full analytics suite
 
-## What export foundation is for
+## What export foundation and dispatch are for
 
 - prepare one calm export request from reflection material that is already ready under Insights
-- keep export shaping in `services/` rather than turning `app/` into a reporting engine
+- keep export shaping and dispatch preparation in `services/` rather than turning `app/` into a reporting engine
 - expose profile-aware formats honestly: formatted PDF summary for all profiles, summary CSV for intermediate and advanced, and event-ledger CSV for advanced
 - keep period selection explicit and timezone labeling visible for CSV-oriented exports
+- support one explicit user-requested create-export path without background work or silent automation
+- allow one narrow linked-summary-note follow-through only for the current PDF summary path when the note already exists and the user explicitly includes it
 - stay narrower than a report center, export-management suite, or journaling workflow
 
 ## What the journal groundwork is for
@@ -85,6 +89,7 @@ Deeper, slower, and more reflective.
 - keep journal linkage, availability, and saved-note shaping in `services/`
 - keep `app/` on prepared journal contracts rather than local context derivation
 - preserve the user's own wording without rewriting, judging, or coaching it
+- support later export follow-through only where the linked reflection context and chosen format can carry that note honestly
 - stay narrower than a general-purpose notes app, reminder system, or analytics product
 
 ## What this family is not
@@ -106,6 +111,7 @@ Deeper, slower, and more reflective.
 - performance-style annual recaps
 - archive-as-dashboard drift
 - export-center drift
+- hidden note inclusion inside exports
 - reminder-driven journaling
 - note-center drift
 - AI-generated reflection commentary
