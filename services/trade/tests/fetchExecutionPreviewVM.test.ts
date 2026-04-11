@@ -80,6 +80,10 @@ function createSession(pathType: TradePlanConfirmationPathType): ConfirmationSes
         executionPreviewAvailable: false,
       },
       risk: createPreviewRisk(),
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
     },
     shell: {
       planId: 'plan-btc',

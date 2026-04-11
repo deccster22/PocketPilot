@@ -52,6 +52,13 @@ export async function fetchTradePlanPreviewVM(params: {
     profile: params.profile,
     selectedPlanId: params.selectedPlanId,
   });
+  const selectedAccountSizingContext =
+    upstream.selectedAccountContext.status === 'AVAILABLE'
+      ? {
+          portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
+          baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
+        }
+      : null;
   const preferredRiskBasisAvailability = await fetchPreferredRiskBasis({
     accountId:
       upstream.selectedAccountContext.status === 'AVAILABLE'
@@ -67,17 +74,13 @@ export async function fetchTradePlanPreviewVM(params: {
       preferredRiskBasisAvailability.status === 'AVAILABLE'
         ? preferredRiskBasisAvailability.preferredBasis
         : null,
-    accountContext:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? {
-            portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
-            baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
-          }
-        : null,
+    accountContext: selectedAccountSizingContext,
   });
 
   return {
-    preview: selectedPlan ? createTradePlanPreview(selectedPlan, risk) : null,
+    preview: selectedPlan
+      ? createTradePlanPreview(selectedPlan, risk, selectedAccountSizingContext)
+      : null,
     selectedPlanId: selectedPlan?.planId ?? null,
     scan: upstream.scan,
   };

@@ -637,6 +637,22 @@ export function TradeHubScreen() {
                   {item.label}: {item.value}
                 </Text>
               ))}
+              <Text style={styles.cardMeta}>{previewView.positionSizing.statusText}</Text>
+              <Text style={styles.cardMeta}>{previewView.positionSizing.headline}</Text>
+              <Text style={styles.cardSummary}>{previewView.positionSizing.summary}</Text>
+              {previewView.positionSizing.details.map((item) => (
+                <View key={`${item.label}:${item.value}`} style={styles.detailRow}>
+                  <Text style={styles.cardMeta}>
+                    {item.label}: {item.value}
+                  </Text>
+                </View>
+              ))}
+              <Text style={styles.cardMeta}>
+                Notes:{' '}
+                {previewView.positionSizing.notes.length
+                  ? previewView.positionSizing.notes.join(' | ')
+                  : 'None'}
+              </Text>
               <Text style={styles.cardMeta}>{previewView.confirmationText}</Text>
               <Text style={styles.cardMeta}>{previewView.placeholderText}</Text>
               <Text style={styles.cardId}>Plan: {previewView.planId}</Text>

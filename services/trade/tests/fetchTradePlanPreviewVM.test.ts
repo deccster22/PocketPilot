@@ -241,6 +241,10 @@ describe('fetchTradePlanPreviewVM', () => {
           reason: 'MISSING_POSITION_CAP',
         },
       },
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
     });
     expect(JSON.stringify(result.preview)).not.toContain('hidden-signal');
     expect(JSON.stringify(result.preview)).not.toContain('hidden');
@@ -412,6 +416,19 @@ describe('fetchTradePlanPreviewVM', () => {
           value: '$100.00 entry to $95.00 stop',
         },
       ],
+    });
+    expect(result.preview?.positionSizing).toEqual({
+      status: 'AVAILABLE',
+      output: {
+        sizeLabel: 'Position size (Position %)',
+        sizeValue: '10 units at $1,000.00 cap',
+        maxLossLabel: 'Max loss at stop',
+        maxLossValue: '$50.00',
+        notes: [
+          'Prepared entry $100.00 to stop $95.00.',
+          'Support-only readout; no order path is opened here.',
+        ],
+      },
     });
   });
 

@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreferredRiskBasisResolver`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder` + `PreferredRiskBasisResolver`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -36,6 +36,7 @@ Prepared plan in, bounded action path out.
 - `selectedRiskBasis`
 - `preferredRiskBasisAvailability`
 - `riskPerTradeContext`
+- `positionSizing`
 - `boundedKnowledgeLinks[]`
 - `rationaleSummary`
 
@@ -63,8 +64,14 @@ Produces canonical plan options.
 Determines which explicit risk bases are supported on the surface and preserves user-selected basis state without silent fallback in the app layer.
 It also seeds the prepared lane from one account-level preferred basis when the service layer has honestly saved one.
 
+### Preferred risk basis resolver
+Resolves the saved account-level preferred basis through the service-owned seam without introducing silent cross-account fallback.
+
 ### Risk-per-trade context builder
 Builds one calm prepared framing from selected basis, prepared plan references, and current selected-account context where honest.
+
+### Prepared sizing output builder
+Builds one calm prepared position-sizing and max-loss readout from the selected basis, prepared plan references, and current selected-account context where honest.
 
 ### Capability mapper
 Determines valid execution path by venue / platform constraints.
@@ -81,6 +88,7 @@ Ensures required confirmation steps remain intact.
 - confirmation-required tests
 - risk-basis explicitness tests
 - prepared risk-context recomputation tests
+- prepared sizing-output availability tests
 - profile visibility tests
 - knowledge-link boundary tests
 

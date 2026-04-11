@@ -224,7 +224,11 @@ async function buildConfirmationSession(params: {
     preferredBasis: params.preferredBasis,
     accountContext: params.selectedAccountRiskContext,
   });
-  const preview = createTradePlanPreview(params.plan, risk);
+  const preview = createTradePlanPreview(
+    params.plan,
+    risk,
+    params.selectedAccountRiskContext,
+  );
   const cachedCapabilities = params.capabilityCache.get(params.plan.accountId);
   const capabilities =
     cachedCapabilities ?? (await getAccountCapabilities(params.plan.accountId));

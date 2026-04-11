@@ -32,7 +32,7 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 Trade Hub may:
 - present prepared `ProtectionPlan` values
 - provide SL / TP calculator access
-- show position size, max loss, and risk / reward outputs
+- show one calm prepared sizing/max-loss output, including position size, max loss, and existing risk / reward framing
 - expose one calm, explicit risk-basis selector when the prepared contract supports it
 - show one calm account-level preferred-basis starting point when it exists
 - show prepared risk-per-trade context that explains framing without pushing action
@@ -62,6 +62,7 @@ Expected prepared data:
 - readiness state
 - risk basis availability
 - selected risk basis
+- prepared sizing/max-loss output
 - prepared risk-per-trade context
 - confirmation metadata
 - capability path type
