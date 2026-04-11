@@ -111,7 +111,9 @@ Semantic rules:
 - Grey handles neutral structure
 - Blue handles informational context
 - Amber handles watchfulness, change, and forming conditions
-- Red is reserved for safety-only or blocked states
+- Red is reserved for safety-only or truly exceptional states
+- Green should not be used as the default language for completion
+- Weakening should not default to red unless it is safety-critical
 - Avoid bright green / bright red emotional framing
 - Avoid neon accents and celebratory gain color logic
 
@@ -324,6 +326,14 @@ Anatomy:
 - Explanation
 - Optional acknowledgement affordance
 
+State semantics:
+
+- `pending` stays neutral
+- `acknowledged` uses informational blue
+- `blocked` should feel calm and procedural, not alarming
+- `unavailable` should feel neutral and quiet
+- `complete` should read as confirmed and settled, not celebratory
+
 ### 8. Buttons
 
 Variants:
@@ -339,6 +349,7 @@ Rules:
 - Intentional, not promotional
 - Moderate height
 - Strong distinction between guarded and standard actions
+- Guarded actions should lean calm amber or neutral procedural treatment, not loud red unless safety-critical
 - No oversized casino CTA energy
 
 ### 9. Segmented Control
@@ -419,6 +430,7 @@ Secondary layers may include:
 - Quiet subordinate context
 
 Snapshot must remain zero-scroll on representative mobile devices.
+The triad should read like one instrument cluster, not three separate cards.
 
 ### Layout Direction
 
@@ -432,6 +444,9 @@ Recommended stack:
 4. Optional subordinate context chips
 5. Optional quiet briefing teaser
 6. Optional 30,000 ft affordance below the briefing lane
+
+Keep context chips sparse so they support the triad rather than repeat it.
+The briefing teaser should feel tucked into the lane, not like a competing card.
 
 ### Required Frames
 
@@ -492,10 +507,12 @@ Create:
 ### Dashboard Rules
 
 - Prime Zone must feel immediately above the fold
+- One hero interpreted item should clearly lead the Prime Zone
 - Interpreted meaning must appear before raw values
 - Customization should tune emphasis, not create widget chaos
 - Account and aggregate portfolio context remain subordinate to Prime content
 - Explanation stays on Dashboard only
+- Advanced mode should tighten row rhythm and reduce medium-card repetition
 
 ## Anchor Surface: Trade Hub
 
@@ -528,10 +545,12 @@ Create:
 
 - Entry intent and protection planning must be visibly separated
 - Primary plan should feel prepared, not promoted
-- Alternatives must stay subordinate
+- Alternatives must stay visibly subordinate and lower-emphasis
+- Protection framing should remain visible without competing with the primary plan
 - Constraints and readiness must be visible
 - Confirmation flow should read like pre-flight checks
 - No one-tap or exchange-adrenaline tone
+- Blocked and unavailable states should read as calm procedural states, not alarms
 
 ## Profile Shaping
 
@@ -605,6 +624,7 @@ Design should assume:
 - One-tap execution energy
 - Generic exchange styling
 - Visual identity shifts between profile modes
+- Emotionally loud green complete / red blocked logic
 
 ## Definition Of Success
 
