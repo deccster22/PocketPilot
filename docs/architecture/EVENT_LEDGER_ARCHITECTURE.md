@@ -64,6 +64,7 @@ Each event should carry:
 - Monthly / quarterly summary builder
 - Year in Review builder
 - Summary archive assembler
+- Reflection export preparation / dispatch seam
 - Journal context linkage seam
 - Asset narrative generator
 - Event Ledger view model
@@ -79,6 +80,7 @@ Each event should carry:
 - no app-side rebuilding of summary archive cards from raw ledger rows
 - no app-side rebuilding of annual debrief items from raw ledger rows
 - no app-side shaping of reflection export options or prepared export payloads
+- no app-side shaping of export files or dispatch outcomes
 - no app-side derivation of journal context ids, linkage labels, or storage keys
 
 ## 7. Architecture responsibilities
@@ -116,8 +118,10 @@ Ledger must support:
 Reflection export foundations must also keep these constraints:
 
 - formatted summary exports stay calm, explicit, and service-owned
+- dispatch remains explicit and user-triggered
 - CSV-oriented exports must carry an explicit timezone label
 - event-level export may widen to ledger rows only when that format is explicitly selected
+- journal-aware follow-through stays narrow and explicit where the linked reflection context and chosen format honestly support it
 - provider/runtime diagnostics and other internal-only metadata stay out of user-facing export contracts by default
 
 ## 9. Testing expectations

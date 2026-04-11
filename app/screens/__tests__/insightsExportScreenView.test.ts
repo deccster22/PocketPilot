@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { createInsightsExportScreenViewData } from '@/app/screens/insightsExportScreenView';
 
 describe('createInsightsExportScreenViewData', () => {
-  it('reads prepared export contracts without deriving export payload details in app', () => {
+  it('reads prepared export and dispatch contracts without deriving export payload details in app', () => {
     expect(
       createInsightsExportScreenViewData(
         {
@@ -44,9 +44,29 @@ describe('createInsightsExportScreenViewData', () => {
                   value: 'A calm formatted cover plus the selected prepared summary.',
                 },
               ],
+              dispatchAvailability: {
+                status: 'AVAILABLE',
+                format: 'PDF_SUMMARY',
+                fileLabel: 'last-month-reflection-summary-2026-04-15.pdf',
+                canShare: false,
+                journalFollowThroughLabel: 'Include linked summary note',
+              },
+              journalReferenceIncluded: true,
+              document: {
+                kind: 'SUMMARY',
+                sections: [],
+                limitationNotes: [],
+                journalReference: {
+                  title: 'Summary note',
+                  linkageLabel: 'Linked to March 2026 summary',
+                  updatedAtLabel: 'Updated 2026-04-14 09:30 UTC',
+                  body: 'A steadier month still asked for patience.',
+                },
+              },
             },
           },
         },
+        null,
         {
           selectedProfile: 'ADVANCED',
           selectedPeriod: 'LAST_MONTH',
@@ -60,6 +80,12 @@ describe('createInsightsExportScreenViewData', () => {
       profileLabel: 'Advanced profile',
       availabilityMessage: null,
       requestAvailabilityMessage: null,
+      dispatchAvailabilityMessage: null,
+      dispatchActionLabel: 'Create export',
+      journalFollowThroughLabel: 'Include linked summary note',
+      journalFollowThroughSummary: 'The linked summary note will be added as a final PDF section.',
+      journalReferenceIncluded: true,
+      dispatchResultMessage: null,
       periodOptions: [
         {
           id: 'LAST_MONTH',
@@ -102,7 +128,7 @@ describe('createInsightsExportScreenViewData', () => {
     });
   });
 
-  it('shows a minimal honest unavailable state when exports are not ready', () => {
+  it('shows an honest read-only state when dispatch is unavailable', () => {
     expect(
       createInsightsExportScreenViewData(
         {
@@ -116,10 +142,28 @@ describe('createInsightsExportScreenViewData', () => {
         {
           generatedAt: '2026-04-15T00:00:00.000Z',
           availability: {
-            status: 'UNAVAILABLE',
-            reason: 'NO_EXPORT_SELECTED',
+            status: 'AVAILABLE',
+            request: {
+              format: 'PDF_SUMMARY',
+              title: 'Last month reflection summary',
+              coveredRangeLabel: 'Covered period: March 2026',
+              timezoneLabel: 'UTC',
+              payloadSummary: [],
+              dispatchAvailability: {
+                status: 'UNAVAILABLE',
+                reason: 'DISPATCH_NOT_SUPPORTED',
+              },
+              journalReferenceIncluded: false,
+              document: {
+                kind: 'SUMMARY',
+                sections: [],
+                limitationNotes: [],
+                journalReference: null,
+              },
+            },
           },
         },
+        null,
         {
           selectedProfile: 'BEGINNER',
           selectedPeriod: 'LAST_QUARTER',
@@ -132,7 +176,14 @@ describe('createInsightsExportScreenViewData', () => {
         'Prepare a calm export of reflection material that is already ready under Insights. Each option stays explicit about what it contains.',
       profileLabel: 'Beginner profile',
       availabilityMessage: 'There is not enough prepared reflection content to export yet.',
-      requestAvailabilityMessage: 'Choose an export option to preview what would be prepared.',
+      requestAvailabilityMessage: null,
+      dispatchAvailabilityMessage:
+        'This device cannot create this export yet, so the preview remains read-only.',
+      dispatchActionLabel: null,
+      journalFollowThroughLabel: null,
+      journalFollowThroughSummary: null,
+      journalReferenceIncluded: false,
+      dispatchResultMessage: null,
       periodOptions: [
         {
           id: 'LAST_MONTH',
@@ -146,11 +197,51 @@ describe('createInsightsExportScreenViewData', () => {
         },
       ],
       options: [],
-      requestTitle: null,
-      coveredRangeLabel: null,
-      timezoneLabel: null,
+      requestTitle: 'Last month reflection summary',
+      coveredRangeLabel: 'Covered period: March 2026',
+      timezoneLabel: 'UTC',
       payloadSummary: [],
     });
+  });
+
+  it('shows the dispatch result from the prepared contract family', () => {
+    expect(
+      createInsightsExportScreenViewData(
+        {
+          generatedAt: '2026-04-15T00:00:00.000Z',
+          profile: 'BEGINNER',
+          availability: {
+            status: 'AVAILABLE',
+            options: [],
+          },
+        },
+        {
+          generatedAt: '2026-04-15T00:00:00.000Z',
+          availability: {
+            status: 'UNAVAILABLE',
+            reason: 'NO_EXPORT_SELECTED',
+          },
+        },
+        {
+          status: 'AVAILABLE',
+          fileLabel: 'last-month-reflection-summary-2026-04-15.pdf',
+          mimeType: 'application/pdf',
+          timezoneLabel: 'UTC',
+          journalReferenceIncluded: true,
+        },
+        {
+          selectedProfile: 'BEGINNER',
+          selectedPeriod: 'LAST_MONTH',
+          selectedFormat: null,
+        },
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        requestAvailabilityMessage: 'Choose an export option to preview what would be prepared.',
+        dispatchResultMessage:
+          'Created last-month-reflection-summary-2026-04-15.pdf. It keeps UTC visible and includes the linked summary note.',
+      }),
+    );
   });
 
   it('keeps the export screen helper on prepared export VMs only', () => {
@@ -163,13 +254,13 @@ describe('createInsightsExportScreenViewData', () => {
     expect(source).toMatch(/selectedPeriod/);
     expect(source).toMatch(/selectedFormat/);
     expect(source).not.toMatch(
-      /createPreparedExportRequest|fetchPreparedExportRequest|createExportOptionsVM|fetchExportOptionsVM|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
+      /createPreparedExportRequest|fetchPreparedExportRequest|dispatchExportRequest|createExportOptionsVM|fetchExportOptionsVM|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|score|unread|inbox|badge/,
     );
   });
 
   it('returns null when the prepared export contracts are unavailable', () => {
     expect(
-      createInsightsExportScreenViewData(null, null, {
+      createInsightsExportScreenViewData(null, null, null, {
         selectedProfile: 'BEGINNER',
         selectedPeriod: 'LAST_MONTH',
         selectedFormat: null,

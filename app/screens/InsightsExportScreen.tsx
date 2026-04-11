@@ -11,6 +11,7 @@ import type { UserProfile } from '@/core/profile/types';
 import type {
   ExportFormat,
   ExportOptionsVM,
+  PreparedExportDispatchResult,
   PreparedExportRequestVM,
   ReflectionPeriod,
 } from '@/services/insights/types';
@@ -79,17 +80,22 @@ function ExportPayloadSummaryRow(params: {
 export function InsightsExportScreen(params: {
   exportOptionsVM: ExportOptionsVM | null;
   preparedExportRequestVM: PreparedExportRequestVM | null;
+  dispatchResult: PreparedExportDispatchResult | null;
+  isDispatching: boolean;
   selectedProfile: UserProfile;
   selectedPeriod: ReflectionPeriod;
   selectedFormat: ExportFormat | null;
   onSelectProfile: (profile: UserProfile) => void;
   onSelectPeriod: (period: ReflectionPeriod) => void;
   onSelectFormat: (format: ExportFormat) => void;
+  onToggleJournalReference: () => void;
+  onDispatchExport: () => void;
   onBack: () => void;
 }) {
   const screenView = createInsightsExportScreenViewData(
     params.exportOptionsVM,
     params.preparedExportRequestVM,
+    params.dispatchResult,
     {
       selectedProfile: params.selectedProfile,
       selectedPeriod: params.selectedPeriod,
@@ -153,6 +159,50 @@ export function InsightsExportScreen(params: {
             {screenView.payloadSummary.map((item) => (
               <ExportPayloadSummaryRow key={`${item.label}:${item.value}`} item={item} />
             ))}
+          </View>
+        ) : null}
+
+        {screenView.journalFollowThroughLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={params.onToggleJournalReference}
+            style={[
+              styles.journalToggleCard,
+              screenView.journalReferenceIncluded ? styles.journalToggleCardSelected : null,
+            ]}
+          >
+            <Text style={styles.journalToggleLabel}>{screenView.journalFollowThroughLabel}</Text>
+            {screenView.journalFollowThroughSummary ? (
+              <Text style={styles.journalToggleSummary}>{screenView.journalFollowThroughSummary}</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
+
+        {screenView.dispatchAvailabilityMessage ? (
+          <View style={styles.unavailableCard}>
+            <Text style={styles.unavailableText}>{screenView.dispatchAvailabilityMessage}</Text>
+          </View>
+        ) : null}
+
+        {screenView.dispatchActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            disabled={params.isDispatching}
+            onPress={params.onDispatchExport}
+            style={[
+              styles.dispatchButton,
+              params.isDispatching ? styles.dispatchButtonDisabled : null,
+            ]}
+          >
+            <Text style={styles.dispatchButtonText}>
+              {params.isDispatching ? 'Creating export...' : screenView.dispatchActionLabel}
+            </Text>
+          </Pressable>
+        ) : null}
+
+        {screenView.dispatchResultMessage ? (
+          <View style={styles.resultCard}>
+            <Text style={styles.resultText}>{screenView.dispatchResultMessage}</Text>
           </View>
         ) : null}
       </ScrollView>
@@ -318,5 +368,55 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: '#374151',
+  },
+  journalToggleCard: {
+    gap: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    padding: 14,
+  },
+  journalToggleCardSelected: {
+    borderColor: '#0f766e',
+    backgroundColor: '#f0fdfa',
+  },
+  journalToggleLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  journalToggleSummary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
+  },
+  dispatchButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: '#0f766e',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  dispatchButtonDisabled: {
+    opacity: 0.7,
+  },
+  dispatchButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#f8fafc',
+  },
+  resultCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#f8fafc',
+    padding: 14,
+  },
+  resultText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#334155',
   },
 });

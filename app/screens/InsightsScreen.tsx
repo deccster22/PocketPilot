@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { defaultInsightsExportDispatchAdapter } from '@/providers/insightsExportDispatchProvider';
 import { EventHistoryCard } from '@/app/components/EventHistoryCard';
 import { InsightsArchiveScreen } from '@/app/screens/InsightsArchiveScreen';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
@@ -22,11 +23,13 @@ import { fetchSummaryArchiveVM } from '@/services/insights/fetchSummaryArchiveVM
 import { fetchYearInReviewVM } from '@/services/insights/fetchYearInReviewVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
 import { saveJournalEntry } from '@/services/insights/saveJournalEntry';
+import { dispatchExportRequest } from '@/services/insights/dispatchExportRequest';
 import type {
   ExportFormat,
   ExportOptionsVM,
   JournalEntryContext,
   JournalEntryVM,
+  PreparedExportDispatchResult,
   PreparedExportRequestVM,
   ReflectionPeriod,
 } from '@/services/insights/types';
@@ -48,6 +51,7 @@ const EXPORT_TIMEZONE_LABEL = 'UTC';
 type ExportSelectionState = {
   profile: UserProfile;
   format: ExportFormat | null;
+  includeJournalReference: boolean;
   optionsVM: ExportOptionsVM;
   requestVM: PreparedExportRequestVM;
 };
@@ -85,6 +89,7 @@ export function InsightsScreen() {
     profile: UserProfile;
     preferredFormat: ExportFormat | null;
     period: ReflectionPeriod;
+    includeJournalReference: boolean;
   }): ExportSelectionState {
     const optionsVM = fetchExportOptionsVM({
       surface: 'INSIGHTS_SCREEN',
@@ -96,6 +101,7 @@ export function InsightsScreen() {
     return {
       profile: params.profile,
       format,
+      includeJournalReference: params.includeJournalReference,
       optionsVM,
       requestVM: fetchPreparedExportRequest({
         surface: 'INSIGHTS_SCREEN',
@@ -104,6 +110,9 @@ export function InsightsScreen() {
         format,
         period: params.period,
         timezoneLabel: EXPORT_TIMEZONE_LABEL,
+        includeJournalReference: params.includeJournalReference,
+        dispatchSupported: defaultInsightsExportDispatchAdapter.dispatchSupported,
+        canShare: defaultInsightsExportDispatchAdapter.canShare,
       }),
     };
   }
@@ -160,8 +169,12 @@ export function InsightsScreen() {
       profile: DEFAULT_USER_PROFILE,
       preferredFormat: 'PDF_SUMMARY',
       period: DEFAULT_SUMMARY_PERIOD,
+      includeJournalReference: false,
     }),
   );
+  const [exportDispatchResult, setExportDispatchResult] =
+    useState<PreparedExportDispatchResult | null>(null);
+  const [isExportDispatching, setIsExportDispatching] = useState(false);
   const screenView = createInsightsScreenViewData(historyVM, {
     hasJournal: true,
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
@@ -176,6 +189,7 @@ export function InsightsScreen() {
     profile?: UserProfile;
     preferredFormat?: ExportFormat | null;
     period?: ReflectionPeriod;
+    includeJournalReference?: boolean;
   }) {
     setExportState(
       createExportState({
@@ -183,8 +197,13 @@ export function InsightsScreen() {
         preferredFormat:
           params.preferredFormat === undefined ? exportState.format : params.preferredFormat,
         period: params.period ?? selectedSummaryPeriod,
+        includeJournalReference:
+          params.includeJournalReference === undefined
+            ? exportState.includeJournalReference
+            : params.includeJournalReference,
       }),
     );
+    setExportDispatchResult(null);
   }
 
   function selectInsightsPeriod(period: ReflectionPeriod) {
@@ -345,6 +364,8 @@ export function InsightsScreen() {
       <InsightsExportScreen
         exportOptionsVM={exportState.optionsVM}
         preparedExportRequestVM={exportState.requestVM}
+        dispatchResult={exportDispatchResult}
+        isDispatching={isExportDispatching}
         selectedProfile={exportState.profile}
         selectedPeriod={selectedSummaryPeriod}
         selectedFormat={exportState.format}
@@ -359,6 +380,25 @@ export function InsightsScreen() {
             preferredFormat: format,
           })
         }
+        onToggleJournalReference={() =>
+          refreshExportState({
+            includeJournalReference: !exportState.includeJournalReference,
+          })
+        }
+        onDispatchExport={async () => {
+          setIsExportDispatching(true);
+
+          try {
+            setExportDispatchResult(
+              await dispatchExportRequest({
+                preparedExportRequestVM: exportState.requestVM,
+                adapter: defaultInsightsExportDispatchAdapter,
+              }),
+            );
+          } finally {
+            setIsExportDispatching(false);
+          }
+        }}
         onBack={() => setRoute('HOME')}
       />
     );
