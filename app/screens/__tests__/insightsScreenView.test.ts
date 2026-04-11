@@ -39,6 +39,7 @@ describe('createInsightsScreenViewData', () => {
         },
         {
           hasArchive: true,
+          hasJournal: true,
           hasReflection: true,
           hasSummaries: true,
           hasSummaryArchive: true,
@@ -53,6 +54,9 @@ describe('createInsightsScreenViewData', () => {
       continuityNote:
         'Since you last viewed Insights, 1 newer interpreted history note is available.',
       availabilityMessage: null,
+      journalActionLabel: 'Open journal note',
+      journalActionSummary:
+        'Keep a small optional note connected to this reflection lane when you want extra context in your own words.',
       archiveActionLabel: 'View deeper history',
       archiveActionSummary:
         'Open a slightly deeper interpreted archive when you want a little more context.',
@@ -107,6 +111,7 @@ describe('createInsightsScreenViewData', () => {
           },
         },
         {
+          hasJournal: true,
           hasSummaries: true,
           hasSummaryArchive: true,
           hasYearInReview: true,
@@ -120,6 +125,9 @@ describe('createInsightsScreenViewData', () => {
       continuityNote: null,
       availabilityMessage:
         'Insights will appear once there is a little more interpreted history to review.',
+      journalActionLabel: 'Open journal note',
+      journalActionSummary:
+        'Keep a small optional note connected to this reflection lane when you want extra context in your own words.',
       archiveActionLabel: null,
       archiveActionSummary: null,
       reflectionActionLabel: null,
@@ -148,6 +156,7 @@ describe('createInsightsScreenViewData', () => {
 
     expect(source).toMatch(/vm\.availability\.status === 'UNAVAILABLE'/);
     expect(source).toMatch(/vm\.continuity\.summary/);
+    expect(source).toMatch(/hasJournal/);
     expect(source).toMatch(/hasArchive/);
     expect(source).toMatch(/hasReflection/);
     expect(source).toMatch(/hasSummaries/);

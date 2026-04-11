@@ -64,6 +64,7 @@ Each event should carry:
 - Monthly / quarterly summary builder
 - Year in Review builder
 - Summary archive assembler
+- Journal context linkage seam
 - Asset narrative generator
 - Event Ledger view model
 - Log / Journal attachment layer
@@ -78,6 +79,7 @@ Each event should carry:
 - no app-side rebuilding of summary archive cards from raw ledger rows
 - no app-side rebuilding of annual debrief items from raw ledger rows
 - no app-side shaping of reflection export options or prepared export payloads
+- no app-side derivation of journal context ids, linkage labels, or storage keys
 
 ## 7. Architecture responsibilities
 
@@ -100,6 +102,7 @@ Provides filtered grouped views for surfaces.
 ### Attachment layer
 
 Allows optional user notes to reference, not overwrite, canonical events.
+In the current groundwork phase, this means one service-owned journal context resolver plus one prepared fetch/save/update seam for small text-only notes.
 
 ## 8. Retention and export posture
 
@@ -124,6 +127,7 @@ Reflection export foundations must also keep these constraints:
 - query correctness tests
 - export integrity tests
 - note attachment separation tests
+- journal fetch/save/update determinism tests
 
 ## 10. Relationship to other docs
 

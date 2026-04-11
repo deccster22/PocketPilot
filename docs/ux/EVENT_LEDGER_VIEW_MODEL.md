@@ -134,11 +134,26 @@ Reflection exports should arrive as prepared export contracts:
 - event-level only when the user explicitly chooses the ledger export path
 - never widened into provider/runtime diagnostics or app-side report shaping
 
+Journal notes should arrive as prepared journal-entry contracts:
+
+- shaped in `services/`
+- explicit about the linked reflection context
+- optional and text-only
+- kept separate from ledger rows and canonical event truth
+- never widened into mood scoring, reminders, or app-side linkage derivation
+
 ## 9. Relationship to Log and Journal
 
 Event Ledger = canonical structured truth.
 Log / Journal = optional user-authored meaning.
 These must stay visually and conceptually distinct in any combined view.
+
+The first journal subsection under Insights is deliberately narrow:
+
+- one prepared fetch seam
+- one save seam
+- one update seam
+- one small note attached to reflection context rather than a free-floating note center
 
 ## 10. Filtering rules
 

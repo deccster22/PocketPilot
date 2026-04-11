@@ -21,6 +21,8 @@ export type InsightsScreenViewData = {
   summary: string;
   continuityNote: string | null;
   availabilityMessage: string | null;
+  journalActionLabel: string | null;
+  journalActionSummary: string | null;
   archiveActionLabel: string | null;
   archiveActionSummary: string | null;
   reflectionActionLabel: string | null;
@@ -52,6 +54,7 @@ function formatAvailabilityMessage(
 export function createInsightsScreenViewData(
   vm: InsightsHistoryWithContinuityVM | null,
   params?: {
+    hasJournal?: boolean;
     hasArchive?: boolean;
     hasReflection?: boolean;
     hasSummaries?: boolean;
@@ -71,6 +74,10 @@ export function createInsightsScreenViewData(
         'A quiet shelf of meaningful interpreted changes. It stays selective, factual, and optional.',
       continuityNote: vm.continuity.summary,
       availabilityMessage: formatAvailabilityMessage(vm.availability.reason),
+      journalActionLabel: params?.hasJournal ? 'Open journal note' : null,
+      journalActionSummary: params?.hasJournal
+        ? 'Keep a small optional note connected to this reflection lane when you want extra context in your own words.'
+        : null,
       archiveActionLabel: null,
       archiveActionSummary: null,
       reflectionActionLabel: null,
@@ -101,6 +108,10 @@ export function createInsightsScreenViewData(
       'A quiet shelf of meaningful interpreted changes. It stays selective, factual, and optional.',
     continuityNote: vm.continuity.summary,
     availabilityMessage: null,
+    journalActionLabel: params?.hasJournal ? 'Open journal note' : null,
+    journalActionSummary: params?.hasJournal
+      ? 'Keep a small optional note connected to this reflection lane when you want extra context in your own words.'
+      : null,
     archiveActionLabel: params?.hasArchive ? 'View deeper history' : null,
     archiveActionSummary: params?.hasArchive
       ? 'Open a slightly deeper interpreted archive when you want a little more context.'

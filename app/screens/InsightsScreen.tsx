@@ -5,6 +5,7 @@ import { EventHistoryCard } from '@/app/components/EventHistoryCard';
 import { InsightsArchiveScreen } from '@/app/screens/InsightsArchiveScreen';
 import { InsightsDetailScreen } from '@/app/screens/InsightsDetailScreen';
 import { InsightsExportScreen } from '@/app/screens/InsightsExportScreen';
+import { InsightsJournalScreen } from '@/app/screens/InsightsJournalScreen';
 import { InsightsReflectionScreen } from '@/app/screens/InsightsReflectionScreen';
 import { InsightsSummaryScreen } from '@/app/screens/InsightsSummaryScreen';
 import { InsightsYearInReviewScreen } from '@/app/screens/InsightsYearInReviewScreen';
@@ -13,17 +14,28 @@ import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState
 import { fetchExportOptionsVM } from '@/services/insights/fetchExportOptionsVM';
 import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchiveVM';
 import { fetchInsightsHistoryVM } from '@/services/insights/fetchInsightsHistoryVM';
+import { fetchJournalEntryVM } from '@/services/insights/fetchJournalEntryVM';
 import { fetchPeriodSummaryVM } from '@/services/insights/fetchPeriodSummaryVM';
 import { fetchPreparedExportRequest } from '@/services/insights/fetchPreparedExportRequest';
 import { fetchReflectionComparisonVM } from '@/services/insights/fetchReflectionComparisonVM';
 import { fetchSummaryArchiveVM } from '@/services/insights/fetchSummaryArchiveVM';
 import { fetchYearInReviewVM } from '@/services/insights/fetchYearInReviewVM';
 import { markInsightsHistoryViewed } from '@/services/insights/insightsLastViewed';
-import type { ExportFormat, ExportOptionsVM, PreparedExportRequestVM, ReflectionPeriod } from '@/services/insights/types';
+import { saveJournalEntry } from '@/services/insights/saveJournalEntry';
+import type {
+  ExportFormat,
+  ExportOptionsVM,
+  JournalEntryContext,
+  JournalEntryVM,
+  PreparedExportRequestVM,
+  ReflectionPeriod,
+} from '@/services/insights/types';
+import { updateJournalEntry } from '@/services/insights/updateJournalEntry';
 
 type InsightsRoute =
   | 'HOME'
   | 'DETAIL'
+  | 'JOURNAL'
   | 'REFLECTION'
   | 'SUMMARY'
   | 'SUMMARY_ARCHIVE'
@@ -38,6 +50,10 @@ type ExportSelectionState = {
   format: ExportFormat | null;
   optionsVM: ExportOptionsVM;
   requestVM: PreparedExportRequestVM;
+};
+
+const GENERAL_JOURNAL_CONTEXT: JournalEntryContext = {
+  contextType: 'GENERAL_REFLECTION',
 };
 
 function resolvePreferredExportFormat(
@@ -64,6 +80,7 @@ function resolvePreferredExportFormat(
 export function InsightsScreen() {
   const [screenNowMs] = useState(() => Date.now());
   const nowProvider = () => screenNowMs;
+  const journalNowProvider = () => Date.now();
   function createExportState(params: {
     profile: UserProfile;
     preferredFormat: ExportFormat | null;
@@ -93,6 +110,7 @@ export function InsightsScreen() {
   const [route, setRoute] = useState<InsightsRoute>('HOME');
   const [selectedSummaryPeriod, setSelectedSummaryPeriod] =
     useState<ReflectionPeriod>(DEFAULT_SUMMARY_PERIOD);
+  const [journalContext, setJournalContext] = useState<JournalEntryContext>(GENERAL_JOURNAL_CONTEXT);
   const [historyVM] = useState(() =>
     fetchInsightsHistoryVM({
       surface: 'INSIGHTS_SCREEN',
@@ -123,6 +141,13 @@ export function InsightsScreen() {
       nowProvider,
     }),
   );
+  const [journalVM, setJournalVM] = useState<JournalEntryVM>(() =>
+    fetchJournalEntryVM({
+      surface: 'INSIGHTS_SCREEN',
+      nowProvider,
+      context: GENERAL_JOURNAL_CONTEXT,
+    }),
+  );
   const [summaryVM, setSummaryVM] = useState(() =>
     fetchPeriodSummaryVM({
       surface: 'INSIGHTS_SCREEN',
@@ -138,6 +163,7 @@ export function InsightsScreen() {
     }),
   );
   const screenView = createInsightsScreenViewData(historyVM, {
+    hasJournal: true,
     hasArchive: archiveVM.availability.status === 'AVAILABLE',
     hasReflection: historyVM.availability.status === 'AVAILABLE',
     hasSummaries: true,
@@ -175,6 +201,22 @@ export function InsightsScreen() {
     });
   }
 
+  function refreshJournalView(context: JournalEntryContext) {
+    setJournalContext(context);
+    setJournalVM(
+      fetchJournalEntryVM({
+        surface: 'INSIGHTS_SCREEN',
+        nowProvider,
+        context,
+      }),
+    );
+  }
+
+  function openJournal(context: JournalEntryContext) {
+    refreshJournalView(context);
+    setRoute('JOURNAL');
+  }
+
   function openSummaryPeriod(period: ReflectionPeriod) {
     selectInsightsPeriod(period);
     setRoute('SUMMARY');
@@ -208,6 +250,44 @@ export function InsightsScreen() {
     );
   }
 
+  if (route === 'JOURNAL') {
+    return (
+      <InsightsJournalScreen
+        journalVM={journalVM}
+        onSave={(body) => {
+          const result = saveJournalEntry({
+            surface: 'INSIGHTS_SCREEN',
+            nowProvider: journalNowProvider,
+            context: journalContext,
+            body,
+          });
+
+          if (result.status === 'SAVED') {
+            refreshJournalView(journalContext);
+          }
+
+          return result;
+        }}
+        onUpdate={(entryId, body) => {
+          const result = updateJournalEntry({
+            surface: 'INSIGHTS_SCREEN',
+            nowProvider: journalNowProvider,
+            context: journalContext,
+            entryId,
+            body,
+          });
+
+          if (result.status === 'UPDATED') {
+            refreshJournalView(journalContext);
+          }
+
+          return result;
+        }}
+        onBack={() => setRoute('HOME')}
+      />
+    );
+  }
+
   if (route === 'REFLECTION') {
     return <InsightsReflectionScreen reflectionVM={reflectionVM} onBack={() => setRoute('HOME')} />;
   }
@@ -218,6 +298,15 @@ export function InsightsScreen() {
         summaryVM={summaryVM}
         selectedPeriod={selectedSummaryPeriod}
         onSelectPeriod={openSummaryPeriod}
+        onOpenJournal={
+          summaryVM.availability.status === 'AVAILABLE'
+            ? () =>
+                openJournal({
+                  contextType: 'PERIOD_SUMMARY',
+                  period: selectedSummaryPeriod,
+                })
+            : undefined
+        }
         onBack={() => setRoute('HOME')}
       />
     );
@@ -235,7 +324,19 @@ export function InsightsScreen() {
 
   if (route === 'YEAR_IN_REVIEW') {
     return (
-      <InsightsYearInReviewScreen yearInReviewVM={yearInReviewVM} onBack={() => setRoute('HOME')} />
+      <InsightsYearInReviewScreen
+        yearInReviewVM={yearInReviewVM}
+        onOpenJournal={
+          yearInReviewVM.availability.status === 'AVAILABLE'
+            ? () =>
+                openJournal({
+                  contextType: 'YEAR_IN_REVIEW',
+                  period: yearInReviewVM.availability.period,
+                })
+            : undefined
+        }
+        onBack={() => setRoute('HOME')}
+      />
     );
   }
 
@@ -294,6 +395,19 @@ export function InsightsScreen() {
             ))}
           </View>
         ))}
+
+        {screenView.journalActionLabel ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => openJournal(GENERAL_JOURNAL_CONTEXT)}
+            style={styles.archiveButton}
+          >
+            <Text style={styles.archiveButtonText}>{screenView.journalActionLabel}</Text>
+            {screenView.journalActionSummary ? (
+              <Text style={styles.archiveButtonSummary}>{screenView.journalActionSummary}</Text>
+            ) : null}
+          </Pressable>
+        ) : null}
 
         {screenView.archiveActionLabel ? (
           <Pressable

@@ -43,6 +43,7 @@ export function InsightsSummaryScreen(params: {
   summaryVM: PeriodSummaryVM | null;
   selectedPeriod: ReflectionPeriod;
   onSelectPeriod: (period: ReflectionPeriod) => void;
+  onOpenJournal?: () => void;
   onBack: () => void;
 }) {
   const screenView = createInsightsSummaryScreenViewData(params.summaryVM, {
@@ -97,6 +98,20 @@ export function InsightsSummaryScreen(params: {
               </Text>
             ))}
           </View>
+        ) : null}
+
+        {params.onOpenJournal ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={params.onOpenJournal}
+            style={styles.journalButton}
+          >
+            <Text style={styles.journalButtonText}>Open note for this summary</Text>
+            <Text style={styles.journalButtonSummary}>
+              Keep a small optional note tied to this summary if you want extra context in your own
+              words.
+            </Text>
+          </Pressable>
         ) : null}
       </ScrollView>
     </SafeAreaView>
@@ -233,6 +248,24 @@ const styles = StyleSheet.create({
   limitationText: {
     fontSize: 12,
     lineHeight: 18,
+    color: '#475569',
+  },
+  journalButton: {
+    gap: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
+    padding: 14,
+  },
+  journalButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  journalButtonSummary: {
+    fontSize: 13,
+    lineHeight: 19,
     color: '#475569',
   },
 });
