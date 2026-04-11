@@ -7,6 +7,10 @@ describe('snapshot briefing placement', () => {
       join(process.cwd(), 'app', 'screens', 'SnapshotScreen.tsx'),
       'utf8',
     );
+    const snapshotBriefingCardSource = readFileSync(
+      join(process.cwd(), 'app', 'components', 'SnapshotBriefingCard.tsx'),
+      'utf8',
+    );
     const dashboardScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'DashboardScreen.tsx'),
       'utf8',
@@ -29,10 +33,16 @@ describe('snapshot briefing placement', () => {
     expect(snapshotScreenSource).not.toMatch(/useFocusEffect|useIsFocused/);
     expect(snapshotScreenSource).not.toMatch(/reorientation\.status === 'VISIBLE'/);
     expect(snapshotScreenSource).not.toMatch(/sinceLastChecked/);
+    expect(snapshotBriefingCardSource).toMatch(/MessageRationaleNote/);
+    expect(snapshotBriefingCardSource).not.toMatch(/modal|toast|inbox|badge|notification center/i);
+    expect(dashboardScreenSource).toMatch(/MessageRationaleNote/);
     expect(dashboardScreenSource).not.toMatch(/SnapshotBriefingCard/);
     expect(dashboardScreenSource).not.toMatch(/ThirtyThousandFootScreen/);
     expect(dashboardScreenSource).not.toMatch(/fetchSnapshotSurfaceVM/);
+    expect(dashboardScreenSource).not.toMatch(/modal|toast|inbox|badge|notification center/i);
+    expect(tradeHubScreenSource).toMatch(/MessageRationaleNote/);
     expect(tradeHubScreenSource).not.toMatch(/SnapshotBriefingCard/);
     expect(tradeHubScreenSource).not.toMatch(/ThirtyThousandFootScreen/);
+    expect(tradeHubScreenSource).not.toMatch(/modal|toast|inbox|badge|notification center/i);
   });
 });

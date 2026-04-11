@@ -17,6 +17,7 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - `services/snapshot/createProfileAwareSnapshotModel.ts` applies profile-aware shaping at the service seam.
 - `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes one prepared Snapshot surface VM, including the canonical briefing state.
 - `services/messages/fetchMessagePolicyVM.ts` classifies prepared Snapshot message output for one requested surface.
+- `services/messages/createPreparedMessageRationale.ts` shapes one optional calm rationale for the surfaced Snapshot message.
 - `services/context/fetchThirtyThousandFootVM.ts` builds one canonical broader-context VM for Snapshot's opt-in 30,000 ft lane.
 - `services/messages/applyMessageProfileTuning.ts` keeps alert threshold and profile sensitivity inside that same message-policy seam.
 - `app/` reads the prepared Snapshot surface VM and prepared message-policy VM through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
@@ -49,6 +50,7 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
   - `SINCE_LAST_CHECKED`
   - `HIDDEN`
 - `services/messages/createMessagePolicyVM.ts` then classifies that prepared result into a Snapshot-facing `REORIENTATION` or `BRIEFING` message, or stays quiet when no message is justified.
+- when a Snapshot message is surfaced, the same service-owned seam may also attach one optional compact rationale explaining why that posture appeared
 - Reorientation owns the zone whenever it is available.
 - Since Last Checked may use the zone only when reorientation is not available.
 - A dismissed reorientation cycle does not fall through to a separate Since Last Checked card.
@@ -57,6 +59,8 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - A thin Snapshot `ALERT` may appear only when no briefing already owns the zone and interpreted context is strong enough after service-owned threshold tuning.
 - Beginner may keep strong interpreted change as a calm `BRIEFING` instead of `ALERT`.
 - Advanced may receive a tighter `ALERT`, but middling change still suppresses to no message.
+- If rationale is available, Snapshot may render one small inline "why this is here" treatment inside the same briefing card.
+- Snapshot rationale must remain explanatory, compact, and non-debuggy.
 - App foreground return re-checks the same prepared Snapshot VM and stays quiet while the app remains active.
 - Snapshot does not become an inbox, alert center, feed, or notification system.
 

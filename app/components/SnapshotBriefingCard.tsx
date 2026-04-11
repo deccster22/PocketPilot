@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { MessageRationaleNote } from '@/app/components/MessageRationaleNote';
 import type { SnapshotScreenMessageViewData } from '@/app/screens/snapshotScreenView';
 
 export function SnapshotBriefingCard(params: {
@@ -16,6 +17,7 @@ export function SnapshotBriefingCard(params: {
         <View style={styles.headerCopy}>
           <Text style={styles.headline}>{params.message.title}</Text>
           <Text style={styles.summary}>{params.message.summary}</Text>
+          <MessageRationaleNote rationale={params.message.rationale} />
         </View>
         {params.onDismiss ? (
           <Pressable onPress={params.onDismiss} style={styles.dismissButton}>

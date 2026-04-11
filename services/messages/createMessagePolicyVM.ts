@@ -1,12 +1,18 @@
 import { applyMessageProfileTuning } from '@/services/messages/applyMessageProfileTuning';
 import { createPreparedMessageInputs } from '@/services/messages/createPreparedMessageInputs';
+import {
+  createPreparedMessageRationale,
+  type PreparedMessageRationaleSource,
+} from '@/services/messages/createPreparedMessageRationale';
 import type {
+  AlertThresholdDecision,
   MessagePolicyAvailability,
   MessagePolicyDashboardContext,
   MessagePriority,
   MessageSurfaceEligibility,
   MessagePolicySnapshotContext,
   MessagePolicyTradeHubContext,
+  MessageSensitivityProfile,
   PreparedMessageInputContext,
   PreparedMessage,
 } from '@/services/messages/types';
@@ -19,6 +25,14 @@ type CreateMessagePolicyVMParams = {
 };
 
 const SURFACELESS_MESSAGE: MessageSurfaceEligibility = 'NONE';
+
+type MessagePolicyCandidate = {
+  message: PreparedMessage;
+  rationaleSource: PreparedMessageRationaleSource;
+  inputContext?: PreparedMessageInputContext | null;
+  decision?: AlertThresholdDecision | null;
+  sensitivity?: MessageSensitivityProfile | null;
+};
 
 function createPreparedMessage(params: {
   kind: PreparedMessage['kind'];
@@ -47,7 +61,7 @@ function compactCopy(parts: ReadonlyArray<string | null | undefined>): string {
 
 function createBriefingMessage(
   snapshot: NonNullable<CreateMessagePolicyVMParams['snapshot']>,
-): PreparedMessage | null {
+): MessagePolicyCandidate | null {
   if (snapshot.briefing.status !== 'VISIBLE') {
     return null;
   }
@@ -58,24 +72,30 @@ function createBriefingMessage(
     'A prepared PocketPilot note is available.';
 
   if (snapshot.briefing.kind === 'REORIENTATION') {
-    return createPreparedMessage({
-      kind: 'REORIENTATION',
-      title: snapshot.briefing.title,
-      summary,
-      priority: 'MEDIUM',
-      surface: 'SNAPSHOT',
-      dismissible: snapshot.briefing.dismissible,
-    });
+    return {
+      message: createPreparedMessage({
+        kind: 'REORIENTATION',
+        title: snapshot.briefing.title,
+        summary,
+        priority: 'MEDIUM',
+        surface: 'SNAPSHOT',
+        dismissible: snapshot.briefing.dismissible,
+      }),
+      rationaleSource: 'SNAPSHOT_REORIENTATION',
+    };
   }
 
-  return createPreparedMessage({
-    kind: 'BRIEFING',
-    title: snapshot.briefing.title,
-    summary,
-    priority: 'LOW',
-    surface: 'SNAPSHOT',
-    dismissible: snapshot.briefing.dismissible,
-  });
+  return {
+    message: createPreparedMessage({
+      kind: 'BRIEFING',
+      title: snapshot.briefing.title,
+      summary,
+      priority: 'LOW',
+      surface: 'SNAPSHOT',
+      dismissible: snapshot.briefing.dismissible,
+    }),
+    rationaleSource: 'SNAPSHOT_HISTORY_BRIEFING',
+  };
 }
 
 function isAlertEligibleInput(
@@ -120,7 +140,7 @@ function createAlertMessage(
 
 function createReferralMessage(
   dashboard?: MessagePolicyDashboardContext | null,
-): PreparedMessage | null {
+): MessagePolicyCandidate | null {
   if (!dashboard) {
     return null;
   }
@@ -129,19 +149,22 @@ function createReferralMessage(
     return null;
   }
 
-  return createPreparedMessage({
-    kind: 'REFERRAL',
-    title: 'Snapshot is the steadier fit',
-    summary:
-      'Dashboard has supporting context but not a strong top-focus item right now. Snapshot is the better place for a calm first read.',
-    priority: 'LOW',
-    surface: 'DASHBOARD',
-  });
+  return {
+    message: createPreparedMessage({
+      kind: 'REFERRAL',
+      title: 'Snapshot is the steadier fit',
+      summary:
+        'Dashboard has supporting context but not a strong top-focus item right now. Snapshot is the better place for a calm first read.',
+      priority: 'LOW',
+      surface: 'DASHBOARD',
+    }),
+    rationaleSource: 'DASHBOARD_REFERRAL',
+  };
 }
 
 function createGuardedStopMessage(
   tradeHub?: MessagePolicyTradeHubContext | null,
-): PreparedMessage | null {
+): MessagePolicyCandidate | null {
   if (!tradeHub) {
     return null;
   }
@@ -150,21 +173,24 @@ function createGuardedStopMessage(
     return null;
   }
 
-  return createPreparedMessage({
-    kind: 'GUARDED_STOP',
-    title: 'Protected path unavailable',
-    summary: compactCopy([
-      tradeHub.executionPathUnavailableReason ??
-        'A protected execution path is not available for this plan.',
-      'Trade Hub will keep the plan visible as a read-only framing note instead of carrying the action path further.',
-    ]),
-    priority: 'HIGH',
-    surface: 'TRADE_HUB',
-  });
+  return {
+    message: createPreparedMessage({
+      kind: 'GUARDED_STOP',
+      title: 'Protected path unavailable',
+      summary: compactCopy([
+        tradeHub.executionPathUnavailableReason ??
+          'A protected execution path is not available for this plan.',
+        'Trade Hub will keep the plan visible as a read-only framing note instead of carrying the action path further.',
+      ]),
+      priority: 'HIGH',
+      surface: 'TRADE_HUB',
+    }),
+    rationaleSource: 'TRADE_HUB_GUARDED_STOP',
+  };
 }
 
-function createCandidates(params: CreateMessagePolicyVMParams): PreparedMessage[] {
-  const candidates: PreparedMessage[] = [];
+function createCandidates(params: CreateMessagePolicyVMParams): MessagePolicyCandidate[] {
+  const candidates: MessagePolicyCandidate[] = [];
 
   const guardedStop = createGuardedStopMessage(params.tradeHub);
   if (guardedStop) {
@@ -205,7 +231,13 @@ function createCandidates(params: CreateMessagePolicyVMParams): PreparedMessage[
     });
 
     if (tunedAlert.message) {
-      candidates.push(tunedAlert.message);
+      candidates.push({
+        message: tunedAlert.message,
+        rationaleSource: 'SNAPSHOT_TUNED_CHANGE',
+        inputContext: preparedInputContext,
+        decision: tunedAlert.decision,
+        sensitivity: tunedAlert.sensitivity,
+      });
     }
   }
 
@@ -218,13 +250,13 @@ function hasInterpretedContext(params: CreateMessagePolicyVMParams): boolean {
 
 function filterCandidatesForSurface(
   surface: MessageSurfaceEligibility,
-  candidates: ReadonlyArray<PreparedMessage>,
-): PreparedMessage[] {
+  candidates: ReadonlyArray<MessagePolicyCandidate>,
+): MessagePolicyCandidate[] {
   if (surface === SURFACELESS_MESSAGE) {
-    return candidates.filter((candidate) => candidate.surface === SURFACELESS_MESSAGE);
+    return candidates.filter((candidate) => candidate.message.surface === SURFACELESS_MESSAGE);
   }
 
-  return candidates.filter((candidate) => candidate.surface === surface);
+  return candidates.filter((candidate) => candidate.message.surface === surface);
 }
 
 export function createMessagePolicyVM(
@@ -234,16 +266,30 @@ export function createMessagePolicyVM(
     return {
       status: 'UNAVAILABLE',
       reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+      rationale: createPreparedMessageRationale({
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INTERPRETED_CONTEXT',
+      }),
     };
   }
 
   const candidates = createCandidates(params);
-  const messages = filterCandidatesForSurface(params.surface, candidates).slice(0, 1);
+  const visibleCandidates = filterCandidatesForSurface(params.surface, candidates).slice(0, 1);
 
-  if (messages.length > 0) {
+  if (visibleCandidates.length > 0) {
+    const visibleCandidate = visibleCandidates[0];
+
     return {
       status: 'AVAILABLE',
-      messages,
+      messages: [visibleCandidate.message],
+      rationale: createPreparedMessageRationale({
+        status: 'AVAILABLE',
+        message: visibleCandidate.message,
+        source: visibleCandidate.rationaleSource,
+        inputContext: visibleCandidate.inputContext,
+        decision: visibleCandidate.decision,
+        sensitivity: visibleCandidate.sensitivity,
+      }),
     };
   }
 
@@ -251,11 +297,19 @@ export function createMessagePolicyVM(
     return {
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_SURFACE',
+      rationale: createPreparedMessageRationale({
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      }),
     };
   }
 
   return {
     status: 'UNAVAILABLE',
     reason: 'NO_MESSAGE',
+    rationale: createPreparedMessageRationale({
+      status: 'UNAVAILABLE',
+      reason: 'NO_MESSAGE',
+    }),
   };
 }

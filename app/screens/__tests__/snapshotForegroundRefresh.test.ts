@@ -161,6 +161,18 @@ const availableMessagePolicy: MessagePolicyAvailability = {
       dismissible: true,
     },
   ],
+  rationale: {
+    status: 'AVAILABLE',
+    rationale: {
+      title: 'Why this is here',
+      summary:
+        'Shown as a reorientation because you are returning after a meaningful gap and Snapshot should help you regain context first.',
+      items: [
+        'It stays separate from alerts so the surface can help you get your bearings first.',
+        'The note stays compact because Snapshot already holds the fuller view.',
+      ],
+    },
+  },
 };
 
 describe('snapshotForegroundRefresh', () => {
@@ -255,6 +267,10 @@ describe('snapshotForegroundRefresh', () => {
     const fetchMessagePolicy = jest.fn().mockResolvedValue({
       status: 'UNAVAILABLE',
       reason: 'NO_MESSAGE',
+      rationale: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_RATIONALE_AVAILABLE',
+      },
     } satisfies MessagePolicyAvailability);
 
     const result = await refreshSnapshotScreenSurface({

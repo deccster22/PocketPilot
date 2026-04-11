@@ -87,6 +87,17 @@ function createSurface(): SnapshotSurfaceVM {
   };
 }
 
+function unavailableMessagePolicy(): MessagePolicyAvailability {
+  return {
+    status: 'UNAVAILABLE',
+    reason: 'NO_MESSAGE',
+    rationale: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_RATIONALE_AVAILABLE',
+    },
+  };
+}
+
 describe('createSnapshotScreenViewData', () => {
   it('keeps the screen helper on the prepared message policy contract only', () => {
     const source = readFileSync(
@@ -96,25 +107,21 @@ describe('createSnapshotScreenViewData', () => {
 
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
+    expect(source).toMatch(/messagePolicy\.rationale/);
     expect(source).toMatch(/thirtyThousandFoot\.availability\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(/surface\.briefing\.status === 'VISIBLE'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
     expect(source).not.toMatch(/kind === 'REORIENTATION'/);
     expect(source).not.toMatch(/kind === 'BRIEFING'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createThirtyThousandFootVM|createStrategyFitSummary|subjectScope|changeStrength|confirmationSupport|eventStream|marketEvents|signalsTriggered|providerId|metadata/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|createThirtyThousandFootVM|createStrategyFitSummary|subjectScope|changeStrength|confirmationSupport|eventStream|marketEvents|signalsTriggered|providerId|metadata/,
     );
   });
 
   it('uses the SnapshotModel path instead of legacy bridge fields', () => {
     const surface = createSurface();
 
-    expect(
-      createSnapshotScreenViewData(surface, {
-        status: 'UNAVAILABLE',
-        reason: 'NO_MESSAGE',
-      }),
-    ).toEqual({
+    expect(createSnapshotScreenViewData(surface, unavailableMessagePolicy())).toEqual({
       currentStateLabel: 'Current State',
       currentStateValue: 'Up',
       change24hLabel: 'Last 24h Change',
@@ -140,19 +147,14 @@ describe('createSnapshotScreenViewData', () => {
   });
 
   it('hides the message when the policy seam says no message is available, even if briefing state exists upstream', () => {
-    expect(
-      createSnapshotScreenViewData(createSurface(), {
-        status: 'UNAVAILABLE',
-        reason: 'NO_MESSAGE',
-      }),
-    ).toMatchObject({
+    expect(createSnapshotScreenViewData(createSurface(), unavailableMessagePolicy())).toMatchObject({
       message: {
         visible: false,
       },
     });
   });
 
-  it('passes through the prepared Snapshot message without classifying it locally', () => {
+  it('passes through the prepared Snapshot message and rationale without classifying it locally', () => {
     const messagePolicy: MessagePolicyAvailability = {
       status: 'AVAILABLE',
       messages: [
@@ -166,6 +168,18 @@ describe('createSnapshotScreenViewData', () => {
           dismissible: false,
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+        rationale: {
+          title: 'Why this is here',
+          summary:
+            "Shown as an alert because the change is focused enough for Snapshot's alert posture.",
+          items: [
+            'The change is focused enough to keep visible without crowding the surface.',
+            'The note stays compact so it points back to Snapshot instead of becoming a stream of messages.',
+          ],
+        },
+      },
     };
 
     expect(createSnapshotScreenViewData(createSurface(), messagePolicy)).toMatchObject({
@@ -177,6 +191,7 @@ describe('createSnapshotScreenViewData', () => {
         title: 'Meaningful change noticed',
         summary:
           'ETH is standing out in recent interpreted context. Review Snapshot before deciding whether it changes your plan.',
+        rationale: messagePolicy.rationale,
       },
       thirtyThousandFoot: {
         visible: true,
@@ -200,12 +215,7 @@ describe('createSnapshotScreenViewData', () => {
       },
     };
 
-    expect(
-      createSnapshotScreenViewData(surface, {
-        status: 'UNAVAILABLE',
-        reason: 'NO_MESSAGE',
-      }),
-    ).toMatchObject({
+    expect(createSnapshotScreenViewData(surface, unavailableMessagePolicy())).toMatchObject({
       thirtyThousandFoot: {
         visible: false,
       },

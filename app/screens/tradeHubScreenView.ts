@@ -2,6 +2,7 @@ import type {
   MessagePolicyAvailability,
   MessagePolicyKind,
   MessagePriority,
+  MessageRationaleAvailability,
 } from '@/services/messages/types';
 import type {
   TradeHubActionState,
@@ -48,9 +49,10 @@ export type TradeHubScreenViewData = {
         visible: true;
         kind: MessagePolicyKind;
         priority: MessagePriority;
-      title: string;
-      summary: string;
-    };
+        title: string;
+        summary: string;
+        rationale: MessageRationaleAvailability;
+      };
   risk: TradeHubRiskViewData | null;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
@@ -105,6 +107,7 @@ function createTradeHubMessageViewData(
       priority: messagePolicy.messages[0].priority,
       title: messagePolicy.messages[0].title,
       summary: messagePolicy.messages[0].summary,
+      rationale: messagePolicy.rationale,
     };
   }
 

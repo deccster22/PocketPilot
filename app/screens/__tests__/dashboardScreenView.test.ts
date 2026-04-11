@@ -145,9 +145,20 @@ function createSurface(): DashboardSurfaceVM {
   };
 }
 
+function unavailableMessagePolicy(): MessagePolicyAvailability {
+  return {
+    status: 'UNAVAILABLE',
+    reason: 'NO_MESSAGE',
+    rationale: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_RATIONALE_AVAILABLE',
+    },
+  };
+}
+
 describe('createDashboardScreenViewData', () => {
   it('reads the prepared Dashboard surface contract and prepared why note without re-ranking it', () => {
-    const view = createDashboardScreenViewData(createSurface());
+    const view = createDashboardScreenViewData(createSurface(), unavailableMessagePolicy());
 
     expect(view).toEqual({
       profileLabel: 'ADVANCED',
@@ -264,13 +275,14 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/accountContext\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
+    expect(source).toMatch(/messagePolicy\.rationale/);
     expect(source).not.toMatch(
       /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext/,
     );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|subjectScope|changeStrength|confirmationSupport/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
     );
     expect(source).not.toMatch(
       /createExplanationSummary|signalsTriggered|eventId|providerId|metadata/,
@@ -278,7 +290,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).not.toMatch(/strategyFit|aggregate alignment|aggregate fit/i);
   });
 
-  it('passes through the prepared Dashboard referral without classifying it locally', () => {
+  it('passes through the prepared Dashboard referral and rationale without classifying it locally', () => {
     const messagePolicy: MessagePolicyAvailability = {
       status: 'AVAILABLE',
       messages: [
@@ -292,6 +304,18 @@ describe('createDashboardScreenViewData', () => {
           dismissible: false,
         },
       ],
+      rationale: {
+        status: 'AVAILABLE',
+        rationale: {
+          title: 'Why this is here',
+          summary:
+            'Shown as a referral because Dashboard has useful context, but Snapshot is the steadier first read right now.',
+          items: [
+            'Snapshot is the surface PocketPilot uses for a calmer first look when top focus is still forming.',
+            'Routing notes stay compact instead of turning into alerts.',
+          ],
+        },
+      },
     };
 
     expect(createDashboardScreenViewData(createSurface(), messagePolicy)).toMatchObject({
@@ -302,6 +326,7 @@ describe('createDashboardScreenViewData', () => {
         title: 'Snapshot is the steadier fit',
         summary:
           'Dashboard has supporting context but not a strong top-focus item right now. Snapshot is the better place for a calm first read.',
+        rationale: messagePolicy.rationale,
       },
     });
     expect(JSON.stringify(messagePolicy)).not.toMatch(/badge|unread|notification|urgent|popup/);
@@ -309,10 +334,7 @@ describe('createDashboardScreenViewData', () => {
 
   it('routes Dashboard refresh through the canonical message-policy seam', async () => {
     const surface = createSurface();
-    const messagePolicy: MessagePolicyAvailability = {
-      status: 'UNAVAILABLE',
-      reason: 'NO_MESSAGE',
-    };
+    const messagePolicy = unavailableMessagePolicy();
     const fetchDashboardSurface = jest.fn().mockResolvedValue(surface);
     const fetchMessagePolicy = jest.fn().mockResolvedValue(messagePolicy);
 
@@ -429,38 +451,41 @@ describe('createDashboardScreenViewData', () => {
 
   it('hides the explanation card when the prepared explanation is unavailable', () => {
     expect(
-      createDashboardScreenViewData({
-        accountContext: {
-          status: 'AVAILABLE',
-          account: {
-            accountId: 'acct-1',
-            displayName: 'Primary account',
-            selectionMode: 'EXPLICIT',
-            baseCurrency: 'USD',
-            strategyId: 'momentum_basics',
+      createDashboardScreenViewData(
+        {
+          accountContext: {
+            status: 'AVAILABLE',
+            account: {
+              accountId: 'acct-1',
+              displayName: 'Primary account',
+              selectionMode: 'EXPLICIT',
+              baseCurrency: 'USD',
+              strategyId: 'momentum_basics',
+            },
+          },
+          aggregatePortfolioContext: {
+            status: 'UNAVAILABLE',
+            reason: 'NO_AGGREGATABLE_PORTFOLIO_DATA',
+          },
+          model: {
+            primeZone: { items: [] },
+            secondaryZone: { items: [] },
+            deepZone: { items: [] },
+            meta: {
+              profile: 'BEGINNER',
+              hasPrimeItems: false,
+              hasSecondaryItems: false,
+              hasDeepItems: false,
+            },
+          },
+          scan: {} as never,
+          explanation: {
+            status: 'UNAVAILABLE',
+            reason: 'NO_EXPLANATION_TARGET',
           },
         },
-        aggregatePortfolioContext: {
-          status: 'UNAVAILABLE',
-          reason: 'NO_AGGREGATABLE_PORTFOLIO_DATA',
-        },
-        model: {
-          primeZone: { items: [] },
-          secondaryZone: { items: [] },
-          deepZone: { items: [] },
-          meta: {
-            profile: 'BEGINNER',
-            hasPrimeItems: false,
-            hasSecondaryItems: false,
-            hasDeepItems: false,
-          },
-        },
-        scan: {} as never,
-        explanation: {
-          status: 'UNAVAILABLE',
-          reason: 'NO_EXPLANATION_TARGET',
-        },
-      }),
+        unavailableMessagePolicy(),
+      ),
     ).toMatchObject({
       aggregatePortfolio: {
         visible: false,

@@ -65,6 +65,7 @@ Start with:
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.
+- Message rationale stays calm and compact. User-visible message posture is explained through prepared service-owned rationale, never raw diagnostics.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.
@@ -106,6 +107,7 @@ Key docs:
 - `product/KNOWLEDGE_LAYER.md`
 - `product/RELEVANCE_PRINCIPLE.md`
 - `product/NOTIFICATION_PHILOSOPHY.md`
+- `product/ALERT_MESSAGE_POLICY.md`
 - `product/PROFILE_EXPLANATION_MODEL.md`
 - `product/LOG_AND_JOURNAL_MODEL.md`
 - `product/ASSET_NARRATIVE_MODEL.md`
@@ -146,6 +148,7 @@ Key docs:
 - `architecture/PROVIDER_ROUTER_MODEL.md`
 - `architecture/QUOTE_BROKER.md`
 - `architecture/SNAPSHOT_SYSTEM.md`
+- `architecture/MESSAGE_POLICY_MODEL.md`
 - `architecture/NOTIFICATION_ROUTER_MODEL.md`
 - `architecture/STRATEGY_STATUS_ENGINE.md`
 - `architecture/TRADE_HUB_RUNTIME_MODEL.md`
