@@ -303,6 +303,10 @@ describe('fetchConfirmationSessionVM', () => {
             ],
           },
         },
+        riskInputGuidance: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_GUIDANCE_NEEDED',
+        },
       },
       shell: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',

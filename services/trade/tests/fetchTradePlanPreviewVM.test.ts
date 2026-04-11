@@ -245,6 +245,15 @@ describe('fetchTradePlanPreviewVM', () => {
         status: 'UNAVAILABLE',
         reason: 'INSUFFICIENT_INPUTS',
       },
+      riskInputGuidance: {
+        status: 'AVAILABLE',
+        guidance: {
+          title: 'Prepared risk context incomplete',
+          summary:
+            'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
+          items: ['Prepared entry and stop references', 'Prepared position cap'],
+        },
+      },
     });
     expect(JSON.stringify(result.preview)).not.toContain('hidden-signal');
     expect(JSON.stringify(result.preview)).not.toContain('hidden');

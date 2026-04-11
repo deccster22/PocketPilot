@@ -186,6 +186,15 @@ describe('createTradeHubScreenViewData', () => {
     );
   });
 
+  it('renders the prepared risk-input guidance note from the preview lane without rebuilding it locally', () => {
+    const source = readFileSync(join(process.cwd(), 'app', 'screens', 'TradeHubScreen.tsx'), 'utf8');
+
+    expect(source).toMatch(/previewView\.riskInputGuidance/);
+    expect(source).toMatch(/previewView\.riskInputGuidance\.guidance\.title/);
+    expect(source).not.toMatch(/createRiskInputGuidance/);
+    expect(source).not.toMatch(/Prepared risk context incomplete|A supported risk basis on this surface/);
+  });
+
   it('passes through the prepared guarded-stop note and rationale without classifying it locally', () => {
     const messagePolicy: MessagePolicyAvailability = {
       status: 'AVAILABLE',

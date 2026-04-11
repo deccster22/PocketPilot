@@ -1,6 +1,7 @@
 import type {
   PositionSizingAvailability,
   PositionSizingUnavailableReason,
+  RiskInputGuidanceAvailability,
   TradeHubActionState,
   TradePlanPreview,
 } from '@/services/trade/types';
@@ -35,6 +36,7 @@ export type TradePlanPreviewViewData = {
     label: string;
     value: string;
   }>;
+  riskInputGuidance: RiskInputGuidanceAvailability;
   positionSizing: TradePlanSizingViewData;
 };
 
@@ -119,6 +121,15 @@ function createPositionSizingViewData(
   };
 }
 
+function createRiskInputGuidanceViewData(
+  preview: TradePlanPreview,
+): RiskInputGuidanceAvailability {
+  return preview.riskInputGuidance ?? {
+    status: 'UNAVAILABLE',
+    reason: 'NO_GUIDANCE_NEEDED',
+  };
+}
+
 export function createTradePlanPreviewViewData(
   preview: TradePlanPreview | null,
 ): TradePlanPreviewViewData | null {
@@ -158,6 +169,7 @@ export function createTradePlanPreviewViewData(
         label: item.label,
         value: item.value,
       })) ?? [],
+    riskInputGuidance: createRiskInputGuidanceViewData(preview),
     positionSizing: createPositionSizingViewData(preview.positionSizing),
   };
 }

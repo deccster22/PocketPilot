@@ -86,6 +86,15 @@ describe('createTradePlanPreviewViewData', () => {
           ],
         },
       },
+      riskInputGuidance: {
+        status: 'AVAILABLE',
+        guidance: {
+          title: 'Prepared risk context incomplete',
+          summary:
+            'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
+          items: ['Prepared entry and stop references', 'Prepared position cap'],
+        },
+      },
     });
 
     expect(view).toEqual({
@@ -113,6 +122,15 @@ describe('createTradePlanPreviewViewData', () => {
           value: '$50.00',
         },
       ],
+      riskInputGuidance: {
+        status: 'AVAILABLE',
+        guidance: {
+          title: 'Prepared risk context incomplete',
+          summary:
+            'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
+          items: ['Prepared entry and stop references', 'Prepared position cap'],
+        },
+      },
       positionSizing: {
         statusText: 'Prepared sizing available',
         headline: 'Position size (Account %)',
@@ -148,6 +166,10 @@ describe('createTradePlanPreviewViewData', () => {
     expect(source).not.toMatch(/Math\.abs/);
     expect(source).not.toMatch(/positionValue\s*\/\s*entryPrice/);
     expect(source).not.toMatch(/maxLoss\s*\/\s*accountValue/);
+    expect(source).toMatch(/preview\.riskInputGuidance\s*\?\?/);
+    expect(source).not.toMatch(/entryPrice\s*===\s*null/);
+    expect(source).not.toMatch(/stopPrice\s*===\s*null/);
+    expect(source).not.toMatch(/accountContext/);
     expect(source).toMatch(/createPositionSizingViewData/);
   });
 });
