@@ -35,6 +35,19 @@ P5-R9 adds one optional risk-input guidance note inside the selected-plan previe
 - it stays service-owned and non-enforcing
 - it does not add troubleshooting flows or validation walls
 
+## P7-K4 Contextual Knowledge Follow-Through
+Trade Hub now has one optional contextual-knowledge lane on the same prepared service path.
+
+Rules:
+- the lane comes from `services/knowledge/createContextualKnowledgeLane`
+- it is service-owned, profile-shaped, and relevance-shaped
+- beginner users can see a little more of the lane than advanced users
+- render it only when the prepared lane is honestly available and non-empty
+- keep it compact, calm, and subordinate to the action-support contract
+- do not turn it into a feed, tutorial stack, or gating mechanism
+- app code only renders prepared topic links and topic detail routes; it does not choose topics locally
+- the lane never locks execution, disables plans, or changes read-only behavior
+
 ## Surface Contract
 
 Trade Hub consumes a prepared `TradeHubSurfaceModel` from `services/trade/`.

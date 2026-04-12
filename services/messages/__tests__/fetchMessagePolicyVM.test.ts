@@ -154,6 +154,15 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
     status: 'UNAVAILABLE' as const,
     reason: 'NOT_ENABLED_FOR_SURFACE' as const,
   };
+  const contextualKnowledgeLane =
+    overrides.contextualKnowledgeLane ??
+    ({
+      availability: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_RELEVANT_TOPIC',
+      },
+      topics: [],
+    } as DashboardSurfaceVM['contextualKnowledgeLane']);
 
   return {
     accountContext: {
@@ -195,6 +204,7 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
       status: 'UNAVAILABLE',
       reason: 'NO_EXPLANATION_TARGET',
     },
+    contextualKnowledgeLane,
     ...overrides,
     aggregatePortfolioContext,
   };

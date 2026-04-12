@@ -3,9 +3,11 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { DashboardAccountSwitcher } from '@/app/components/DashboardAccountSwitcher';
 import { DashboardAggregatePortfolioCard } from '@/app/components/DashboardAggregatePortfolioCard';
+import { ContextualKnowledgeCard } from '@/app/components/ContextualKnowledgeCard';
 import { ExplanationCard } from '@/app/components/ExplanationCard';
 import { MessageRationaleNote } from '@/app/components/MessageRationaleNote';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
+import { KnowledgeTopicScreen } from '@/app/screens/KnowledgeTopicScreen';
 import {
   createDashboardScreenViewData,
   refreshDashboardScreenSurface,
@@ -14,6 +16,7 @@ import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState
 import { setPrimaryAccount } from '@/services/accounts/setPrimaryAccount';
 import { switchSelectedAccount } from '@/services/accounts/switchSelectedAccount';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
 import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
@@ -44,6 +47,7 @@ export function DashboardScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceVM | null>(null);
   const [messagePolicyLane, setMessagePolicyLane] = useState<MessagePolicyLane | null>(null);
+  const [selectedKnowledgeTopicId, setSelectedKnowledgeTopicId] = useState<string | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
   const [refreshNonce, setRefreshNonce] = useState(0);
   const [accountSwitcherExpanded, setAccountSwitcherExpanded] = useState(false);
@@ -80,6 +84,24 @@ export function DashboardScreen() {
     () => createDashboardScreenViewData(surfaceModel, messagePolicyLane),
     [messagePolicyLane, surfaceModel],
   );
+  const knowledgeTopicVM = useMemo(
+    () =>
+      fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId: selectedKnowledgeTopicId,
+      }),
+    [selectedKnowledgeTopicId],
+  );
+
+  if (selectedKnowledgeTopicId) {
+    return (
+      <KnowledgeTopicScreen
+        topicVM={knowledgeTopicVM}
+        onBack={() => setSelectedKnowledgeTopicId(null)}
+        onOpenTopic={setSelectedKnowledgeTopicId}
+      />
+    );
+  }
 
   async function handleSwitchAccount(accountId: string) {
     if (surfaceModel?.accountContext.status !== 'AVAILABLE') {
@@ -157,6 +179,14 @@ export function DashboardScreen() {
             <Text style={styles.noteTitle}>{screenView.message.title}</Text>
             <Text style={styles.noteSummary}>{screenView.message.summary}</Text>
             <MessageRationaleNote rationale={screenView.message.rationale} />
+          </View>
+        ) : null}
+        {screenView?.contextualKnowledge.visible ? (
+          <View style={styles.section}>
+            <ContextualKnowledgeCard
+              items={screenView.contextualKnowledge.items}
+              onOpenTopic={setSelectedKnowledgeTopicId}
+            />
           </View>
         ) : null}
         <DashboardZone

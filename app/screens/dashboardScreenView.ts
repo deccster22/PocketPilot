@@ -10,6 +10,7 @@ import {
 } from '@/services/dashboard/dashboardSurfaceService';
 import type { DashboardItem } from '@/services/dashboard/types';
 import type { ExplanationConfidence, ExplanationLineageItem } from '@/services/explanation/types';
+import { createContextualKnowledgeSectionViewData } from '@/app/screens/contextualKnowledgeView';
 import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import type {
   MessagePolicyLane,
@@ -17,6 +18,7 @@ import type {
   MessagePriority,
   MessageRationaleAvailability,
 } from '@/services/messages/types';
+import type { ContextualKnowledgeCandidate } from '@/services/knowledge/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type DashboardScreenAccountContextViewData =
@@ -90,11 +92,17 @@ export type DashboardScreenMessageViewData =
       rationale: MessageRationaleAvailability;
     };
 
+export type DashboardScreenContextualKnowledgeViewData = {
+  visible: boolean;
+  items: ReadonlyArray<ContextualKnowledgeCandidate>;
+};
+
 export type DashboardScreenViewData = {
   profileLabel: string;
   accountContext: DashboardScreenAccountContextViewData;
   aggregatePortfolio: DashboardScreenAggregatePortfolioViewData;
   message: DashboardScreenMessageViewData;
+  contextualKnowledge: DashboardScreenContextualKnowledgeViewData;
   primeZone: DashboardScreenZoneViewData;
   secondaryZone: DashboardScreenZoneViewData;
   deepZone: DashboardScreenZoneViewData;
@@ -374,6 +382,7 @@ export function createDashboardScreenViewData(
     accountContext: createAccountContextViewData(surface.accountContext),
     aggregatePortfolio: createAggregatePortfolioViewData(surface.aggregatePortfolioContext),
     message: createDashboardMessageViewData(messagePolicyLane),
+    contextualKnowledge: createContextualKnowledgeSectionViewData(surface.contextualKnowledgeLane),
     primeZone: {
       title: 'Prime Zone',
       items: formatZoneItems(surface.model.primeZone.items),

@@ -51,6 +51,8 @@ export type KnowledgeLibraryItem = {
   mediaType: KnowledgeMediaType;
 };
 
+export type KnowledgeLibraryTopicSummary = KnowledgeLibraryItem;
+
 export type KnowledgeLibrarySection = {
   id: string;
   title: string;
@@ -117,6 +119,15 @@ export type ContextualKnowledgeCandidate = {
   topicId: string;
   title: string;
   reason: string;
+};
+
+export type ContextualKnowledgeLaneTopic = KnowledgeLibraryTopicSummary & {
+  reason: string;
+};
+
+export type ContextualKnowledgeLane = {
+  availability: ContextualKnowledgeAvailability;
+  topics: ReadonlyArray<ContextualKnowledgeLaneTopic>;
 };
 
 export type ContextualKnowledgeAvailability =

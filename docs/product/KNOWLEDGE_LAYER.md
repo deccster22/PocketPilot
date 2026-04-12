@@ -28,10 +28,11 @@ The layer should:
 - support strategy learning
 - support disciplined readiness
 - support reflection without shame
+- keep contextual follow-through thin, optional, and service-owned on live surfaces
 
 ## Surface posture
-- Dashboard is the strongest contextual home
-- Trade Hub is bounded and support-only
+- Dashboard is the strongest contextual home and now carries the canonical contextual-knowledge lane when relevance is honest
+- Trade Hub is bounded and support-only, with a smaller contextual-knowledge lane when action-support context is honest
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
 

@@ -1,4 +1,9 @@
 import type {
+  ContextualKnowledgeCandidate,
+  ContextualKnowledgeLane,
+} from '@/services/knowledge/types';
+import { createContextualKnowledgeSectionViewData } from '@/app/screens/contextualKnowledgeView';
+import type {
   MessagePolicyLane,
   MessagePolicyKind,
   MessagePriority,
@@ -77,6 +82,11 @@ export type TradeHubRiskLaneViewData = {
   guardrailEvaluation: TradeHubGuardrailEvaluationViewData | null;
 };
 
+export type TradeHubScreenContextualKnowledgeViewData = {
+  visible: boolean;
+  items: ReadonlyArray<ContextualKnowledgeCandidate>;
+};
+
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
@@ -94,6 +104,7 @@ export type TradeHubScreenViewData = {
         rationale: MessageRationaleAvailability;
   };
   riskLane: TradeHubRiskLaneViewData;
+  contextualKnowledge: TradeHubScreenContextualKnowledgeViewData;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
@@ -391,6 +402,7 @@ function createTradeHubRiskLaneViewData(surface: TradeHubSurfaceModel): TradeHub
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
   messagePolicyLane?: MessagePolicyLane | null,
+  contextualKnowledgeLane?: ContextualKnowledgeLane | null,
 ): TradeHubScreenViewData | null {
   if (!surface) {
     return null;
@@ -404,6 +416,7 @@ export function createTradeHubScreenViewData(
       : 'Confirmation rules are not required.',
     message: createTradeHubMessageViewData(messagePolicyLane),
     riskLane: createTradeHubRiskLaneViewData(surface),
+    contextualKnowledge: createContextualKnowledgeSectionViewData(contextualKnowledgeLane),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),
   };

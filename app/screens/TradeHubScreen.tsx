@@ -9,9 +9,11 @@ import {
   View,
 } from 'react-native';
 
+import { ContextualKnowledgeCard } from '@/app/components/ContextualKnowledgeCard';
 import { MessageRationaleNote } from '@/app/components/MessageRationaleNote';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
+import { KnowledgeTopicScreen } from '@/app/screens/KnowledgeTopicScreen';
 import { createTradeConfirmationFlowViewData } from '@/app/screens/tradeConfirmationFlowView';
 import { createTradeExecutionAdapterViewData } from '@/app/screens/tradeExecutionAdapterView';
 import { createTradeExecutionReadinessViewData } from '@/app/screens/tradeExecutionReadinessView';
@@ -28,8 +30,9 @@ import { updateGuardrailPreferences } from '@/services/trade/updateGuardrailPref
 import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
+import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
-import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
+import { fetchTradeHubVM, type TradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { updatePreferredRiskBasis } from '@/services/trade/updatePreferredRiskBasis';
 import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
@@ -205,7 +208,10 @@ function formatGuardrailPreferenceActionText(
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
+  const [contextualKnowledgeLane, setContextualKnowledgeLane] =
+    useState<TradeHubVM['contextualKnowledgeLane'] | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | undefined>();
+  const [selectedKnowledgeTopicId, setSelectedKnowledgeTopicId] = useState<string | null>(null);
   const [selectedRiskBasis, setSelectedRiskBasis] = useState<RiskBasis | undefined>();
   const [messagePolicyLane, setMessagePolicyLane] = useState<MessagePolicyLane | null>(null);
   const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
@@ -247,6 +253,7 @@ export function TradeHubScreen() {
         }
 
         setSurfaceModel(tradeHub.model);
+        setContextualKnowledgeLane(tradeHub.contextualKnowledgeLane);
         setBaselineScan((currentBaseline) => currentBaseline ?? tradeHub.scan);
       })
       .catch(() => {
@@ -255,6 +262,7 @@ export function TradeHubScreen() {
         }
 
         setSurfaceModel(null);
+        setContextualKnowledgeLane(null);
       });
 
     return () => {
@@ -273,8 +281,16 @@ export function TradeHubScreen() {
   }, [preferredRiskBasisAccountId]);
 
   const screenView = useMemo(
-    () => createTradeHubScreenViewData(surfaceModel, messagePolicyLane),
-    [messagePolicyLane, surfaceModel],
+    () => createTradeHubScreenViewData(surfaceModel, messagePolicyLane, contextualKnowledgeLane),
+    [contextualKnowledgeLane, messagePolicyLane, surfaceModel],
+  );
+  const knowledgeTopicVM = useMemo(
+    () =>
+      fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId: selectedKnowledgeTopicId,
+      }),
+    [selectedKnowledgeTopicId],
   );
   const riskLaneView = screenView?.riskLane;
   const tradeHubRiskView = riskLaneView?.risk;
@@ -601,6 +617,16 @@ export function TradeHubScreen() {
     }));
   }
 
+  if (selectedKnowledgeTopicId) {
+    return (
+      <KnowledgeTopicScreen
+        topicVM={knowledgeTopicVM}
+        onBack={() => setSelectedKnowledgeTopicId(null)}
+        onOpenTopic={setSelectedKnowledgeTopicId}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -621,6 +647,15 @@ export function TradeHubScreen() {
             <Text style={styles.noteTitle}>{screenView.message.title}</Text>
             <Text style={styles.noteSummary}>{screenView.message.summary}</Text>
             <MessageRationaleNote rationale={screenView.message.rationale} />
+          </View>
+        ) : null}
+
+        {screenView?.contextualKnowledge.visible ? (
+          <View style={styles.section}>
+            <ContextualKnowledgeCard
+              items={screenView.contextualKnowledge.items}
+              onOpenTopic={setSelectedKnowledgeTopicId}
+            />
           </View>
         ) : null}
 

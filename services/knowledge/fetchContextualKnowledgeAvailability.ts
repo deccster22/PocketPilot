@@ -1,4 +1,4 @@
-import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { DashboardSurfaceModel } from '@/services/dashboard/types';
 import type {
   InsightsArchiveVM,
   InsightsHistoryWithContinuityVM,
@@ -13,30 +13,31 @@ import type {
 } from '@/services/knowledge/types';
 import type { MessagePolicyAvailability, MessagePolicyKind } from '@/services/messages/types';
 import type { StrategyNavigatorVM } from '@/services/strategyNavigator/types';
+import type { TradeHubSurfaceModel } from '@/services/trade/types';
 
-function collectDashboardStrategyIds(surface: DashboardSurfaceVM | null | undefined): string[] {
+function collectDashboardStrategyIds(surface: DashboardSurfaceModel | null | undefined): string[] {
   if (!surface) {
     return [];
   }
 
   return [
-    ...surface.model.primeZone.items,
-    ...surface.model.secondaryZone.items,
-    ...surface.model.deepZone.items,
+    ...surface.primeZone.items,
+    ...surface.secondaryZone.items,
+    ...surface.deepZone.items,
   ]
     .map((item) => item.strategyId)
     .filter((strategyId): strategyId is string => Boolean(strategyId));
 }
 
-function collectDashboardEventTypes(surface: DashboardSurfaceVM | null | undefined) {
+function collectDashboardEventTypes(surface: DashboardSurfaceModel | null | undefined) {
   if (!surface) {
     return [];
   }
 
   return [
-    ...surface.model.primeZone.items,
-    ...surface.model.secondaryZone.items,
-    ...surface.model.deepZone.items,
+    ...surface.primeZone.items,
+    ...surface.secondaryZone.items,
+    ...surface.deepZone.items,
   ].map((item) => item.eventType);
 }
 
@@ -53,9 +54,10 @@ function collectMessageKinds(
 export function fetchContextualKnowledgeAvailability(params: {
   surface: KnowledgeContextSurface;
   nodes?: ReadonlyArray<KnowledgeCatalogEntry>;
-  dashboardSurface?: DashboardSurfaceVM | null;
+  dashboardSurface?: DashboardSurfaceModel | null;
   messagePolicy?: MessagePolicyAvailability | null;
   strategyNavigatorVM?: StrategyNavigatorVM | null;
+  tradeHubSurface?: TradeHubSurfaceModel | null;
   insightsHistory?: InsightsHistoryWithContinuityVM | null;
   insightsArchive?: InsightsArchiveVM | null;
   reflectionComparison?: ReflectionComparisonVM | null;
@@ -86,6 +88,14 @@ export function fetchContextualKnowledgeAvailability(params: {
           strategyIds: collectDashboardStrategyIds(params.dashboardSurface),
           eventTypes: collectDashboardEventTypes(params.dashboardSurface),
           messageKinds: collectMessageKinds(params.messagePolicy),
+        },
+      });
+    case 'TRADE_HUB':
+      return createContextualKnowledgeAvailability({
+        nodes,
+        input: {
+          surface: params.surface,
+          tradeHubSurface: params.tradeHubSurface ?? undefined,
         },
       });
     case 'INSIGHTS':

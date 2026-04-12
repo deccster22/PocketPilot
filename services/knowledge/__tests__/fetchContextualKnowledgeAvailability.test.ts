@@ -1,4 +1,4 @@
-import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { DashboardSurfaceModel } from '@/services/dashboard/types';
 import { fetchContextualKnowledgeAvailability } from '@/services/knowledge/fetchContextualKnowledgeAvailability';
 import type {
   InsightsArchiveVM,
@@ -7,6 +7,36 @@ import type {
 } from '@/services/insights/types';
 import type { MessagePolicyAvailability } from '@/services/messages/types';
 import { fetchStrategyNavigatorVM } from '@/services/strategyNavigator/fetchStrategyNavigatorVM';
+import type { TradeHubSurfaceModel } from '@/services/trade/types';
+
+function createTradeHubSurface(): TradeHubSurfaceModel {
+  return {
+    primaryPlan: {
+      actionState: 'CAUTION',
+      certainty: 'LOW',
+      alignment: 'MISALIGNED',
+    },
+    alternativePlans: [],
+    riskLane: {
+      preparedRiskLane: {
+        basisAvailability: {
+          status: 'AVAILABLE',
+        },
+      },
+      positionSizingAvailability: {
+        status: 'AVAILABLE',
+      },
+        guardrailEvaluationAvailability: {
+          status: 'AVAILABLE',
+        },
+      },
+    meta: {
+      hasPrimaryPlan: true,
+      profile: 'ADVANCED',
+      requiresConfirmation: true,
+    },
+  } as unknown as TradeHubSurfaceModel;
+}
 
 describe('fetchContextualKnowledgeAvailability', () => {
   it('builds contextual Strategy Preview candidates from the prepared preview VM', () => {
@@ -69,33 +99,31 @@ describe('fetchContextualKnowledgeAvailability', () => {
 
   it('builds dashboard candidates from prepared dashboard and message-policy seams without app-side selection logic', () => {
     const dashboardSurface = {
-      model: {
-        primeZone: {
-          items: [
-            {
-              accountId: 'primary',
-              symbol: 'BTC',
-              strategyId: 'dip_buying',
-              eventType: 'ESTIMATED_PRICE',
-              timestamp: 1,
-              certainty: 'estimated',
-            },
-          ],
-        },
-        secondaryZone: {
-          items: [],
-        },
-        deepZone: {
-          items: [],
-        },
-        meta: {
-          profile: 'BEGINNER',
-          hasPrimeItems: true,
-          hasSecondaryItems: false,
-          hasDeepItems: false,
-        },
+      primeZone: {
+        items: [
+          {
+            accountId: 'primary',
+            symbol: 'BTC',
+            strategyId: 'dip_buying',
+            eventType: 'ESTIMATED_PRICE',
+            timestamp: 1,
+            certainty: 'estimated',
+          },
+        ],
       },
-    } as unknown as DashboardSurfaceVM;
+      secondaryZone: {
+        items: [],
+      },
+      deepZone: {
+        items: [],
+      },
+      meta: {
+        profile: 'BEGINNER',
+        hasPrimeItems: true,
+        hasSecondaryItems: false,
+        hasDeepItems: false,
+      },
+    } as unknown as DashboardSurfaceModel;
     const messagePolicy: MessagePolicyAvailability = {
       status: 'AVAILABLE',
       messages: [
@@ -213,10 +241,41 @@ describe('fetchContextualKnowledgeAvailability', () => {
     );
   });
 
+  it('builds trade hub candidates from prepared trade hub seams without widening the app surface', () => {
+    const result = fetchContextualKnowledgeAvailability({
+      surface: 'TRADE_HUB',
+      tradeHubSurface: createTradeHubSurface(),
+    });
+
+    expect(result).toMatchObject({
+      status: 'AVAILABLE',
+      surface: 'TRADE_HUB',
+    });
+
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected Trade Hub contextual knowledge to be available.');
+    }
+
+    expect(result.items).toHaveLength(3);
+    expect(result.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          topicId: 'pp-risk-reward-basics',
+        }),
+        expect.objectContaining({
+          topicId: 'pp-stop-loss-basics',
+        }),
+        expect.objectContaining({
+          topicId: 'pp-estimated-vs-confirmed-context',
+        }),
+      ]),
+    );
+  });
+
   it('keeps unsupported surfaces explicit instead of widening contextual rollout everywhere', () => {
     expect(
       fetchContextualKnowledgeAvailability({
-        surface: 'TRADE_HUB',
+        surface: 'SNAPSHOT',
       }),
     ).toEqual({
       status: 'UNAVAILABLE',
