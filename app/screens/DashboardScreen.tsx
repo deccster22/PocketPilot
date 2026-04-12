@@ -184,7 +184,7 @@ export function DashboardScreen() {
         {screenView?.contextualKnowledge.visible ? (
           <View style={styles.section}>
             <ContextualKnowledgeCard
-              items={screenView.contextualKnowledge.items}
+              contextualKnowledge={screenView.contextualKnowledge}
               onOpenTopic={setSelectedKnowledgeTopicId}
             />
           </View>

@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P9-S2)
 
 ## Purpose
 
@@ -7,6 +7,8 @@
 `P7-K1` established the baseline shelf seam.
 `P7-K2` extends that same seam with one subordinate topic detail contract without turning knowledge into a CMS, markdown browser, or gating system.
 `P7-K3` adds one thin contextual-eligibility seam without turning knowledge into a recommendation engine or broad rollout system.
+`P7-K4` carries that same seam into a calm live-surface rollout for Dashboard and Trade Hub.
+`P7-K5` refines the live rollout with one explicit density/placement presentation seam without turning it into a feed or gate.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -15,6 +17,7 @@ The current goal is simple:
 - shape that tree into one prepared library contract
 - shape one selected topic into one prepared topic-detail contract
 - shape one interpreted surface into one prepared contextual-eligibility result
+- shape one live contextual shelf into one prepared presentation result
 - keep `app/` passive and display-only
 - keep knowledge optional, calm, and non-intrusive
 
@@ -140,6 +143,24 @@ Rules:
 - unsupported or thin context returns explicit unavailable states
 - the contract stays small and does not include markdown, docs paths, or progress mechanics
 
+`P7-K5` adds one explicit contextual presentation contract:
+
+```ts
+type ContextualKnowledgePresentation = {
+  maxVisibleTopics: number;
+  emphasis: 'SUBORDINATE' | 'LIGHT' | 'STANDARD';
+  shouldRenderShelf: boolean;
+};
+```
+
+Rules:
+
+- `services/knowledge/createContextualKnowledgePresentation.ts` owns density and placement shaping
+- `services/knowledge/createContextualKnowledgeLane.ts` owns the live shelf composition seam and applies the presentation to the selected topics
+- `app/` consumes the prepared presentation only
+- the shelf can stay available but intentionally not render when relevance is too thin
+- the contract stays small and does not include gating, recommendation, or inbox behaviour
+
 ## Canonical Knowledge Tree
 
 The runtime catalog now has one canonical source path:
@@ -167,7 +188,9 @@ knowledgeCatalog
 -> Knowledge topic detail screen
 -> createContextualKnowledgeAvailability
 -> fetchContextualKnowledgeAvailability
--> generic contextual availability for approved surfaces
+-> createContextualKnowledgePresentation
+-> createContextualKnowledgeLane
+-> contextual live shelf
 ```
 
 `P9-S2` then adds a preview-specific follow-through path on top of the same catalog:
@@ -187,6 +210,8 @@ Responsibilities:
 - `services/knowledge/createKnowledgeTopicDetailVM.ts` owns selected-topic shaping
 - `services/knowledge/fetchKnowledgeLibraryVM.ts` owns library surface enablement
 - `services/knowledge/fetchKnowledgeTopicDetailVM.ts` owns topic-detail surface enablement
+- `services/knowledge/createContextualKnowledgePresentation.ts` owns contextual density / placement shaping
+- `services/knowledge/createContextualKnowledgeLane.ts` owns the contextual live-lane composition and applies the presentation to the selected topics
 - `services/knowledge/createContextualKnowledgeAvailability.ts` owns contextual candidate shaping
 - `services/knowledge/fetchContextualKnowledgeAvailability.ts` owns contextual surface interpretation
 - `services/strategyNavigator/selectStrategyPreviewKnowledge.ts` owns preview-specific follow-through selection
@@ -195,14 +220,16 @@ Responsibilities:
 
 ## Availability And Gating Rules
 
-Knowledge stays optional in `P7-K1`, `P7-K2`, and `P7-K3`.
+Knowledge stays optional in `P7-K1`, `P7-K2`, `P7-K3`, `P7-K4`, and `P7-K5`.
 
 Rules locked in this phase:
 
 - the Knowledge Library remains available as a top-level destination
 - the topic detail surface is subordinate to that same shelf
 - the contextual seam is allowed to return `AVAILABLE` only when interpreted surface context is strong enough
+- the contextual shelf may still remain hidden when the presentation says the relevant context is too thin for the current profile or surface
 - Strategy Preview is the only proof-path consumer in `P7-K3`
+- Dashboard and Trade Hub are the only live-surface consumers in `P7-K4` and `P7-K5`
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
@@ -211,12 +238,13 @@ Rules locked in this phase:
 
 ## Relationship To Later Work
 
-`P7-K3` is still baseline work, not the whole knowledge family.
+`P7-K3`, `P7-K4`, and `P7-K5` are still baseline work, not the whole knowledge family.
 
 Later phases can build on this seam by:
 
 - widening contextual links from strategies, signals, and events through the same service-owned eligibility rules
 - adding richer detail presentation or media handling when the model honestly supports it
+- tuning the density rules further only if a later rung keeps the shelf calm and subordinate
 - connecting knowledge more deeply with `P8` reflection flows and future `P9` explanation work
 - adding recommendation logic only after the shelf and detail contracts are already stable
 

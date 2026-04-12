@@ -18,6 +18,11 @@ function createUnavailableContextualKnowledgeLane(): ContextualKnowledgeLane {
       status: 'UNAVAILABLE',
       reason: 'NO_RELEVANT_TOPIC',
     },
+    presentation: {
+      maxVisibleTopics: 0,
+      emphasis: 'SUBORDINATE',
+      shouldRenderShelf: false,
+    },
     topics: [],
   };
 }
@@ -234,13 +239,20 @@ describe('createDashboardScreenViewData', () => {
           },
         ],
       },
-      message: {
-        visible: false,
-      },
-      contextualKnowledge: {
-        visible: false,
-        items: [],
-      },
+        message: {
+          visible: false,
+        },
+        contextualKnowledge: {
+          visible: false,
+          title: 'Optional knowledge',
+          summary: 'The shelf stays hidden until the prepared context is stronger.',
+          presentation: {
+            maxVisibleTopics: 0,
+            emphasis: 'SUBORDINATE',
+            shouldRenderShelf: false,
+          },
+          items: [],
+        },
       primeZone: {
         title: 'Prime Zone',
         items: [
@@ -310,6 +322,11 @@ describe('createDashboardScreenViewData', () => {
             },
           ],
         },
+        presentation: {
+          maxVisibleTopics: 1,
+          emphasis: 'SUBORDINATE',
+          shouldRenderShelf: true,
+        },
         topics: [
           {
             topicId: 'pp-what-dashboard-is-for',
@@ -325,6 +342,13 @@ describe('createDashboardScreenViewData', () => {
 
     expect(view?.contextualKnowledge).toEqual({
       visible: true,
+      title: 'Quiet context',
+      summary: 'Only one quiet link stays visible, and only when the surface is still relevant enough.',
+      presentation: {
+        maxVisibleTopics: 1,
+        emphasis: 'SUBORDINATE',
+        shouldRenderShelf: true,
+      },
       items: [
         {
           topicId: 'pp-what-dashboard-is-for',
@@ -332,6 +356,54 @@ describe('createDashboardScreenViewData', () => {
           reason: 'Dashboard is the strongest contextual home for deeper explanation.',
         },
       ],
+    });
+  });
+
+  it('hides the prepared contextual knowledge shelf when the service says the lane is too sparse', () => {
+    const view = createDashboardScreenViewData({
+      ...createSurface(),
+      contextualKnowledgeLane: {
+        availability: {
+          status: 'AVAILABLE',
+          surface: 'DASHBOARD',
+          items: [
+            {
+              topicId: 'pp-what-dashboard-is-for',
+              title: 'What Dashboard Is For',
+              reason:
+                'Dashboard stays on one quiet contextual link only when the shelf is still relevant.',
+            },
+          ],
+        },
+        presentation: {
+          maxVisibleTopics: 1,
+          emphasis: 'SUBORDINATE',
+          shouldRenderShelf: false,
+        },
+        topics: [
+          {
+            topicId: 'pp-what-dashboard-is-for',
+            title: 'What Dashboard Is For',
+            summary: 'Dashboard is PocketPilot\'s focus workspace.',
+            difficulty: 'BEGINNER',
+            mediaType: 'ARTICLE',
+            reason:
+              'Dashboard stays on one quiet contextual link only when the shelf is still relevant.',
+          },
+        ],
+      },
+    });
+
+    expect(view?.contextualKnowledge).toEqual({
+      visible: false,
+      title: 'Optional knowledge',
+      summary: 'The shelf stays hidden until the prepared context is stronger.',
+      presentation: {
+        maxVisibleTopics: 0,
+        emphasis: 'SUBORDINATE',
+        shouldRenderShelf: false,
+      },
+      items: [],
     });
   });
 

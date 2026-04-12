@@ -121,12 +121,21 @@ export type ContextualKnowledgeCandidate = {
   reason: string;
 };
 
+export type ContextualKnowledgeEmphasis = 'SUBORDINATE' | 'LIGHT' | 'STANDARD';
+
+export type ContextualKnowledgePresentation = {
+  maxVisibleTopics: number;
+  emphasis: ContextualKnowledgeEmphasis;
+  shouldRenderShelf: boolean;
+};
+
 export type ContextualKnowledgeLaneTopic = KnowledgeLibraryTopicSummary & {
   reason: string;
 };
 
 export type ContextualKnowledgeLane = {
   availability: ContextualKnowledgeAvailability;
+  presentation: ContextualKnowledgePresentation;
   topics: ReadonlyArray<ContextualKnowledgeLaneTopic>;
 };
 

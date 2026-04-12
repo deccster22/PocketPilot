@@ -48,6 +48,17 @@ Rules:
 - app code only renders prepared topic links and topic detail routes; it does not choose topics locally
 - the lane never locks execution, disables plans, or changes read-only behavior
 
+## P7-K5 Contextual Knowledge Density / Placement Refinement
+Trade Hub now also consumes the same contextual lane through one explicit prepared presentation contract so the shelf can stay smaller and quieter on the action surface.
+
+Rules:
+- `services/knowledge/createContextualKnowledgePresentation.ts` owns the prepared density and placement result
+- the presentation is explicit: `maxVisibleTopics`, `emphasis`, and `shouldRenderShelf`
+- Trade Hub stays more bounded than Dashboard even when the lane is available
+- the shelf may stay hidden when the prepared context is too thin for the current profile or surface
+- `app/` renders the prepared title, summary, and topic links only
+- no local topic selection, recommendation feed behavior, gating behavior, or execution-lock behavior is introduced
+
 ## Surface Contract
 
 Trade Hub consumes a prepared `TradeHubSurfaceModel` from `services/trade/`.

@@ -1,5 +1,6 @@
 import type { UserProfile } from '@/core/profile/types';
 import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
+import { createContextualKnowledgePresentation } from '@/services/knowledge/createContextualKnowledgePresentation';
 import { fetchContextualKnowledgeAvailability } from '@/services/knowledge/fetchContextualKnowledgeAvailability';
 import type {
   ContextualKnowledgeLane,
@@ -7,12 +8,6 @@ import type {
   KnowledgeCatalogEntry,
   KnowledgeLibraryTopicSummary,
 } from '@/services/knowledge/types';
-
-const TOPIC_LIMIT_BY_PROFILE: Record<UserProfile, number> = {
-  BEGINNER: 3,
-  MIDDLE: 2,
-  ADVANCED: 1,
-};
 
 function toKnowledgeLibraryTopicSummary(node: KnowledgeCatalogEntry): KnowledgeLibraryTopicSummary {
   return {
@@ -45,18 +40,23 @@ export function createContextualKnowledgeLane(
     ...availabilityParams,
     nodes,
   });
+  const presentation = createContextualKnowledgePresentation({
+    profile,
+    surface: availabilityParams.surface,
+    availability,
+  });
 
   if (availability.status !== 'AVAILABLE') {
     return {
       availability,
+      presentation,
       topics: [],
     };
   }
 
   const nodesByTopicId = new Map(nodes.map((node) => [node.topicId, node] as const));
-  const topicLimit = TOPIC_LIMIT_BY_PROFILE[profile];
   const topics = availability.items
-    .slice(0, topicLimit)
+    .slice(0, presentation.maxVisibleTopics)
     .map((item) => {
       const node = nodesByTopicId.get(item.topicId);
 
@@ -71,8 +71,17 @@ export function createContextualKnowledgeLane(
     })
     .filter((topic): topic is ContextualKnowledgeLaneTopic => Boolean(topic));
 
+  const effectivePresentation =
+    topics.length === 0
+      ? {
+          ...presentation,
+          shouldRenderShelf: false,
+        }
+      : presentation;
+
   return {
     availability,
+    presentation: effectivePresentation,
     topics,
   };
 }

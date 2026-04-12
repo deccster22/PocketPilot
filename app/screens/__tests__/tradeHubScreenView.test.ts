@@ -172,11 +172,18 @@ describe('createTradeHubScreenViewData', () => {
       confirmationText: 'Every action remains confirmation-safe and non-executing in this phase.',
       message: {
         visible: false,
-      },
-      contextualKnowledge: {
-        visible: false,
-        items: [],
-      },
+        },
+        contextualKnowledge: {
+          visible: false,
+          title: 'Optional knowledge',
+          summary: 'The shelf stays hidden until the prepared context is stronger.',
+          presentation: {
+            maxVisibleTopics: 0,
+            emphasis: 'SUBORDINATE',
+            shouldRenderShelf: false,
+          },
+          items: [],
+        },
       riskLane: {
         risk: {
           selectedBasisLabel: 'Fixed currency',
@@ -297,13 +304,18 @@ describe('createTradeHubScreenViewData', () => {
             topicId: 'pp-risk-reward-basics',
             title: 'Risk Reward Basics',
             reason: 'The prepared risk lane makes risk and reward the calmest next read.',
-          },
-        ],
-      },
-      topics: [
-        {
-          topicId: 'pp-risk-reward-basics',
-          title: 'Risk Reward Basics',
+            },
+          ],
+        },
+        presentation: {
+          maxVisibleTopics: 1,
+          emphasis: 'SUBORDINATE',
+          shouldRenderShelf: true,
+        },
+        topics: [
+          {
+            topicId: 'pp-risk-reward-basics',
+            title: 'Risk Reward Basics',
           summary: 'Risk and reward stay in balance.',
           difficulty: 'BEGINNER',
           mediaType: 'ARTICLE',
@@ -329,6 +341,13 @@ describe('createTradeHubScreenViewData', () => {
 
     expect(view?.contextualKnowledge).toEqual({
       visible: true,
+      title: 'Quiet context',
+      summary: 'Only one quiet link stays visible, and only when the surface is still relevant enough.',
+      presentation: {
+        maxVisibleTopics: 1,
+        emphasis: 'SUBORDINATE',
+        shouldRenderShelf: true,
+      },
       items: [
         {
           topicId: 'pp-risk-reward-basics',
@@ -438,6 +457,64 @@ describe('createTradeHubScreenViewData', () => {
       },
     });
     expect(JSON.stringify(messagePolicy)).not.toMatch(/badge|unread|notification|urgent|popup/);
+  });
+
+  it('hides the prepared contextual knowledge shelf when Trade Hub relevance is too thin', () => {
+    const view = createTradeHubScreenViewData(
+      {
+        primaryPlan: null,
+        alternativePlans: [],
+        riskLane: createUnavailableTradeHubRiskLane(),
+        meta: {
+          hasPrimaryPlan: false,
+          profile: 'ADVANCED',
+          requiresConfirmation: true,
+        },
+      },
+      createMessagePolicyLane(unavailableMessagePolicy()),
+      {
+        availability: {
+          status: 'AVAILABLE',
+          surface: 'TRADE_HUB',
+          items: [
+            {
+              topicId: 'pp-risk-reward-basics',
+              title: 'Risk Reward Basics',
+              reason:
+                'Trade Hub stays on one quiet contextual link only when the shelf is still relevant.',
+            },
+          ],
+        },
+        presentation: {
+          maxVisibleTopics: 1,
+          emphasis: 'SUBORDINATE',
+          shouldRenderShelf: false,
+        },
+        topics: [
+          {
+            topicId: 'pp-risk-reward-basics',
+            title: 'Risk Reward Basics',
+            summary: 'Risk and reward stay in balance.',
+            difficulty: 'BEGINNER',
+            mediaType: 'ARTICLE',
+            reason:
+              'Trade Hub stays on one quiet contextual link only when the shelf is still relevant.',
+          },
+        ],
+      },
+    );
+
+    expect(view?.contextualKnowledge).toEqual({
+      visible: false,
+      title: 'Optional knowledge',
+      summary: 'The shelf stays hidden until the prepared context is stronger.',
+      presentation: {
+        maxVisibleTopics: 0,
+        emphasis: 'SUBORDINATE',
+        shouldRenderShelf: false,
+      },
+      items: [],
+    });
   });
 
   it('returns null when the prepared trade hub surface is unavailable', () => {

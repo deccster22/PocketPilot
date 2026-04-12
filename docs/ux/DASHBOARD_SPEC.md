@@ -185,6 +185,17 @@ Rules:
 - do not turn it into a feed, tutorial stack, or gating mechanism
 - app code only renders prepared topic links and topic detail routes; it does not choose topics locally
 
+## P7-K5 Contextual Knowledge Density / Placement Refinement
+Dashboard now also consumes a prepared contextual-knowledge presentation contract so the same lane can stay calmer or disappear more quietly when relevance is thin.
+
+Rules:
+- `services/knowledge/createContextualKnowledgePresentation.ts` owns the prepared density and placement result
+- the presentation is explicit: `maxVisibleTopics`, `emphasis`, and `shouldRenderShelf`
+- beginner and middle profiles stay a little more open than advanced profiles
+- the shelf may stay hidden when the prepared context is too thin for the current profile or surface
+- `app/` renders the prepared title, summary, and topic links only
+- no local topic selection, recommendation feed behavior, or gating behavior is introduced
+
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.
 
