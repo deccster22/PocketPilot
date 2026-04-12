@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder` + `PreferredRiskBasisResolver` + `GuardrailPreferencesResolver` + `GuardrailEvaluationResolver` + `RiskInputGuidanceBuilder`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `TradeHubRiskLaneComposer`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -32,13 +32,14 @@ Prepared plan in, bounded action path out.
 - `readinessState`
 - `capabilityPath`
 - `confirmationRequirements`
-- `riskBasisAvailability`
-- `selectedRiskBasis`
-- `preferredRiskBasisAvailability`
-- `guardrailPreferencesAvailability`
-- `guardrailEvaluationAvailability`
-- `riskPerTradeContext`
-- `positionSizing`
+- `riskLane`
+  - `selectedRiskBasis`
+  - `preparedRiskLane`
+  - `preferredRiskBasisAvailability`
+  - `positionSizingAvailability`
+  - `riskInputGuidanceAvailability`
+  - `guardrailPreferencesAvailability`
+  - `guardrailEvaluationAvailability`
 - `boundedKnowledgeLinks[]`
 - `rationaleSummary`
 
@@ -68,6 +69,9 @@ Produces canonical plan options.
 ### Risk basis selector
 Determines which explicit risk bases are supported on the surface and preserves user-selected basis state without silent fallback in the app layer.
 It also seeds the prepared lane from one account-level preferred basis when the service layer has honestly saved one.
+
+### Trade Hub risk lane composer
+Groups the risk-basis selector, preferred-basis resolver, prepared risk-per-trade context, sizing output, guidance, guardrail preferences, and guardrail evaluation into one prepared lane object.
 
 ### Preferred risk basis resolver
 Resolves the saved account-level preferred basis through the service-owned seam without introducing silent cross-account fallback.

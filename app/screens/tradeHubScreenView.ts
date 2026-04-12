@@ -71,6 +71,12 @@ export type TradeHubGuardrailEvaluationViewData = {
   items: ReadonlyArray<TradeHubGuardrailEvaluationItemViewData>;
 };
 
+export type TradeHubRiskLaneViewData = {
+  risk: TradeHubRiskViewData | null;
+  guardrailPreferences: TradeHubGuardrailPreferencesViewData;
+  guardrailEvaluation: TradeHubGuardrailEvaluationViewData | null;
+};
+
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
@@ -87,15 +93,13 @@ export type TradeHubScreenViewData = {
         summary: string;
         rationale: MessageRationaleAvailability;
   };
-  risk: TradeHubRiskViewData | null;
-  guardrailPreferences: TradeHubGuardrailPreferencesViewData;
-  guardrailEvaluation: TradeHubGuardrailEvaluationViewData | null;
+  riskLane: TradeHubRiskLaneViewData;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
 
 function formatPreferredRiskBasisText(surface: TradeHubSurfaceModel): string {
-  const preferredRiskBasisAvailability = surface.meta.preferredRiskBasisAvailability;
+  const preferredRiskBasisAvailability = surface.riskLane.preferredRiskBasisAvailability;
 
   if (preferredRiskBasisAvailability.status === 'UNAVAILABLE') {
     switch (preferredRiskBasisAvailability.reason) {
@@ -111,8 +115,8 @@ function formatPreferredRiskBasisText(surface: TradeHubSurfaceModel): string {
   }
 
   const preferredLabel =
-    surface.risk.basisAvailability.status === 'AVAILABLE'
-      ? surface.risk.basisAvailability.options.find(
+    surface.riskLane.preparedRiskLane.basisAvailability.status === 'AVAILABLE'
+      ? surface.riskLane.preparedRiskLane.basisAvailability.options.find(
           (option) => option.basis === preferredRiskBasisAvailability.preferredBasis,
         )?.label ?? preferredRiskBasisAvailability.preferredBasis
       : preferredRiskBasisAvailability.preferredBasis;
@@ -180,28 +184,28 @@ function createTradeHubMessageViewData(
 
 function createTradeHubRiskViewData(surface: TradeHubSurfaceModel): TradeHubRiskViewData | null {
   if (
-    surface.risk.basisAvailability.status !== 'AVAILABLE' ||
-    surface.risk.context === null ||
-    surface.risk.activeBasisLabel === null
+    surface.riskLane.preparedRiskLane.basisAvailability.status !== 'AVAILABLE' ||
+    surface.riskLane.preparedRiskLane.context === null ||
+    surface.riskLane.preparedRiskLane.activeBasisLabel === null
   ) {
     return null;
   }
 
   return {
-    selectedBasisLabel: surface.risk.activeBasisLabel,
+    selectedBasisLabel: surface.riskLane.preparedRiskLane.activeBasisLabel,
     preferredRiskBasisText: formatPreferredRiskBasisText(surface),
     statusText:
-      surface.risk.context.status === 'AVAILABLE'
+      surface.riskLane.preparedRiskLane.context.status === 'AVAILABLE'
         ? 'Prepared risk context available'
         : 'Prepared risk context unavailable',
-    headline: surface.risk.context.headline,
-    summary: surface.risk.context.summary,
-    options: surface.risk.basisAvailability.options.map((option) => ({
+    headline: surface.riskLane.preparedRiskLane.context.headline,
+    summary: surface.riskLane.preparedRiskLane.context.summary,
+    options: surface.riskLane.preparedRiskLane.basisAvailability.options.map((option) => ({
       basis: option.basis,
       label: option.label,
       isSelected: option.isSelected,
     })),
-    items: surface.risk.context.items.map((item) => ({
+    items: surface.riskLane.preparedRiskLane.context.items.map((item) => ({
       label: item.label,
       value: item.value,
     })),
@@ -368,6 +372,18 @@ function createTradeHubGuardrailEvaluationViewData(
   };
 }
 
+function createTradeHubRiskLaneViewData(surface: TradeHubSurfaceModel): TradeHubRiskLaneViewData {
+  return {
+    risk: createTradeHubRiskViewData(surface),
+    guardrailPreferences: createTradeHubGuardrailPreferencesViewData(
+      surface.riskLane.guardrailPreferencesAvailability,
+    ),
+    guardrailEvaluation: createTradeHubGuardrailEvaluationViewData(
+      surface.riskLane.guardrailEvaluationAvailability,
+    ),
+  };
+}
+
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
   messagePolicy?: MessagePolicyAvailability | null,
@@ -383,13 +399,7 @@ export function createTradeHubScreenViewData(
       ? 'Every action remains confirmation-safe and non-executing in this phase.'
       : 'Confirmation rules are not required.',
     message: createTradeHubMessageViewData(messagePolicy),
-    risk: createTradeHubRiskViewData(surface),
-    guardrailPreferences: createTradeHubGuardrailPreferencesViewData(
-      surface.meta.guardrailPreferencesAvailability,
-    ),
-    guardrailEvaluation: createTradeHubGuardrailEvaluationViewData(
-      surface.meta.guardrailEvaluationAvailability,
-    ),
+    riskLane: createTradeHubRiskLaneViewData(surface),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),
   };

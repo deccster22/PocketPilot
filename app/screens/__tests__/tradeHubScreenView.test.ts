@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MessagePolicyAvailability } from '@/services/messages/types';
+import { createUnavailableTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 
 function unavailableMessagePolicy(): MessagePolicyAvailability {
@@ -42,52 +43,67 @@ describe('createTradeHubScreenViewData', () => {
             actionState: 'CAUTION',
           },
         ],
-        risk: {
-          activeBasis: 'FIXED_CURRENCY',
-          activeBasisLabel: 'Fixed currency',
-          basisAvailability: {
-            status: 'AVAILABLE',
-            selectedBasis: 'FIXED_CURRENCY',
-            options: [
-              {
-                basis: 'ACCOUNT_PERCENT',
-                label: 'Account %',
-                isSelected: false,
-              },
-              {
-                basis: 'FIXED_CURRENCY',
-                label: 'Fixed currency',
-                isSelected: true,
-              },
-              {
-                basis: 'POSITION_PERCENT',
-                label: 'Position %',
-                isSelected: false,
-              },
-            ],
+        riskLane: {
+          selectedRiskBasis: 'FIXED_CURRENCY',
+          preparedRiskLane: {
+            activeBasis: 'FIXED_CURRENCY',
+            activeBasisLabel: 'Fixed currency',
+            basisAvailability: {
+              status: 'AVAILABLE',
+              selectedBasis: 'FIXED_CURRENCY',
+              options: [
+                {
+                  basis: 'ACCOUNT_PERCENT',
+                  label: 'Account %',
+                  isSelected: false,
+                },
+                {
+                  basis: 'FIXED_CURRENCY',
+                  label: 'Fixed currency',
+                  isSelected: true,
+                },
+                {
+                  basis: 'POSITION_PERCENT',
+                  label: 'Position %',
+                  isSelected: false,
+                },
+              ],
+            },
+            context: {
+              status: 'AVAILABLE',
+              basis: 'FIXED_CURRENCY',
+              headline: 'Fixed-currency risk frame',
+              summary:
+                'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+              items: [
+                {
+                  label: 'Risk per trade',
+                  value: '$50.00',
+                },
+              ],
+            },
           },
-          context: {
-            status: 'AVAILABLE',
-            basis: 'FIXED_CURRENCY',
-            headline: 'Fixed-currency risk frame',
-            summary:
-              'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
-            items: [
-              {
-                label: 'Risk per trade',
-                value: '$50.00',
-              },
-            ],
-          },
-        },
-        meta: {
-          hasPrimaryPlan: true,
-          profile: 'ADVANCED',
-          requiresConfirmation: true,
           preferredRiskBasisAvailability: {
             status: 'AVAILABLE',
             accountId: 'acct-live',
             preferredBasis: 'FIXED_CURRENCY',
+          },
+          positionSizingAvailability: {
+            status: 'AVAILABLE',
+            output: {
+              sizeLabel: 'Position size (Fixed currency)',
+              sizeValue: '10 units at $1,000.00 cap',
+              maxLossLabel: 'Max loss at stop',
+              maxLossValue: '$50.00',
+              notes: [
+                'Prepared entry $100.00 to stop $95.00.',
+                'Support-only readout; no order path is opened here.',
+              ],
+            },
+          },
+          riskInputGuidanceAvailability: {
+            status: 'UNAVAILABLE',
+            reason: 'NO_GUIDANCE_NEEDED',
           },
           guardrailPreferencesAvailability: {
             status: 'AVAILABLE',
@@ -130,6 +146,11 @@ describe('createTradeHubScreenViewData', () => {
             },
           },
         },
+        meta: {
+          hasPrimaryPlan: true,
+          profile: 'ADVANCED',
+          requiresConfirmation: true,
+        },
       },
       unavailableMessagePolicy(),
     );
@@ -141,87 +162,89 @@ describe('createTradeHubScreenViewData', () => {
       message: {
         visible: false,
       },
-      risk: {
-        selectedBasisLabel: 'Fixed currency',
-        preferredRiskBasisText: 'Usual basis for this account: Fixed currency',
-        statusText: 'Prepared risk context available',
-        headline: 'Fixed-currency risk frame',
-        summary:
-          'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
-        options: [
-          {
-            basis: 'ACCOUNT_PERCENT',
-            label: 'Account %',
-            isSelected: false,
-          },
-          {
-            basis: 'FIXED_CURRENCY',
-            label: 'Fixed currency',
-            isSelected: true,
-          },
-          {
-            basis: 'POSITION_PERCENT',
-            label: 'Position %',
-            isSelected: false,
-          },
-        ],
-        items: [
-          {
-            label: 'Risk per trade',
-            value: '$50.00',
-          },
-        ],
-      },
-      guardrailPreferences: {
-        accountText: 'Account: acct-live',
-        summaryText: '2 optional guardrails are enabled and 1 are off by default.',
-        statusText: 'Guardrail preferences are ready for this account.',
-        canEdit: true,
-        items: [
-          {
-            key: 'riskLimitPerTrade',
-            label: 'Risk limit per trade',
-            isEnabled: true,
-            stateText: 'Enabled - 2%',
-            detailText: 'Threshold: 2%',
-            inputPlaceholder: 'e.g. 2%',
-          },
-          {
-            key: 'dailyLossThreshold',
-            label: 'Daily loss threshold',
-            isEnabled: false,
-            stateText: 'Off by default',
-            detailText: 'Threshold not set',
-            inputPlaceholder: 'e.g. 4%',
-          },
-          {
-            key: 'cooldownAfterLoss',
-            label: 'Cooldown after loss',
-            isEnabled: true,
-            stateText: 'Enabled - 1 day',
-            detailText: 'Window: 1 day',
-            inputPlaceholder: 'e.g. 1 day',
-          },
-        ],
-      },
-      guardrailEvaluation: {
-        titleText: 'Prepared guardrail status',
-        summaryText:
-          'One enabled guardrail sits outside the chosen structure. Trade Hub prepared the rest as not evaluated, and is only describing that status here.',
-        items: [
-          {
-            key: 'riskLimitPerTrade',
-            label: 'Risk limit per trade',
-            statusText: 'Outside guardrail',
-            summaryText: 'Current risk per trade sits above your saved threshold.',
-          },
-          {
-            key: 'cooldownAfterLoss',
-            label: 'Cooldown after loss',
-            statusText: 'Not evaluated',
-            summaryText: 'The current plan does not yet carry a cooldown state.',
-          },
-        ],
+      riskLane: {
+        risk: {
+          selectedBasisLabel: 'Fixed currency',
+          preferredRiskBasisText: 'Usual basis for this account: Fixed currency',
+          statusText: 'Prepared risk context available',
+          headline: 'Fixed-currency risk frame',
+          summary:
+            'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: false,
+            },
+            {
+              basis: 'FIXED_CURRENCY',
+              label: 'Fixed currency',
+              isSelected: true,
+            },
+            {
+              basis: 'POSITION_PERCENT',
+              label: 'Position %',
+              isSelected: false,
+            },
+          ],
+          items: [
+            {
+              label: 'Risk per trade',
+              value: '$50.00',
+            },
+          ],
+        },
+        guardrailPreferences: {
+          accountText: 'Account: acct-live',
+          summaryText: '2 optional guardrails are enabled and 1 are off by default.',
+          statusText: 'Guardrail preferences are ready for this account.',
+          canEdit: true,
+          items: [
+            {
+              key: 'riskLimitPerTrade',
+              label: 'Risk limit per trade',
+              isEnabled: true,
+              stateText: 'Enabled - 2%',
+              detailText: 'Threshold: 2%',
+              inputPlaceholder: 'e.g. 2%',
+            },
+            {
+              key: 'dailyLossThreshold',
+              label: 'Daily loss threshold',
+              isEnabled: false,
+              stateText: 'Off by default',
+              detailText: 'Threshold not set',
+              inputPlaceholder: 'e.g. 4%',
+            },
+            {
+              key: 'cooldownAfterLoss',
+              label: 'Cooldown after loss',
+              isEnabled: true,
+              stateText: 'Enabled - 1 day',
+              detailText: 'Window: 1 day',
+              inputPlaceholder: 'e.g. 1 day',
+            },
+          ],
+        },
+        guardrailEvaluation: {
+          titleText: 'Prepared guardrail status',
+          summaryText:
+            'One enabled guardrail sits outside the chosen structure. Trade Hub prepared the rest as not evaluated, and is only describing that status here.',
+          items: [
+            {
+              key: 'riskLimitPerTrade',
+              label: 'Risk limit per trade',
+              statusText: 'Outside guardrail',
+              summaryText: 'Current risk per trade sits above your saved threshold.',
+            },
+            {
+              key: 'cooldownAfterLoss',
+              label: 'Cooldown after loss',
+              statusText: 'Not evaluated',
+              summaryText: 'The current plan does not yet carry a cooldown state.',
+            },
+          ],
+        },
       },
       primaryPlan: {
         planId: 'primary-plan',
@@ -255,10 +278,10 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/messagePolicy\.messages\[0\]/);
     expect(source).toMatch(/messagePolicy\.rationale/);
-    expect(source).toMatch(/surface\.risk\.basisAvailability\.status !== 'AVAILABLE'/);
-    expect(source).toMatch(/surface\.meta\.preferredRiskBasisAvailability/);
-    expect(source).toMatch(/surface\.meta\.guardrailPreferencesAvailability/);
-    expect(source).toMatch(/surface\.meta\.guardrailEvaluationAvailability/);
+    expect(source).toMatch(/surface\.riskLane\.preparedRiskLane\.basisAvailability\.status !== 'AVAILABLE'/);
+    expect(source).toMatch(/surface\.riskLane\.preferredRiskBasisAvailability/);
+    expect(source).toMatch(/surface\.riskLane\.guardrailPreferencesAvailability/);
+    expect(source).toMatch(/surface\.riskLane\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
       /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
@@ -268,6 +291,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).not.toMatch(
       /updatePreferredRiskBasis|updateGuardrailPreferences|preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore|createGuardrailEvaluation|compareComparableValues|parseComparableValue|classifyComparableValue/,
     );
+    expect(source).not.toMatch(/from '@\/services\/trade\/createTradeHubRiskLane'/);
   });
 
   it('keeps preference persistence routed through the screen component service seam, not a screen-owned store', () => {
@@ -275,7 +299,8 @@ describe('createTradeHubScreenViewData', () => {
 
     expect(source).toMatch(/updatePreferredRiskBasis/);
     expect(source).toMatch(/updateGuardrailPreferences/);
-    expect(source).toMatch(/screenView\?\.guardrailEvaluation/);
+    expect(source).toMatch(/surfaceModel\?\.riskLane\.preferredRiskBasisAvailability/);
+    expect(source).toMatch(/riskLaneView\?\.guardrailEvaluation/);
     expect(source).not.toMatch(
       /preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore|createGuardrailEvaluation|compareComparableValues|parseComparableValue|classifyComparableValue/,
     );
@@ -323,31 +348,11 @@ describe('createTradeHubScreenViewData', () => {
         {
           primaryPlan: null,
           alternativePlans: [],
-          risk: {
-            activeBasis: null,
-            activeBasisLabel: null,
-            basisAvailability: {
-              status: 'UNAVAILABLE',
-              reason: 'NOT_ENABLED_FOR_SURFACE',
-            },
-            context: null,
-          },
+          riskLane: createUnavailableTradeHubRiskLane(),
           meta: {
             hasPrimaryPlan: false,
             profile: 'ADVANCED',
             requiresConfirmation: true,
-            preferredRiskBasisAvailability: {
-              status: 'UNAVAILABLE',
-              reason: 'NO_ACCOUNT_CONTEXT',
-            },
-            guardrailPreferencesAvailability: {
-              status: 'UNAVAILABLE',
-              reason: 'NO_ACCOUNT_CONTEXT',
-            },
-            guardrailEvaluationAvailability: {
-              status: 'UNAVAILABLE',
-              reason: 'INSUFFICIENT_CONTEXT',
-            },
           },
         },
         messagePolicy,

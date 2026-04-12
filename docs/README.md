@@ -63,6 +63,7 @@ Start with:
 - Explicit risk framing. Selected risk basis must stay legible and flow through prepared Trade Hub summaries and sizing outputs.
 - Account-level preferred risk basis and optional guardrail preferences stay service-owned and explicit. Trade Hub may start from a saved per-account basis or guardrail choice, but the screen never invents or silently stores one.
 - Prepared guardrail evaluation stays service-owned, descriptive, and non-blocking. Trade Hub may show how the selected plan sits against enabled guardrails, but it never turns that status into default enforcement.
+- The Trade Hub risk lane stays grouped as one prepared service-owned contract, so selected basis, preferred basis, sizing, guidance, guardrail preferences, and guardrail evaluation travel together without app-owned recomposition.
 - Prepared risk-input guidance stays service-owned, calm, and non-enforcing when sizing context is thin or unsupported.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.

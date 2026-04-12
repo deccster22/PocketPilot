@@ -262,9 +262,10 @@ export function TradeHubScreen() {
     };
   }, [guardrailPreferencesRefreshNonce, profile, baselineScan, selectedPlanId, selectedRiskBasis]);
 
+  const preferredRiskBasisAvailability = surfaceModel?.riskLane.preferredRiskBasisAvailability;
   const preferredRiskBasisAccountId =
-    surfaceModel?.meta.preferredRiskBasisAvailability.status === 'AVAILABLE'
-      ? surfaceModel.meta.preferredRiskBasisAvailability.accountId
+    preferredRiskBasisAvailability?.status === 'AVAILABLE'
+      ? preferredRiskBasisAvailability.accountId
       : null;
 
   useEffect(() => {
@@ -275,6 +276,10 @@ export function TradeHubScreen() {
     () => createTradeHubScreenViewData(surfaceModel, messagePolicy),
     [messagePolicy, surfaceModel],
   );
+  const riskLaneView = screenView?.riskLane;
+  const tradeHubRiskView = riskLaneView?.risk;
+  const guardrailPreferencesView = riskLaneView?.guardrailPreferences;
+  const guardrailEvaluationView = riskLaneView?.guardrailEvaluation;
   const previewView = useMemo(
     () => createTradePlanPreviewViewData(confirmationSessionVm?.session.preview ?? null),
     [confirmationSessionVm],
@@ -571,7 +576,7 @@ export function TradeHubScreen() {
   }
 
   function handleToggleGuardrailPreference(key: GuardrailPreferenceKey) {
-    const availability = surfaceModel?.meta.guardrailPreferencesAvailability;
+    const availability = surfaceModel?.riskLane.guardrailPreferencesAvailability;
 
     if (availability?.status !== 'AVAILABLE') {
       return;
@@ -658,18 +663,18 @@ export function TradeHubScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Risk Basis</Text>
           <Text style={styles.supportText}>
-            {screenView?.risk?.summary ??
+            {tradeHubRiskView?.summary ??
               'Risk framing appears when a prepared plan can carry an explicit basis.'}
           </Text>
-          {screenView?.risk ? (
+          {tradeHubRiskView ? (
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Prepared risk framing</Text>
-              <Text style={styles.cardTitle}>{screenView.risk.selectedBasisLabel}</Text>
-              <Text style={styles.cardMeta}>{screenView.risk.preferredRiskBasisText}</Text>
-              <Text style={styles.cardMeta}>{screenView.risk.statusText}</Text>
-              <Text style={styles.cardMeta}>{screenView.risk.headline}</Text>
+              <Text style={styles.cardTitle}>{tradeHubRiskView.selectedBasisLabel}</Text>
+              <Text style={styles.cardMeta}>{tradeHubRiskView.preferredRiskBasisText}</Text>
+              <Text style={styles.cardMeta}>{tradeHubRiskView.statusText}</Text>
+              <Text style={styles.cardMeta}>{tradeHubRiskView.headline}</Text>
               <View style={styles.toggleRow}>
-                {screenView.risk.options.map((option) => {
+                {tradeHubRiskView.options.map((option) => {
                   const isSelected =
                     (selectedRiskBasis ?? confirmationSessionVm?.session.preview?.risk.activeBasis) ===
                     option.basis || (!selectedRiskBasis && option.isSelected);
@@ -706,21 +711,21 @@ export function TradeHubScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Guardrail Preferences</Text>
           <Text style={styles.supportText}>
-            {screenView?.guardrailPreferences.summaryText ??
+            {guardrailPreferencesView?.summaryText ??
               'Optional guardrails stay off by default until an account is available.'}
           </Text>
-          {screenView?.guardrailPreferences ? (
+          {guardrailPreferencesView ? (
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Optional, explicit, account-scoped</Text>
-              <Text style={styles.cardTitle}>{screenView.guardrailPreferences.statusText}</Text>
-              <Text style={styles.cardMeta}>{screenView.guardrailPreferences.accountText}</Text>
-              {screenView.guardrailPreferences.items.length ? (
-                screenView.guardrailPreferences.items.map((item) => (
+              <Text style={styles.cardTitle}>{guardrailPreferencesView.statusText}</Text>
+              <Text style={styles.cardMeta}>{guardrailPreferencesView.accountText}</Text>
+              {guardrailPreferencesView.items.length ? (
+                guardrailPreferencesView.items.map((item) => (
                   <View key={item.key} style={styles.guardrailItem}>
                     <Text style={styles.cardMeta}>{item.label}</Text>
                     <Text style={styles.cardSummary}>{item.stateText}</Text>
                     <Text style={styles.cardMeta}>{item.detailText}</Text>
-                    {screenView.guardrailPreferences.canEdit ? (
+                    {guardrailPreferencesView.canEdit ? (
                       <Pressable
                         accessibilityRole="button"
                         onPress={() => handleToggleGuardrailPreference(item.key)}
@@ -750,12 +755,12 @@ export function TradeHubScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Guardrail Evaluation</Text>
-          {screenView?.guardrailEvaluation ? (
+          {guardrailEvaluationView ? (
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Prepared, descriptive only</Text>
-              <Text style={styles.cardTitle}>{screenView.guardrailEvaluation.titleText}</Text>
-              <Text style={styles.cardSummary}>{screenView.guardrailEvaluation.summaryText}</Text>
-              {screenView.guardrailEvaluation.items.map((item) => (
+              <Text style={styles.cardTitle}>{guardrailEvaluationView.titleText}</Text>
+              <Text style={styles.cardSummary}>{guardrailEvaluationView.summaryText}</Text>
+              {guardrailEvaluationView.items.map((item) => (
                 <View key={item.key} style={styles.guardrailItem}>
                   <Text style={styles.cardMeta}>{item.label}</Text>
                   <Text style={styles.cardSummary}>{item.statusText}</Text>

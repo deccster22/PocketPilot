@@ -207,64 +207,79 @@ describe('fetchTradeHubVM', () => {
         actionState: 'READY',
       },
       alternativePlans: [],
-      risk: {
-        activeBasis: 'POSITION_PERCENT',
-        activeBasisLabel: 'Position %',
-        basisAvailability: {
-          status: 'AVAILABLE',
-          selectedBasis: 'POSITION_PERCENT',
-          options: [
-            {
-              basis: 'ACCOUNT_PERCENT',
-              label: 'Account %',
-              isSelected: false,
-            },
-            {
-              basis: 'FIXED_CURRENCY',
-              label: 'Fixed currency',
-              isSelected: false,
-            },
-            {
-              basis: 'POSITION_PERCENT',
-              label: 'Position %',
-              isSelected: true,
-            },
-          ],
+      riskLane: {
+        selectedRiskBasis: 'POSITION_PERCENT',
+        preparedRiskLane: {
+          activeBasis: 'POSITION_PERCENT',
+          activeBasisLabel: 'Position %',
+          basisAvailability: {
+            status: 'AVAILABLE',
+            selectedBasis: 'POSITION_PERCENT',
+            options: [
+              {
+                basis: 'ACCOUNT_PERCENT',
+                label: 'Account %',
+                isSelected: false,
+              },
+              {
+                basis: 'FIXED_CURRENCY',
+                label: 'Fixed currency',
+                isSelected: false,
+              },
+              {
+                basis: 'POSITION_PERCENT',
+                label: 'Position %',
+                isSelected: true,
+              },
+            ],
+          },
+          context: {
+            status: 'AVAILABLE',
+            basis: 'POSITION_PERCENT',
+            headline: 'Position % risk frame',
+            summary:
+              'Shows the capped loss from this prepared plan as a share of the capped position value using prepared references only.',
+            items: [
+              {
+                label: 'Risk per trade',
+                value: '5.00%',
+              },
+              {
+                label: 'Max loss at cap',
+                value: '$50.00',
+              },
+              {
+                label: 'Position cap used',
+                value: '10.00%',
+              },
+              {
+                label: 'Prepared price path',
+                value: '$100.00 entry to $95.00 stop',
+              },
+            ],
+          },
         },
-        context: {
-          status: 'AVAILABLE',
-          basis: 'POSITION_PERCENT',
-          headline: 'Position % risk frame',
-          summary:
-            'Shows the capped loss from this prepared plan as a share of the capped position value using prepared references only.',
-          items: [
-            {
-              label: 'Risk per trade',
-              value: '5.00%',
-            },
-            {
-              label: 'Max loss at cap',
-              value: '$50.00',
-            },
-            {
-              label: 'Position cap used',
-              value: '10.00%',
-            },
-            {
-              label: 'Prepared price path',
-              value: '$100.00 entry to $95.00 stop',
-            },
-          ],
-        },
-      },
-      meta: {
-        hasPrimaryPlan: true,
-        profile: 'ADVANCED',
-        requiresConfirmation: true,
         preferredRiskBasisAvailability: {
           status: 'AVAILABLE',
           accountId: 'acct-live',
           preferredBasis: 'POSITION_PERCENT',
+        },
+        positionSizingAvailability: {
+          status: 'AVAILABLE',
+          output: {
+            sizeLabel: 'Position size (Position %)',
+            sizeValue: '10 units at $1,000.00 cap',
+            maxLossLabel: 'Max loss at stop',
+            maxLossValue: '$50.00',
+            notes: [
+              'Prepared entry $100.00 to stop $95.00.',
+              'Support-only readout; no order path is opened here.',
+            ],
+          },
+        },
+        riskInputGuidanceAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_GUIDANCE_NEEDED',
         },
         guardrailPreferencesAvailability: {
           status: 'AVAILABLE',
@@ -306,6 +321,11 @@ describe('fetchTradeHubVM', () => {
             ],
           },
         },
+      },
+      meta: {
+        hasPrimaryPlan: true,
+        profile: 'ADVANCED',
+        requiresConfirmation: true,
       },
     });
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');

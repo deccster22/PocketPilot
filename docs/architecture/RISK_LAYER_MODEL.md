@@ -38,6 +38,7 @@ Possible core objects:
 - `GuardrailPreferencesUpdateResult`
 - `GuardrailEvaluation`
 - `GuardrailEvaluationAvailability`
+- `TradeHubRiskLane`
 - `ReadinessState`
 
 ## 4. Responsibilities
@@ -47,6 +48,7 @@ Possible core objects:
 - remember optional guardrail preferences per account through a service-owned seam
 - prepare bounded review outputs for Trade Hub
 - prepare descriptive guardrail-evaluation outputs for Trade Hub
+- compose the related Trade Hub risk support objects into one grouped prepared lane
 - support stop loss / take profit explanation
 - provide consistent max loss / position sizing / risk-reward logic
 - shape one canonical prepared sizing/max-loss output from the same service-owned inputs
@@ -65,6 +67,7 @@ Possible core objects:
 - unsupported or incomplete risk-input guidance must stay support-first and non-enforcing by default
 - guardrail preferences must stay explicit, account-scoped, and non-blocking by default
 - guardrail evaluation must stay explicit, descriptive, and non-blocking by default
+- grouped Trade Hub risk-lane composition must stay explicit, service-owned, and non-blocking by default
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers

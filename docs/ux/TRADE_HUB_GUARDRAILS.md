@@ -26,6 +26,7 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 - account-scoped truth
 - account-level preferred risk basis may seed the lane, but it must stay explicit and service-owned
 - optional guardrail preferences may exist, but they must stay explicit, account-scoped, off by default, and non-blocking unless a future phase says otherwise
+- the prepared risk lane should stay grouped into one service-owned contract rather than splitting basis, sizing, guidance, preferences, and evaluation across separate UI-owned paths
 - bounded explanatory content
 - strategy / risk / regime layers must not collapse into a silent override engine
 
@@ -36,6 +37,7 @@ Trade Hub may:
 - show one calm prepared sizing/max-loss output, including position size, max loss, and existing risk / reward framing
 - expose one calm, explicit risk-basis selector when the prepared contract supports it
 - show one calm account-level preferred-basis starting point when it exists
+- show one calm grouped prepared risk lane when the prepared service contract supports it
 - show one calm optional guardrail-preferences summary and edit path when the prepared service contract supports it
 - show one calm optional guardrail-evaluation summary when the prepared service contract supports it
 - show prepared risk-per-trade context that explains framing without pushing action
@@ -73,6 +75,7 @@ Expected prepared data:
 - selected risk basis
 - prepared sizing/max-loss output
 - prepared risk-per-trade context
+- grouped prepared risk-lane contract
 - prepared guardrail evaluation status
 - prepared risk-input guidance when the lane is incomplete
 - confirmation metadata
