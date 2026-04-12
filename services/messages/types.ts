@@ -86,6 +86,11 @@ export type MessagePolicyAvailability =
       rationale: MessageRationaleAvailability;
     };
 
+export type MessagePolicyLane = {
+  policyAvailability: MessagePolicyAvailability;
+  rationaleAvailability: MessageRationaleAvailability;
+};
+
 export type MessagePolicyReferralInput = {
   title: string;
   summary: string;

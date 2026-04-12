@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type {
+  MessagePolicyAvailability,
+  MessagePolicyLane,
+} from '@/services/messages/types';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
 import {
   createDashboardScreenViewData,
@@ -156,9 +159,19 @@ function unavailableMessagePolicy(): MessagePolicyAvailability {
   };
 }
 
+function createMessagePolicyLane(policyAvailability: MessagePolicyAvailability): MessagePolicyLane {
+  return {
+    policyAvailability,
+    rationaleAvailability: policyAvailability.rationale,
+  };
+}
+
 describe('createDashboardScreenViewData', () => {
   it('reads the prepared Dashboard surface contract and prepared why note without re-ranking it', () => {
-    const view = createDashboardScreenViewData(createSurface(), unavailableMessagePolicy());
+    const view = createDashboardScreenViewData(
+      createSurface(),
+      createMessagePolicyLane(unavailableMessagePolicy()),
+    );
 
     expect(view).toEqual({
       profileLabel: 'ADVANCED',
@@ -273,9 +286,10 @@ describe('createDashboardScreenViewData', () => {
     );
 
     expect(source).toMatch(/accountContext\.status !== 'AVAILABLE'/);
-    expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
-    expect(source).toMatch(/messagePolicy\.messages\[0\]/);
-    expect(source).toMatch(/messagePolicy\.rationale/);
+    expect(source).toMatch(/messagePolicyLane\?\.policyAvailability/);
+    expect(source).toMatch(/policyAvailability\?\.status === 'AVAILABLE'/);
+    expect(source).toMatch(/policyAvailability\.messages\[0\]/);
+    expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
     expect(source).not.toMatch(
       /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext/,
     );
@@ -318,7 +332,9 @@ describe('createDashboardScreenViewData', () => {
       },
     };
 
-    expect(createDashboardScreenViewData(createSurface(), messagePolicy)).toMatchObject({
+    expect(
+      createDashboardScreenViewData(createSurface(), createMessagePolicyLane(messagePolicy)),
+    ).toMatchObject({
       message: {
         visible: true,
         kind: 'REFERRAL',
@@ -334,7 +350,7 @@ describe('createDashboardScreenViewData', () => {
 
   it('routes Dashboard refresh through the canonical message-policy seam', async () => {
     const surface = createSurface();
-    const messagePolicy = unavailableMessagePolicy();
+    const messagePolicy = createMessagePolicyLane(unavailableMessagePolicy());
     const fetchDashboardSurface = jest.fn().mockResolvedValue(surface);
     const fetchMessagePolicy = jest.fn().mockResolvedValue(messagePolicy);
 
@@ -355,7 +371,7 @@ describe('createDashboardScreenViewData', () => {
     });
     expect(result).toEqual({
       surface,
-      messagePolicy,
+      messagePolicyLane: messagePolicy,
       nextBaselineScan: surface.scan,
     });
   });
@@ -484,7 +500,7 @@ describe('createDashboardScreenViewData', () => {
             reason: 'NO_EXPLANATION_TARGET',
           },
         },
-        unavailableMessagePolicy(),
+        createMessagePolicyLane(unavailableMessagePolicy()),
       ),
     ).toMatchObject({
       aggregatePortfolio: {

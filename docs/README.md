@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-12
+Last Updated: 2026-04-13
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-12
+**Last updated:** 2026-04-13
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -69,7 +69,7 @@ Start with:
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.
-- Message rationale stays calm and compact. User-visible message posture is explained through prepared service-owned rationale, never raw diagnostics.
+- Message policy stays grouped as one prepared service-owned lane. User-visible message posture is explained through prepared rationale on that lane, never raw diagnostics or app-owned recomposition.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.

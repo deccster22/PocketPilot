@@ -261,7 +261,7 @@ describe('fetchMessagePolicyVM', () => {
     });
 
     expect(mockFetchSnapshotSurfaceVM).not.toHaveBeenCalled();
-    expect(result).toEqual({
+    expect(result.policyAvailability).toEqual({
       status: 'AVAILABLE',
       messages: [
         {
@@ -318,7 +318,7 @@ describe('fetchMessagePolicyVM', () => {
       },
       reorientationVisibility: undefined,
     });
-    expect(result).toMatchObject({
+    expect(result.policyAvailability).toMatchObject({
       status: 'AVAILABLE',
       messages: [
         {
@@ -366,7 +366,7 @@ describe('fetchMessagePolicyVM', () => {
       snapshotSurface,
     });
 
-    expect(result).toEqual({
+    expect(result.policyAvailability).toEqual({
       status: 'AVAILABLE',
       messages: [
         {
@@ -400,7 +400,7 @@ describe('fetchMessagePolicyVM', () => {
     });
 
     expect(mockFetchSnapshotSurfaceVM).not.toHaveBeenCalled();
-    expect(result).toEqual({
+    expect(result.policyAvailability).toEqual({
       status: 'AVAILABLE',
       messages: [
         {
@@ -434,7 +434,7 @@ describe('fetchMessagePolicyVM', () => {
 
     expect(mockFetchDashboardSurfaceVM).not.toHaveBeenCalled();
     expect(mockFetchSnapshotSurfaceVM).not.toHaveBeenCalled();
-    expect(result).toEqual({
+    expect(result.policyAvailability).toEqual({
       status: 'AVAILABLE',
       messages: [
         {
@@ -472,7 +472,7 @@ describe('fetchMessagePolicyVM', () => {
       baselineScan: dashboardSurface.scan,
       nowProvider: undefined,
     });
-    expect(result).toMatchObject({
+    expect(result.policyAvailability).toMatchObject({
       status: 'AVAILABLE',
       messages: [
         {
@@ -496,7 +496,7 @@ describe('fetchMessagePolicyVM', () => {
     });
 
     expect(mockFetchConfirmationSessionVM).not.toHaveBeenCalled();
-    expect(result).toEqual({
+    expect(result.policyAvailability).toEqual({
       status: 'AVAILABLE',
       messages: [
         {
@@ -539,7 +539,7 @@ describe('fetchMessagePolicyVM', () => {
       lastViewedTimestamp: undefined,
       lastViewedState: undefined,
     });
-    expect(result).toMatchObject({
+    expect(result.policyAvailability).toMatchObject({
       status: 'AVAILABLE',
       messages: [
         {

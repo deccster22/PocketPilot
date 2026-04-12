@@ -14,7 +14,7 @@ import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState
 import { setPrimaryAccount } from '@/services/accounts/setPrimaryAccount';
 import { switchSelectedAccount } from '@/services/accounts/switchSelectedAccount';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 function DashboardZone(props: {
@@ -43,7 +43,7 @@ function DashboardZone(props: {
 export function DashboardScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceVM | null>(null);
-  const [messagePolicy, setMessagePolicy] = useState<MessagePolicyAvailability | null>(null);
+  const [messagePolicyLane, setMessagePolicyLane] = useState<MessagePolicyLane | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
   const [refreshNonce, setRefreshNonce] = useState(0);
   const [accountSwitcherExpanded, setAccountSwitcherExpanded] = useState(false);
@@ -59,7 +59,7 @@ export function DashboardScreen() {
         }
 
         setSurfaceModel(result.surface);
-        setMessagePolicy(result.messagePolicy);
+        setMessagePolicyLane(result.messagePolicyLane);
         setBaselineScan((currentBaseline) => currentBaseline ?? result.nextBaselineScan);
       })
       .catch(() => {
@@ -68,7 +68,7 @@ export function DashboardScreen() {
         }
 
         setSurfaceModel(null);
-        setMessagePolicy(null);
+        setMessagePolicyLane(null);
       });
 
     return () => {
@@ -77,8 +77,8 @@ export function DashboardScreen() {
   }, [profile, baselineScan, refreshNonce]);
 
   const screenView = useMemo(
-    () => createDashboardScreenViewData(surfaceModel, messagePolicy),
-    [messagePolicy, surfaceModel],
+    () => createDashboardScreenViewData(surfaceModel, messagePolicyLane),
+    [messagePolicyLane, surfaceModel],
   );
 
   async function handleSwitchAccount(accountId: string) {

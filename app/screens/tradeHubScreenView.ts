@@ -1,5 +1,5 @@
 import type {
-  MessagePolicyAvailability,
+  MessagePolicyLane,
   MessagePolicyKind,
   MessagePriority,
   MessageRationaleAvailability,
@@ -164,16 +164,20 @@ function formatPlanCard(plan: TradeHubPlanCard): TradeHubScreenPlanViewData {
 }
 
 function createTradeHubMessageViewData(
-  messagePolicy?: MessagePolicyAvailability | null,
+  messagePolicyLane?: MessagePolicyLane | null,
 ): TradeHubScreenViewData['message'] {
-  if (messagePolicy?.status === 'AVAILABLE' && messagePolicy.messages[0]) {
+  const policyAvailability = messagePolicyLane?.policyAvailability;
+
+  if (policyAvailability?.status === 'AVAILABLE' && policyAvailability.messages[0]) {
+    const visibleMessage = policyAvailability.messages[0];
+
     return {
       visible: true,
-      kind: messagePolicy.messages[0].kind,
-      priority: messagePolicy.messages[0].priority,
-      title: messagePolicy.messages[0].title,
-      summary: messagePolicy.messages[0].summary,
-      rationale: messagePolicy.rationale,
+      kind: visibleMessage.kind,
+      priority: visibleMessage.priority,
+      title: visibleMessage.title,
+      summary: visibleMessage.summary,
+      rationale: messagePolicyLane?.rationaleAvailability ?? policyAvailability.rationale,
     };
   }
 
@@ -386,7 +390,7 @@ function createTradeHubRiskLaneViewData(surface: TradeHubSurfaceModel): TradeHub
 
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
-  messagePolicy?: MessagePolicyAvailability | null,
+  messagePolicyLane?: MessagePolicyLane | null,
 ): TradeHubScreenViewData | null {
   if (!surface) {
     return null;
@@ -398,7 +402,7 @@ export function createTradeHubScreenViewData(
     confirmationText: surface.meta.requiresConfirmation
       ? 'Every action remains confirmation-safe and non-executing in this phase.'
       : 'Confirmation rules are not required.',
-    message: createTradeHubMessageViewData(messagePolicy),
+    message: createTradeHubMessageViewData(messagePolicyLane),
     riskLane: createTradeHubRiskLaneViewData(surface),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),

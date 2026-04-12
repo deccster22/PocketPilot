@@ -1,7 +1,7 @@
 import type { UserProfile } from '@/core/profile/types';
 import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import type {
-  MessagePolicyAvailability,
+  MessagePolicyLane,
   MessagePolicyKind,
   MessagePriority,
   MessageRationaleAvailability,
@@ -86,7 +86,7 @@ export async function refreshSnapshotScreenSurface(params: {
   fetchMessagePolicy?: typeof fetchMessagePolicyVM;
 }): Promise<{
   surface: SnapshotSurfaceVM;
-  messagePolicy: MessagePolicyAvailability;
+  messagePolicyLane: MessagePolicyLane;
   nextBaselineScan: SnapshotSurfaceVM['snapshot']['scan'];
   shouldClearPersistedDismissState: boolean;
 }> {
@@ -99,7 +99,7 @@ export async function refreshSnapshotScreenSurface(params: {
     reorientationDismissState: params.reorientationDismissState,
     currentSessionDismissState: params.currentSessionDismissState,
   });
-  const messagePolicy = await fetchMessagePolicy({
+  const messagePolicyLane = await fetchMessagePolicy({
     surface: 'SNAPSHOT',
     profile: params.profile,
     snapshotSurface: surface,
@@ -107,7 +107,7 @@ export async function refreshSnapshotScreenSurface(params: {
 
   return {
     surface,
-    messagePolicy,
+    messagePolicyLane,
     nextBaselineScan: params.baselineScan ?? surface.snapshot.scan,
     shouldClearPersistedDismissState: shouldClearPersistedReorientationDismissState({
       summary: surface.reorientation.summary,
@@ -118,7 +118,7 @@ export async function refreshSnapshotScreenSurface(params: {
 
 export function createSnapshotScreenViewData(
   surface: SnapshotSurfaceVM | null,
-  messagePolicy?: MessagePolicyAvailability | null,
+  messagePolicyLane?: MessagePolicyLane | null,
 ): SnapshotScreenViewData | null {
   const model = surface?.snapshot.model;
 
@@ -130,15 +130,19 @@ export function createSnapshotScreenViewData(
     visible: false,
   };
 
-  if (messagePolicy?.status === 'AVAILABLE' && messagePolicy.messages[0]) {
+  const policyAvailability = messagePolicyLane?.policyAvailability;
+
+  if (policyAvailability?.status === 'AVAILABLE' && policyAvailability.messages[0]) {
+    const visibleMessage = policyAvailability.messages[0];
+
     message = {
       visible: true,
-      kind: messagePolicy.messages[0].kind,
-      priority: messagePolicy.messages[0].priority,
-      dismissible: messagePolicy.messages[0].dismissible,
-      title: messagePolicy.messages[0].title,
-      summary: messagePolicy.messages[0].summary,
-      rationale: messagePolicy.rationale,
+      kind: visibleMessage.kind,
+      priority: visibleMessage.priority,
+      dismissible: visibleMessage.dismissible,
+      title: visibleMessage.title,
+      summary: visibleMessage.summary,
+      rationale: messagePolicyLane?.rationaleAvailability ?? policyAvailability.rationale,
     };
   }
 

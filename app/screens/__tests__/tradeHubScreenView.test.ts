@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type {
+  MessagePolicyAvailability,
+  MessagePolicyLane,
+} from '@/services/messages/types';
 import { createUnavailableTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 
@@ -13,6 +16,13 @@ function unavailableMessagePolicy(): MessagePolicyAvailability {
       status: 'UNAVAILABLE',
       reason: 'NO_RATIONALE_AVAILABLE',
     },
+  };
+}
+
+function createMessagePolicyLane(policyAvailability: MessagePolicyAvailability): MessagePolicyLane {
+  return {
+    policyAvailability,
+    rationaleAvailability: policyAvailability.rationale,
   };
 }
 
@@ -152,7 +162,7 @@ describe('createTradeHubScreenViewData', () => {
           requiresConfirmation: true,
         },
       },
-      unavailableMessagePolicy(),
+      createMessagePolicyLane(unavailableMessagePolicy()),
     );
 
     expect(view).toEqual({
@@ -275,9 +285,10 @@ describe('createTradeHubScreenViewData', () => {
   it('keeps the screen helper on the prepared message-policy and Trade Hub contracts only', () => {
     const source = readFileSync(join(process.cwd(), 'app', 'screens', 'tradeHubScreenView.ts'), 'utf8');
 
-    expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
-    expect(source).toMatch(/messagePolicy\.messages\[0\]/);
-    expect(source).toMatch(/messagePolicy\.rationale/);
+    expect(source).toMatch(/messagePolicyLane\?\.policyAvailability/);
+    expect(source).toMatch(/policyAvailability\?\.status === 'AVAILABLE'/);
+    expect(source).toMatch(/policyAvailability\.messages\[0\]/);
+    expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
     expect(source).toMatch(/surface\.riskLane\.preparedRiskLane\.basisAvailability\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/surface\.riskLane\.preferredRiskBasisAvailability/);
     expect(source).toMatch(/surface\.riskLane\.guardrailPreferencesAvailability/);
@@ -355,7 +366,7 @@ describe('createTradeHubScreenViewData', () => {
             requiresConfirmation: true,
           },
         },
-        messagePolicy,
+        createMessagePolicyLane(messagePolicy),
       ),
     ).toMatchObject({
       message: {

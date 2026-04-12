@@ -27,7 +27,7 @@ import {
   EMPTY_REORIENTATION_DISMISS_STATE,
   type ReorientationDismissState,
 } from '@/services/orientation/reorientationPersistence';
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type { MessagePolicyLane } from '@/services/messages/types';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 type SnapshotRoute = 'HOME' | 'THIRTY_THOUSAND_FOOT';
@@ -36,8 +36,8 @@ export function SnapshotScreen() {
   const [route, setRoute] = useState<SnapshotRoute>('HOME');
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [snapshotSurface, setSnapshotSurface] = useState<SnapshotSurfaceVM | null>(null);
-  const [snapshotMessagePolicy, setSnapshotMessagePolicy] =
-    useState<MessagePolicyAvailability | null>(null);
+  const [snapshotMessagePolicyLane, setSnapshotMessagePolicyLane] =
+    useState<MessagePolicyLane | null>(null);
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [currentSessionDismissState, setCurrentSessionDismissState] =
     useState<ReorientationDismissState>(EMPTY_REORIENTATION_DISMISS_STATE);
@@ -122,7 +122,7 @@ export function SnapshotScreen() {
         }
 
         setSnapshotSurface(result.surface);
-        setSnapshotMessagePolicy(result.messagePolicy);
+        setSnapshotMessagePolicyLane(result.messagePolicyLane);
         baselineScanRef.current = result.nextBaselineScan;
 
         if (result.shouldClearPersistedDismissState) {
@@ -136,7 +136,7 @@ export function SnapshotScreen() {
         }
 
         setSnapshotSurface(null);
-        setSnapshotMessagePolicy(null);
+        setSnapshotMessagePolicyLane(null);
       });
 
     return () => {
@@ -152,8 +152,8 @@ export function SnapshotScreen() {
   ]);
 
   const screenView = useMemo(
-    () => createSnapshotScreenViewData(snapshotSurface, snapshotMessagePolicy),
-    [snapshotMessagePolicy, snapshotSurface],
+    () => createSnapshotScreenViewData(snapshotSurface, snapshotMessagePolicyLane),
+    [snapshotMessagePolicyLane, snapshotSurface],
   );
 
   if (route === 'THIRTY_THOUSAND_FOOT') {

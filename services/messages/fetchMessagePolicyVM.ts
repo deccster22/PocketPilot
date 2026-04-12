@@ -6,10 +6,10 @@ import {
 } from '@/services/dashboard/dashboardSurfaceService';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
-import { createMessagePolicyVM } from '@/services/messages/createMessagePolicyVM';
+import { createMessagePolicyLane } from '@/services/messages/createMessagePolicyLane';
 import type {
-  MessagePolicyAvailability,
   MessagePolicyDashboardContext,
+  MessagePolicyLane,
   MessageSurfaceEligibility,
   MessagePolicySnapshotContext,
   MessagePolicyTradeHubContext,
@@ -102,7 +102,7 @@ export async function fetchMessagePolicyVM(params: {
   currentSessionDismissState?: ReorientationDismissState;
   reorientationVisibility?: ReorientationVisibilityInput;
   confirmationSession?: ConfirmationSession | null;
-}): Promise<MessagePolicyAvailability> {
+}): Promise<MessagePolicyLane> {
   switch (params.surface) {
     case 'SNAPSHOT': {
       const snapshotSurface =
@@ -122,7 +122,7 @@ export async function fetchMessagePolicyVM(params: {
           reorientationVisibility: params.reorientationVisibility,
         }));
 
-      return createMessagePolicyVM({
+      return createMessagePolicyLane({
         surface: params.surface,
         snapshot: createSnapshotContext(snapshotSurface),
       });
@@ -136,7 +136,7 @@ export async function fetchMessagePolicyVM(params: {
           nowProvider: params.nowProvider,
         }));
 
-      return createMessagePolicyVM({
+      return createMessagePolicyLane({
         surface: params.surface,
         dashboard: createDashboardContext(dashboardSurface),
       });
@@ -156,13 +156,13 @@ export async function fetchMessagePolicyVM(params: {
           })
         ).session;
 
-      return createMessagePolicyVM({
+      return createMessagePolicyLane({
         surface: params.surface,
         tradeHub: createTradeHubContext(confirmationSession),
       });
     }
     default:
-      return createMessagePolicyVM({
+      return createMessagePolicyLane({
         surface: params.surface,
       });
   }
