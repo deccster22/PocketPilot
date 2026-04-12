@@ -2,6 +2,7 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
+import { createGuardrailEvaluation } from '@/services/trade/createGuardrailEvaluation';
 import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
@@ -85,6 +86,13 @@ export async function fetchTradeHubVM(params: {
           }
         : null,
   });
+  const guardrailEvaluationAvailability = createGuardrailEvaluation({
+    plan: selectedPlan,
+    risk,
+    guardrailPreferencesAvailability,
+    accountValue: upstream.selectedAccountPortfolioValue ?? null,
+    isEnabledForSurface: true,
+  });
 
   return {
     model: createTradeHubSurfaceModel({
@@ -93,6 +101,7 @@ export async function fetchTradeHubVM(params: {
       risk,
       preferredRiskBasisAvailability,
       guardrailPreferencesAvailability,
+      guardrailEvaluationAvailability,
     }),
     scan: upstream.scan,
   };

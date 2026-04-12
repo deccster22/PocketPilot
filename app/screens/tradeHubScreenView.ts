@@ -5,6 +5,8 @@ import type {
   MessageRationaleAvailability,
 } from '@/services/messages/types';
 import type {
+  GuardrailEvaluationAvailability,
+  GuardrailEvaluationStatus,
   GuardrailPreferencesAvailability,
   TradeHubActionState,
   TradeHubPlanCard,
@@ -56,6 +58,19 @@ export type TradeHubGuardrailPreferencesViewData = {
   items: ReadonlyArray<TradeHubGuardrailPreferenceViewData>;
 };
 
+export type TradeHubGuardrailEvaluationItemViewData = {
+  key: 'riskLimitPerTrade' | 'dailyLossThreshold' | 'cooldownAfterLoss';
+  label: string;
+  statusText: string;
+  summaryText: string;
+};
+
+export type TradeHubGuardrailEvaluationViewData = {
+  titleText: string;
+  summaryText: string;
+  items: ReadonlyArray<TradeHubGuardrailEvaluationItemViewData>;
+};
+
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
@@ -71,9 +86,10 @@ export type TradeHubScreenViewData = {
         title: string;
         summary: string;
         rationale: MessageRationaleAvailability;
-      };
+  };
   risk: TradeHubRiskViewData | null;
   guardrailPreferences: TradeHubGuardrailPreferencesViewData;
+  guardrailEvaluation: TradeHubGuardrailEvaluationViewData | null;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
@@ -214,6 +230,32 @@ function formatGuardrailDetailText(
   return label ? `${labelPrefix}: ${label}` : `${labelPrefix} needed`;
 }
 
+function formatGuardrailEvaluationStatusText(status: GuardrailEvaluationStatus): string {
+  switch (status) {
+    case 'WITHIN_GUARDRAIL':
+      return 'Within guardrail';
+    case 'NEAR_GUARDRAIL':
+      return 'Near guardrail';
+    case 'OUTSIDE_GUARDRAIL':
+      return 'Outside guardrail';
+    default:
+      return 'Not evaluated';
+  }
+}
+
+function formatGuardrailEvaluationLabel(
+  key: TradeHubGuardrailEvaluationItemViewData['key'],
+): string {
+  switch (key) {
+    case 'riskLimitPerTrade':
+      return 'Risk limit per trade';
+    case 'dailyLossThreshold':
+      return 'Daily loss threshold';
+    default:
+      return 'Cooldown after loss';
+  }
+}
+
 function createUnavailableGuardrailPreferencesViewData(
   reason: Extract<GuardrailPreferencesAvailability, { status: 'UNAVAILABLE' }>['reason'],
 ): TradeHubGuardrailPreferencesViewData {
@@ -307,6 +349,25 @@ function createTradeHubGuardrailPreferencesViewData(
   };
 }
 
+function createTradeHubGuardrailEvaluationViewData(
+  evaluationAvailability: GuardrailEvaluationAvailability,
+): TradeHubGuardrailEvaluationViewData | null {
+  if (evaluationAvailability.status !== 'AVAILABLE') {
+    return null;
+  }
+
+  return {
+    titleText: evaluationAvailability.evaluation.title,
+    summaryText: evaluationAvailability.evaluation.summary,
+    items: evaluationAvailability.evaluation.items.map((item) => ({
+      key: item.guardrailKey,
+      label: formatGuardrailEvaluationLabel(item.guardrailKey),
+      statusText: formatGuardrailEvaluationStatusText(item.status),
+      summaryText: item.summary,
+    })),
+  };
+}
+
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
   messagePolicy?: MessagePolicyAvailability | null,
@@ -325,6 +386,9 @@ export function createTradeHubScreenViewData(
     risk: createTradeHubRiskViewData(surface),
     guardrailPreferences: createTradeHubGuardrailPreferencesViewData(
       surface.meta.guardrailPreferencesAvailability,
+    ),
+    guardrailEvaluation: createTradeHubGuardrailEvaluationViewData(
+      surface.meta.guardrailEvaluationAvailability,
     ),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),

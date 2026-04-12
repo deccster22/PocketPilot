@@ -14,6 +14,8 @@ export type PreparedTradePlanRiskReferences = {
 
 export type RiskBasis = 'ACCOUNT_PERCENT' | 'FIXED_CURRENCY' | 'POSITION_PERCENT';
 
+export type GuardrailKey = 'riskLimitPerTrade' | 'dailyLossThreshold' | 'cooldownAfterLoss';
+
 export type PreferredRiskBasis = {
   accountId: string;
   riskBasis: RiskBasis;
@@ -93,6 +95,35 @@ export type GuardrailPreferencesUpdateResult =
   | {
       status: 'REJECTED';
       reason: 'NO_ACCOUNT_CONTEXT' | 'INVALID_CONFIGURATION';
+    };
+
+export type GuardrailEvaluationStatus =
+  | 'WITHIN_GUARDRAIL'
+  | 'NEAR_GUARDRAIL'
+  | 'OUTSIDE_GUARDRAIL'
+  | 'NOT_EVALUATED';
+
+export type GuardrailEvaluationItem = {
+  guardrailKey: GuardrailKey;
+  status: GuardrailEvaluationStatus;
+  label: string;
+  summary: string;
+};
+
+export type GuardrailEvaluation = {
+  title: string;
+  summary: string;
+  items: ReadonlyArray<GuardrailEvaluationItem>;
+};
+
+export type GuardrailEvaluationAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ENABLED_GUARDRAILS' | 'INSUFFICIENT_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      evaluation: GuardrailEvaluation;
     };
 
 export type RiskBasisOption = {
@@ -234,6 +265,7 @@ export type TradeHubSurfaceModel = {
     requiresConfirmation: boolean;
     preferredRiskBasisAvailability: PreferredRiskBasisAvailability;
     guardrailPreferencesAvailability: GuardrailPreferencesAvailability;
+    guardrailEvaluationAvailability: GuardrailEvaluationAvailability;
   };
 };
 

@@ -749,6 +749,26 @@ export function TradeHubScreen() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Guardrail Evaluation</Text>
+          {screenView?.guardrailEvaluation ? (
+            <View style={styles.card}>
+              <Text style={styles.cardEyebrow}>Prepared, descriptive only</Text>
+              <Text style={styles.cardTitle}>{screenView.guardrailEvaluation.titleText}</Text>
+              <Text style={styles.cardSummary}>{screenView.guardrailEvaluation.summaryText}</Text>
+              {screenView.guardrailEvaluation.items.map((item) => (
+                <View key={item.key} style={styles.guardrailItem}>
+                  <Text style={styles.cardMeta}>{item.label}</Text>
+                  <Text style={styles.cardSummary}>{item.statusText}</Text>
+                  <Text style={styles.cardMeta}>{item.summaryText}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.emptyState}>No guardrail evaluation is prepared right now.</Text>
+          )}
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Plan Preview</Text>
           {previewView ? (
             <View style={styles.card}>

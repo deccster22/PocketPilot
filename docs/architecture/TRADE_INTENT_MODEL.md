@@ -103,6 +103,7 @@ P5-R7 adds one canonical prepared sizing/max-loss contract so the same selected-
 P5-R8 adds one canonical account-scoped preferred risk-basis seam so the lane can start from a saved per-account preference without inventing a settings maze or silent default.
 P5-R9 adds `RiskInputGuidanceAvailability` to the selected-plan preview seam so the lane can explain thin or unsupported risk inputs calmly without turning Trade Hub into a validation wall.
 P5-R10 adds one canonical account-scoped guardrail-preferences seam plus one calm Trade Hub proof path so optional guardrails can be remembered explicitly without turning the lane into a default-blocking settings maze.
+P5-R11 adds one canonical guardrail-evaluation seam plus one calm Trade Hub proof path so the selected plan can be described against enabled guardrails without turning the lane into a blocking validator.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:

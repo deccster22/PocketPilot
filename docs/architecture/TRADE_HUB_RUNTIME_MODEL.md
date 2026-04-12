@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder` + `PreferredRiskBasisResolver` + `GuardrailPreferencesResolver` + `RiskInputGuidanceBuilder`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `RiskBasisSelector` + `PreparedSizingOutputBuilder` + `PreferredRiskBasisResolver` + `GuardrailPreferencesResolver` + `GuardrailEvaluationResolver` + `RiskInputGuidanceBuilder`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -36,6 +36,7 @@ Prepared plan in, bounded action path out.
 - `selectedRiskBasis`
 - `preferredRiskBasisAvailability`
 - `guardrailPreferencesAvailability`
+- `guardrailEvaluationAvailability`
 - `riskPerTradeContext`
 - `positionSizing`
 - `boundedKnowledgeLinks[]`
@@ -54,6 +55,7 @@ The view renders the selected prepared path only.
 - no hidden UI-side action reprioritization
 - no hidden UI-side risk-basis switching
 - no hidden UI-side guardrail persistence
+- no hidden UI-side guardrail evaluation
 - no implicit urgency escalators
 - no plan-creation logic in presentation code
 - no UI-side risk math
@@ -72,6 +74,9 @@ Resolves the saved account-level preferred basis through the service-owned seam 
 
 ### Guardrail preferences resolver
 Resolves optional account-level guardrail preferences through the service-owned seam without introducing silent defaults or UI-owned persistence.
+
+### Guardrail evaluation resolver
+Resolves the prepared plan against enabled guardrail preferences through the service-owned seam and returns calm descriptive status without blocking by default.
 
 ### Risk-per-trade context builder
 Builds one calm prepared framing from selected basis, prepared plan references, and current selected-account context where honest.
@@ -99,6 +104,7 @@ Ensures required confirmation steps remain intact.
 - prepared risk-context recomputation tests
 - prepared sizing-output availability tests
 - guardrail-preference explicitness tests
+- guardrail-evaluation explicitness tests
 - risk-input guidance availability tests
 - profile visibility tests
 - knowledge-link boundary tests

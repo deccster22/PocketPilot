@@ -37,6 +37,7 @@ Trade Hub may:
 - expose one calm, explicit risk-basis selector when the prepared contract supports it
 - show one calm account-level preferred-basis starting point when it exists
 - show one calm optional guardrail-preferences summary and edit path when the prepared service contract supports it
+- show one calm optional guardrail-evaluation summary when the prepared service contract supports it
 - show prepared risk-per-trade context that explains framing without pushing action
 - show one calm prepared risk-input guidance note when sizing context is thin or unsupported
 - present readiness / constraints / rationale
@@ -52,9 +53,11 @@ Trade Hub must not:
 - behave like a slot machine with buttons
 - hide a preferred basis behind a global default
 - hide guardrail preferences behind a global default or auto-blocking default-on posture
+- hide guardrail evaluation behind a global default or auto-blocking default-on posture
 - turn incomplete-input guidance into a block, validator, or troubleshooting wall
 - mutate preferred-basis state in app-owned persistence code
 - mutate guardrail-preference state in app-owned persistence code
+- turn guardrail evaluation into a blocker, validator, or warning wall
 
 ## 5. ProtectionPlan posture
 `ProtectionPlan` is the main logic object behind action framing.
@@ -70,6 +73,7 @@ Expected prepared data:
 - selected risk basis
 - prepared sizing/max-loss output
 - prepared risk-per-trade context
+- prepared guardrail evaluation status
 - prepared risk-input guidance when the lane is incomplete
 - confirmation metadata
 - capability path type
@@ -127,7 +131,9 @@ The UI renders the prepared path only. It should not contain hidden execution lo
 - non-directive beginner-copy tests
 - calm guidance-placement tests
 - optional guardrail preference summary tests
+- calm guardrail-evaluation status tests
 - no-enforcement-by-default tests for guardrail preferences
+- no-enforcement-by-default tests for guardrail evaluation
 
 ## 11. Anti-patterns to block
 - one-tap execution drift
