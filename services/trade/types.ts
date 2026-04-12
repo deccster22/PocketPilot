@@ -46,6 +46,55 @@ export type PreferredRiskBasisUpdateResult =
       reason: 'NO_ACCOUNT_CONTEXT' | 'UNSUPPORTED_RISK_BASIS';
     };
 
+export type GuardrailPreferenceSetting = {
+  isEnabled: boolean;
+  thresholdLabel: string | null;
+};
+
+export type GuardrailCooldownSetting = {
+  isEnabled: boolean;
+  windowLabel: string | null;
+};
+
+export type GuardrailPreferences = {
+  riskLimitPerTrade: GuardrailPreferenceSetting;
+  dailyLossThreshold: GuardrailPreferenceSetting;
+  cooldownAfterLoss: GuardrailCooldownSetting;
+};
+
+export type GuardrailPreferencesInput = Partial<{
+  riskLimitPerTrade: Partial<GuardrailPreferenceSetting> | null;
+  dailyLossThreshold: Partial<GuardrailPreferenceSetting> | null;
+  cooldownAfterLoss: Partial<GuardrailCooldownSetting> | null;
+}>;
+
+export type GuardrailPreferencesAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ACCOUNT_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      accountId: string;
+      preferences: GuardrailPreferences;
+    };
+
+export type GuardrailPreferencesUpdateResult =
+  | {
+      status: 'UPDATED';
+      accountId: string;
+      preferences: GuardrailPreferences;
+    }
+  | {
+      status: 'UNCHANGED';
+      accountId: string;
+      preferences: GuardrailPreferences;
+    }
+  | {
+      status: 'REJECTED';
+      reason: 'NO_ACCOUNT_CONTEXT' | 'INVALID_CONFIGURATION';
+    };
+
 export type RiskBasisOption = {
   basis: RiskBasis;
   label: string;
@@ -184,6 +233,7 @@ export type TradeHubSurfaceModel = {
     profile: UserProfile;
     requiresConfirmation: boolean;
     preferredRiskBasisAvailability: PreferredRiskBasisAvailability;
+    guardrailPreferencesAvailability: GuardrailPreferencesAvailability;
   };
 };
 

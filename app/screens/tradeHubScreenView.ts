@@ -5,6 +5,7 @@ import type {
   MessageRationaleAvailability,
 } from '@/services/messages/types';
 import type {
+  GuardrailPreferencesAvailability,
   TradeHubActionState,
   TradeHubPlanCard,
   TradeHubSurfaceModel,
@@ -38,6 +39,23 @@ export type TradeHubRiskViewData = {
   }>;
 };
 
+export type TradeHubGuardrailPreferenceViewData = {
+  key: 'riskLimitPerTrade' | 'dailyLossThreshold' | 'cooldownAfterLoss';
+  label: string;
+  isEnabled: boolean;
+  stateText: string;
+  detailText: string;
+  inputPlaceholder: string;
+};
+
+export type TradeHubGuardrailPreferencesViewData = {
+  accountText: string;
+  summaryText: string;
+  statusText: string;
+  canEdit: boolean;
+  items: ReadonlyArray<TradeHubGuardrailPreferenceViewData>;
+};
+
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
@@ -55,6 +73,7 @@ export type TradeHubScreenViewData = {
         rationale: MessageRationaleAvailability;
       };
   risk: TradeHubRiskViewData | null;
+  guardrailPreferences: TradeHubGuardrailPreferencesViewData;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };
@@ -173,6 +192,121 @@ function createTradeHubRiskViewData(surface: TradeHubSurfaceModel): TradeHubRisk
   };
 }
 
+function formatGuardrailStateText(isEnabled: boolean, label: string | null): string {
+  if (!isEnabled) {
+    return 'Off by default';
+  }
+
+  return label ? `Enabled - ${label}` : 'Enabled';
+}
+
+function formatGuardrailDetailText(
+  key: TradeHubGuardrailPreferenceViewData['key'],
+  isEnabled: boolean,
+  label: string | null,
+): string {
+  const labelPrefix = key === 'cooldownAfterLoss' ? 'Window' : 'Threshold';
+
+  if (!isEnabled) {
+    return `${labelPrefix} not set`;
+  }
+
+  return label ? `${labelPrefix}: ${label}` : `${labelPrefix} needed`;
+}
+
+function createUnavailableGuardrailPreferencesViewData(
+  reason: Extract<GuardrailPreferencesAvailability, { status: 'UNAVAILABLE' }>['reason'],
+): TradeHubGuardrailPreferencesViewData {
+  switch (reason) {
+    case 'NO_ACCOUNT_CONTEXT':
+      return {
+        accountText: 'Account context is needed before guardrails can be remembered.',
+        summaryText: 'Optional guardrails stay off by default until an account is available.',
+        statusText: 'No account context is available to remember guardrails yet.',
+        canEdit: false,
+        items: [],
+      };
+    default:
+      return {
+        accountText: 'This surface is not currently showing guardrails.',
+        summaryText: 'Optional guardrails are not enabled for this surface.',
+        statusText: 'Guardrails are not enabled for this surface.',
+        canEdit: false,
+        items: [],
+      };
+  }
+}
+
+function createTradeHubGuardrailPreferencesViewData(
+  preferencesAvailability: GuardrailPreferencesAvailability,
+): TradeHubGuardrailPreferencesViewData {
+  if (preferencesAvailability.status === 'UNAVAILABLE') {
+    return createUnavailableGuardrailPreferencesViewData(preferencesAvailability.reason);
+  }
+
+  const preferences = preferencesAvailability.preferences;
+  const items: TradeHubGuardrailPreferencesViewData['items'] = [
+    {
+      key: 'riskLimitPerTrade',
+      label: 'Risk limit per trade',
+      isEnabled: preferences.riskLimitPerTrade.isEnabled,
+      stateText: formatGuardrailStateText(
+        preferences.riskLimitPerTrade.isEnabled,
+        preferences.riskLimitPerTrade.thresholdLabel,
+      ),
+      detailText: formatGuardrailDetailText(
+        'riskLimitPerTrade',
+        preferences.riskLimitPerTrade.isEnabled,
+        preferences.riskLimitPerTrade.thresholdLabel,
+      ),
+      inputPlaceholder: 'e.g. 2%',
+    },
+    {
+      key: 'dailyLossThreshold',
+      label: 'Daily loss threshold',
+      isEnabled: preferences.dailyLossThreshold.isEnabled,
+      stateText: formatGuardrailStateText(
+        preferences.dailyLossThreshold.isEnabled,
+        preferences.dailyLossThreshold.thresholdLabel,
+      ),
+      detailText: formatGuardrailDetailText(
+        'dailyLossThreshold',
+        preferences.dailyLossThreshold.isEnabled,
+        preferences.dailyLossThreshold.thresholdLabel,
+      ),
+      inputPlaceholder: 'e.g. 4%',
+    },
+    {
+      key: 'cooldownAfterLoss',
+      label: 'Cooldown after loss',
+      isEnabled: preferences.cooldownAfterLoss.isEnabled,
+      stateText: formatGuardrailStateText(
+        preferences.cooldownAfterLoss.isEnabled,
+        preferences.cooldownAfterLoss.windowLabel,
+      ),
+      detailText: formatGuardrailDetailText(
+        'cooldownAfterLoss',
+        preferences.cooldownAfterLoss.isEnabled,
+        preferences.cooldownAfterLoss.windowLabel,
+      ),
+      inputPlaceholder: 'e.g. 1 day',
+    },
+  ];
+  const enabledCount = items.filter((item) => item.isEnabled).length;
+  const disabledCount = items.length - enabledCount;
+
+  return {
+    accountText: `Account: ${preferencesAvailability.accountId}`,
+    summaryText:
+      enabledCount === 0
+        ? 'Optional guardrails are off by default for this account.'
+        : `${enabledCount} optional guardrail${enabledCount === 1 ? ' is' : 's are'} enabled and ${disabledCount} are off by default.`,
+    statusText: 'Guardrail preferences are ready for this account.',
+    canEdit: true,
+    items,
+  };
+}
+
 export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
   messagePolicy?: MessagePolicyAvailability | null,
@@ -189,6 +323,9 @@ export function createTradeHubScreenViewData(
       : 'Confirmation rules are not required.',
     message: createTradeHubMessageViewData(messagePolicy),
     risk: createTradeHubRiskViewData(surface),
+    guardrailPreferences: createTradeHubGuardrailPreferencesViewData(
+      surface.meta.guardrailPreferencesAvailability,
+    ),
     primaryPlan: surface.primaryPlan ? formatPlanCard(surface.primaryPlan) : null,
     alternativePlans: surface.alternativePlans.map(formatPlanCard),
   };

@@ -89,6 +89,24 @@ describe('createTradeHubScreenViewData', () => {
             accountId: 'acct-live',
             preferredBasis: 'FIXED_CURRENCY',
           },
+          guardrailPreferencesAvailability: {
+            status: 'AVAILABLE',
+            accountId: 'acct-live',
+            preferences: {
+              riskLimitPerTrade: {
+                isEnabled: true,
+                thresholdLabel: '2%',
+              },
+              dailyLossThreshold: {
+                isEnabled: false,
+                thresholdLabel: null,
+              },
+              cooldownAfterLoss: {
+                isEnabled: true,
+                windowLabel: '1 day',
+              },
+            },
+          },
         },
       },
       unavailableMessagePolicy(),
@@ -132,6 +150,38 @@ describe('createTradeHubScreenViewData', () => {
           },
         ],
       },
+      guardrailPreferences: {
+        accountText: 'Account: acct-live',
+        summaryText: '2 optional guardrails are enabled and 1 are off by default.',
+        statusText: 'Guardrail preferences are ready for this account.',
+        canEdit: true,
+        items: [
+          {
+            key: 'riskLimitPerTrade',
+            label: 'Risk limit per trade',
+            isEnabled: true,
+            stateText: 'Enabled - 2%',
+            detailText: 'Threshold: 2%',
+            inputPlaceholder: 'e.g. 2%',
+          },
+          {
+            key: 'dailyLossThreshold',
+            label: 'Daily loss threshold',
+            isEnabled: false,
+            stateText: 'Off by default',
+            detailText: 'Threshold not set',
+            inputPlaceholder: 'e.g. 4%',
+          },
+          {
+            key: 'cooldownAfterLoss',
+            label: 'Cooldown after loss',
+            isEnabled: true,
+            stateText: 'Enabled - 1 day',
+            detailText: 'Window: 1 day',
+            inputPlaceholder: 'e.g. 1 day',
+          },
+        ],
+      },
       primaryPlan: {
         planId: 'primary-plan',
         intentLabel: 'Accumulate',
@@ -166,6 +216,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/messagePolicy\.rationale/);
     expect(source).toMatch(/surface\.risk\.basisAvailability\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/surface\.meta\.preferredRiskBasisAvailability/);
+    expect(source).toMatch(/surface\.meta\.guardrailPreferencesAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
       /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
@@ -173,16 +224,17 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);
     expect(source).not.toMatch(
-      /updatePreferredRiskBasis|preferredRiskBasisStore|normalisePreferredRiskBasisState|createInMemoryPreferredRiskBasisStore/,
+      /updatePreferredRiskBasis|updateGuardrailPreferences|preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore/,
     );
   });
 
-  it('keeps preferred-basis persistence routed through the screen component service seam, not a screen-owned store', () => {
+  it('keeps preference persistence routed through the screen component service seam, not a screen-owned store', () => {
     const source = readFileSync(join(process.cwd(), 'app', 'screens', 'TradeHubScreen.tsx'), 'utf8');
 
     expect(source).toMatch(/updatePreferredRiskBasis/);
+    expect(source).toMatch(/updateGuardrailPreferences/);
     expect(source).not.toMatch(
-      /preferredRiskBasisStore|normalisePreferredRiskBasisState|createInMemoryPreferredRiskBasisStore/,
+      /preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore/,
     );
   });
 
@@ -242,6 +294,10 @@ describe('createTradeHubScreenViewData', () => {
             profile: 'ADVANCED',
             requiresConfirmation: true,
             preferredRiskBasisAvailability: {
+              status: 'UNAVAILABLE',
+              reason: 'NO_ACCOUNT_CONTEXT',
+            },
+            guardrailPreferencesAvailability: {
               status: 'UNAVAILABLE',
               reason: 'NO_ACCOUNT_CONTEXT',
             },

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { MarketEvent } from '@/core/types/marketEvent';
+import { createInMemoryGuardrailPreferencesStore } from '@/services/trade/guardrailPreferencesStore';
 import { createInMemoryPreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
@@ -44,6 +45,25 @@ describe('fetchTradeHubVM', () => {
   it('builds a prepared trade hub surface from shared upstream truth', async () => {
     const upstreamEvent = createEvent();
     const nowProvider = () => 1_700_000_000_100;
+    const guardrailPreferencesStore = createInMemoryGuardrailPreferencesStore([
+      {
+        accountId: 'acct-live',
+        preferences: {
+          riskLimitPerTrade: {
+            isEnabled: true,
+            thresholdLabel: '2%',
+          },
+          dailyLossThreshold: {
+            isEnabled: false,
+            thresholdLabel: null,
+          },
+          cooldownAfterLoss: {
+            isEnabled: true,
+            windowLabel: '1 day',
+          },
+        },
+      },
+    ]);
     const preferredRiskBasisStore = createInMemoryPreferredRiskBasisStore([
       {
         accountId: 'acct-live',
@@ -160,6 +180,7 @@ describe('fetchTradeHubVM', () => {
       profile: 'ADVANCED',
       nowProvider,
       preferredRiskBasisStore,
+      guardrailPreferencesStore,
     });
 
     expect(mockFetchSurfaceContext).toHaveBeenCalledWith({
@@ -244,6 +265,24 @@ describe('fetchTradeHubVM', () => {
           status: 'AVAILABLE',
           accountId: 'acct-live',
           preferredBasis: 'POSITION_PERCENT',
+        },
+        guardrailPreferencesAvailability: {
+          status: 'AVAILABLE',
+          accountId: 'acct-live',
+          preferences: {
+            riskLimitPerTrade: {
+              isEnabled: true,
+              thresholdLabel: '2%',
+            },
+            dailyLossThreshold: {
+              isEnabled: false,
+              thresholdLabel: null,
+            },
+            cooldownAfterLoss: {
+              isEnabled: true,
+              windowLabel: '1 day',
+            },
+          },
         },
       },
     });
