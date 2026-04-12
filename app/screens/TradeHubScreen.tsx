@@ -31,7 +31,7 @@ import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewV
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { updatePreferredRiskBasis } from '@/services/trade/updatePreferredRiskBasis';
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type { RiskToolVM } from '@/services/risk/types';
 import type {
@@ -207,7 +207,7 @@ export function TradeHubScreen() {
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | undefined>();
   const [selectedRiskBasis, setSelectedRiskBasis] = useState<RiskBasis | undefined>();
-  const [messagePolicy, setMessagePolicy] = useState<MessagePolicyAvailability | null>(null);
+  const [messagePolicyLane, setMessagePolicyLane] = useState<MessagePolicyLane | null>(null);
   const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
     null,
   );
@@ -273,8 +273,8 @@ export function TradeHubScreen() {
   }, [preferredRiskBasisAccountId]);
 
   const screenView = useMemo(
-    () => createTradeHubScreenViewData(surfaceModel, messagePolicy),
-    [messagePolicy, surfaceModel],
+    () => createTradeHubScreenViewData(surfaceModel, messagePolicyLane),
+    [messagePolicyLane, surfaceModel],
   );
   const riskLaneView = screenView?.riskLane;
   const tradeHubRiskView = riskLaneView?.risk;
@@ -358,7 +358,7 @@ export function TradeHubScreen() {
     let isMounted = true;
 
     if (!confirmationSessionVm) {
-      setMessagePolicy(null);
+      setMessagePolicyLane(null);
       return () => {
         isMounted = false;
       };
@@ -374,14 +374,14 @@ export function TradeHubScreen() {
           return;
         }
 
-        setMessagePolicy(result);
+        setMessagePolicyLane(result);
       })
       .catch(() => {
         if (!isMounted) {
           return;
         }
 
-        setMessagePolicy(null);
+        setMessagePolicyLane(null);
       });
 
     return () => {

@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type {
+  MessagePolicyAvailability,
+  MessagePolicyLane,
+} from '@/services/messages/types';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 import { createSnapshotScreenViewData } from '@/app/screens/snapshotScreenView';
 
@@ -98,6 +101,13 @@ function unavailableMessagePolicy(): MessagePolicyAvailability {
   };
 }
 
+function createMessagePolicyLane(policyAvailability: MessagePolicyAvailability): MessagePolicyLane {
+  return {
+    policyAvailability,
+    rationaleAvailability: policyAvailability.rationale,
+  };
+}
+
 describe('createSnapshotScreenViewData', () => {
   it('keeps the screen helper on the prepared message policy contract only', () => {
     const source = readFileSync(
@@ -105,9 +115,10 @@ describe('createSnapshotScreenViewData', () => {
       'utf8',
     );
 
-    expect(source).toMatch(/messagePolicy\?\.status === 'AVAILABLE'/);
-    expect(source).toMatch(/messagePolicy\.messages\[0\]/);
-    expect(source).toMatch(/messagePolicy\.rationale/);
+    expect(source).toMatch(/messagePolicyLane\?\.policyAvailability/);
+    expect(source).toMatch(/policyAvailability\?\.status === 'AVAILABLE'/);
+    expect(source).toMatch(/policyAvailability\.messages\[0\]/);
+    expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
     expect(source).toMatch(/thirtyThousandFoot\.availability\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(/surface\.briefing\.status === 'VISIBLE'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
@@ -121,7 +132,9 @@ describe('createSnapshotScreenViewData', () => {
   it('uses the SnapshotModel path instead of legacy bridge fields', () => {
     const surface = createSurface();
 
-    expect(createSnapshotScreenViewData(surface, unavailableMessagePolicy())).toEqual({
+    expect(
+      createSnapshotScreenViewData(surface, createMessagePolicyLane(unavailableMessagePolicy())),
+    ).toEqual({
       currentStateLabel: 'Current State',
       currentStateValue: 'Up',
       change24hLabel: 'Last 24h Change',
@@ -147,7 +160,12 @@ describe('createSnapshotScreenViewData', () => {
   });
 
   it('hides the message when the policy seam says no message is available, even if briefing state exists upstream', () => {
-    expect(createSnapshotScreenViewData(createSurface(), unavailableMessagePolicy())).toMatchObject({
+    expect(
+      createSnapshotScreenViewData(
+        createSurface(),
+        createMessagePolicyLane(unavailableMessagePolicy()),
+      ),
+    ).toMatchObject({
       message: {
         visible: false,
       },
@@ -182,7 +200,9 @@ describe('createSnapshotScreenViewData', () => {
       },
     };
 
-    expect(createSnapshotScreenViewData(createSurface(), messagePolicy)).toMatchObject({
+    expect(
+      createSnapshotScreenViewData(createSurface(), createMessagePolicyLane(messagePolicy)),
+    ).toMatchObject({
       message: {
         visible: true,
         kind: 'ALERT',
@@ -215,7 +235,9 @@ describe('createSnapshotScreenViewData', () => {
       },
     };
 
-    expect(createSnapshotScreenViewData(surface, unavailableMessagePolicy())).toMatchObject({
+    expect(
+      createSnapshotScreenViewData(surface, createMessagePolicyLane(unavailableMessagePolicy())),
+    ).toMatchObject({
       thirtyThousandFoot: {
         visible: false,
       },

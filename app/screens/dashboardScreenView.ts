@@ -12,7 +12,7 @@ import type { DashboardItem } from '@/services/dashboard/types';
 import type { ExplanationConfidence, ExplanationLineageItem } from '@/services/explanation/types';
 import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import type {
-  MessagePolicyAvailability,
+  MessagePolicyLane,
   MessagePolicyKind,
   MessagePriority,
   MessageRationaleAvailability,
@@ -292,16 +292,20 @@ function formatConfidenceText(confidence: ExplanationConfidence): string {
 }
 
 function createDashboardMessageViewData(
-  messagePolicy?: MessagePolicyAvailability | null,
+  messagePolicyLane?: MessagePolicyLane | null,
 ): DashboardScreenMessageViewData {
-  if (messagePolicy?.status === 'AVAILABLE' && messagePolicy.messages[0]) {
+  const policyAvailability = messagePolicyLane?.policyAvailability;
+
+  if (policyAvailability?.status === 'AVAILABLE' && policyAvailability.messages[0]) {
+    const visibleMessage = policyAvailability.messages[0];
+
     return {
       visible: true,
-      kind: messagePolicy.messages[0].kind,
-      priority: messagePolicy.messages[0].priority,
-      title: messagePolicy.messages[0].title,
-      summary: messagePolicy.messages[0].summary,
-      rationale: messagePolicy.rationale,
+      kind: visibleMessage.kind,
+      priority: visibleMessage.priority,
+      title: visibleMessage.title,
+      summary: visibleMessage.summary,
+      rationale: messagePolicyLane?.rationaleAvailability ?? policyAvailability.rationale,
     };
   }
 
@@ -317,7 +321,7 @@ export async function refreshDashboardScreenSurface(params: {
   fetchMessagePolicy?: typeof fetchMessagePolicyVM;
 }): Promise<{
   surface: DashboardSurfaceVM;
-  messagePolicy: MessagePolicyAvailability;
+  messagePolicyLane: MessagePolicyLane;
   nextBaselineScan: ForegroundScanResult;
 }> {
   const fetchDashboardSurface = params.fetchDashboardSurface ?? fetchDashboardSurfaceVM;
@@ -326,7 +330,7 @@ export async function refreshDashboardScreenSurface(params: {
     profile: params.profile,
     baselineScan: params.baselineScan,
   });
-  const messagePolicy = await fetchMessagePolicy({
+  const messagePolicyLane = await fetchMessagePolicy({
     surface: 'DASHBOARD',
     profile: params.profile,
     dashboardSurface: surface,
@@ -334,14 +338,14 @@ export async function refreshDashboardScreenSurface(params: {
 
   return {
     surface,
-    messagePolicy,
+    messagePolicyLane,
     nextBaselineScan: params.baselineScan ?? surface.scan,
   };
 }
 
 export function createDashboardScreenViewData(
   surface: DashboardSurfaceVM | null,
-  messagePolicy?: MessagePolicyAvailability | null,
+  messagePolicyLane?: MessagePolicyLane | null,
 ): DashboardScreenViewData | null {
   if (!surface) {
     return null;
@@ -369,7 +373,7 @@ export function createDashboardScreenViewData(
     profileLabel: surface.model.meta.profile,
     accountContext: createAccountContextViewData(surface.accountContext),
     aggregatePortfolio: createAggregatePortfolioViewData(surface.aggregatePortfolioContext),
-    message: createDashboardMessageViewData(messagePolicy),
+    message: createDashboardMessageViewData(messagePolicyLane),
     primeZone: {
       title: 'Prime Zone',
       items: formatZoneItems(surface.model.primeZone.items),

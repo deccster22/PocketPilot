@@ -1,4 +1,4 @@
-# Message Policy Model (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5)
+# Message Policy Model (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5 + P6-A6)
 
 ## Purpose
 P6-A1 added PocketPilot's canonical message-policy seam.
@@ -6,6 +6,7 @@ P6-A2 reused that seam for Dashboard `REFERRAL` and Trade Hub `GUARDED_STOP`.
 P6-A3 added explicit profile sensitivity and keep, downgrade, or suppress tuning.
 P6-A4 improved the interpreted inputs feeding the same seam.
 P6-A5 adds one canonical user-visible rationale seam on top of that same policy path.
+P6-A6 groups the policy and rationale outputs into one prepared lane so the current message-consuming surfaces can thread one cleaner service-owned contract.
 
 The result is still one policy system, not a notification platform.
 
@@ -16,7 +17,7 @@ Goals:
 - keep `app/` on prepared contracts only
 - keep rollout inline, compact, and calm
 
-P6-A1 through P6-A5 do not add push, inbox, unread state, badges, background jobs, generic toast infrastructure, or user-editable sensitivity settings.
+P6-A1 through P6-A6 do not add push, inbox, unread state, badges, background jobs, generic toast infrastructure, or user-editable sensitivity settings.
 
 ## Canonical Contracts
 The canonical contracts live in `services/messages/types.ts`.
@@ -70,6 +71,11 @@ type MessagePolicyAvailability =
       messages: readonly PreparedMessage[]
       rationale: MessageRationaleAvailability
     }
+
+type MessagePolicyLane = {
+  policyAvailability: MessagePolicyAvailability
+  rationaleAvailability: MessageRationaleAvailability
+}
 ```
 
 Rules:
@@ -78,6 +84,11 @@ Rules:
 - `MessageRationale` is user-facing copy, not an engineering trace
 - rationale explains posture, not mechanics
 - no raw IDs, provider diagnostics, runtime facts, score readouts, or signal arrays leak into rationale
+
+P6-A6 keeps the lane explicit and minimal:
+- `policyAvailability` remains the canonical prepared policy result
+- `rationaleAvailability` keeps the visible "why this is here" copy paired with that policy result
+- the grouped lane exists so surface builders and screen helpers do not have to thread separate ad hoc policy and rationale values
 
 ## Data Flow
 The message-policy seam still sits above interpreted service-owned inputs rather than app-owned heuristics.
@@ -92,8 +103,10 @@ EventLedger
 -> SnapshotBriefingState
 -> createPreparedMessageInputs
 -> createMessagePolicyVM
+-> createMessagePolicyLane
 -> createPreparedMessageRationale
 -> MessagePolicyAvailability
+-> MessagePolicyLane
 -> Snapshot message zone
 ```
 
@@ -102,21 +115,24 @@ The canonical fetch path remains one entry seam:
 ```text
 fetchSnapshotSurfaceVM
 -> fetchMessagePolicyVM(surface: 'SNAPSHOT')
+-> MessagePolicyLane
 -> app/screens/snapshotScreenView.ts
 -> SnapshotScreen
 
 fetchDashboardSurfaceVM
 -> fetchMessagePolicyVM(surface: 'DASHBOARD')
+-> MessagePolicyLane
 -> app/screens/dashboardScreenView.ts
 -> DashboardScreen
 
 fetchConfirmationSessionVM
 -> fetchMessagePolicyVM(surface: 'TRADE_HUB')
+-> MessagePolicyLane
 -> app/screens/tradeHubScreenView.ts
 -> TradeHubScreen
 ```
 
-`app/` renders the prepared message plus prepared rationale only.
+`app/` renders the grouped prepared lane only.
 It does not classify message families, build rationale text, re-derive tuned inputs, or expose raw runtime facts.
 
 ## Threshold And Sensitivity Rules

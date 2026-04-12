@@ -22,13 +22,14 @@ In P5-11 it presents:
 The surface helps the user understand what kind of action PocketPilot is framing without executing anything.
 
 P6-A2 adds one optional message-policy note above the same prepared surface:
-- one inline `MessagePolicyAvailability` result from `services/messages/fetchMessagePolicyVM`
+- one inline `MessagePolicyLane` result from `services/messages/fetchMessagePolicyVM`
 - it remains separate from the `TradeHubSurfaceModel` contract and from confirmation/readiness/execution seams
 - it does not add notification mechanics or order behavior
 P6-A5 adds one optional prepared rationale on that same message-policy result:
 - it stays inside the existing inline note posture
 - it explains the boundary calmly without becoming a debug panel
 - it does not add settings or delivery mechanics
+P6-A6 keeps the same note grouped as one lane so the screen helper reads one service-owned policy-and-rationale contract instead of threading separate ad hoc message fields.
 P5-R9 adds one optional risk-input guidance note inside the selected-plan preview:
 - it explains thin or unsupported sizing context calmly and explicitly
 - it stays service-owned and non-enforcing

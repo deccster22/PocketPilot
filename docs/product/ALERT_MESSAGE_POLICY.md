@@ -1,4 +1,4 @@
-# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5)
+# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5 + P6-A6)
 
 ## Why This Exists
 PocketPilot already had calm briefing and reorientation groundwork, but `P6` needed one explicit product spine for messaging.
@@ -8,6 +8,7 @@ P6-A2 reused it for narrow Dashboard and Trade Hub rollout.
 P6-A3 made alert treatment profile-aware.
 P6-A4 improved the interpreted input quality feeding the seam.
 P6-A5 adds one compact explanation layer so PocketPilot can say why the current message posture surfaced.
+P6-A6 consolidates the same final policy and rationale outputs into one grouped prepared lane so the current consumers can keep reading one calm service-owned contract.
 
 The goal is still not to make PocketPilot louder.
 The goal is to make message treatment clearer, calmer, and easier to trust.
@@ -116,6 +117,14 @@ Those surfaces still:
 - stay inline
 - avoid popup, badge, or inbox mechanics
 - avoid urgency theatre
+
+## Grouped Prepared Lane
+P6-A6 keeps the same message families and meanings.
+It only groups the final service-owned outputs into one prepared lane:
+- `policyAvailability`
+- `rationaleAvailability`
+
+That keeps Snapshot, Dashboard, and Trade Hub on one calm contract shape while avoiding separate ad hoc policy and rationale plumbing in `app/`.
 
 ## Threshold Posture
 P6-A4 and P6-A5 keep alerting narrower than "anything changed."

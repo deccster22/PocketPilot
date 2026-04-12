@@ -3,7 +3,10 @@ import {
   refreshSnapshotScreenSurface,
   shouldRefreshSnapshotOnAppForegroundTransition,
 } from '@/app/screens/snapshotScreenView';
-import type { MessagePolicyAvailability } from '@/services/messages/types';
+import type {
+  MessagePolicyAvailability,
+  MessagePolicyLane,
+} from '@/services/messages/types';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 const availableSurface = {
@@ -175,6 +178,13 @@ const availableMessagePolicy: MessagePolicyAvailability = {
   },
 };
 
+function createMessagePolicyLane(policyAvailability: MessagePolicyAvailability): MessagePolicyLane {
+  return {
+    policyAvailability,
+    rationaleAvailability: policyAvailability.rationale,
+  };
+}
+
 describe('snapshotForegroundRefresh', () => {
   it('refreshes only on explicit background or inactive to active transitions', () => {
     expect(shouldRefreshSnapshotOnAppForegroundTransition('background', 'active')).toBe(true);
@@ -187,7 +197,8 @@ describe('snapshotForegroundRefresh', () => {
 
   it('routes foreground refresh through the same prepared Snapshot VM path and canonical message policy seam', async () => {
     const fetchSnapshotSurface = jest.fn().mockResolvedValue(availableSurface);
-    const fetchMessagePolicy = jest.fn().mockResolvedValue(availableMessagePolicy);
+    const availableMessagePolicyLane = createMessagePolicyLane(availableMessagePolicy);
+    const fetchMessagePolicy = jest.fn().mockResolvedValue(availableMessagePolicyLane);
 
     const initialMountResult = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
@@ -246,9 +257,9 @@ describe('snapshotForegroundRefresh', () => {
       snapshotSurface: availableSurface,
     });
     expect(initialMountResult.surface).toBe(availableSurface);
-    expect(initialMountResult.messagePolicy).toBe(availableMessagePolicy);
+    expect(initialMountResult.messagePolicyLane).toBe(availableMessagePolicyLane);
     expect(foregroundResult.surface).toBe(availableSurface);
-    expect(foregroundResult.messagePolicy).toBe(availableMessagePolicy);
+    expect(foregroundResult.messagePolicyLane).toBe(availableMessagePolicyLane);
   });
 
   it('keeps a dismissed cycle hidden after foreground refresh without leaking raw signals or notification language', async () => {
@@ -264,14 +275,16 @@ describe('snapshotForegroundRefresh', () => {
         reason: 'NO_MEANINGFUL_BRIEFING',
       },
     } as SnapshotSurfaceVM);
-    const fetchMessagePolicy = jest.fn().mockResolvedValue({
-      status: 'UNAVAILABLE',
-      reason: 'NO_MESSAGE',
-      rationale: {
+    const fetchMessagePolicy = jest.fn().mockResolvedValue(
+      createMessagePolicyLane({
         status: 'UNAVAILABLE',
-        reason: 'NO_RATIONALE_AVAILABLE',
-      },
-    } satisfies MessagePolicyAvailability);
+        reason: 'NO_MESSAGE',
+        rationale: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_RATIONALE_AVAILABLE',
+        },
+      }),
+    );
 
     const result = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
@@ -285,7 +298,7 @@ describe('snapshotForegroundRefresh', () => {
       fetchMessagePolicy,
     });
 
-    expect(createSnapshotScreenViewData(result.surface, result.messagePolicy)).toEqual({
+    expect(createSnapshotScreenViewData(result.surface, result.messagePolicyLane)).toEqual({
       currentStateLabel: 'Current State',
       currentStateValue: 'Up',
       change24hLabel: 'Last 24h Change',
@@ -304,7 +317,7 @@ describe('snapshotForegroundRefresh', () => {
     expect(JSON.stringify(result.surface.reorientation.summary)).not.toMatch(
       /signalsTriggered|budget_blocked_symbols|signalTitle/,
     );
-    expect(JSON.stringify(result.messagePolicy)).not.toMatch(/unread|badge|notification|urgent/);
+    expect(JSON.stringify(result.messagePolicyLane)).not.toMatch(/unread|badge|notification|urgent/);
   });
 
   it('marks stale persisted dismissal for clearing when a newer eligible cycle appears on foreground refresh', async () => {
@@ -322,7 +335,7 @@ describe('snapshotForegroundRefresh', () => {
         },
       },
     } as SnapshotSurfaceVM);
-    const fetchMessagePolicy = jest.fn().mockResolvedValue(availableMessagePolicy);
+    const fetchMessagePolicy = jest.fn().mockResolvedValue(createMessagePolicyLane(availableMessagePolicy));
 
     const result = await refreshSnapshotScreenSurface({
       profile: 'BEGINNER',
