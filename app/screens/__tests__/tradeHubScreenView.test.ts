@@ -107,6 +107,28 @@ describe('createTradeHubScreenViewData', () => {
               },
             },
           },
+          guardrailEvaluationAvailability: {
+            status: 'AVAILABLE',
+            evaluation: {
+              title: 'Prepared guardrail status',
+              summary:
+                'One enabled guardrail sits outside the chosen structure. Trade Hub prepared the rest as not evaluated, and is only describing that status here.',
+              items: [
+                {
+                  guardrailKey: 'riskLimitPerTrade',
+                  status: 'OUTSIDE_GUARDRAIL',
+                  label: 'Risk limit per trade',
+                  summary: 'Current risk per trade sits above your saved threshold.',
+                },
+                {
+                  guardrailKey: 'cooldownAfterLoss',
+                  status: 'NOT_EVALUATED',
+                  label: 'Cooldown after loss',
+                  summary: 'The current plan does not yet carry a cooldown state.',
+                },
+              ],
+            },
+          },
         },
       },
       unavailableMessagePolicy(),
@@ -182,6 +204,25 @@ describe('createTradeHubScreenViewData', () => {
           },
         ],
       },
+      guardrailEvaluation: {
+        titleText: 'Prepared guardrail status',
+        summaryText:
+          'One enabled guardrail sits outside the chosen structure. Trade Hub prepared the rest as not evaluated, and is only describing that status here.',
+        items: [
+          {
+            key: 'riskLimitPerTrade',
+            label: 'Risk limit per trade',
+            statusText: 'Outside guardrail',
+            summaryText: 'Current risk per trade sits above your saved threshold.',
+          },
+          {
+            key: 'cooldownAfterLoss',
+            label: 'Cooldown after loss',
+            statusText: 'Not evaluated',
+            summaryText: 'The current plan does not yet carry a cooldown state.',
+          },
+        ],
+      },
       primaryPlan: {
         planId: 'primary-plan',
         intentLabel: 'Accumulate',
@@ -217,6 +258,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/surface\.risk\.basisAvailability\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/surface\.meta\.preferredRiskBasisAvailability/);
     expect(source).toMatch(/surface\.meta\.guardrailPreferencesAvailability/);
+    expect(source).toMatch(/surface\.meta\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
       /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
@@ -224,7 +266,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);
     expect(source).not.toMatch(
-      /updatePreferredRiskBasis|updateGuardrailPreferences|preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore/,
+      /updatePreferredRiskBasis|updateGuardrailPreferences|preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore|createGuardrailEvaluation|compareComparableValues|parseComparableValue|classifyComparableValue/,
     );
   });
 
@@ -233,8 +275,9 @@ describe('createTradeHubScreenViewData', () => {
 
     expect(source).toMatch(/updatePreferredRiskBasis/);
     expect(source).toMatch(/updateGuardrailPreferences/);
+    expect(source).toMatch(/screenView\?\.guardrailEvaluation/);
     expect(source).not.toMatch(
-      /preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore/,
+      /preferredRiskBasisStore|guardrailPreferencesStore|normalisePreferredRiskBasisState|normaliseGuardrailPreferencesState|createInMemoryPreferredRiskBasisStore|createInMemoryGuardrailPreferencesStore|createGuardrailEvaluation|compareComparableValues|parseComparableValue|classifyComparableValue/,
     );
   });
 
@@ -300,6 +343,10 @@ describe('createTradeHubScreenViewData', () => {
             guardrailPreferencesAvailability: {
               status: 'UNAVAILABLE',
               reason: 'NO_ACCOUNT_CONTEXT',
+            },
+            guardrailEvaluationAvailability: {
+              status: 'UNAVAILABLE',
+              reason: 'INSUFFICIENT_CONTEXT',
             },
           },
         },

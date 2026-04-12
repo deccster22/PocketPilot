@@ -36,6 +36,8 @@ Possible core objects:
 - `GuardrailPreferences`
 - `GuardrailPreferencesAvailability`
 - `GuardrailPreferencesUpdateResult`
+- `GuardrailEvaluation`
+- `GuardrailEvaluationAvailability`
 - `ReadinessState`
 
 ## 4. Responsibilities
@@ -44,6 +46,7 @@ Possible core objects:
 - remember one preferred basis per account through a service-owned seam
 - remember optional guardrail preferences per account through a service-owned seam
 - prepare bounded review outputs for Trade Hub
+- prepare descriptive guardrail-evaluation outputs for Trade Hub
 - support stop loss / take profit explanation
 - provide consistent max loss / position sizing / risk-reward logic
 - shape one canonical prepared sizing/max-loss output from the same service-owned inputs
@@ -61,6 +64,7 @@ Possible core objects:
 - account-level preferred basis may seed the selected basis, but it must remain explicit in the prepared contract
 - unsupported or incomplete risk-input guidance must stay support-first and non-enforcing by default
 - guardrail preferences must stay explicit, account-scoped, and non-blocking by default
+- guardrail evaluation must stay explicit, descriptive, and non-blocking by default
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -86,6 +90,7 @@ Possible core objects:
 - sizing-output availability tests
 - unsupported / incomplete guidance tests
 - support-vs-enforcement boundary tests
+- guardrail-evaluation explicitness tests
 
 ## 9. Relationship to other docs
 Sits beside:

@@ -284,6 +284,28 @@ describe('fetchTradeHubVM', () => {
             },
           },
         },
+        guardrailEvaluationAvailability: {
+          status: 'AVAILABLE',
+          evaluation: {
+            title: 'Prepared guardrail status',
+            summary:
+              'One enabled guardrail sits outside the chosen structure. Trade Hub prepared the rest as not evaluated, and is only describing that status here.',
+            items: [
+              {
+                guardrailKey: 'riskLimitPerTrade',
+                status: 'OUTSIDE_GUARDRAIL',
+                label: 'Risk limit per trade',
+                summary: 'Current risk per trade sits above your saved threshold.',
+              },
+              {
+                guardrailKey: 'cooldownAfterLoss',
+                status: 'NOT_EVALUATED',
+                label: 'Cooldown after loss',
+                summary: 'The current plan does not yet carry a cooldown state.',
+              },
+            ],
+          },
+        },
       },
     });
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');
