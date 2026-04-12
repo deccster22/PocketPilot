@@ -104,6 +104,7 @@ P5-R8 adds one canonical account-scoped preferred risk-basis seam so the lane ca
 P5-R9 adds `RiskInputGuidanceAvailability` to the selected-plan preview seam so the lane can explain thin or unsupported risk inputs calmly without turning Trade Hub into a validation wall.
 P5-R10 adds one canonical account-scoped guardrail-preferences seam plus one calm Trade Hub proof path so optional guardrails can be remembered explicitly without turning the lane into a default-blocking settings maze.
 P5-R11 adds one canonical guardrail-evaluation seam plus one calm Trade Hub proof path so the selected plan can be described against enabled guardrails without turning the lane into a blocking validator.
+P5-R12 compacts the same Trade Hub risk lane into one grouped prepared contract so the app can keep rendering one service-owned lane without redoing risk logic or widening into new behavior.
 P5-X hardens the seams after that resolution point with explicit invariant tests and calm execution-state language rules.
 
 The boundary is:

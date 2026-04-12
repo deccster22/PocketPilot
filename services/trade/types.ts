@@ -219,6 +219,16 @@ export type PreparedTradeRiskLane = {
   context: RiskPerTradeContext | null;
 };
 
+export type TradeHubRiskLane = {
+  selectedRiskBasis: RiskBasis | null;
+  preparedRiskLane: PreparedTradeRiskLane;
+  preferredRiskBasisAvailability: PreferredRiskBasisAvailability;
+  positionSizingAvailability: PositionSizingAvailability;
+  riskInputGuidanceAvailability: RiskInputGuidanceAvailability;
+  guardrailPreferencesAvailability: GuardrailPreferencesAvailability;
+  guardrailEvaluationAvailability: GuardrailEvaluationAvailability;
+};
+
 export type ProtectionPlan = {
   planId: string;
   accountId: string;
@@ -258,14 +268,11 @@ export type TradeHubPlanCard = {
 export type TradeHubSurfaceModel = {
   primaryPlan: TradeHubPlanCard | null;
   alternativePlans: TradeHubPlanCard[];
-  risk: PreparedTradeRiskLane;
+  riskLane: TradeHubRiskLane;
   meta: {
     hasPrimaryPlan: boolean;
     profile: UserProfile;
     requiresConfirmation: boolean;
-    preferredRiskBasisAvailability: PreferredRiskBasisAvailability;
-    guardrailPreferencesAvailability: GuardrailPreferencesAvailability;
-    guardrailEvaluationAvailability: GuardrailEvaluationAvailability;
   };
 };
 

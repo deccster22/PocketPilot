@@ -2,12 +2,9 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
-import { createGuardrailEvaluation } from '@/services/trade/createGuardrailEvaluation';
-import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
+import { createTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
-import { fetchGuardrailPreferences } from '@/services/trade/fetchGuardrailPreferences';
-import { fetchPreferredRiskBasis } from '@/services/trade/fetchPreferredRiskBasis';
 import type { GuardrailPreferencesStore } from '@/services/trade/guardrailPreferencesStore';
 import type { PreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
@@ -55,28 +52,12 @@ export async function fetchTradeHubVM(params: {
     profile: params.profile,
     selectedPlanId: params.selectedPlanId ?? undefined,
   });
-  const preferredRiskBasisAvailability = await fetchPreferredRiskBasis({
-    accountId:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? upstream.selectedAccountContext.account.accountId
-        : null,
-    isEnabledForSurface: selectedPlan !== null,
-    preferredRiskBasisStore: params.preferredRiskBasisStore,
-  });
-  const guardrailPreferencesAvailability = await fetchGuardrailPreferences({
-    accountId:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? upstream.selectedAccountContext.account.accountId
-        : null,
-    isEnabledForSurface: true,
-    guardrailPreferencesStore: params.guardrailPreferencesStore,
-  });
-  const risk = createPreparedTradeRiskLane({
+  const riskLane = await createTradeHubRiskLane({
     plan: selectedPlan,
-    requestedBasis: params.selectedRiskBasis,
-    preferredBasis:
-      preferredRiskBasisAvailability.status === 'AVAILABLE'
-        ? preferredRiskBasisAvailability.preferredBasis
+    selectedRiskBasis: params.selectedRiskBasis,
+    accountId:
+      upstream.selectedAccountContext.status === 'AVAILABLE'
+        ? upstream.selectedAccountContext.account.accountId
         : null,
     accountContext:
       upstream.selectedAccountContext.status === 'AVAILABLE'
@@ -85,23 +66,15 @@ export async function fetchTradeHubVM(params: {
             baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
           }
         : null,
-  });
-  const guardrailEvaluationAvailability = createGuardrailEvaluation({
-    plan: selectedPlan,
-    risk,
-    guardrailPreferencesAvailability,
-    accountValue: upstream.selectedAccountPortfolioValue ?? null,
-    isEnabledForSurface: true,
+    guardrailPreferencesStore: params.guardrailPreferencesStore,
+    preferredRiskBasisStore: params.preferredRiskBasisStore,
   });
 
   return {
     model: createTradeHubSurfaceModel({
       profile: params.profile,
       protectionPlans,
-      risk,
-      preferredRiskBasisAvailability,
-      guardrailPreferencesAvailability,
-      guardrailEvaluationAvailability,
+      riskLane,
     }),
     scan: upstream.scan,
   };

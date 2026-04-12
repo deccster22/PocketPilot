@@ -1,15 +1,13 @@
 import type { UserProfile } from '@/core/profile/types';
 import type {
-  GuardrailEvaluationAvailability,
-  GuardrailPreferencesAvailability,
-  PreparedTradeRiskLane,
-  PreferredRiskBasisAvailability,
   ProtectionPlan,
   ProtectionPlanIntentType,
   TradeHubActionState,
   TradeHubPlanCard,
+  TradeHubRiskLane,
   TradeHubSurfaceModel,
 } from '@/services/trade/types';
+import { createUnavailableTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
 
 const ACTION_STATE_PRIORITY: Record<TradeHubActionState, number> = {
@@ -35,21 +33,6 @@ const ALTERNATIVE_LIMIT_BY_PROFILE: Record<UserProfile, number> = {
   BEGINNER: 1,
   MIDDLE: 2,
   ADVANCED: 3,
-};
-
-const UNAVAILABLE_PREFERRED_RISK_BASIS: PreferredRiskBasisAvailability = {
-  status: 'UNAVAILABLE',
-  reason: 'NO_ACCOUNT_CONTEXT',
-};
-
-const UNAVAILABLE_GUARDRAIL_PREFERENCES: GuardrailPreferencesAvailability = {
-  status: 'UNAVAILABLE',
-  reason: 'NO_ACCOUNT_CONTEXT',
-};
-
-const UNAVAILABLE_GUARDRAIL_EVALUATION: GuardrailEvaluationAvailability = {
-  status: 'UNAVAILABLE',
-  reason: 'INSUFFICIENT_CONTEXT',
 };
 
 function createPlanCard(plan: ProtectionPlan): TradeHubPlanCard {
@@ -95,10 +78,7 @@ function sortPlanCards(cards: ReadonlyArray<TradeHubPlanCard>): TradeHubPlanCard
 export function createTradeHubSurfaceModel(params: {
   profile: UserProfile;
   protectionPlans: ReadonlyArray<ProtectionPlan>;
-  risk: PreparedTradeRiskLane;
-  preferredRiskBasisAvailability?: PreferredRiskBasisAvailability;
-  guardrailPreferencesAvailability?: GuardrailPreferencesAvailability;
-  guardrailEvaluationAvailability?: GuardrailEvaluationAvailability;
+  riskLane?: TradeHubRiskLane;
 }): TradeHubSurfaceModel {
   const planCards = sortPlanCards(params.protectionPlans.map(createPlanCard));
   const primaryPlan = planCards[0] ?? null;
@@ -107,17 +87,11 @@ export function createTradeHubSurfaceModel(params: {
   return {
     primaryPlan,
     alternativePlans: planCards.slice(1, 1 + alternativeLimit),
-    risk: params.risk,
+    riskLane: params.riskLane ?? createUnavailableTradeHubRiskLane(),
     meta: {
       hasPrimaryPlan: primaryPlan !== null,
       profile: params.profile,
       requiresConfirmation: true,
-      preferredRiskBasisAvailability:
-        params.preferredRiskBasisAvailability ?? UNAVAILABLE_PREFERRED_RISK_BASIS,
-      guardrailPreferencesAvailability:
-        params.guardrailPreferencesAvailability ?? UNAVAILABLE_GUARDRAIL_PREFERENCES,
-      guardrailEvaluationAvailability:
-        params.guardrailEvaluationAvailability ?? UNAVAILABLE_GUARDRAIL_EVALUATION,
     },
   };
 }

@@ -1,5 +1,10 @@
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
-import type { PreparedTradeRiskLane, ProtectionPlan } from '@/services/trade/types';
+import { createUnavailableTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
+import type {
+  PreparedTradeRiskLane,
+  ProtectionPlan,
+  TradeHubRiskLane,
+} from '@/services/trade/types';
 
 function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
   return {
@@ -26,7 +31,9 @@ function createPlan(overrides: Partial<ProtectionPlan> = {}): ProtectionPlan {
   };
 }
 
-function createRiskLane(overrides: Partial<PreparedTradeRiskLane> = {}): PreparedTradeRiskLane {
+function createPreparedRiskLane(
+  overrides: Partial<PreparedTradeRiskLane> = {},
+): PreparedTradeRiskLane {
   return {
     activeBasis: 'ACCOUNT_PERCENT',
     activeBasisLabel: 'Account %',
@@ -69,11 +76,41 @@ function createRiskLane(overrides: Partial<PreparedTradeRiskLane> = {}): Prepare
   };
 }
 
+function createTradeHubRiskLaneFixture(
+  overrides: Partial<TradeHubRiskLane> = {},
+): TradeHubRiskLane {
+  return {
+    selectedRiskBasis: 'ACCOUNT_PERCENT',
+    preparedRiskLane: createPreparedRiskLane(),
+    preferredRiskBasisAvailability: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ACCOUNT_CONTEXT',
+    },
+    positionSizingAvailability: {
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    },
+    riskInputGuidanceAvailability: {
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    },
+    guardrailPreferencesAvailability: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ACCOUNT_CONTEXT',
+    },
+    guardrailEvaluationAvailability: {
+      status: 'UNAVAILABLE',
+      reason: 'INSUFFICIENT_CONTEXT',
+    },
+    ...overrides,
+  };
+}
+
 describe('createTradeHubSurfaceModel', () => {
   it('creates one primary plan and profile-limited alternatives', () => {
     const result = createTradeHubSurfaceModel({
       profile: 'BEGINNER',
-      risk: createRiskLane(),
+      riskLane: createTradeHubRiskLaneFixture(),
       protectionPlans: [
         createPlan({
           planId: 'wait-plan',
@@ -131,23 +168,11 @@ describe('createTradeHubSurfaceModel', () => {
           actionState: 'CAUTION',
         },
       ],
-      risk: createRiskLane(),
+      riskLane: createTradeHubRiskLaneFixture(),
       meta: {
         hasPrimaryPlan: true,
         profile: 'BEGINNER',
         requiresConfirmation: true,
-        preferredRiskBasisAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'NO_ACCOUNT_CONTEXT',
-        },
-        guardrailPreferencesAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'NO_ACCOUNT_CONTEXT',
-        },
-        guardrailEvaluationAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'INSUFFICIENT_CONTEXT',
-        },
       },
     });
   });
@@ -175,12 +200,12 @@ describe('createTradeHubSurfaceModel', () => {
 
     const resultA = createTradeHubSurfaceModel({
       profile: 'ADVANCED',
-      risk: createRiskLane(),
+      riskLane: createTradeHubRiskLaneFixture(),
       protectionPlans: [wait, ready, caution],
     });
     const resultB = createTradeHubSurfaceModel({
       profile: 'ADVANCED',
-      risk: createRiskLane(),
+      riskLane: createTradeHubRiskLaneFixture(),
       protectionPlans: [caution, ready, wait],
     });
 
@@ -190,7 +215,7 @@ describe('createTradeHubSurfaceModel', () => {
   it('does not leak non-surface fields into plan cards', () => {
     const [alternativePlan] = createTradeHubSurfaceModel({
       profile: 'MIDDLE',
-      risk: createRiskLane(),
+      riskLane: createTradeHubRiskLaneFixture(),
       protectionPlans: [
         createPlan({
           planId: 'alt-plan',
@@ -216,45 +241,16 @@ describe('createTradeHubSurfaceModel', () => {
     expect(
       createTradeHubSurfaceModel({
         profile: 'ADVANCED',
-        risk: createRiskLane({
-          activeBasis: null,
-          activeBasisLabel: null,
-          basisAvailability: {
-            status: 'UNAVAILABLE',
-            reason: 'NOT_ENABLED_FOR_SURFACE',
-          },
-          context: null,
-        }),
         protectionPlans: [],
       }),
     ).toEqual({
       primaryPlan: null,
       alternativePlans: [],
-      risk: {
-        activeBasis: null,
-        activeBasisLabel: null,
-        basisAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'NOT_ENABLED_FOR_SURFACE',
-        },
-        context: null,
-      },
+      riskLane: createUnavailableTradeHubRiskLane(),
       meta: {
         hasPrimaryPlan: false,
         profile: 'ADVANCED',
         requiresConfirmation: true,
-        preferredRiskBasisAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'NO_ACCOUNT_CONTEXT',
-        },
-        guardrailPreferencesAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'NO_ACCOUNT_CONTEXT',
-        },
-        guardrailEvaluationAvailability: {
-          status: 'UNAVAILABLE',
-          reason: 'INSUFFICIENT_CONTEXT',
-        },
       },
     });
   });
