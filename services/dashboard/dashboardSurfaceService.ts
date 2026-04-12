@@ -9,11 +9,14 @@ import { fetchDashboardData } from '@/services/dashboard/dashboardDataService';
 import { fetchDashboardExplanationVM } from '@/services/dashboard/fetchDashboardExplanationVM';
 import type { DashboardSurfaceModel } from '@/services/dashboard/types';
 import type { ExplanationAvailability } from '@/services/explanation/types';
+import { createContextualKnowledgeLane } from '@/services/knowledge/createContextualKnowledgeLane';
+import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type DashboardSurfaceVM = {
   accountContext: Awaited<ReturnType<typeof fetchDashboardData>>['accountContext'];
   aggregatePortfolioContext: Awaited<ReturnType<typeof fetchDashboardData>>['aggregatePortfolioContext'];
+  contextualKnowledgeLane: ContextualKnowledgeLane;
   model: DashboardSurfaceModel;
   scan: ForegroundScanResult;
   explanation: ExplanationAvailability;
@@ -47,10 +50,16 @@ export async function fetchDashboardSurfaceVM(params: {
     model: dashboardModel,
     profile: params.profile,
   });
+  const contextualKnowledgeLane = createContextualKnowledgeLane({
+    profile: params.profile,
+    surface: 'DASHBOARD',
+    dashboardSurface: surfaceModel,
+  });
 
   return {
     accountContext: dashboardData.accountContext,
     aggregatePortfolioContext: dashboardData.aggregatePortfolioContext,
+    contextualKnowledgeLane,
     model: surfaceModel,
     scan: dashboardData.scan,
     explanation: fetchDashboardExplanationVM({

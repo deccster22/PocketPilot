@@ -1,4 +1,5 @@
 import type { EventType } from '@/core/types/marketEvent';
+import type { TradeHubSurfaceModel } from '@/services/trade/types';
 import type { MessagePolicyKind } from '@/services/messages/types';
 import type {
   ContextualKnowledgeAvailability,
@@ -13,6 +14,7 @@ type ContextualKnowledgeInput = {
   eventTypes?: ReadonlyArray<EventType>;
   messageKinds?: ReadonlyArray<MessagePolicyKind>;
   scenarioId?: StrategyPreviewScenarioId | null;
+  tradeHubSurface?: TradeHubSurfaceModel | undefined;
   insights?:
     | {
         hasHistory: boolean;
@@ -42,6 +44,7 @@ const MAX_CANDIDATES = 3;
 const ENABLED_SURFACES = new Set<KnowledgeContextSurface>([
   'DASHBOARD',
   'INSIGHTS',
+  'TRADE_HUB',
   'STRATEGY_PREVIEW',
 ]);
 
@@ -174,6 +177,14 @@ const SURFACE_HINTS: Readonly<Partial<Record<KnowledgeContextSurface, ReadonlyAr
       weight: 2,
     },
   ],
+  TRADE_HUB: [
+    {
+      topicId: 'pp-what-trade-hub-is-for',
+      reason:
+        'This surface is the calm action-support layer, so the Trade Hub overview is the clearest baseline explainer.',
+      weight: 2,
+    },
+  ],
   INSIGHTS: [
     {
       topicId: 'pp-what-insights-is-for',
@@ -246,6 +257,11 @@ function hasInterpretedContext(input: ContextualKnowledgeInput): boolean {
           input.insights?.hasArchive ||
           input.insights?.hasReflection ||
           input.insights?.hasNewItems,
+      );
+    case 'TRADE_HUB':
+      return Boolean(
+        input.tradeHubSurface?.primaryPlan ||
+          input.tradeHubSurface?.alternativePlans.length,
       );
     default:
       return false;
@@ -322,6 +338,107 @@ function buildInsightHints(input: ContextualKnowledgeInput): TopicHint[] {
   return hints;
 }
 
+function buildTradeHubHints(input: ContextualKnowledgeInput): TopicHint[] {
+  if (input.surface !== 'TRADE_HUB' || !input.tradeHubSurface) {
+    return [];
+  }
+
+  const hints: TopicHint[] = [];
+  const { primaryPlan } = input.tradeHubSurface;
+
+  if (!primaryPlan && input.tradeHubSurface.alternativePlans.length === 0) {
+    return hints;
+  }
+
+  if (primaryPlan) {
+    switch (primaryPlan.actionState) {
+      case 'READY':
+        hints.push({
+          topicId: 'pp-what-protection-plans-are-for',
+          reason:
+            'This plan is already framed and ready to review, so protection-plan context stays the calmest next read.',
+          weight: 5,
+        });
+        break;
+      case 'CAUTION':
+        hints.push({
+          topicId: 'pp-risk-reward-basics',
+          reason:
+            'This plan still carries caution, so risk and reward stay the clearest support for the current frame.',
+          weight: 5,
+        });
+        hints.push({
+          topicId: 'pp-stop-loss-basics',
+          reason:
+            'This plan still needs protective boundaries, so stop-loss context stays relevant here.',
+          weight: 4,
+        });
+        break;
+      case 'WAIT':
+        hints.push({
+          topicId: 'pp-position-sizing-basics',
+          reason:
+            'This plan is still waiting on better conditions, so sizing context stays the calmest support.',
+          weight: 5,
+        });
+        hints.push({
+          topicId: 'pp-what-protection-plans-are-for',
+          reason:
+            'This is still a support-only frame, so protection-plan context stays useful before anything else.',
+          weight: 3,
+        });
+        break;
+    }
+
+    if (primaryPlan.certainty === 'LOW') {
+      hints.push({
+        topicId: 'pp-estimated-vs-confirmed-context',
+        reason:
+          'This plan is still low-certainty, so the confirmed-versus-estimated boundary matters before the read feels settled.',
+        weight: 4,
+      });
+    }
+
+    if (primaryPlan.alignment === 'MISALIGNED') {
+      hints.push({
+        topicId: 'pp-risk-reward-basics',
+        reason:
+          'This plan is misaligned, so the risk-reward frame stays more useful than a stronger action story.',
+        weight: 3,
+      });
+    }
+  }
+
+  if (input.tradeHubSurface.riskLane.preparedRiskLane.basisAvailability.status === 'AVAILABLE') {
+    hints.push({
+      topicId: 'pp-risk-reward-basics',
+      reason:
+        'The prepared risk lane is already visible, so risk and reward stay central to the current frame.',
+      weight: 4,
+    });
+  }
+
+  if (input.tradeHubSurface.riskLane.positionSizingAvailability.status === 'AVAILABLE') {
+    hints.push({
+      topicId: 'pp-position-sizing-basics',
+      reason:
+        'Prepared sizing is available, so position-sizing context stays useful here.',
+      weight: 4,
+    });
+  }
+
+  if (input.tradeHubSurface.riskLane.guardrailEvaluationAvailability.status === 'AVAILABLE') {
+    hints.push({
+      topicId: 'pp-stop-loss-basics',
+      reason:
+        'Prepared guardrail evaluation is available, so stop-loss context is the cleanest safety follow-through.',
+      weight: 4,
+    });
+  }
+
+  return hints;
+}
+
 export function createContextualKnowledgeAvailability(params: {
   nodes: ReadonlyArray<KnowledgeCatalogEntry>;
   input: ContextualKnowledgeInput;
@@ -363,6 +480,7 @@ export function createContextualKnowledgeAvailability(params: {
   }
 
   buildInsightHints(input).forEach((hint) => addHint(scores, nodesByTopicId, hint));
+  buildTradeHubHints(input).forEach((hint) => addHint(scores, nodesByTopicId, hint));
 
   const items = [...scores.values()]
     .sort((left, right) => right.score - left.score || left.title.localeCompare(right.title))

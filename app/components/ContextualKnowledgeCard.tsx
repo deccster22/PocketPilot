@@ -11,8 +11,8 @@ export function ContextualKnowledgeCard(props: {
       <Text style={styles.eyebrow}>Optional knowledge</Text>
       <Text style={styles.title}>If you want a little more context</Text>
       <Text style={styles.summary}>
-        These links stay subordinate to the preview. They explain the current lens without gating
-        anything else on this screen.
+        These links stay subordinate to the current surface. They explain the current lens without
+        gating anything else on this screen.
       </Text>
 
       {props.items.map((item) => (

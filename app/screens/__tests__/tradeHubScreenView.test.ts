@@ -6,6 +6,7 @@ import type {
   MessagePolicyLane,
 } from '@/services/messages/types';
 import { createUnavailableTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
+import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
 import { createTradeHubScreenViewData } from '@/app/screens/tradeHubScreenView';
 
 function unavailableMessagePolicy(): MessagePolicyAvailability {
@@ -172,6 +173,10 @@ describe('createTradeHubScreenViewData', () => {
       message: {
         visible: false,
       },
+      contextualKnowledge: {
+        visible: false,
+        items: [],
+      },
       riskLane: {
         risk: {
           selectedBasisLabel: 'Fixed currency',
@@ -282,6 +287,58 @@ describe('createTradeHubScreenViewData', () => {
     });
   });
 
+  it('maps the prepared contextual knowledge lane without deriving recommendation logic locally', () => {
+    const lane: ContextualKnowledgeLane = {
+      availability: {
+        status: 'AVAILABLE',
+        surface: 'TRADE_HUB',
+        items: [
+          {
+            topicId: 'pp-risk-reward-basics',
+            title: 'Risk Reward Basics',
+            reason: 'The prepared risk lane makes risk and reward the calmest next read.',
+          },
+        ],
+      },
+      topics: [
+        {
+          topicId: 'pp-risk-reward-basics',
+          title: 'Risk Reward Basics',
+          summary: 'Risk and reward stay in balance.',
+          difficulty: 'BEGINNER',
+          mediaType: 'ARTICLE',
+          reason: 'The prepared risk lane makes risk and reward the calmest next read.',
+        },
+      ],
+    };
+
+    const view = createTradeHubScreenViewData(
+      {
+        primaryPlan: null,
+        alternativePlans: [],
+        riskLane: createUnavailableTradeHubRiskLane(),
+        meta: {
+          hasPrimaryPlan: false,
+          profile: 'ADVANCED',
+          requiresConfirmation: true,
+        },
+      },
+      createMessagePolicyLane(unavailableMessagePolicy()),
+      lane,
+    );
+
+    expect(view?.contextualKnowledge).toEqual({
+      visible: true,
+      items: [
+        {
+          topicId: 'pp-risk-reward-basics',
+          title: 'Risk Reward Basics',
+          reason: 'The prepared risk lane makes risk and reward the calmest next read.',
+        },
+      ],
+    });
+  });
+
   it('keeps the screen helper on the prepared message-policy and Trade Hub contracts only', () => {
     const source = readFileSync(join(process.cwd(), 'app', 'screens', 'tradeHubScreenView.ts'), 'utf8');
 
@@ -289,13 +346,14 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/policyAvailability\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/policyAvailability\.messages\[0\]/);
     expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
+    expect(source).toMatch(/createContextualKnowledgeSectionViewData/);
     expect(source).toMatch(/surface\.riskLane\.preparedRiskLane\.basisAvailability\.status !== 'AVAILABLE'/);
     expect(source).toMatch(/surface\.riskLane\.preferredRiskBasisAvailability/);
     expect(source).toMatch(/surface\.riskLane\.guardrailPreferencesAvailability/);
     expect(source).toMatch(/surface\.riskLane\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);

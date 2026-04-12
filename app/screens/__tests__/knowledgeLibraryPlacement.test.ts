@@ -40,14 +40,20 @@ describe('knowledge library placement', () => {
     expect(knowledgeTopicScreenSource).not.toMatch(
       /fetchKnowledgeTopicDetailVM|createKnowledgeTopicDetailVM|knowledgeCatalog|canonicalPath|docs\/knowledge|markdown|unlock|required reading|complete to continue/i,
     );
+    expect(dashboardScreenSource).toMatch(/ContextualKnowledgeCard/);
+    expect(dashboardScreenSource).toMatch(/KnowledgeTopicScreen/);
+    expect(dashboardScreenSource).toMatch(/fetchKnowledgeTopicDetailVM/);
     expect(dashboardScreenSource).not.toMatch(
-      /KnowledgeCard|KnowledgeTopicScreen|fetchKnowledgeTopicDetailVM/,
+      /knowledgeCatalog|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability/,
     );
     expect(snapshotScreenSource).not.toMatch(
-      /KnowledgeCard|KnowledgeTopicScreen|fetchKnowledgeTopicDetailVM/,
+      /ContextualKnowledgeCard|KnowledgeTopicScreen|fetchKnowledgeTopicDetailVM/,
     );
+    expect(tradeHubScreenSource).toMatch(/ContextualKnowledgeCard/);
+    expect(tradeHubScreenSource).toMatch(/KnowledgeTopicScreen/);
+    expect(tradeHubScreenSource).toMatch(/fetchKnowledgeTopicDetailVM/);
     expect(tradeHubScreenSource).not.toMatch(
-      /KnowledgeCard|KnowledgeTopicScreen|fetchKnowledgeTopicDetailVM/,
+      /knowledgeCatalog|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability/,
     );
   });
 });

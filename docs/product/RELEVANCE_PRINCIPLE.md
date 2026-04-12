@@ -27,6 +27,8 @@ Something may be true without being relevant.
 Something may be interesting without being relevant.
 Something may even be important in the market and still not deserve surface space for this user, on this account, on this screen.
 
+Contextual knowledge follows the same rule: Strategy -> Profile -> Relevance decides whether a compact prepared lane appears at all, and profile only shapes how much of that lane the user sees.
+
 ## Drift to block
 - indicator stacking
 - alert volume inflation

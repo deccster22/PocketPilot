@@ -2,6 +2,7 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
+import { createContextualKnowledgeLane } from '@/services/knowledge/createContextualKnowledgeLane';
 import { createTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
@@ -14,6 +15,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
 export type TradeHubVM = {
+  contextualKnowledgeLane: ReturnType<typeof createContextualKnowledgeLane>;
   model: TradeHubSurfaceModel;
   scan: ForegroundScanResult;
 };
@@ -69,13 +71,19 @@ export async function fetchTradeHubVM(params: {
     guardrailPreferencesStore: params.guardrailPreferencesStore,
     preferredRiskBasisStore: params.preferredRiskBasisStore,
   });
+  const model = createTradeHubSurfaceModel({
+    profile: params.profile,
+    protectionPlans,
+    riskLane,
+  });
 
   return {
-    model: createTradeHubSurfaceModel({
+    contextualKnowledgeLane: createContextualKnowledgeLane({
       profile: params.profile,
-      protectionPlans,
-      riskLane,
+      surface: 'TRADE_HUB',
+      tradeHubSurface: model,
     }),
+    model,
     scan: upstream.scan,
   };
 }

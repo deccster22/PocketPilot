@@ -29,12 +29,13 @@ PX-E2 keeps Dashboard as the only explanation surface and deepens the existing P
 
 `DashboardItem` remains display-safe and intentionally excludes raw signal payloads, scoring internals, metadata blobs, and execution details.
 
-Dashboard also has a surface VM with one optional explanation seam:
+Dashboard also has a surface VM with one optional explanation seam and one optional contextual-knowledge lane:
 
 ```ts
 {
   accountContext: SelectedAccountAvailability,
   aggregatePortfolioContext: AggregatePortfolioAvailability,
+  contextualKnowledgeLane: ContextualKnowledgeLane,
   model: DashboardSurfaceModel,
   scan: ForegroundScanResult,
   explanation: ExplanationAvailability
@@ -171,6 +172,18 @@ The app path remains:
 - `DashboardScreen`
 
 `app/` does not decide whether Dashboard should show referral copy.
+
+## P7-K4 Contextual Knowledge Follow-Through
+Dashboard now has one optional contextual-knowledge lane on the same prepared surface path.
+
+Rules:
+- the lane comes from `services/knowledge/createContextualKnowledgeLane`
+- it is service-owned, profile-shaped, and relevance-shaped
+- beginner users can see a little more of the lane than advanced users
+- render it only when the prepared lane is honestly available and non-empty
+- keep it compact, calm, and subordinate to the main Focus zones
+- do not turn it into a feed, tutorial stack, or gating mechanism
+- app code only renders prepared topic links and topic detail routes; it does not choose topics locally
 
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.

@@ -6,16 +6,27 @@ import type {
   MessagePolicyLane,
 } from '@/services/messages/types';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
+import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
 import {
   createDashboardScreenViewData,
   refreshDashboardScreenSurface,
 } from '@/app/screens/dashboardScreenView';
 
-function createSurface(): DashboardSurfaceVM {
+function createUnavailableContextualKnowledgeLane(): ContextualKnowledgeLane {
   return {
-    accountContext: {
-      status: 'AVAILABLE',
-      account: {
+    availability: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_RELEVANT_TOPIC',
+    },
+    topics: [],
+  };
+}
+
+function createSurface(): DashboardSurfaceVM {
+    return {
+      accountContext: {
+        status: 'AVAILABLE',
+        account: {
         accountId: 'acct-1',
         displayName: 'Primary account',
         selectionMode: 'PRIMARY_FALLBACK',
@@ -120,12 +131,13 @@ function createSurface(): DashboardSurfaceVM {
         hasSecondaryItems: true,
         hasDeepItems: true,
       },
-    },
-    scan: { accountId: 'acct-1' } as never,
-    explanation: {
-      status: 'AVAILABLE' as const,
+      },
+      scan: { accountId: 'acct-1' } as never,
+      contextualKnowledgeLane: createUnavailableContextualKnowledgeLane(),
       explanation: {
-        title: 'Why BTC is in focus',
+        status: 'AVAILABLE' as const,
+        explanation: {
+          title: 'Why BTC is in focus',
         summary:
           'BTC is in focus because momentum is strengthening in the current interpreted picture.',
         contextNote:
@@ -225,6 +237,10 @@ describe('createDashboardScreenViewData', () => {
       message: {
         visible: false,
       },
+      contextualKnowledge: {
+        visible: false,
+        items: [],
+      },
       primeZone: {
         title: 'Prime Zone',
         items: [
@@ -279,6 +295,46 @@ describe('createDashboardScreenViewData', () => {
     });
   });
 
+  it('maps the prepared contextual knowledge lane without deriving local topic selection', () => {
+    const view = createDashboardScreenViewData({
+      ...createSurface(),
+      contextualKnowledgeLane: {
+        availability: {
+          status: 'AVAILABLE',
+          surface: 'DASHBOARD',
+          items: [
+            {
+              topicId: 'pp-what-dashboard-is-for',
+              title: 'What Dashboard Is For',
+              reason: 'Dashboard is the strongest contextual home for deeper explanation.',
+            },
+          ],
+        },
+        topics: [
+          {
+            topicId: 'pp-what-dashboard-is-for',
+            title: 'What Dashboard Is For',
+            summary: 'Dashboard is PocketPilot\'s focus workspace.',
+            difficulty: 'BEGINNER',
+            mediaType: 'ARTICLE',
+            reason: 'Dashboard is the strongest contextual home for deeper explanation.',
+          },
+        ],
+      },
+    });
+
+    expect(view?.contextualKnowledge).toEqual({
+      visible: true,
+      items: [
+        {
+          topicId: 'pp-what-dashboard-is-for',
+          title: 'What Dashboard Is For',
+          reason: 'Dashboard is the strongest contextual home for deeper explanation.',
+        },
+      ],
+    });
+  });
+
   it('keeps the screen helper on the prepared account, message-policy, and explanation contracts only', () => {
     const source = readFileSync(
       join(process.cwd(), 'app', 'screens', 'dashboardScreenView.ts'),
@@ -290,8 +346,9 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/policyAvailability\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/policyAvailability\.messages\[0\]/);
     expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
+    expect(source).toMatch(/createContextualKnowledgeSectionViewData/);
     expect(source).not.toMatch(
-      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext/,
+      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
@@ -495,6 +552,7 @@ describe('createDashboardScreenViewData', () => {
             },
           },
           scan: {} as never,
+          contextualKnowledgeLane: createUnavailableContextualKnowledgeLane(),
           explanation: {
             status: 'UNAVAILABLE',
             reason: 'NO_EXPLANATION_TARGET',

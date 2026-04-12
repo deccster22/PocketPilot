@@ -1,5 +1,35 @@
 import { createContextualKnowledgeAvailability } from '@/services/knowledge/createContextualKnowledgeAvailability';
 import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
+import type { TradeHubSurfaceModel } from '@/services/trade/types';
+
+function createTradeHubSurface(): TradeHubSurfaceModel {
+  return {
+    primaryPlan: {
+      actionState: 'READY',
+      certainty: 'LOW',
+      alignment: 'MISALIGNED',
+    },
+    alternativePlans: [],
+    riskLane: {
+      preparedRiskLane: {
+        basisAvailability: {
+          status: 'AVAILABLE',
+        },
+      },
+      positionSizingAvailability: {
+        status: 'AVAILABLE',
+      },
+        guardrailEvaluationAvailability: {
+          status: 'AVAILABLE',
+        },
+      },
+    meta: {
+      hasPrimaryPlan: true,
+      profile: 'BEGINNER',
+      requiresConfirmation: true,
+    },
+  } as unknown as TradeHubSurfaceModel;
+}
 
 describe('createContextualKnowledgeAvailability', () => {
   it('returns a small ordered set of strategy-preview candidates from interpreted strategy context', () => {
@@ -36,6 +66,40 @@ describe('createContextualKnowledgeAvailability', () => {
         },
       ],
     });
+  });
+
+  it('builds contextual Trade Hub candidates from prepared Trade Hub context', () => {
+    const result = createContextualKnowledgeAvailability({
+      nodes: knowledgeCatalog,
+      input: {
+        surface: 'TRADE_HUB',
+        tradeHubSurface: createTradeHubSurface(),
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: 'AVAILABLE',
+      surface: 'TRADE_HUB',
+    });
+
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected Trade Hub contextual knowledge to be available.');
+    }
+
+    expect(result.items).toHaveLength(3);
+    expect(result.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          topicId: 'pp-risk-reward-basics',
+        }),
+        expect.objectContaining({
+          topicId: 'pp-what-protection-plans-are-for',
+        }),
+        expect.objectContaining({
+          topicId: 'pp-estimated-vs-confirmed-context',
+        }),
+      ]),
+    );
   });
 
   it('returns honest unavailable when a supported surface still has too little interpreted context', () => {

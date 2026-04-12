@@ -328,6 +328,14 @@ describe('fetchTradeHubVM', () => {
         requiresConfirmation: true,
       },
     });
+    expect(result.contextualKnowledgeLane).toMatchObject({
+      availability: {
+        status: 'AVAILABLE',
+        surface: 'TRADE_HUB',
+      },
+    });
+    expect(result.contextualKnowledgeLane.topics).toHaveLength(1);
+    expect(result.contextualKnowledgeLane.topics[0].reason).toEqual(expect.any(String));
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');
     expect(JSON.stringify(result.model)).not.toContain('hidden');
   });

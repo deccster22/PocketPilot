@@ -206,6 +206,14 @@ describe('fetchDashboardSurfaceVM', () => {
     });
     expect(result.model.primeZone.items[0]).not.toHaveProperty('signalsTriggered');
     expect(result.model.primeZone.items[0]).not.toHaveProperty('metadata');
+    expect(result.contextualKnowledgeLane).toMatchObject({
+      availability: {
+        status: 'AVAILABLE',
+        surface: 'DASHBOARD',
+      },
+    });
+    expect(result.contextualKnowledgeLane.topics).toHaveLength(1);
+    expect(result.contextualKnowledgeLane.topics[0].reason).toEqual(expect.any(String));
     expect(result.explanation).toMatchObject({
       status: 'AVAILABLE',
       explanation: {
