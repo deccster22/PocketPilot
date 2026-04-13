@@ -5,6 +5,7 @@ import { fetchThirtyThousandFootVM } from '@/services/context/fetchThirtyThousan
 import type { ThirtyThousandFootVM } from '@/services/context/types';
 import { createSnapshotBriefingState } from '@/services/orientation/createSnapshotBriefingState';
 import { createSinceLastCheckedVM } from '@/services/orientation/createSinceLastCheckedVM';
+import { fetchSinceLastCheckedVM } from '@/services/orientation/fetchSinceLastCheckedVM';
 import { createReorientationSummaryFromSnapshot } from '@/services/orientation/createReorientationSummaryFromSnapshot';
 import { createReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
@@ -22,6 +23,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 export type SnapshotSurfaceVM = {
   snapshot: SnapshotVM;
   sinceLastChecked?: ReturnType<typeof createSinceLastCheckedVM>;
+  sinceLastCheckedDisplay?: Awaited<ReturnType<typeof fetchSinceLastCheckedVM>>;
   reorientation: ReturnType<typeof createReorientationSurfaceState>;
   briefing: ReturnType<typeof createSnapshotBriefingState>;
   thirtyThousandFoot: ThirtyThousandFootVM;
@@ -35,7 +37,7 @@ export async function fetchSnapshotSurfaceVM(params: {
   eventLedger?: EventLedgerService;
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
-  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
+  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp' | 'setLastViewedTimestamp'>;
   preference?: ReorientationPreference;
   reorientationDismissState?: ReorientationDismissState;
   currentSessionDismissState?: ReorientationDismissState;
@@ -54,6 +56,12 @@ export async function fetchSnapshotSurfaceVM(params: {
   });
   const sinceLastChecked = createSinceLastCheckedVM({
     snapshot,
+  });
+  const sinceLastCheckedDisplay = await fetchSinceLastCheckedVM({
+    surface: 'SNAPSHOT',
+    snapshot,
+    lastViewedTimestamp: params.lastViewedTimestamp,
+    lastViewedState: params.lastViewedState,
   });
   const summary = createReorientationSummaryFromSnapshot({
     snapshot,
@@ -86,6 +94,7 @@ export async function fetchSnapshotSurfaceVM(params: {
       snapshot,
       sinceLastChecked,
     }),
+    sinceLastCheckedDisplay,
     thirtyThousandFoot,
   };
 }

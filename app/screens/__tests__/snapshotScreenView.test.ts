@@ -66,6 +66,23 @@ function createSurface(): SnapshotSurfaceVM {
         },
       ],
     },
+    sinceLastCheckedDisplay: {
+      status: 'VISIBLE',
+      title: 'Since last checked',
+      summary: 'A calm read on the most meaningful interpreted changes since your last visit.',
+      items: [
+        {
+          title: 'Data context',
+          summary: 'Some recent market context was captured with data quality limits in view.',
+          emphasis: 'CONTEXT',
+        },
+        {
+          title: 'Current orientation',
+          summary: 'Snapshot reads up with strategy status at watchful.',
+          emphasis: 'NEUTRAL',
+        },
+      ],
+    },
     reorientation: {
       status: 'HIDDEN',
       reason: 'NOT_NEEDED',
@@ -136,15 +153,18 @@ describe('createSnapshotScreenViewData', () => {
     expect(source).toMatch(/policyAvailability\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/policyAvailability\.messages\[0\]/);
     expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
-    expect(source).toMatch(/surface\?\.sinceLastChecked\?\.status === 'AVAILABLE'/);
+    expect(source).toMatch(/surface\?\.sinceLastCheckedDisplay\?\.status === 'VISIBLE'/);
     expect(source).toMatch(/thirtyThousandFoot\.availability\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(/surface\.briefing\.status === 'VISIBLE'/);
+    expect(source).not.toMatch(/surface\.sinceLastChecked\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
     expect(source).not.toMatch(/kind === 'REORIENTATION'/);
     expect(source).not.toMatch(/kind === 'BRIEFING'/);
-    expect(source).not.toMatch(/eventsSinceLastViewed|createOrientationBriefingItems|summaryCount/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createPreparedMessageRationale|createThirtyThousandFootVM|createStrategyFitSummary|subjectScope|changeStrength|confirmationSupport|eventStream|marketEvents|signalsTriggered|providerId|metadata/,
+      /eventsSinceLastViewed|createOrientationBriefingItems|summaryCount|resolveSinceLastCheckedViewedTimestamp|lastViewedState\.getLastViewedTimestamp|createSinceLastCheckedVM|markSinceLastCheckedViewed/,
+    );
+    expect(source).not.toMatch(
+      /createPreparedMessageInputs|createPreparedMessageRationale|createThirtyThousandFootVM|createStrategyFitSummary|subjectScope|changeStrength|confirmationSupport|eventStream|marketEvents|signalsTriggered|providerId|metadata|ALREADY_VIEWED|NO_MEANINGFUL_CHANGES/,
     );
   });
 
@@ -210,8 +230,8 @@ describe('createSnapshotScreenViewData', () => {
 
   it('hides the Since Last Checked section when the prepared VM is unavailable', () => {
     const surface = createSurface();
-    surface.sinceLastChecked = {
-      status: 'UNAVAILABLE',
+    surface.sinceLastCheckedDisplay = {
+      status: 'HIDDEN',
       reason: 'NO_MEANINGFUL_CHANGES',
     };
 

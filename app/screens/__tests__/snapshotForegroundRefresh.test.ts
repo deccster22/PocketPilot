@@ -7,6 +7,7 @@ import type {
   MessagePolicyAvailability,
   MessagePolicyLane,
 } from '@/services/messages/types';
+import { createInMemoryLastViewedState } from '@/services/orientation/lastViewedState';
 import type { SnapshotSurfaceVM } from '@/services/snapshot/fetchSnapshotSurfaceVM';
 
 const availableSurface = {
@@ -228,6 +229,8 @@ describe('snapshotForegroundRefresh', () => {
       profile: 'BEGINNER',
       baselineScan: undefined,
       includeDebugObservatory: undefined,
+      nowProvider: expect.any(Function),
+      lastViewedState: expect.any(Object),
       reorientationDismissState: {
         dismissedAt: null,
       },
@@ -239,6 +242,8 @@ describe('snapshotForegroundRefresh', () => {
       profile: 'BEGINNER',
       baselineScan: availableSurface.snapshot.scan,
       includeDebugObservatory: undefined,
+      nowProvider: expect.any(Function),
+      lastViewedState: expect.any(Object),
       reorientationDismissState: {
         dismissedAt: null,
       },
@@ -353,5 +358,182 @@ describe('snapshotForegroundRefresh', () => {
     });
 
     expect(result.shouldClearPersistedDismissState).toBe(true);
+  });
+
+  it('clears the Since Last Checked section after view and lets newer meaningful changes bring it back', async () => {
+    const lastViewedState = createInMemoryLastViewedState();
+    let hasNewMeaningfulChanges = true;
+    const now = Date.parse('2026-04-01T00:00:00.000Z');
+
+    const fetchSnapshotSurface = jest.fn().mockImplementation(async (params) => {
+      const isVisible = hasNewMeaningfulChanges;
+      const currentViewedTimestamp = params.lastViewedState?.getLastViewedTimestamp({
+        surfaceId: 'snapshot',
+        accountId: 'acct-1',
+      });
+      const shouldShow = isVisible || currentViewedTimestamp === undefined;
+
+      if (shouldShow) {
+        params.lastViewedState?.setLastViewedTimestamp(
+          {
+            surfaceId: 'snapshot',
+            accountId: 'acct-1',
+          },
+          now,
+        );
+      }
+
+      return {
+        ...availableSurface,
+        snapshot: {
+          ...availableSurface.snapshot,
+          orientationContext: {
+            ...availableSurface.snapshot.orientationContext,
+            accountId: 'acct-1',
+            historyContext: {
+              ...availableSurface.snapshot.orientationContext.historyContext,
+              sinceLastChecked: shouldShow
+                ? {
+                    sinceTimestamp: Date.parse('2026-03-01T00:00:00.000Z'),
+                    accountId: 'acct-1',
+                    summaryCount: 1,
+                    events: [],
+                  }
+                : null,
+            },
+          },
+        },
+        sinceLastChecked: shouldShow
+          ? {
+              status: 'AVAILABLE',
+              title: 'Since last checked',
+              summary:
+                'A calm read on the most meaningful interpreted changes since your last visit.',
+              items: [
+                {
+                  title: 'Current orientation',
+                  summary: 'Snapshot reads up with strategy status at watchful.',
+                  emphasis: 'NEUTRAL',
+                },
+              ],
+            }
+          : {
+              status: 'UNAVAILABLE',
+              reason: 'NO_MEANINGFUL_CHANGES',
+            },
+        sinceLastCheckedDisplay: shouldShow
+          ? {
+              status: 'VISIBLE',
+              title: 'Since last checked',
+              summary:
+                'A calm read on the most meaningful interpreted changes since your last visit.',
+              items: [
+                {
+                  title: 'Current orientation',
+                  summary: 'Snapshot reads up with strategy status at watchful.',
+                  emphasis: 'NEUTRAL',
+                },
+              ],
+            }
+          : {
+              status: 'HIDDEN',
+              reason: 'ALREADY_VIEWED',
+            },
+      } as SnapshotSurfaceVM;
+    });
+    const fetchMessagePolicy = jest.fn().mockResolvedValue(
+      createMessagePolicyLane({
+        status: 'UNAVAILABLE',
+        reason: 'NO_MESSAGE',
+        rationale: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_RATIONALE_AVAILABLE',
+        },
+      }),
+    );
+
+    const firstResult = await refreshSnapshotScreenSurface({
+      profile: 'BEGINNER',
+      reorientationDismissState: {
+        dismissedAt: null,
+      },
+      currentSessionDismissState: {
+        dismissedAt: null,
+      },
+      nowProvider: () => now,
+      lastViewedState,
+      fetchSnapshotSurface,
+      fetchMessagePolicy,
+    });
+
+    expect(createSnapshotScreenViewData(firstResult.surface, firstResult.messagePolicyLane)).toEqual(
+      expect.objectContaining({
+        sinceLastChecked: expect.objectContaining({
+          visible: true,
+          title: 'Since last checked',
+          summary: 'A calm read on the most meaningful interpreted changes since your last visit.',
+          items: [
+            {
+              title: 'Current orientation',
+              summary: 'Snapshot reads up with strategy status at watchful.',
+              emphasis: 'NEUTRAL',
+            },
+          ],
+        }),
+      }),
+    );
+    expect(
+      lastViewedState.getLastViewedTimestamp({
+        surfaceId: 'snapshot',
+        accountId: 'acct-1',
+      }),
+    ).toBe(now);
+
+    hasNewMeaningfulChanges = false;
+    const secondResult = await refreshSnapshotScreenSurface({
+      profile: 'BEGINNER',
+      reorientationDismissState: {
+        dismissedAt: null,
+      },
+      currentSessionDismissState: {
+        dismissedAt: null,
+      },
+      nowProvider: () => now,
+      lastViewedState,
+      fetchSnapshotSurface,
+      fetchMessagePolicy,
+    });
+
+    expect(createSnapshotScreenViewData(secondResult.surface, secondResult.messagePolicyLane)).toEqual(
+      expect.objectContaining({
+        sinceLastChecked: expect.objectContaining({
+          visible: false,
+        }),
+      }),
+    );
+
+    hasNewMeaningfulChanges = true;
+    const thirdResult = await refreshSnapshotScreenSurface({
+      profile: 'BEGINNER',
+      reorientationDismissState: {
+        dismissedAt: null,
+      },
+      currentSessionDismissState: {
+        dismissedAt: null,
+      },
+      nowProvider: () => now,
+      lastViewedState,
+      fetchSnapshotSurface,
+      fetchMessagePolicy,
+    });
+
+    expect(createSnapshotScreenViewData(thirdResult.surface, thirdResult.messagePolicyLane)).toEqual(
+      expect.objectContaining({
+        sinceLastChecked: expect.objectContaining({
+          visible: true,
+          title: 'Since last checked',
+        }),
+      }),
+    );
   });
 });

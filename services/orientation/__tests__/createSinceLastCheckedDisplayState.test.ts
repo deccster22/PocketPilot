@@ -1,10 +1,7 @@
 import type { EventLedgerEntry } from '@/core/types/eventLedger';
 import { createInMemoryLastViewedState } from '@/services/orientation/lastViewedState';
-import { fetchSinceLastCheckedVM } from '@/services/orientation/fetchSinceLastCheckedVM';
-import { fetchSnapshotVM } from '@/services/snapshot/snapshotService';
+import { createSinceLastCheckedDisplayState } from '@/services/orientation/createSinceLastCheckedDisplayState';
 import type { SnapshotVM } from '@/services/snapshot/snapshotService';
-
-jest.mock('@/services/snapshot/snapshotService');
 
 function createEvent(params: {
   accountId: string;
@@ -30,9 +27,10 @@ function createEvent(params: {
   };
 }
 
-function createSnapshot(
-  overrides?: Partial<Pick<SnapshotVM, 'model' | 'orientationContext'>>,
-): Pick<SnapshotVM, 'model' | 'orientationContext'> {
+function createSnapshot(overrides?: Partial<Pick<SnapshotVM, 'model' | 'orientationContext'>>): Pick<
+  SnapshotVM,
+  'model' | 'orientationContext'
+> {
   return {
     model: {
       profile: 'BEGINNER',
@@ -109,21 +107,22 @@ function createSnapshot(
   };
 }
 
-describe('fetchSinceLastCheckedVM', () => {
-  const mockFetchSnapshotVM = jest.mocked(fetchSnapshotVM);
+describe('createSinceLastCheckedDisplayState', () => {
+  it('is deterministic for identical inputs', () => {
+    const params = {
+      snapshot: createSnapshot(),
+    };
 
-  beforeEach(() => {
-    jest.resetAllMocks();
+    expect(createSinceLastCheckedDisplayState(params)).toEqual(
+      createSinceLastCheckedDisplayState(params),
+    );
   });
 
-  it('uses a provided snapshot without fetching again', async () => {
-    const snapshot = createSnapshot();
-
-    const result = await fetchSinceLastCheckedVM({
-      snapshot,
+  it('returns a visible briefing and keeps the output capped at three items', () => {
+    const result = createSinceLastCheckedDisplayState({
+      snapshot: createSnapshot(),
     });
 
-    expect(mockFetchSnapshotVM).not.toHaveBeenCalled();
     expect(result).toEqual({
       status: 'VISIBLE',
       title: 'Since last checked',
@@ -146,28 +145,15 @@ describe('fetchSinceLastCheckedVM', () => {
         },
       ],
     });
+    expect(JSON.stringify(result)).not.toContain('SOL momentum');
+    expect(JSON.stringify(result)).not.toContain('XRP pullback');
+    expect(JSON.stringify(result)).not.toContain('inbox');
+    expect(JSON.stringify(result)).not.toContain('badge');
+    expect(JSON.stringify(result)).not.toContain('push');
+    expect(JSON.stringify(result)).not.toContain('notification');
   });
 
-  it('collapses to already viewed when no newer meaningful changes exist after the boundary is acknowledged', async () => {
-    const snapshot = createSnapshot({
-      orientationContext: {
-        accountId: 'acct-1',
-        currentState: {
-          latestRelevantEvent: null,
-          strategyAlignment: 'WATCHFUL',
-          certainty: null,
-        },
-        historyContext: {
-          eventsSinceLastViewed: [],
-          sinceLastChecked: {
-            sinceTimestamp: Date.parse('2026-04-01T00:00:00.000Z'),
-            accountId: 'acct-1',
-            summaryCount: 0,
-            events: [],
-          },
-        },
-      },
-    });
+  it('collapses to already viewed when the boundary has already been acknowledged', () => {
     const lastViewedState = createInMemoryLastViewedState([
       {
         surfaceId: 'snapshot',
@@ -176,8 +162,26 @@ describe('fetchSinceLastCheckedVM', () => {
       },
     ]);
 
-    const result = await fetchSinceLastCheckedVM({
-      snapshot,
+    const result = createSinceLastCheckedDisplayState({
+      snapshot: createSnapshot({
+        orientationContext: {
+          accountId: 'acct-1',
+          currentState: {
+            latestRelevantEvent: null,
+            strategyAlignment: 'WATCHFUL',
+            certainty: null,
+          },
+          historyContext: {
+            eventsSinceLastViewed: [],
+            sinceLastChecked: {
+              sinceTimestamp: Date.parse('2026-04-01T00:00:00.000Z'),
+              accountId: 'acct-1',
+              summaryCount: 0,
+              events: [],
+            },
+          },
+        },
+      }),
       lastViewedState,
     });
 
@@ -187,53 +191,15 @@ describe('fetchSinceLastCheckedVM', () => {
     });
   });
 
-  it('marks the snapshot surface as viewed when the prepared briefing is visible', async () => {
-    const snapshot = createSnapshot();
-    const lastViewedState = createInMemoryLastViewedState();
-    const now = Date.parse('2026-04-01T00:00:00.000Z');
-
-    const result = await fetchSinceLastCheckedVM({
-      snapshot,
-      lastViewedState,
-      nowProvider: () => now,
-    });
-
-    expect(result).toMatchObject({
-      status: 'VISIBLE',
-      title: 'Since last checked',
-    });
+  it('keeps the non-Snapshot surfaces hidden without inventing a display lane', () => {
     expect(
-      lastViewedState.getLastViewedTimestamp({
-        surfaceId: 'snapshot',
-        accountId: 'acct-1',
+      createSinceLastCheckedDisplayState({
+        snapshot: createSnapshot(),
+        surface: 'DASHBOARD',
       }),
-    ).toBe(now);
-  });
-
-  it('fetches the snapshot first when only service inputs are supplied', async () => {
-    const snapshot = createSnapshot();
-    mockFetchSnapshotVM.mockResolvedValue(snapshot as Awaited<ReturnType<typeof fetchSnapshotVM>>);
-
-    const result = await fetchSinceLastCheckedVM({
-      profile: 'BEGINNER',
-      nowProvider: () => Date.parse('2026-04-01T00:00:00.000Z'),
-    });
-
-    expect(mockFetchSnapshotVM).toHaveBeenCalledWith({
-      profile: 'BEGINNER',
-      accounts: undefined,
-      selectedAccountId: undefined,
-      baselineScan: undefined,
-      nowProvider: expect.any(Function),
-      includeDebugObservatory: undefined,
-      eventLedger: undefined,
-      eventLedgerQueries: undefined,
-      lastViewedTimestamp: undefined,
-      lastViewedState: undefined,
-    });
-    expect(result).toMatchObject({
-      status: 'VISIBLE',
-      title: 'Since last checked',
+    ).toEqual({
+      status: 'HIDDEN',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
     });
   });
 });

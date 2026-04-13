@@ -3,12 +3,18 @@ import type { AccountContextCandidate } from '@/services/accounts/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import { createSinceLastCheckedVM } from '@/services/orientation/createSinceLastCheckedVM';
+import { createSinceLastCheckedDisplayState } from '@/services/orientation/createSinceLastCheckedDisplayState';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
-import type { SinceLastCheckedAvailability } from '@/services/orientation/types';
+import { markSinceLastCheckedViewed } from '@/services/orientation/sinceLastCheckedViewedState';
+import type {
+  SinceLastCheckedDisplayState,
+  SinceLastCheckedSurface,
+} from '@/services/orientation/types';
 import { fetchSnapshotVM, type SnapshotVM } from '@/services/snapshot/snapshotService';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 type FetchSinceLastCheckedVMParams = {
+  surface?: SinceLastCheckedSurface;
   snapshot?: Pick<SnapshotVM, 'model' | 'orientationContext'>;
   profile?: UserProfile;
   accounts?: ReadonlyArray<AccountContextCandidate>;
@@ -19,16 +25,34 @@ type FetchSinceLastCheckedVMParams = {
   eventLedger?: EventLedgerService;
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
-  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
+  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp' | 'setLastViewedTimestamp'>;
 };
 
 export async function fetchSinceLastCheckedVM(
   params: FetchSinceLastCheckedVMParams,
-): Promise<SinceLastCheckedAvailability> {
+): Promise<SinceLastCheckedDisplayState> {
   if (params.snapshot) {
-    return createSinceLastCheckedVM({
+    const availability = createSinceLastCheckedVM({
       snapshot: params.snapshot,
+      surface: params.surface ?? 'SNAPSHOT',
     });
+    const displayState = createSinceLastCheckedDisplayState({
+      snapshot: params.snapshot,
+      surface: params.surface ?? 'SNAPSHOT',
+      availability,
+      lastViewedTimestamp: params.lastViewedTimestamp,
+      lastViewedState: params.lastViewedState,
+    });
+
+    if (displayState.status === 'VISIBLE' && params.lastViewedState) {
+      markSinceLastCheckedViewed({
+        accountId: params.snapshot.orientationContext.accountId,
+        nowProvider: params.nowProvider,
+        lastViewedState: params.lastViewedState,
+      });
+    }
+
+    return displayState;
   }
 
   if (!params.profile) {
@@ -48,7 +72,26 @@ export async function fetchSinceLastCheckedVM(
     lastViewedState: params.lastViewedState,
   });
 
-  return createSinceLastCheckedVM({
+  const availability = createSinceLastCheckedVM({
     snapshot,
+    surface: params.surface ?? 'SNAPSHOT',
   });
+
+  const displayState = createSinceLastCheckedDisplayState({
+    snapshot,
+    surface: params.surface ?? 'SNAPSHOT',
+    availability,
+    lastViewedTimestamp: params.lastViewedTimestamp,
+    lastViewedState: params.lastViewedState,
+  });
+
+  if (displayState.status === 'VISIBLE' && params.lastViewedState) {
+    markSinceLastCheckedViewed({
+      accountId: snapshot.orientationContext.accountId,
+      nowProvider: params.nowProvider,
+      lastViewedState: params.lastViewedState,
+    });
+  }
+
+  return displayState;
 }
