@@ -66,6 +66,7 @@ Start with:
 - The Trade Hub risk lane stays grouped as one prepared service-owned contract, so selected basis, preferred basis, sizing, guidance, guardrail preferences, and guardrail evaluation travel together without app-owned recomposition.
 - Prepared risk-input guidance stays service-owned, calm, and non-enforcing when sizing context is thin or unsupported.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
+- PX-MA4 normalized the selected-account surface shape so Snapshot, Dashboard, Trade Hub, and related support seams reuse one prepared account-context helper instead of rebuilding local branching.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.

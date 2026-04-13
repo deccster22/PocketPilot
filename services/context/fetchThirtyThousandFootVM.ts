@@ -1,4 +1,5 @@
 import type { UserProfile } from '@/core/profile/types';
+import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import {
   filterAccountScopedItems,
   scopeOrientationContextToSelectedAccount,
@@ -61,20 +62,21 @@ export async function fetchThirtyThousandFootVM(params: {
       lastViewedTimestamp: params.lastViewedTimestamp,
       lastViewedState: params.lastViewedState,
     }));
-  const scopedCurrentEvents =
-    snapshot.accountContext?.status === 'AVAILABLE'
-      ? filterAccountScopedItems({
-          selectedAccount: snapshot.accountContext.account,
-          items: snapshot.eventStream.events,
-        })
-      : snapshot.eventStream.events;
-  const scopedOrientationContext =
-    snapshot.accountContext?.status === 'AVAILABLE'
-      ? scopeOrientationContextToSelectedAccount({
-          selectedAccount: snapshot.accountContext.account,
-          orientationContext: snapshot.orientationContext,
-        })
-      : snapshot.orientationContext;
+  const surfaceAccountContext = createSurfaceAccountContext({
+    selectedAccountContext: snapshot.accountContext,
+  });
+  const scopedCurrentEvents = surfaceAccountContext.selectedAccount
+    ? filterAccountScopedItems({
+        selectedAccount: surfaceAccountContext.selectedAccount,
+        items: snapshot.eventStream.events,
+      })
+    : snapshot.eventStream.events;
+  const scopedOrientationContext = surfaceAccountContext.selectedAccount
+    ? scopeOrientationContextToSelectedAccount({
+        selectedAccount: surfaceAccountContext.selectedAccount,
+        orientationContext: snapshot.orientationContext,
+      })
+    : snapshot.orientationContext;
   const contextInputs = createPreparedContextInputs({
     strategyAlignment:
       scopedOrientationContext.currentState.strategyAlignment ?? snapshot.strategyAlignment,

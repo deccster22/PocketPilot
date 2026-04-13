@@ -531,10 +531,12 @@ describe('fetchConfirmationSessionVM', () => {
       'utf8',
     );
 
+    expect(serviceSource).toMatch(/createSurfaceAccountContext/);
     expect(serviceSource).not.toMatch(/fetchSnapshotVM/);
     expect(serviceSource).not.toMatch(/snapshotService/);
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
+    expect(serviceSource).not.toMatch(/upstream\.selectedAccountContext\.status === 'AVAILABLE'/);
   });
 
   it('changes the prepared risk frame without changing execution capability or default blocking posture', async () => {

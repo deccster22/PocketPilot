@@ -1,4 +1,4 @@
-# Multi-Account Model (PX-MA1 + PX-MA2 + PX-MA3)
+# Multi-Account Model (PX-MA1 + PX-MA2 + PX-MA3 + PX-MA4)
 
 ## Purpose
 
@@ -7,6 +7,8 @@ PX-MA1 adds PocketPilot's first thin multi-account integrity seam.
 PX-MA2 builds on that seam with one explicit switching path and one explicit primary-account preference path.
 
 PX-MA3 builds on the same seam with one canonical aggregate holdings / exposure lane that stays explicitly separate from selected-account strategy truth.
+
+PX-MA4 keeps the same selected-account truth path but normalizes how that truth is threaded through prepared surface VMs so Snapshot, Dashboard, Trade Hub, and related support seams all reuse one prepared account-context helper instead of rebuilding local branching.
 
 The goal is still not full multi-account product rollout. The goal is to keep one selected-account truth explicit, deterministic, reusable, intentionally controllable, and now cleanly separable from one small aggregate portfolio context lane without leaking account management into `app/`.
 
@@ -203,6 +205,14 @@ The two lanes stay separate on purpose:
 
 - selected-account truth continues to drive alignment, fit, alerts, risk, and execution support
 - aggregate portfolio context may describe total value and combined holdings only
+
+## Surface Account Normalization
+
+PX-MA4 adds one small normalization helper in `services/accounts/createSurfaceAccountContext.ts`.
+
+That helper turns the selected-account availability into one consistent prepared shape for consumers that need the selected account, selected account id, selected account portfolio value, selected account base currency, or prepared trade-risk context together.
+
+This keeps the surface shape explicit and service-owned without moving fallback logic into `app/` or creating a second account-selection brain.
 
 ## Account-Scoped Enforcement Rules
 
