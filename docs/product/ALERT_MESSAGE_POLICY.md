@@ -9,6 +9,7 @@ P6-A3 made alert treatment profile-aware.
 P6-A4 improved the interpreted input quality feeding the seam.
 P6-A5 adds one compact explanation layer so PocketPilot can say why the current message posture surfaced.
 P6-A6 consolidates the same final policy and rationale outputs into one grouped prepared lane so the current consumers can keep reading one calm service-owned contract.
+P6-A7 adds one separate Snapshot-facing Since Last Checked section under Strategy Status, but it does not change the message families or create a delivery channel.
 
 The goal is still not to make PocketPilot louder.
 The goal is to make message treatment clearer, calmer, and easier to trust.
@@ -95,6 +96,7 @@ Typical examples:
 
 ## Current Consumer Surfaces
 Snapshot remains the main consumer for tuned alert behavior.
+Snapshot also gains one separate Since Last Checked section under Strategy Status, but that section remains outside the message-policy lane and stays service-owned, compact, and non-inbox-like.
 
 Why Snapshot:
 - it already has one calm subordinate message zone
@@ -147,3 +149,5 @@ Later `P6` phases can build on this foundation by adding:
 - additional surface eligibility only where a natural inline home already exists
 
 Those future phases should extend the same message-policy seam rather than inventing a separate notification stack.
+
+P6-A7 can now extend the same calm Snapshot posture with one separate Since Last Checked section while keeping that section out of the alert-policy lane entirely.

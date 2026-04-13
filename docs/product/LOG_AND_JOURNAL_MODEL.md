@@ -17,6 +17,7 @@ Reflection should help users remember what mattered, not make them perform self-
 - Year in Review is one calm service-owned annual debrief built from the last completed calendar year.
 - Export foundation is one calm service-owned preparation seam for reflection output that is already ready under Insights.
 - Journal groundwork now adds one calm service-owned note subsection under Insights with explicit fetch / save / update seams.
+- Since Last Checked is a separate calm Snapshot section for recent meaningful change, not an archive shelf or journal entry lane.
 - Export dispatch now adds one calm service-owned file-creation seam plus one narrow journal-aware follow-through path where the current summary context and export format honestly support it.
 - Log remains a later phase; journal scope is still intentionally narrow.
 

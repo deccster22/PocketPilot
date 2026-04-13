@@ -1,5 +1,5 @@
 import type { ReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
-import { createOrientationBriefingItems } from '@/services/orientation/createOrientationBriefingItems';
+import { createSinceLastCheckedVM } from '@/services/orientation/createSinceLastCheckedVM';
 import type { SnapshotBriefingState } from '@/services/orientation/types';
 import type { SnapshotVM } from '@/services/snapshot/snapshotService';
 
@@ -17,6 +17,7 @@ function createHiddenState(
 export function createSnapshotBriefingState(params: {
   reorientation: ReorientationSurfaceState;
   snapshot: Pick<SnapshotVM, 'model' | 'orientationContext'>;
+  sinceLastChecked?: ReturnType<typeof createSinceLastCheckedVM> | null;
 }): SnapshotBriefingState {
   if (params.reorientation.summary?.status === 'AVAILABLE') {
     if (params.reorientation.status === 'VISIBLE') {
@@ -36,35 +37,26 @@ export function createSnapshotBriefingState(params: {
     return createHiddenState('NO_MEANINGFUL_BRIEFING');
   }
 
-  const sinceLastChecked = params.snapshot.orientationContext.historyContext.sinceLastChecked;
+  const sinceLastChecked =
+    params.sinceLastChecked ?? createSinceLastCheckedVM({ snapshot: params.snapshot });
 
-  if (!sinceLastChecked || sinceLastChecked.summaryCount === 0) {
-    return createHiddenState(!sinceLastChecked ? 'NO_REORIENTATION' : 'NO_SINCE_LAST_CHECKED');
-  }
-
-  const items = createOrientationBriefingItems({
-    eventsSinceLastViewed: params.snapshot.orientationContext.historyContext.eventsSinceLastViewed,
-    snapshotState: {
-      currentState: params.snapshot.model.core.currentState.value,
-      strategyStatus: params.snapshot.model.core.strategyStatus.value,
-    },
-  })
-    .slice(0, MAX_BRIEFING_ITEMS)
-    .map((item) => ({
-      label: item.label,
-      detail: item.detail,
-    }));
-
-  if (items.length === 0) {
-    return createHiddenState('NO_MEANINGFUL_BRIEFING');
+  if (sinceLastChecked.status !== 'AVAILABLE') {
+    return createHiddenState(
+      params.snapshot.orientationContext.historyContext.sinceLastChecked
+        ? 'NO_SINCE_LAST_CHECKED'
+        : 'NO_REORIENTATION',
+    );
   }
 
   return {
     status: 'VISIBLE',
     kind: 'SINCE_LAST_CHECKED',
-    title: 'Since last checked',
-    subtitle: 'A calm read on the most meaningful interpreted changes since your last visit.',
-    items,
+    title: sinceLastChecked.title,
+    subtitle: sinceLastChecked.summary,
+    items: sinceLastChecked.items.slice(0, MAX_BRIEFING_ITEMS).map((item) => ({
+      label: item.title,
+      detail: item.summary,
+    })),
     dismissible: false,
   };
 }

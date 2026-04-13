@@ -4,6 +4,7 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import { fetchThirtyThousandFootVM } from '@/services/context/fetchThirtyThousandFootVM';
 import type { ThirtyThousandFootVM } from '@/services/context/types';
 import { createSnapshotBriefingState } from '@/services/orientation/createSnapshotBriefingState';
+import { createSinceLastCheckedVM } from '@/services/orientation/createSinceLastCheckedVM';
 import { createReorientationSummaryFromSnapshot } from '@/services/orientation/createReorientationSummaryFromSnapshot';
 import { createReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
@@ -20,6 +21,7 @@ import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type SnapshotSurfaceVM = {
   snapshot: SnapshotVM;
+  sinceLastChecked?: ReturnType<typeof createSinceLastCheckedVM>;
   reorientation: ReturnType<typeof createReorientationSurfaceState>;
   briefing: ReturnType<typeof createSnapshotBriefingState>;
   thirtyThousandFoot: ThirtyThousandFootVM;
@@ -50,6 +52,9 @@ export async function fetchSnapshotSurfaceVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
+  const sinceLastChecked = createSinceLastCheckedVM({
+    snapshot,
+  });
   const summary = createReorientationSummaryFromSnapshot({
     snapshot,
     profile: params.profile,
@@ -74,10 +79,12 @@ export async function fetchSnapshotSurfaceVM(params: {
 
   return {
     snapshot,
+    sinceLastChecked,
     reorientation,
     briefing: createSnapshotBriefingState({
       reorientation,
       snapshot,
+      sinceLastChecked,
     }),
     thirtyThousandFoot,
   };

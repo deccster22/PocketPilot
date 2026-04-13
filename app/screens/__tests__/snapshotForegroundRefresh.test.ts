@@ -307,6 +307,9 @@ describe('snapshotForegroundRefresh', () => {
       strategyStatusValue: 'Watchful',
       bundleName: undefined,
       portfolioValueText: undefined,
+      sinceLastChecked: {
+        visible: false,
+      },
       message: {
         visible: false,
       },

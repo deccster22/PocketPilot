@@ -36,6 +36,31 @@ export type SnapshotBriefingState =
       dismissible: boolean;
     };
 
+export type SinceLastCheckedItemEmphasis = 'NEUTRAL' | 'CHANGE' | 'CONTEXT';
+
+export type SinceLastCheckedItem = {
+  title: string;
+  summary: string;
+  emphasis: SinceLastCheckedItemEmphasis;
+};
+
+export type SinceLastCheckedUnavailableReason =
+  | 'NO_MEANINGFUL_CHANGES'
+  | 'NO_ACCOUNT_CONTEXT'
+  | 'NOT_ENABLED_FOR_SURFACE';
+
+export type SinceLastCheckedAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: SinceLastCheckedUnavailableReason;
+    }
+  | {
+      status: 'AVAILABLE';
+      title: string;
+      summary: string;
+      items: ReadonlyArray<SinceLastCheckedItem>;
+    };
+
 export type ReorientationPreference = {
   enabled: boolean;
   thresholdDaysOverride?: number | null;

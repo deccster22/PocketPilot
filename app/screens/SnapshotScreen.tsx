@@ -13,6 +13,7 @@ import {
 import { DebugObservatoryPanel } from '@/app/components/debug/DebugObservatoryPanel';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { SnapshotBriefingCard } from '@/app/components/SnapshotBriefingCard';
+import { SinceLastCheckedCard } from '@/app/components/SinceLastCheckedCard';
 import { ThirtyThousandFootScreen } from '@/app/screens/ThirtyThousandFootScreen';
 import {
   refreshSnapshotScreenSurface,
@@ -183,6 +184,11 @@ export function SnapshotScreen() {
           <Text style={styles.bundleLabel}>
             {screenView?.strategyStatusLabel ?? 'Strategy Status'}: {screenView?.strategyStatusValue ?? '--'}
           </Text>
+          {screenView?.sinceLastChecked.visible ? (
+            <View style={styles.sinceLastCheckedSection}>
+              <SinceLastCheckedCard item={screenView.sinceLastChecked} />
+            </View>
+          ) : null}
           {screenView?.message.visible ? (
             <View style={styles.briefingSection}>
               <Text style={styles.briefingLabel}>Update</Text>
@@ -283,6 +289,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   briefingSection: {
+    gap: 8,
+    marginTop: 4,
+  },
+  sinceLastCheckedSection: {
     gap: 8,
     marginTop: 4,
   },
