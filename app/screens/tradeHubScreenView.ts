@@ -1,8 +1,8 @@
-import type {
-  ContextualKnowledgeCandidate,
-  ContextualKnowledgeLane,
-} from '@/services/knowledge/types';
-import { createContextualKnowledgeSectionViewData } from '@/app/screens/contextualKnowledgeView';
+import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
+import {
+  createContextualKnowledgeSectionViewData,
+  type ContextualKnowledgeSectionViewData,
+} from '@/app/screens/contextualKnowledgeView';
 import type {
   MessagePolicyLane,
   MessagePolicyKind,
@@ -82,11 +82,6 @@ export type TradeHubRiskLaneViewData = {
   guardrailEvaluation: TradeHubGuardrailEvaluationViewData | null;
 };
 
-export type TradeHubScreenContextualKnowledgeViewData = {
-  visible: boolean;
-  items: ReadonlyArray<ContextualKnowledgeCandidate>;
-};
-
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
@@ -104,7 +99,7 @@ export type TradeHubScreenViewData = {
         rationale: MessageRationaleAvailability;
   };
   riskLane: TradeHubRiskLaneViewData;
-  contextualKnowledge: TradeHubScreenContextualKnowledgeViewData;
+  contextualKnowledge: ContextualKnowledgeSectionViewData;
   primaryPlan: TradeHubScreenPlanViewData | null;
   alternativePlans: TradeHubScreenPlanViewData[];
 };

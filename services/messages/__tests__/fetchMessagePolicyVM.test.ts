@@ -161,6 +161,11 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
         status: 'UNAVAILABLE',
         reason: 'NO_RELEVANT_TOPIC',
       },
+      presentation: {
+        maxVisibleTopics: 0,
+        emphasis: 'SUBORDINATE',
+        shouldRenderShelf: false,
+      },
       topics: [],
     } as DashboardSurfaceVM['contextualKnowledgeLane']);
 
