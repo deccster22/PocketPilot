@@ -212,6 +212,10 @@ describe('fetchDashboardSurfaceVM', () => {
         surface: 'DASHBOARD',
       },
     });
+    expect(result.contextualKnowledgeLane.linkage).toEqual({
+      selectedTopicIds: ['strategy-momentum-pulse', 'pp-what-dashboard-is-for'],
+      selectionReason: 'MIXED',
+    });
     expect(result.contextualKnowledgeLane.topics).toHaveLength(1);
     expect(result.contextualKnowledgeLane.topics[0].reason).toEqual(expect.any(String));
     expect(result.explanation).toMatchObject({

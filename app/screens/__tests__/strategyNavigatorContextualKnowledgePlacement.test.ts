@@ -58,7 +58,7 @@ describe('strategy navigator knowledge follow-through placement', () => {
     expect(dashboardScreenSource).toMatch(/KnowledgeTopicScreen/);
     expect(dashboardScreenSource).toMatch(/fetchKnowledgeTopicDetailVM/);
     expect(dashboardScreenSource).not.toMatch(
-      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog/,
+      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|knowledgeCatalog|selectedTopicIds|selectionReason|linkage/,
     );
     expect(snapshotScreenSource).not.toMatch(
       /fetchContextualKnowledgeAvailability|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
@@ -70,7 +70,7 @@ describe('strategy navigator knowledge follow-through placement', () => {
     expect(tradeHubScreenSource).toMatch(/KnowledgeTopicScreen/);
     expect(tradeHubScreenSource).toMatch(/fetchKnowledgeTopicDetailVM/);
     expect(tradeHubScreenSource).not.toMatch(
-      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog/,
+      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|knowledgeCatalog|selectedTopicIds|selectionReason|linkage/,
     );
   });
 });

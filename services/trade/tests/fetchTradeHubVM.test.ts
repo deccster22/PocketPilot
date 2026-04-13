@@ -334,6 +334,14 @@ describe('fetchTradeHubVM', () => {
         surface: 'TRADE_HUB',
       },
     });
+    expect(result.contextualKnowledgeLane.linkage).toEqual({
+      selectedTopicIds: [
+        'strategy-momentum-pulse',
+        'pp-what-protection-plans-are-for',
+        'pp-position-sizing-basics',
+      ],
+      selectionReason: 'MIXED',
+    });
     expect(result.contextualKnowledgeLane.topics).toHaveLength(1);
     expect(result.contextualKnowledgeLane.topics[0].reason).toEqual(expect.any(String));
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');
@@ -350,5 +358,6 @@ describe('fetchTradeHubVM', () => {
     expect(serviceSource).not.toMatch(/snapshotService/);
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
+    expect(serviceSource).not.toMatch(/canProceed|blockedReason|gate|gating|lockout|requiresAcknowledgement/);
   });
 });

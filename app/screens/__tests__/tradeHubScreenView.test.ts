@@ -307,6 +307,10 @@ describe('createTradeHubScreenViewData', () => {
             },
           ],
         },
+        linkage: {
+          selectedTopicIds: ['pp-risk-reward-basics'],
+          selectionReason: 'SURFACE_CONTEXT',
+        },
         presentation: {
           maxVisibleTopics: 1,
           emphasis: 'SUBORDINATE',
@@ -372,7 +376,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/surface\.riskLane\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);
@@ -484,6 +488,10 @@ describe('createTradeHubScreenViewData', () => {
                 'Trade Hub stays on one quiet contextual link only when the shelf is still relevant.',
             },
           ],
+        },
+        linkage: {
+          selectedTopicIds: ['pp-risk-reward-basics'],
+          selectionReason: 'SURFACE_CONTEXT',
         },
         presentation: {
           maxVisibleTopics: 1,

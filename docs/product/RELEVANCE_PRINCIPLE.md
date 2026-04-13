@@ -27,7 +27,7 @@ Something may be true without being relevant.
 Something may be interesting without being relevant.
 Something may even be important in the market and still not deserve surface space for this user, on this account, on this screen.
 
-Contextual knowledge follows the same rule: Strategy -> Profile -> Relevance decides whether a compact prepared lane appears at all, and profile only shapes how much of that lane the user sees. P7-K5 adds one prepared presentation contract so the lane can stay available in services while still collapsing quietly when the current profile/surface combination is too thin to deserve shelf space.
+Contextual knowledge follows the same rule: Strategy -> Profile -> Relevance decides whether a compact prepared lane appears at all, and profile only shapes how much of that lane the user sees. P7-K5 adds one prepared presentation contract so the lane can stay available in services while still collapsing quietly when the current profile/surface combination is too thin to deserve shelf space. P7-K6 improves how live strategy, signal, event, and surface context link to prepared topics, but it still stays downstream of relevance and does not turn the lane into a recommendation feed.
 
 ## Drift to block
 - indicator stacking

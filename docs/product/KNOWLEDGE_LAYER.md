@@ -34,6 +34,7 @@ The layer should:
 - Dashboard is the strongest contextual home and now carries the canonical contextual-knowledge lane when relevance is honest
 - Trade Hub is bounded and support-only, with a smaller contextual-knowledge lane when action-support context is honest
 - P7-K5 refines that live lane with an explicit presentation contract so Dashboard and Trade Hub can stay calmer, more profile-aware, and more subordinate when relevance is thin
+- P7-K6 deepens how live context is linked to prepared topics so Dashboard and Trade Hub can surface better prepared topics without turning the lane into a feed or changing the K4/K5 presentation model
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
 

@@ -82,6 +82,7 @@ export async function fetchTradeHubVM(params: {
       profile: params.profile,
       surface: 'TRADE_HUB',
       tradeHubSurface: model,
+      marketEvents: upstream.marketEvents,
     }),
     model,
     scan: upstream.scan,
