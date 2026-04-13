@@ -72,6 +72,7 @@ It also seeds the prepared lane from one account-level preferred basis when the 
 
 ### Trade Hub risk lane composer
 Groups the risk-basis selector, preferred-basis resolver, prepared risk-per-trade context, sizing output, guidance, guardrail preferences, and guardrail evaluation into one prepared lane object.
+It receives selected-account truth through the shared surface-account normalization seam so the prepared lane does not rebuild account-derived shape in each surface service.
 
 ### Preferred risk basis resolver
 Resolves the saved account-level preferred basis through the service-owned seam without introducing silent cross-account fallback.

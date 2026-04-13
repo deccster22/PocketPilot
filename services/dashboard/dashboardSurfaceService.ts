@@ -1,4 +1,5 @@
 import type { UserProfile } from '@/core/profile/types';
+import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import {
   filterAccountScopedItems,
   scopeOrientationContextToSelectedAccount,
@@ -28,20 +29,21 @@ export async function fetchDashboardSurfaceVM(params: {
   nowProvider?: () => number;
 }): Promise<DashboardSurfaceVM> {
   const dashboardData = await fetchDashboardData(params);
-  const scopedEvents =
-    dashboardData.accountContext.status === 'AVAILABLE'
-      ? filterAccountScopedItems({
-          selectedAccount: dashboardData.accountContext.account,
-          items: dashboardData.events,
-        })
-      : dashboardData.events;
-  const scopedExplanationContext =
-    dashboardData.accountContext.status === 'AVAILABLE'
-      ? scopeOrientationContextToSelectedAccount({
-          selectedAccount: dashboardData.accountContext.account,
-          orientationContext: dashboardData.explanationContext,
-        })
-      : dashboardData.explanationContext;
+  const surfaceAccountContext = createSurfaceAccountContext({
+    selectedAccountContext: dashboardData.accountContext,
+  });
+  const scopedEvents = surfaceAccountContext.selectedAccount
+    ? filterAccountScopedItems({
+        selectedAccount: surfaceAccountContext.selectedAccount,
+        items: dashboardData.events,
+      })
+    : dashboardData.events;
+  const scopedExplanationContext = surfaceAccountContext.selectedAccount
+    ? scopeOrientationContextToSelectedAccount({
+        selectedAccount: surfaceAccountContext.selectedAccount,
+        orientationContext: dashboardData.explanationContext,
+      })
+    : dashboardData.explanationContext;
   const dashboardModel = createDashboardModel({
     orientationContext: dashboardData.orientationContext,
     events: scopedEvents,

@@ -57,6 +57,11 @@ Later work can safely deepen this lane with:
 
 Future work should deepen the same service-owned seam rather than creating competing alert, macro, or explanation systems.
 
+## Related Cleanup Note
+PX-MA4 later added a separate selected-account surface-context cleanup pass. That pass normalized account-context threading across Snapshot, Dashboard, Trade Hub, and related support seams through one shared service-owned helper.
+
+It did not change the PX-C1 scope above.
+
 ## Recommendation Review
 ### Adopt Now
 - Canonical fit and 30,000 ft contracts: they give PocketPilot one honest descriptive-context lane without widening into a regime engine.

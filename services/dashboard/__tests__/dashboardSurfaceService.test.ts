@@ -399,7 +399,9 @@ describe('fetchDashboardSurfaceVM', () => {
       'utf8',
     );
 
+    expect(serviceSource).toMatch(/createSurfaceAccountContext/);
     expect(serviceSource).not.toMatch(/fetchSnapshotVM/);
     expect(serviceSource).not.toMatch(/snapshotService/);
+    expect(serviceSource).not.toMatch(/dashboardData\.accountContext\.status === 'AVAILABLE'/);
   });
 });
