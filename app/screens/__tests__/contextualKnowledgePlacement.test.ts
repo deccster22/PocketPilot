@@ -23,21 +23,25 @@ describe('contextual knowledge placement', () => {
     expect(contextualKnowledgeViewSource).toMatch(/shouldRenderShelf/);
     expect(contextualKnowledgeViewSource).toMatch(/maxVisibleTopics/);
     expect(contextualKnowledgeViewSource).toMatch(/presentation\.shouldRenderShelf/);
+    expect(contextualKnowledgeViewSource).toMatch(/originSurface/);
+    expect(contextualKnowledgeViewSource).toMatch(/selectionReason/);
     expect(contextualKnowledgeViewSource).not.toMatch(
-      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|selectionReason|linkage|strategyIds|eventTypes|messageKinds|tradeHubSurface|dashboardSurface/,
+      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|strategyIds|eventTypes|messageKinds|tradeHubSurface|dashboardSurface|createKnowledgeTopicContextFraming/,
     );
     expect(contextualKnowledgeCardSource).toMatch(/presentation\.emphasis/);
     expect(contextualKnowledgeCardSource).toMatch(/contextualKnowledge\.title/);
+    expect(contextualKnowledgeCardSource).toMatch(/contextualKnowledge\.originSurface/);
+    expect(contextualKnowledgeCardSource).toMatch(/contextualKnowledge\.selectionReason/);
     expect(contextualKnowledgeCardSource).not.toMatch(
-      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|selectionReason|linkage|strategyIds|eventTypes|messageKinds|tradeHubSurface|dashboardSurface/,
+      /createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|strategyIds|eventTypes|messageKinds|tradeHubSurface|dashboardSurface|createKnowledgeTopicContextFraming/,
     );
     expect(dashboardScreenSource).toMatch(/contextualKnowledge\s*=\s*\{screenView\.contextualKnowledge\}/);
     expect(tradeHubScreenSource).toMatch(/contextualKnowledge\s*=\s*\{screenView\.contextualKnowledge\}/);
     expect(dashboardScreenSource).not.toMatch(
-      /knowledgeCatalog|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|selectionReason|linkage/,
+      /knowledgeCatalog|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|createKnowledgeTopicContextFraming/,
     );
     expect(tradeHubScreenSource).not.toMatch(
-      /knowledgeCatalog|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|selectionReason|linkage/,
+      /knowledgeCatalog|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|selectedTopicIds|createKnowledgeTopicContextFraming/,
     );
   });
 });

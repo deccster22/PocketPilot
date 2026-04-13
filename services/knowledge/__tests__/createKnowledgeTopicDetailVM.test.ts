@@ -77,6 +77,35 @@ describe('createKnowledgeTopicDetailVM', () => {
             mediaType: 'ARTICLE',
           },
         ],
+        contextFraming: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_CONTEXTUAL_ORIGIN',
+        },
+      },
+    });
+  });
+
+  it('threads a prepared Trade Hub framing block through the topic detail contract', () => {
+    const result = createKnowledgeTopicDetailVM({
+      topicId: 'pp-what-trade-hub-is-for',
+      nodes: knowledgeCatalog,
+      contextualOrigin: {
+        originSurface: 'TRADE_HUB',
+        linkageReason: 'MIXED',
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: 'AVAILABLE',
+      topic: {
+        topicId: 'pp-what-trade-hub-is-for',
+        contextFraming: {
+          status: 'AVAILABLE',
+          framing: {
+            originSurface: 'TRADE_HUB',
+            linkageReasons: ['STRATEGY', 'SIGNAL', 'EVENT', 'SURFACE_CONTEXT'],
+          },
+        },
       },
     });
   });

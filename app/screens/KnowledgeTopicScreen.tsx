@@ -30,6 +30,22 @@ export function KnowledgeTopicScreen(params: {
           <Text style={styles.summary}>{screenView.summary}</Text>
         </View>
 
+        {screenView.contextFraming ? (
+          <View style={styles.contextFramingCard}>
+            <Text style={styles.contextFramingLabel}>Context</Text>
+            <Text style={styles.contextFramingTitle}>{screenView.contextFraming.title}</Text>
+            <Text style={styles.contextFramingSummary}>{screenView.contextFraming.summary}</Text>
+            <Text style={styles.contextFramingMeta}>
+              Origin: {screenView.contextFraming.originSurfaceText}
+            </Text>
+            {screenView.contextFraming.linkageReasonsText ? (
+              <Text style={styles.contextFramingMeta}>
+                Linkage: {screenView.contextFraming.linkageReasonsText}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
+
         {screenView.availabilityMessage ? (
           <View style={styles.unavailableCard}>
             <Text style={styles.unavailableText}>{screenView.availabilityMessage}</Text>
@@ -114,6 +130,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
     color: '#4b5563',
+  },
+  contextFramingCard: {
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#dbe4ea',
+    borderRadius: 14,
+    backgroundColor: '#f8fafc',
+    padding: 14,
+  },
+  contextFramingLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748b',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  contextFramingTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  contextFramingSummary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
+  },
+  contextFramingMeta: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#64748b',
   },
   unavailableCard: {
     borderWidth: 1,

@@ -207,6 +207,17 @@ Rules:
 - the K5 presentation contract remains intact, so density and placement behavior do not change
 - the lane still does not become a feed, gate, or tutorial stack
 
+## P7-K7 Topic-Detail Context Framing
+Dashboard keeps the same contextual shelf and the same topic-detail navigation path, but a tap from that shelf can now carry one small prepared context frame into the detail view.
+
+Rules:
+- `services/knowledge/createKnowledgeTopicContextFraming.ts` owns the prepared topic-detail relevance frame
+- `services/knowledge/createKnowledgeTopicDetailVM.ts` threads the frame into the prepared topic detail contract
+- `app/` passes prepared origin metadata only and renders the frame only when the service says it is available
+- the frame stays optional, calm, and subordinate to the topic detail body
+- the shelf still behaves exactly as it did in K4/K5/K6
+- no gating, recommendation feed, inbox, or forced-reading behavior is introduced
+
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.
 

@@ -42,6 +42,16 @@ describe('createKnowledgeTopicScreenViewData', () => {
                 mediaType: 'ARTICLE',
               },
             ],
+            contextFraming: {
+              status: 'AVAILABLE',
+              framing: {
+                title: 'Why this topic is here',
+                summary:
+                  'Opened from Dashboard, so the detail view keeps the same calm contextual frame rather than becoming a separate surface of its own.',
+                originSurface: 'DASHBOARD',
+                linkageReasons: ['SURFACE_CONTEXT'],
+              },
+            },
           },
         },
       }),
@@ -51,6 +61,13 @@ describe('createKnowledgeTopicScreenViewData', () => {
         'PocketPilot distinguishes between estimated and confirmed context so it can stay honest about how solid a current read is.',
       difficultyText: 'Beginner',
       availabilityMessage: null,
+      contextFraming: {
+        title: 'Why this topic is here',
+        summary:
+          'Opened from Dashboard, so the detail view keeps the same calm contextual frame rather than becoming a separate surface of its own.',
+        originSurfaceText: 'Dashboard',
+        linkageReasonsText: 'Surface context',
+      },
       sections: [
         {
           heading: 'Overview',
@@ -92,6 +109,7 @@ describe('createKnowledgeTopicScreenViewData', () => {
         'A calm topic view for one PocketPilot concept or strategy. It stays optional and ready when you want more depth.',
       difficultyText: null,
       availabilityMessage: 'That topic is not available in the current knowledge shelf.',
+      contextFraming: null,
       sections: [],
       relatedTopics: [],
     });
@@ -105,7 +123,7 @@ describe('createKnowledgeTopicScreenViewData', () => {
 
     expect(source).toMatch(/vm\.availability\.status === 'UNAVAILABLE'/);
     expect(source).not.toMatch(
-      /knowledgeCatalog|KnowledgeCatalogEntry|createKnowledgeTopicDetailVM|fetchKnowledgeTopicDetailVM|docs\/knowledge|canonicalPath|markdown|README\.md/,
+      /knowledgeCatalog|KnowledgeCatalogEntry|createKnowledgeTopicDetailVM|fetchKnowledgeTopicDetailVM|createKnowledgeTopicContextFraming|docs\/knowledge|canonicalPath|markdown|README\.md|selectedTopicIds|selectionReason/,
     );
   });
 
