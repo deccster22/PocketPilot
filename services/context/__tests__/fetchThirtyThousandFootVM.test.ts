@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fetchThirtyThousandFootVM } from '@/services/context/fetchThirtyThousandFootVM';
 import { fetchSnapshotVM } from '@/services/snapshot/snapshotService';
 import type { SnapshotVM } from '@/services/snapshot/snapshotService';
@@ -194,5 +197,15 @@ describe('fetchThirtyThousandFootVM', () => {
       summary:
         'Conditions look broadly favourable for this strategy. Broader structure remains stable and volatility is closer to recent norms.',
     });
+  });
+
+  it('keeps the service on the shared surface-account seam instead of rebuilding selected-account branching locally', () => {
+    const serviceSource = readFileSync(
+      join(process.cwd(), 'services', 'context', 'fetchThirtyThousandFootVM.ts'),
+      'utf8',
+    );
+
+    expect(serviceSource).toMatch(/createSurfaceAccountContext/);
+    expect(serviceSource).not.toMatch(/snapshot\.accountContext\?\.status === 'AVAILABLE'/);
   });
 });

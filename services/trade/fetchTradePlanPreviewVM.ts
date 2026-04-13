@@ -2,6 +2,7 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
+import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { fetchPreferredRiskBasis } from '@/services/trade/fetchPreferredRiskBasis';
@@ -40,8 +41,12 @@ export async function fetchTradePlanPreviewVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = selectAccountScopedProtectionPlans({
+  const surfaceAccountContext = createSurfaceAccountContext({
     selectedAccountContext: upstream.selectedAccountContext,
+    selectedAccountPortfolioValue: upstream.selectedAccountPortfolioValue,
+  });
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: surfaceAccountContext.selectedAccountContext,
     protectionPlans: createProtectionPlans({
       orientationContext: upstream.orientationContext,
       marketEvents: upstream.marketEvents,
@@ -52,18 +57,9 @@ export async function fetchTradePlanPreviewVM(params: {
     profile: params.profile,
     selectedPlanId: params.selectedPlanId,
   });
-  const selectedAccountSizingContext =
-    upstream.selectedAccountContext.status === 'AVAILABLE'
-      ? {
-          portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
-          baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
-        }
-      : null;
+  const selectedAccountSizingContext = surfaceAccountContext.riskContext;
   const preferredRiskBasisAvailability = await fetchPreferredRiskBasis({
-    accountId:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? upstream.selectedAccountContext.account.accountId
-        : null,
+    accountId: surfaceAccountContext.selectedAccountId,
     isEnabledForSurface: selectedPlan !== null,
     preferredRiskBasisStore: params.preferredRiskBasisStore,
   });

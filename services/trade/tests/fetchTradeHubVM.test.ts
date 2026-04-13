@@ -354,10 +354,12 @@ describe('fetchTradeHubVM', () => {
       'utf8',
     );
 
+    expect(serviceSource).toMatch(/createSurfaceAccountContext/);
     expect(serviceSource).not.toMatch(/fetchSnapshotVM/);
     expect(serviceSource).not.toMatch(/snapshotService/);
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
     expect(serviceSource).not.toMatch(/canProceed|blockedReason|gate|gating|lockout|requiresAcknowledgement/);
+    expect(serviceSource).not.toMatch(/upstream\.selectedAccountContext\.status === 'AVAILABLE'/);
   });
 });

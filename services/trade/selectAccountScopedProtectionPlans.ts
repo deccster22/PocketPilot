@@ -2,6 +2,7 @@ import {
   enforceAccountScopedTruth,
   filterAccountScopedItems,
 } from '@/services/accounts/enforceAccountScopedTruth';
+import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import type { SelectedAccountAvailability } from '@/services/accounts/types';
 
 import type { ProtectionPlan } from './types';
@@ -10,18 +11,22 @@ export function selectAccountScopedProtectionPlans(params: {
   selectedAccountContext?: SelectedAccountAvailability;
   protectionPlans: ReadonlyArray<ProtectionPlan>;
 }): ProtectionPlan[] {
-  if (params.selectedAccountContext?.status !== 'AVAILABLE') {
+  const selectedAccountContext = createSurfaceAccountContext({
+    selectedAccountContext: params.selectedAccountContext,
+  });
+
+  if (!selectedAccountContext.selectedAccount) {
     return [...params.protectionPlans];
   }
 
   const scopedPlans = filterAccountScopedItems({
-    selectedAccount: params.selectedAccountContext.account,
+    selectedAccount: selectedAccountContext.selectedAccount,
     items: params.protectionPlans,
   });
 
   return enforceAccountScopedTruth({
     label: 'Risk and execution support',
-    selectedAccount: params.selectedAccountContext.account,
+    selectedAccount: selectedAccountContext.selectedAccount,
     accountIds: scopedPlans.map((plan) => plan.accountId),
     value: scopedPlans,
   });

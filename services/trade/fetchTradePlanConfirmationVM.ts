@@ -1,4 +1,5 @@
 import type { UserProfile } from '@/core/profile/types';
+import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import { enforceAccountScopedTruth } from '@/services/accounts/enforceAccountScopedTruth';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
@@ -38,8 +39,12 @@ export async function fetchTradePlanConfirmationVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = selectAccountScopedProtectionPlans({
+  const surfaceAccountContext = createSurfaceAccountContext({
     selectedAccountContext: upstream.selectedAccountContext,
+    selectedAccountPortfolioValue: upstream.selectedAccountPortfolioValue,
+  });
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: surfaceAccountContext.selectedAccountContext,
     protectionPlans: createProtectionPlans({
       orientationContext: upstream.orientationContext,
       marketEvents: upstream.marketEvents,
@@ -62,10 +67,10 @@ export async function fetchTradePlanConfirmationVM(params: {
   const capabilities = await getAccountCapabilities(selectedPlan.accountId);
   const capabilityResolution = resolveExecutionCapability(capabilities);
   const confirmationShell =
-    upstream.selectedAccountContext.status === 'AVAILABLE'
+    surfaceAccountContext.selectedAccount
       ? enforceAccountScopedTruth({
           label: 'Execution support',
-          selectedAccount: upstream.selectedAccountContext.account,
+          selectedAccount: surfaceAccountContext.selectedAccount,
           accountIds: [selectedPlan.accountId, capabilityResolution.accountId],
           value: createTradePlanConfirmationShell({
             plan: selectedPlan,

@@ -447,9 +447,11 @@ describe('fetchTradePlanPreviewVM', () => {
       'utf8',
     );
 
+    expect(serviceSource).toMatch(/createSurfaceAccountContext/);
     expect(serviceSource).not.toMatch(/fetchSnapshotVM/);
     expect(serviceSource).not.toMatch(/snapshotService/);
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
+    expect(serviceSource).not.toMatch(/upstream\.selectedAccountContext\.status === 'AVAILABLE'/);
   });
 });

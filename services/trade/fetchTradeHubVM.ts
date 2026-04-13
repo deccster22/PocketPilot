@@ -2,6 +2,7 @@ import type { UserProfile } from '@/core/profile/types';
 import type { EventLedgerQueries } from '@/services/events/eventLedgerQueries';
 import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
+import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import { createContextualKnowledgeLane } from '@/services/knowledge/createContextualKnowledgeLane';
 import { createTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
@@ -42,8 +43,12 @@ export async function fetchTradeHubVM(params: {
     lastViewedTimestamp: params.lastViewedTimestamp,
     lastViewedState: params.lastViewedState,
   });
-  const protectionPlans = selectAccountScopedProtectionPlans({
+  const surfaceAccountContext = createSurfaceAccountContext({
     selectedAccountContext: upstream.selectedAccountContext,
+    selectedAccountPortfolioValue: upstream.selectedAccountPortfolioValue,
+  });
+  const protectionPlans = selectAccountScopedProtectionPlans({
+    selectedAccountContext: surfaceAccountContext.selectedAccountContext,
     protectionPlans: createProtectionPlans({
       orientationContext: upstream.orientationContext,
       marketEvents: upstream.marketEvents,
@@ -57,17 +62,8 @@ export async function fetchTradeHubVM(params: {
   const riskLane = await createTradeHubRiskLane({
     plan: selectedPlan,
     selectedRiskBasis: params.selectedRiskBasis,
-    accountId:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? upstream.selectedAccountContext.account.accountId
-        : null,
-    accountContext:
-      upstream.selectedAccountContext.status === 'AVAILABLE'
-        ? {
-            portfolioValue: upstream.selectedAccountPortfolioValue ?? null,
-            baseCurrency: upstream.selectedAccountContext.account.baseCurrency,
-          }
-        : null,
+    accountId: surfaceAccountContext.selectedAccountId,
+    accountContext: surfaceAccountContext.riskContext,
     guardrailPreferencesStore: params.guardrailPreferencesStore,
     preferredRiskBasisStore: params.preferredRiskBasisStore,
   });
