@@ -8,6 +8,7 @@ P6-R5 unifies Snapshot's subordinate orientation layer into one canonical briefi
 It remains optional, quiet, and secondary to the Snapshot core.
 P6-A7 adds one separate calm Since Last Checked section under Strategy Status.
 It remains optional, quiet, and secondary to the Snapshot core.
+P6-A8 refines that separate section so it clears after view while staying account-scoped, calm, and non-inbox-like.
 PX-C1 adds one separate calm 30,000 ft affordance on the same prepared Snapshot path.
 It remains opt-in, descriptive, and subordinate.
 PX-C2 deepens that same lane with richer service-owned volatility and structural inputs without changing Snapshot's subordinate posture.
@@ -75,9 +76,10 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - Since Last Checked has one separate calm section under Strategy Status.
 - `services/orientation/createSinceLastCheckedVM.ts` shapes the prepared section from the existing account-scoped event/history/last-viewed seams.
 - `services/orientation/fetchSinceLastCheckedVM.ts` provides one canonical service-owned fetch path for that section.
+- `services/orientation/createSinceLastCheckedDisplayState.ts` refines the same seam into one service-owned display state that can clear after view without adding inbox or badge semantics.
 - `app/` renders the prepared section only and does not rank, filter, or expand events locally.
 - The section remains compact, meaningful-change-only, and auto-collapses when unavailable.
-- The section remains non-dismissible in this phase.
+- The section clears after view through service-owned viewed-state handling, but it remains non-dismissible in this phase.
 - The section does not become an inbox, feed, notification center, badge system, or history browser.
 
 ## 30,000 ft Affordance Rules

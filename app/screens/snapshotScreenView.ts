@@ -6,10 +6,12 @@ import type {
   MessagePriority,
   MessageRationaleAvailability,
 } from '@/services/messages/types';
+import { defaultLastViewedState } from '@/services/orientation/lastViewedState';
 import {
   shouldClearPersistedReorientationDismissState,
   type ReorientationDismissState,
 } from '@/services/orientation/reorientationPersistence';
+import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import {
   fetchSnapshotSurfaceVM,
   type SnapshotSurfaceVM,
@@ -98,8 +100,10 @@ export async function refreshSnapshotScreenSurface(params: {
   profile: UserProfile;
   baselineScan?: SnapshotSurfaceVM['snapshot']['scan'];
   includeDebugObservatory?: boolean;
+  nowProvider?: () => number;
   reorientationDismissState: ReorientationDismissState;
   currentSessionDismissState: ReorientationDismissState;
+  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp' | 'setLastViewedTimestamp'>;
   fetchSnapshotSurface?: typeof fetchSnapshotSurfaceVM;
   fetchMessagePolicy?: typeof fetchMessagePolicyVM;
 }): Promise<{
@@ -108,12 +112,16 @@ export async function refreshSnapshotScreenSurface(params: {
   nextBaselineScan: SnapshotSurfaceVM['snapshot']['scan'];
   shouldClearPersistedDismissState: boolean;
 }> {
+  const nowProvider = params.nowProvider ?? Date.now;
   const fetchSnapshotSurface = params.fetchSnapshotSurface ?? fetchSnapshotSurfaceVM;
   const fetchMessagePolicy = params.fetchMessagePolicy ?? fetchMessagePolicyVM;
+  const lastViewedState = params.lastViewedState ?? defaultLastViewedState;
   const surface = await fetchSnapshotSurface({
     profile: params.profile,
     baselineScan: params.baselineScan,
     includeDebugObservatory: params.includeDebugObservatory,
+    nowProvider,
+    lastViewedState,
     reorientationDismissState: params.reorientationDismissState,
     currentSessionDismissState: params.currentSessionDismissState,
   });
@@ -176,12 +184,12 @@ export function createSnapshotScreenViewData(
         };
 
   const sinceLastChecked =
-    surface?.sinceLastChecked?.status === 'AVAILABLE'
+    surface?.sinceLastCheckedDisplay?.status === 'VISIBLE'
       ? {
           visible: true as const,
-          title: surface.sinceLastChecked.title,
-          summary: surface.sinceLastChecked.summary,
-          items: surface.sinceLastChecked.items.map((item) => ({
+          title: surface.sinceLastCheckedDisplay.title,
+          summary: surface.sinceLastCheckedDisplay.summary,
+          items: surface.sinceLastCheckedDisplay.items.map((item) => ({
             title: item.title,
             summary: item.summary,
             emphasis: item.emphasis,

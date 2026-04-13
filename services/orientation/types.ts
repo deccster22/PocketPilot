@@ -44,10 +44,16 @@ export type SinceLastCheckedItem = {
   emphasis: SinceLastCheckedItemEmphasis;
 };
 
+export type SinceLastCheckedSurface = 'SNAPSHOT' | 'DASHBOARD' | 'TRADE_HUB' | 'NONE';
+
 export type SinceLastCheckedUnavailableReason =
   | 'NO_MEANINGFUL_CHANGES'
   | 'NO_ACCOUNT_CONTEXT'
   | 'NOT_ENABLED_FOR_SURFACE';
+
+export type SinceLastCheckedDisplayHiddenReason =
+  | SinceLastCheckedUnavailableReason
+  | 'ALREADY_VIEWED';
 
 export type SinceLastCheckedAvailability =
   | {
@@ -56,6 +62,18 @@ export type SinceLastCheckedAvailability =
     }
   | {
       status: 'AVAILABLE';
+      title: string;
+      summary: string;
+      items: ReadonlyArray<SinceLastCheckedItem>;
+    };
+
+export type SinceLastCheckedDisplayState =
+  | {
+      status: 'HIDDEN';
+      reason: SinceLastCheckedDisplayHiddenReason;
+    }
+  | {
+      status: 'VISIBLE';
       title: string;
       summary: string;
       items: ReadonlyArray<SinceLastCheckedItem>;

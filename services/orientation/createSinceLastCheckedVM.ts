@@ -3,13 +3,12 @@ import { createOrientationBriefingItems } from '@/services/orientation/createOri
 import type {
   SinceLastCheckedAvailability,
   SinceLastCheckedItemEmphasis,
+  SinceLastCheckedSurface,
   SinceLastCheckedUnavailableReason,
 } from '@/services/orientation/types';
 import type { SnapshotVM } from '@/services/snapshot/snapshotService';
 
 const MAX_ITEMS = 3;
-
-type SinceLastCheckedSurface = 'SNAPSHOT' | 'DASHBOARD' | 'TRADE_HUB' | 'NONE';
 
 function isForSelectedAccount(accountId: string, entry: EventLedgerEntry): boolean {
   return entry.accountId === accountId;

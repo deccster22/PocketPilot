@@ -187,6 +187,23 @@ describe('fetchSnapshotSurfaceVM', () => {
         },
       ],
     });
+    expect(result.sinceLastCheckedDisplay).toEqual({
+      status: 'VISIBLE',
+      title: 'Since last checked',
+      summary: 'A calm read on the most meaningful interpreted changes since your last visit.',
+      items: [
+        {
+          title: 'Data context',
+          summary: 'Some recent market context was captured with data quality limits in view.',
+          emphasis: 'CONTEXT',
+        },
+        {
+          title: 'Current orientation',
+          summary: 'Snapshot reads up with strategy status at watchful.',
+          emphasis: 'NEUTRAL',
+        },
+      ],
+    });
     expect(result.briefing).toEqual({
       status: 'VISIBLE',
       kind: 'REORIENTATION',
@@ -322,6 +339,23 @@ describe('fetchSnapshotSurfaceVM', () => {
     });
     expect(result.sinceLastChecked).toEqual({
       status: 'AVAILABLE',
+      title: 'Since last checked',
+      summary: 'A calm read on the most meaningful interpreted changes since your last visit.',
+      items: [
+        {
+          title: 'Data context',
+          summary: 'Some recent market context was captured with data quality limits in view.',
+          emphasis: 'CONTEXT',
+        },
+        {
+          title: 'Current orientation',
+          summary: 'Snapshot reads up with strategy status at watchful.',
+          emphasis: 'NEUTRAL',
+        },
+      ],
+    });
+    expect(result.sinceLastCheckedDisplay).toEqual({
+      status: 'VISIBLE',
       title: 'Since last checked',
       summary: 'A calm read on the most meaningful interpreted changes since your last visit.',
       items: [

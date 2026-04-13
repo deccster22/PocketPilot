@@ -10,6 +10,7 @@ P6-A4 improved the interpreted input quality feeding the seam.
 P6-A5 adds one compact explanation layer so PocketPilot can say why the current message posture surfaced.
 P6-A6 consolidates the same final policy and rationale outputs into one grouped prepared lane so the current consumers can keep reading one calm service-owned contract.
 P6-A7 adds one separate Snapshot-facing Since Last Checked section under Strategy Status, but it does not change the message families or create a delivery channel.
+P6-A8 refines that Snapshot-facing section with service-owned viewed-state and clear-after-view behavior without turning it into an inbox or notification center.
 
 The goal is still not to make PocketPilot louder.
 The goal is to make message treatment clearer, calmer, and easier to trust.
@@ -151,3 +152,4 @@ Later `P6` phases can build on this foundation by adding:
 Those future phases should extend the same message-policy seam rather than inventing a separate notification stack.
 
 P6-A7 can now extend the same calm Snapshot posture with one separate Since Last Checked section while keeping that section out of the alert-policy lane entirely.
+P6-A8 can now extend that same calm Snapshot posture with clear-after-view refinement while still keeping the section out of any inbox or badge model.

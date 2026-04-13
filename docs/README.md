@@ -68,7 +68,7 @@ Start with:
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - PX-MA4 normalized the selected-account surface shape so Snapshot, Dashboard, Trade Hub, and related support seams reuse one prepared account-context helper instead of rebuilding local branching.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
-- Snapshot also carries one separate calm Since Last Checked section under Strategy Status, but it stays compact, service-owned, and non-inbox-like.
+- Snapshot also carries one separate calm Since Last Checked section under Strategy Status, and `P6-A8` refines it with service-owned clear-after-view behavior while it stays compact, account-scoped, and non-inbox-like.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.
 - Message policy stays grouped as one prepared service-owned lane. User-visible message posture is explained through prepared rationale on that lane, never raw diagnostics or app-owned recomposition.

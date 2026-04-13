@@ -97,7 +97,7 @@ export async function fetchMessagePolicyVM(params: {
   eventLedger?: EventLedgerService;
   eventLedgerQueries?: EventLedgerQueries;
   lastViewedTimestamp?: number;
-  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp'>;
+  lastViewedState?: Pick<LastViewedState, 'getLastViewedTimestamp' | 'setLastViewedTimestamp'>;
   preference?: ReorientationPreference;
   reorientationDismissState?: ReorientationDismissState;
   currentSessionDismissState?: ReorientationDismissState;
