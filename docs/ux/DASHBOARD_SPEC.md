@@ -196,6 +196,17 @@ Rules:
 - `app/` renders the prepared title, summary, and topic links only
 - no local topic selection, recommendation feed behavior, or gating behavior is introduced
 
+## P7-K6 Contextual Knowledge Topic-Linkage Expansion
+Dashboard now links live context to better prepared topics before the existing K5 presentation contract decides how much of the lane should appear.
+
+Rules:
+- `services/knowledge/selectContextualKnowledgeTopics.ts` owns the topic-linkage ranking seam
+- ranking can use strategy, signal, event, and dashboard surface context already prepared by services
+- the lane remains optional, calm, and subordinate to the main Focus zones
+- `app/` still renders prepared topics only and does not select or rank them locally
+- the K5 presentation contract remains intact, so density and placement behavior do not change
+- the lane still does not become a feed, gate, or tutorial stack
+
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.
 

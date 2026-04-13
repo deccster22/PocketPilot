@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P9-S2)
 
 ## Purpose
 
@@ -9,6 +9,7 @@
 `P7-K3` adds one thin contextual-eligibility seam without turning knowledge into a recommendation engine or broad rollout system.
 `P7-K4` carries that same seam into a calm live-surface rollout for Dashboard and Trade Hub.
 `P7-K5` refines the live rollout with one explicit density/placement presentation seam without turning it into a feed or gate.
+`P7-K6` improves the canonical live-surface linkage path so the same prepared lane can choose better topics from live strategy, signal, event, and surface context without changing the K4/K5 presentation contract.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -161,6 +162,23 @@ Rules:
 - the shelf can stay available but intentionally not render when relevance is too thin
 - the contract stays small and does not include gating, recommendation, or inbox behaviour
 
+`P7-K6` adds one explicit contextual linkage contract:
+
+```ts
+type ContextualKnowledgeLinkage = {
+  selectedTopicIds: readonly string[];
+  selectionReason: 'STRATEGY' | 'SIGNAL' | 'EVENT' | 'SURFACE_CONTEXT' | 'MIXED';
+};
+```
+
+Rules:
+
+- `services/knowledge/selectContextualKnowledgeTopics.ts` owns ranking, linkage, and ordered candidate selection
+- `services/knowledge/createContextualKnowledgeLane.ts` threads the linkage through the live lane
+- `app/` still consumes prepared topics only and does not rank topics locally
+- the linkage seam remains deterministic, optional, and non-gating
+- the contract stays small and does not include recommendation-feed, push, or inbox behaviour
+
 ## Canonical Knowledge Tree
 
 The runtime catalog now has one canonical source path:
@@ -187,6 +205,7 @@ knowledgeCatalog
 -> fetchKnowledgeTopicDetailVM
 -> Knowledge topic detail screen
 -> createContextualKnowledgeAvailability
+-> selectContextualKnowledgeTopics
 -> fetchContextualKnowledgeAvailability
 -> createContextualKnowledgePresentation
 -> createContextualKnowledgeLane
@@ -213,6 +232,7 @@ Responsibilities:
 - `services/knowledge/createContextualKnowledgePresentation.ts` owns contextual density / placement shaping
 - `services/knowledge/createContextualKnowledgeLane.ts` owns the contextual live-lane composition and applies the presentation to the selected topics
 - `services/knowledge/createContextualKnowledgeAvailability.ts` owns contextual candidate shaping
+- `services/knowledge/selectContextualKnowledgeTopics.ts` owns contextual topic ranking and linkage shaping
 - `services/knowledge/fetchContextualKnowledgeAvailability.ts` owns contextual surface interpretation
 - `services/strategyNavigator/selectStrategyPreviewKnowledge.ts` owns preview-specific follow-through selection
 - `app/screens/*knowledge*View.ts` files format prepared display text only
@@ -228,8 +248,10 @@ Rules locked in this phase:
 - the topic detail surface is subordinate to that same shelf
 - the contextual seam is allowed to return `AVAILABLE` only when interpreted surface context is strong enough
 - the contextual shelf may still remain hidden when the presentation says the relevant context is too thin for the current profile or surface
+- the contextual linkage seam may stay empty when there is not enough honest context to rank
 - Strategy Preview is the only proof-path consumer in `P7-K3`
 - Dashboard and Trade Hub are the only live-surface consumers in `P7-K4` and `P7-K5`
+- `P7-K6` keeps the same live-surface consumers and only improves how their prepared topics are linked
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
@@ -243,6 +265,7 @@ Rules locked in this phase:
 Later phases can build on this seam by:
 
 - widening contextual links from strategies, signals, and events through the same service-owned eligibility rules
+- deepening live topic linkage through the same service-owned ranking seam without changing the presentation contract
 - adding richer detail presentation or media handling when the model honestly supports it
 - tuning the density rules further only if a later rung keeps the shelf calm and subordinate
 - connecting knowledge more deeply with `P8` reflection flows and future `P9` explanation work

@@ -18,6 +18,10 @@ function createUnavailableContextualKnowledgeLane(): ContextualKnowledgeLane {
       status: 'UNAVAILABLE',
       reason: 'NO_RELEVANT_TOPIC',
     },
+    linkage: {
+      selectedTopicIds: [],
+      selectionReason: 'SURFACE_CONTEXT',
+    },
     presentation: {
       maxVisibleTopics: 0,
       emphasis: 'SUBORDINATE',
@@ -322,6 +326,10 @@ describe('createDashboardScreenViewData', () => {
             },
           ],
         },
+        linkage: {
+          selectedTopicIds: ['pp-what-dashboard-is-for'],
+          selectionReason: 'SURFACE_CONTEXT',
+        },
         presentation: {
           maxVisibleTopics: 1,
           emphasis: 'SUBORDINATE',
@@ -375,6 +383,10 @@ describe('createDashboardScreenViewData', () => {
             },
           ],
         },
+        linkage: {
+          selectedTopicIds: ['pp-what-dashboard-is-for'],
+          selectionReason: 'SURFACE_CONTEXT',
+        },
         presentation: {
           maxVisibleTopics: 1,
           emphasis: 'SUBORDINATE',
@@ -420,7 +432,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
     expect(source).toMatch(/createContextualKnowledgeSectionViewData/);
     expect(source).not.toMatch(
-      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|knowledgeCatalog|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);

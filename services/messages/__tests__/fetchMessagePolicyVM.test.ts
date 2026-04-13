@@ -161,6 +161,10 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
         status: 'UNAVAILABLE',
         reason: 'NO_RELEVANT_TOPIC',
       },
+      linkage: {
+        selectedTopicIds: [],
+        selectionReason: 'SURFACE_CONTEXT',
+      },
       presentation: {
         maxVisibleTopics: 0,
         emphasis: 'SUBORDINATE',

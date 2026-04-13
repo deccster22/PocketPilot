@@ -119,6 +119,10 @@ describe('createContextualKnowledgeLane', () => {
       status: 'AVAILABLE',
       surface: 'TRADE_HUB',
     });
+    expect(beginnerLane.linkage).toEqual({
+      selectedTopicIds: ['pp-what-protection-plans-are-for'],
+      selectionReason: 'EVENT',
+    });
     expect(beginnerLane.presentation).toEqual({
       maxVisibleTopics: 1,
       emphasis: 'LIGHT',
@@ -134,6 +138,7 @@ describe('createContextualKnowledgeLane', () => {
       emphasis: 'SUBORDINATE',
       shouldRenderShelf: false,
     });
+    expect(advancedLane.linkage).toEqual(beginnerLane.linkage);
     expect(advancedLane.topics).toHaveLength(1);
     expect(advancedLane.topics[0]).toMatchObject({
       topicId: 'pp-what-protection-plans-are-for',

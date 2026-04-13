@@ -129,12 +129,25 @@ export type ContextualKnowledgePresentation = {
   shouldRenderShelf: boolean;
 };
 
+export type ContextualKnowledgeLinkageReason =
+  | 'STRATEGY'
+  | 'SIGNAL'
+  | 'EVENT'
+  | 'SURFACE_CONTEXT'
+  | 'MIXED';
+
+export type ContextualKnowledgeLinkage = {
+  selectedTopicIds: ReadonlyArray<string>;
+  selectionReason: ContextualKnowledgeLinkageReason;
+};
+
 export type ContextualKnowledgeLaneTopic = KnowledgeLibraryTopicSummary & {
   reason: string;
 };
 
 export type ContextualKnowledgeLane = {
   availability: ContextualKnowledgeAvailability;
+  linkage: ContextualKnowledgeLinkage;
   presentation: ContextualKnowledgePresentation;
   topics: ReadonlyArray<ContextualKnowledgeLaneTopic>;
 };

@@ -1,3 +1,4 @@
+import type { MarketEvent } from '@/core/types/marketEvent';
 import type { DashboardSurfaceModel } from '@/services/dashboard/types';
 import type {
   InsightsArchiveVM,
@@ -58,6 +59,7 @@ export function fetchContextualKnowledgeAvailability(params: {
   messagePolicy?: MessagePolicyAvailability | null;
   strategyNavigatorVM?: StrategyNavigatorVM | null;
   tradeHubSurface?: TradeHubSurfaceModel | null;
+  marketEvents?: ReadonlyArray<MarketEvent> | null;
   insightsHistory?: InsightsHistoryWithContinuityVM | null;
   insightsArchive?: InsightsArchiveVM | null;
   reflectionComparison?: ReflectionComparisonVM | null;
@@ -78,6 +80,7 @@ export function fetchContextualKnowledgeAvailability(params: {
             params.strategyNavigatorVM?.availability.status === 'AVAILABLE'
               ? params.strategyNavigatorVM.availability.scenario.scenarioId
               : null,
+          marketEvents: params.marketEvents,
         },
       });
     case 'DASHBOARD':
@@ -88,6 +91,7 @@ export function fetchContextualKnowledgeAvailability(params: {
           strategyIds: collectDashboardStrategyIds(params.dashboardSurface),
           eventTypes: collectDashboardEventTypes(params.dashboardSurface),
           messageKinds: collectMessageKinds(params.messagePolicy),
+          marketEvents: params.marketEvents,
         },
       });
     case 'TRADE_HUB':
@@ -96,6 +100,7 @@ export function fetchContextualKnowledgeAvailability(params: {
         input: {
           surface: params.surface,
           tradeHubSurface: params.tradeHubSurface ?? undefined,
+          marketEvents: params.marketEvents,
         },
       });
     case 'INSIGHTS':
@@ -109,6 +114,7 @@ export function fetchContextualKnowledgeAvailability(params: {
             hasReflection: params.reflectionComparison?.availability.status === 'AVAILABLE',
             hasNewItems: (params.insightsHistory?.continuity.newItemCount ?? 0) > 0,
           },
+          marketEvents: params.marketEvents,
         },
       });
     default:
@@ -116,6 +122,7 @@ export function fetchContextualKnowledgeAvailability(params: {
         nodes,
         input: {
           surface: params.surface,
+          marketEvents: params.marketEvents,
         },
       });
   }

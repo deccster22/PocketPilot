@@ -54,6 +54,7 @@ export async function fetchDashboardSurfaceVM(params: {
     profile: params.profile,
     surface: 'DASHBOARD',
     dashboardSurface: surfaceModel,
+    marketEvents: scopedEvents,
   });
 
   return {
