@@ -35,6 +35,7 @@ The layer should:
 - Trade Hub is bounded and support-only, with a smaller contextual-knowledge lane when action-support context is honest
 - P7-K5 refines that live lane with an explicit presentation contract so Dashboard and Trade Hub can stay calmer, more profile-aware, and more subordinate when relevance is thin
 - P7-K6 deepens how live context is linked to prepared topics so Dashboard and Trade Hub can surface better prepared topics without turning the lane into a feed or changing the K4/K5 presentation model
+- P7-K7 carries one calm prepared context frame into topic detail so a tapped topic can keep its live-surface relevance without turning topic detail into a feed, gate, or advice surface
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
 

@@ -34,6 +34,7 @@ import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledge
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM, type TradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { updatePreferredRiskBasis } from '@/services/trade/updatePreferredRiskBasis';
+import type { KnowledgeTopicContextOrigin } from '@/services/knowledge/types';
 import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type { RiskToolVM } from '@/services/risk/types';
@@ -211,7 +212,10 @@ export function TradeHubScreen() {
   const [contextualKnowledgeLane, setContextualKnowledgeLane] =
     useState<TradeHubVM['contextualKnowledgeLane'] | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | undefined>();
-  const [selectedKnowledgeTopicId, setSelectedKnowledgeTopicId] = useState<string | null>(null);
+  const [selectedKnowledgeTopic, setSelectedKnowledgeTopic] = useState<{
+    topicId: string;
+    contextualOrigin: KnowledgeTopicContextOrigin | null;
+  } | null>(null);
   const [selectedRiskBasis, setSelectedRiskBasis] = useState<RiskBasis | undefined>();
   const [messagePolicyLane, setMessagePolicyLane] = useState<MessagePolicyLane | null>(null);
   const [confirmationSessionVm, setConfirmationSessionVm] = useState<ConfirmationSessionVM | null>(
@@ -288,9 +292,10 @@ export function TradeHubScreen() {
     () =>
       fetchKnowledgeTopicDetailVM({
         surface: 'KNOWLEDGE_LIBRARY',
-        topicId: selectedKnowledgeTopicId,
+        topicId: selectedKnowledgeTopic?.topicId,
+        contextualOrigin: selectedKnowledgeTopic?.contextualOrigin,
       }),
-    [selectedKnowledgeTopicId],
+    [selectedKnowledgeTopic],
   );
   const riskLaneView = screenView?.riskLane;
   const tradeHubRiskView = riskLaneView?.risk;
@@ -339,6 +344,16 @@ export function TradeHubScreen() {
     () => (executionAdapterVm ? createTradeExecutionAdapterViewData(executionAdapterVm) : null),
     [executionAdapterVm],
   );
+
+  function handleOpenKnowledgeTopic(
+    topicId: string,
+    contextualOrigin?: KnowledgeTopicContextOrigin | null,
+  ) {
+    setSelectedKnowledgeTopic({
+      topicId,
+      contextualOrigin: contextualOrigin ?? null,
+    });
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -617,12 +632,12 @@ export function TradeHubScreen() {
     }));
   }
 
-  if (selectedKnowledgeTopicId) {
+  if (selectedKnowledgeTopic) {
     return (
       <KnowledgeTopicScreen
         topicVM={knowledgeTopicVM}
-        onBack={() => setSelectedKnowledgeTopicId(null)}
-        onOpenTopic={setSelectedKnowledgeTopicId}
+        onBack={() => setSelectedKnowledgeTopic(null)}
+        onOpenTopic={handleOpenKnowledgeTopic}
       />
     );
   }
@@ -654,7 +669,7 @@ export function TradeHubScreen() {
           <View style={styles.section}>
             <ContextualKnowledgeCard
               contextualKnowledge={screenView.contextualKnowledge}
-              onOpenTopic={setSelectedKnowledgeTopicId}
+              onOpenTopic={handleOpenKnowledgeTopic}
             />
           </View>
         ) : null}

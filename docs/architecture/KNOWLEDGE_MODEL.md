@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P9-S2)
 
 ## Purpose
 
@@ -10,13 +10,14 @@
 `P7-K4` carries that same seam into a calm live-surface rollout for Dashboard and Trade Hub.
 `P7-K5` refines the live rollout with one explicit density/placement presentation seam without turning it into a feed or gate.
 `P7-K6` improves the canonical live-surface linkage path so the same prepared lane can choose better topics from live strategy, signal, event, and surface context without changing the K4/K5 presentation contract.
+`P7-K7` carries that same relevance judgment into topic detail by letting the selected topic receive one prepared context frame from Dashboard or Trade Hub without adding a gate, inbox, or advice layer.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
 
 - keep one canonical in-app knowledge tree
 - shape that tree into one prepared library contract
-- shape one selected topic into one prepared topic-detail contract
+- shape one selected topic into one prepared topic-detail contract, with one optional prepared context frame when it opened from Dashboard or Trade Hub
 - shape one interpreted surface into one prepared contextual-eligibility result
 - shape one live contextual shelf into one prepared presentation result
 - keep `app/` passive and display-only
@@ -94,16 +95,19 @@ type KnowledgeTopicDetailVM = {
       }
     | {
         status: 'AVAILABLE';
-        topic: {
-          topicId: string;
-          title: string;
-          summary: string;
-          difficulty: KnowledgeDifficulty | null;
-          sections: readonly KnowledgeTopicSection[];
-          relatedTopicIds: readonly string[];
-          relatedTopics: readonly KnowledgeTopicRelatedItem[];
-        };
+        topic: KnowledgeTopicDetail;
       };
+};
+
+type KnowledgeTopicDetail = {
+  topicId: string;
+  title: string;
+  summary: string;
+  difficulty: KnowledgeDifficulty | null;
+  sections: readonly KnowledgeTopicSection[];
+  relatedTopicIds: readonly string[];
+  relatedTopics: readonly KnowledgeTopicRelatedItem[];
+  contextFraming: KnowledgeTopicContextFramingAvailability;
 };
 ```
 
@@ -112,7 +116,19 @@ Rules:
 - `topicId` is the only routing-safe identifier exposed forward
 - `sections` are prepared text blocks, not markdown source fragments
 - `relatedTopics` exist so `app/` never has to look up topic metadata locally
+- `contextFraming` stays optional and subordinate to the selected topic
 - no raw file paths, repo metadata, progress theatre, or recommendation scores are exposed to the UI
+
+`KnowledgeContextSurface` names the surfaces that may participate in contextual knowledge:
+
+```ts
+type KnowledgeContextSurface =
+  | 'SNAPSHOT'
+  | 'DASHBOARD'
+  | 'TRADE_HUB'
+  | 'INSIGHTS'
+  | 'STRATEGY_PREVIEW';
+```
 
 `P7-K3` adds one explicit contextual-eligibility contract:
 
@@ -127,7 +143,7 @@ type ContextualKnowledgeAvailability =
     }
   | {
       status: 'AVAILABLE';
-      surface: 'SNAPSHOT' | 'DASHBOARD' | 'TRADE_HUB' | 'INSIGHTS' | 'STRATEGY_PREVIEW';
+      surface: KnowledgeContextSurface;
       items: readonly Array<{
         topicId: string;
         title: string;
@@ -165,9 +181,16 @@ Rules:
 `P7-K6` adds one explicit contextual linkage contract:
 
 ```ts
+type ContextualKnowledgeLinkageReason =
+  | 'STRATEGY'
+  | 'SIGNAL'
+  | 'EVENT'
+  | 'SURFACE_CONTEXT'
+  | 'MIXED';
+
 type ContextualKnowledgeLinkage = {
   selectedTopicIds: readonly string[];
-  selectionReason: 'STRATEGY' | 'SIGNAL' | 'EVENT' | 'SURFACE_CONTEXT' | 'MIXED';
+  selectionReason: ContextualKnowledgeLinkageReason;
 };
 ```
 
@@ -178,6 +201,46 @@ Rules:
 - `app/` still consumes prepared topics only and does not rank topics locally
 - the linkage seam remains deterministic, optional, and non-gating
 - the contract stays small and does not include recommendation-feed, push, or inbox behaviour
+
+`P7-K7` adds one explicit topic-detail context-framing contract:
+
+```ts
+type KnowledgeTopicContextOrigin = {
+  originSurface: KnowledgeContextSurface | 'NONE';
+  linkageReason: ContextualKnowledgeLinkageReason | null;
+};
+
+type KnowledgeTopicContextFramingReason =
+  | 'STRATEGY'
+  | 'SIGNAL'
+  | 'EVENT'
+  | 'SURFACE_CONTEXT';
+
+type KnowledgeTopicContextFraming = {
+  title: string;
+  summary: string;
+  originSurface: 'DASHBOARD' | 'TRADE_HUB' | 'NONE';
+  linkageReasons: ReadonlyArray<KnowledgeTopicContextFramingReason>;
+};
+
+type KnowledgeTopicContextFramingAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_CONTEXTUAL_ORIGIN' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      framing: KnowledgeTopicContextFraming;
+    };
+```
+
+Rules:
+
+- `services/knowledge/createKnowledgeTopicContextFraming.ts` owns the calm prepared framing seam
+- `services/knowledge/createKnowledgeTopicDetailVM.ts` composes the topic and optional frame
+- `app/` consumes the prepared frame only and never derives topic-detail framing locally
+- the framing stays optional, calm, and subordinate to the selected topic
+- the contract stays small and does not include advice, gating, recommendations, inbox, or push behaviour
 
 ## Canonical Knowledge Tree
 
@@ -202,6 +265,7 @@ knowledgeCatalog
 -> fetchKnowledgeLibraryVM
 -> Knowledge Library screen
 -> createKnowledgeTopicDetailVM
+-> createKnowledgeTopicContextFraming
 -> fetchKnowledgeTopicDetailVM
 -> Knowledge topic detail screen
 -> createContextualKnowledgeAvailability
@@ -226,7 +290,8 @@ Responsibilities:
 
 - `services/knowledge/knowledgeCatalog.ts` owns the canonical runtime tree
 - `services/knowledge/createKnowledgeLibraryVM.ts` owns shelf grouping and deterministic ordering
-- `services/knowledge/createKnowledgeTopicDetailVM.ts` owns selected-topic shaping
+- `services/knowledge/createKnowledgeTopicDetailVM.ts` owns selected-topic shaping and composes optional context framing
+- `services/knowledge/createKnowledgeTopicContextFraming.ts` owns the calm topic-detail framing seam
 - `services/knowledge/fetchKnowledgeLibraryVM.ts` owns library surface enablement
 - `services/knowledge/fetchKnowledgeTopicDetailVM.ts` owns topic-detail surface enablement
 - `services/knowledge/createContextualKnowledgePresentation.ts` owns contextual density / placement shaping
@@ -240,7 +305,7 @@ Responsibilities:
 
 ## Availability And Gating Rules
 
-Knowledge stays optional in `P7-K1`, `P7-K2`, `P7-K3`, `P7-K4`, and `P7-K5`.
+Knowledge stays optional in `P7-K1`, `P7-K2`, `P7-K3`, `P7-K4`, `P7-K5`, `P7-K6`, and `P7-K7`.
 
 Rules locked in this phase:
 
@@ -250,11 +315,13 @@ Rules locked in this phase:
 - the contextual shelf may still remain hidden when the presentation says the relevant context is too thin for the current profile or surface
 - the contextual linkage seam may stay empty when there is not enough honest context to rank
 - Strategy Preview is the only proof-path consumer in `P7-K3`
-- Dashboard and Trade Hub are the only live-surface consumers in `P7-K4` and `P7-K5`
+- Dashboard and Trade Hub are the only live-surface consumers in `P7-K4`, `P7-K5`, `P7-K6`, and `P7-K7`
 - `P7-K6` keeps the same live-surface consumers and only improves how their prepared topics are linked
+- `P7-K7` keeps the same live-surface consumers and adds optional detail framing without changing the topic route, shelf ownership, or non-gating posture
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
+- topic detail can stay clean when opened without a contextual origin
 - unavailable knowledge must not block Dashboard, Snapshot, Trade Hub, or monitoring flows
 - no background work, push notifications, or hidden recommendation engine are introduced
 
@@ -266,6 +333,7 @@ Later phases can build on this seam by:
 
 - widening contextual links from strategies, signals, and events through the same service-owned eligibility rules
 - deepening live topic linkage through the same service-owned ranking seam without changing the presentation contract
+- carrying the same calm context into topic detail without turning detail into a gate, inbox, or advice surface
 - adding richer detail presentation or media handling when the model honestly supports it
 - tuning the density rules further only if a later rung keeps the shelf calm and subordinate
 - connecting knowledge more deeply with `P8` reflection flows and future `P9` explanation work

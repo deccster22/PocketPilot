@@ -74,6 +74,7 @@ Start with:
 - Contextual knowledge on Dashboard and Trade Hub stays service-owned, optional, and non-gating. The app only renders prepared lanes and topic detail routes; it does not choose topics locally.
 - Contextual knowledge on Dashboard and Trade Hub now also carries a prepared density/placement presentation so the shelf can stay calmer, smaller, or hidden when profile and surface make that the honest choice.
 - P7-K6 deepens contextual topic linkage from live strategy, signal, event, and surface context while keeping the same prepared lane and presentation seams intact.
+- P7-K7 carries one prepared topic-detail context frame from Dashboard and Trade Hub into the existing detail route so the selected topic can explain why it matters there without becoming a gate or advice surface.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.

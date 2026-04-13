@@ -177,6 +177,8 @@ describe('createTradeHubScreenViewData', () => {
           visible: false,
           title: 'Optional knowledge',
           summary: 'The shelf stays hidden until the prepared context is stronger.',
+          originSurface: 'NONE',
+          selectionReason: null,
           presentation: {
             maxVisibleTopics: 0,
             emphasis: 'SUBORDINATE',
@@ -347,6 +349,8 @@ describe('createTradeHubScreenViewData', () => {
       visible: true,
       title: 'Quiet context',
       summary: 'Only one quiet link stays visible, and only when the surface is still relevant enough.',
+      originSurface: 'TRADE_HUB',
+      selectionReason: 'SURFACE_CONTEXT',
       presentation: {
         maxVisibleTopics: 1,
         emphasis: 'SUBORDINATE',
@@ -516,6 +520,8 @@ describe('createTradeHubScreenViewData', () => {
       visible: false,
       title: 'Optional knowledge',
       summary: 'The shelf stays hidden until the prepared context is stronger.',
+      originSurface: 'NONE',
+      selectionReason: null,
       presentation: {
         maxVisibleTopics: 0,
         emphasis: 'SUBORDINATE',

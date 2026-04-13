@@ -1,13 +1,17 @@
 import type {
   ContextualKnowledgeCandidate,
+  ContextualKnowledgeLinkageReason,
   ContextualKnowledgeLane,
   ContextualKnowledgePresentation,
+  KnowledgeContextSurface,
 } from '@/services/knowledge/types';
 
 export type ContextualKnowledgeSectionViewData = {
   visible: boolean;
   title: string;
   summary: string;
+  originSurface: KnowledgeContextSurface | 'NONE';
+  selectionReason: ContextualKnowledgeLinkageReason | null;
   presentation: ContextualKnowledgePresentation;
   items: ReadonlyArray<ContextualKnowledgeCandidate>;
 };
@@ -71,6 +75,8 @@ export function createContextualKnowledgeSectionViewData(
       visible: false,
       title: createContextualKnowledgeTitle(HIDDEN_PRESENTATION, 0),
       summary: createContextualKnowledgeSummary(HIDDEN_PRESENTATION, 0),
+      originSurface: 'NONE',
+      selectionReason: null,
       presentation: HIDDEN_PRESENTATION,
       items: [],
     };
@@ -80,6 +86,8 @@ export function createContextualKnowledgeSectionViewData(
     visible: true,
     title: createContextualKnowledgeTitle(lane.presentation, lane.topics.length),
     summary: createContextualKnowledgeSummary(lane.presentation, lane.topics.length),
+    originSurface: lane.availability.surface,
+    selectionReason: lane.linkage.selectionReason,
     presentation: lane.presentation,
     items: lane.topics.map((topic) => ({
       topicId: topic.topicId,

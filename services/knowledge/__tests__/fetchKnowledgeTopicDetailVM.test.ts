@@ -4,7 +4,11 @@ describe('fetchKnowledgeTopicDetailVM', () => {
   it('returns one canonical topic detail VM for the Knowledge Library surface', () => {
     const result = fetchKnowledgeTopicDetailVM({
       surface: 'KNOWLEDGE_LIBRARY',
-      topicId: 'pp-estimated-vs-confirmed-context',
+      topicId: 'pp-what-dashboard-is-for',
+      contextualOrigin: {
+        originSurface: 'DASHBOARD',
+        linkageReason: 'SURFACE_CONTEXT',
+      },
     });
 
     expect(result).toMatchObject({
@@ -12,8 +16,15 @@ describe('fetchKnowledgeTopicDetailVM', () => {
       availability: {
         status: 'AVAILABLE',
         topic: {
-          topicId: 'pp-estimated-vs-confirmed-context',
-          title: 'Estimated vs Confirmed Context',
+          topicId: 'pp-what-dashboard-is-for',
+          title: 'What Dashboard Is For',
+          contextFraming: {
+            status: 'AVAILABLE',
+            framing: {
+              originSurface: 'DASHBOARD',
+              linkageReasons: ['SURFACE_CONTEXT'],
+            },
+          },
         },
       },
     });
@@ -24,6 +35,10 @@ describe('fetchKnowledgeTopicDetailVM', () => {
       fetchKnowledgeTopicDetailVM({
         surface: 'DASHBOARD',
         topicId: 'pp-estimated-vs-confirmed-context',
+        contextualOrigin: {
+          originSurface: 'DASHBOARD',
+          linkageReason: 'EVENT',
+        },
       }),
     ).toEqual({
       generatedAt: null,
@@ -39,6 +54,7 @@ describe('fetchKnowledgeTopicDetailVM', () => {
       fetchKnowledgeTopicDetailVM({
         surface: 'STRATEGY_PREVIEW',
         topicId: 'strategy-buy-the-dip',
+        contextualOrigin: null,
       }),
     ).toMatchObject({
       generatedAt: null,

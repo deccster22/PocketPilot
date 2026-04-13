@@ -1,8 +1,10 @@
 import type {
   KnowledgeCatalogEntry,
   KnowledgeTopicAvailability,
+  KnowledgeTopicContextOrigin,
   KnowledgeTopicRelatedItem,
 } from '@/services/knowledge/types';
+import { createKnowledgeTopicContextFraming } from '@/services/knowledge/createKnowledgeTopicContextFraming';
 
 function toRelatedTopic(entry: KnowledgeCatalogEntry): KnowledgeTopicRelatedItem {
   return {
@@ -17,6 +19,7 @@ function toRelatedTopic(entry: KnowledgeCatalogEntry): KnowledgeTopicRelatedItem
 export function createKnowledgeTopicDetailVM(params: {
   topicId?: string | null;
   nodes: ReadonlyArray<KnowledgeCatalogEntry>;
+  contextualOrigin?: KnowledgeTopicContextOrigin | null;
 }): KnowledgeTopicAvailability {
   if (!params.topicId) {
     return {
@@ -50,6 +53,9 @@ export function createKnowledgeTopicDetailVM(params: {
       sections: topic.sections,
       relatedTopicIds: relatedTopics.map((entry) => entry.topicId),
       relatedTopics,
+      contextFraming: createKnowledgeTopicContextFraming({
+        contextualOrigin: params.contextualOrigin,
+      }),
     },
   };
 }

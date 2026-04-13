@@ -91,6 +91,7 @@ export type KnowledgeTopicDetail = {
   sections: ReadonlyArray<KnowledgeTopicSection>;
   relatedTopicIds: ReadonlyArray<string>;
   relatedTopics: ReadonlyArray<KnowledgeTopicRelatedItem>;
+  contextFraming: KnowledgeTopicContextFramingAvailability;
 };
 
 export type KnowledgeTopicAvailability =
@@ -101,6 +102,34 @@ export type KnowledgeTopicAvailability =
   | {
       status: 'AVAILABLE';
       topic: KnowledgeTopicDetail;
+    };
+
+export type KnowledgeTopicContextOrigin = {
+  originSurface: KnowledgeContextSurface | 'NONE';
+  linkageReason: ContextualKnowledgeLinkageReason | null;
+};
+
+export type KnowledgeTopicContextFramingReason =
+  | 'STRATEGY'
+  | 'SIGNAL'
+  | 'EVENT'
+  | 'SURFACE_CONTEXT';
+
+export type KnowledgeTopicContextFraming = {
+  title: string;
+  summary: string;
+  originSurface: 'DASHBOARD' | 'TRADE_HUB' | 'NONE';
+  linkageReasons: ReadonlyArray<KnowledgeTopicContextFramingReason>;
+};
+
+export type KnowledgeTopicContextFramingAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_CONTEXTUAL_ORIGIN' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      framing: KnowledgeTopicContextFraming;
     };
 
 export type KnowledgeTopicDetailVM = {

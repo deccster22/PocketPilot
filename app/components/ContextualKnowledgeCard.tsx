@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { ContextualKnowledgeSectionViewData } from '@/app/screens/contextualKnowledgeView';
+import type { KnowledgeTopicContextOrigin } from '@/services/knowledge/types';
 
 export function ContextualKnowledgeCard(props: {
   contextualKnowledge: ContextualKnowledgeSectionViewData;
-  onOpenTopic: (topicId: string) => void;
+  onOpenTopic: (topicId: string, contextualOrigin?: KnowledgeTopicContextOrigin | null) => void;
 }) {
   const { contextualKnowledge } = props;
   const emphasisStyle =
@@ -24,7 +25,18 @@ export function ContextualKnowledgeCard(props: {
         <Pressable
           key={item.topicId}
           accessibilityRole="button"
-          onPress={() => props.onOpenTopic(item.topicId)}
+          onPress={() =>
+            props.onOpenTopic(
+              item.topicId,
+              contextualKnowledge.originSurface !== 'NONE' &&
+                contextualKnowledge.selectionReason !== null
+                ? {
+                    originSurface: contextualKnowledge.originSurface,
+                    linkageReason: contextualKnowledge.selectionReason,
+                  }
+                : null,
+            )
+          }
           style={[
             styles.itemCard,
             contextualKnowledge.presentation.emphasis === 'SUBORDINATE'

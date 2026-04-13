@@ -17,6 +17,7 @@ import { setPrimaryAccount } from '@/services/accounts/setPrimaryAccount';
 import { switchSelectedAccount } from '@/services/accounts/switchSelectedAccount';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
 import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
+import type { KnowledgeTopicContextOrigin } from '@/services/knowledge/types';
 import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
@@ -47,7 +48,10 @@ export function DashboardScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<DashboardSurfaceVM | null>(null);
   const [messagePolicyLane, setMessagePolicyLane] = useState<MessagePolicyLane | null>(null);
-  const [selectedKnowledgeTopicId, setSelectedKnowledgeTopicId] = useState<string | null>(null);
+  const [selectedKnowledgeTopic, setSelectedKnowledgeTopic] = useState<{
+    topicId: string;
+    contextualOrigin: KnowledgeTopicContextOrigin | null;
+  } | null>(null);
   const [baselineScan, setBaselineScan] = useState<ForegroundScanResult>();
   const [refreshNonce, setRefreshNonce] = useState(0);
   const [accountSwitcherExpanded, setAccountSwitcherExpanded] = useState(false);
@@ -88,17 +92,28 @@ export function DashboardScreen() {
     () =>
       fetchKnowledgeTopicDetailVM({
         surface: 'KNOWLEDGE_LIBRARY',
-        topicId: selectedKnowledgeTopicId,
+        topicId: selectedKnowledgeTopic?.topicId,
+        contextualOrigin: selectedKnowledgeTopic?.contextualOrigin,
       }),
-    [selectedKnowledgeTopicId],
+    [selectedKnowledgeTopic],
   );
 
-  if (selectedKnowledgeTopicId) {
+  function handleOpenKnowledgeTopic(
+    topicId: string,
+    contextualOrigin?: KnowledgeTopicContextOrigin | null,
+  ) {
+    setSelectedKnowledgeTopic({
+      topicId,
+      contextualOrigin: contextualOrigin ?? null,
+    });
+  }
+
+  if (selectedKnowledgeTopic) {
     return (
       <KnowledgeTopicScreen
         topicVM={knowledgeTopicVM}
-        onBack={() => setSelectedKnowledgeTopicId(null)}
-        onOpenTopic={setSelectedKnowledgeTopicId}
+        onBack={() => setSelectedKnowledgeTopic(null)}
+        onOpenTopic={handleOpenKnowledgeTopic}
       />
     );
   }
@@ -185,7 +200,7 @@ export function DashboardScreen() {
           <View style={styles.section}>
             <ContextualKnowledgeCard
               contextualKnowledge={screenView.contextualKnowledge}
-              onOpenTopic={setSelectedKnowledgeTopicId}
+              onOpenTopic={handleOpenKnowledgeTopic}
             />
           </View>
         ) : null}

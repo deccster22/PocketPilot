@@ -1,6 +1,9 @@
 import type {
   KnowledgeDifficulty,
   KnowledgeMediaType,
+  KnowledgeTopicContextFraming,
+  KnowledgeTopicContextFramingAvailability,
+  KnowledgeTopicContextFramingReason,
   KnowledgeTopicDetailVM,
 } from '@/services/knowledge/types';
 
@@ -16,11 +19,19 @@ export type KnowledgeTopicRelatedCardViewData = {
   metaText: string | null;
 };
 
+export type KnowledgeTopicContextFramingViewData = {
+  title: string;
+  summary: string;
+  originSurfaceText: string;
+  linkageReasonsText: string | null;
+};
+
 export type KnowledgeTopicScreenViewData = {
   title: string;
   summary: string;
   difficultyText: string | null;
   availabilityMessage: string | null;
+  contextFraming: KnowledgeTopicContextFramingViewData | null;
   sections: KnowledgeTopicSectionViewData[];
   relatedTopics: KnowledgeTopicRelatedCardViewData[];
 };
@@ -51,6 +62,44 @@ function formatMediaType(mediaType: KnowledgeMediaType): string {
   }
 }
 
+function formatOriginSurface(
+  originSurface: KnowledgeTopicContextFraming['originSurface'],
+): string {
+  switch (originSurface) {
+    case 'DASHBOARD':
+      return 'Dashboard';
+    case 'TRADE_HUB':
+      return 'Trade Hub';
+    default:
+      return 'None';
+  }
+}
+
+function formatLinkageReason(
+  reason: KnowledgeTopicContextFramingReason,
+): string {
+  switch (reason) {
+    case 'STRATEGY':
+      return 'Strategy';
+    case 'SIGNAL':
+      return 'Signal';
+    case 'EVENT':
+      return 'Event';
+    default:
+      return 'Surface context';
+  }
+}
+
+function formatLinkageReasons(
+  reasons: ReadonlyArray<KnowledgeTopicContextFramingReason>,
+): string | null {
+  if (reasons.length === 0) {
+    return null;
+  }
+
+  return reasons.map(formatLinkageReason).join(' / ');
+}
+
 function formatAvailabilityMessage(
   reason: Extract<KnowledgeTopicDetailVM['availability'], { status: 'UNAVAILABLE' }>['reason'],
 ): string {
@@ -76,6 +125,21 @@ function formatRelatedMeta(params: {
   return parts.length > 0 ? parts.join(' / ') : null;
 }
 
+function createContextFramingViewData(
+  framingAvailability: KnowledgeTopicContextFramingAvailability,
+): KnowledgeTopicContextFramingViewData | null {
+  if (framingAvailability.status !== 'AVAILABLE') {
+    return null;
+  }
+
+  return {
+    title: framingAvailability.framing.title,
+    summary: framingAvailability.framing.summary,
+    originSurfaceText: formatOriginSurface(framingAvailability.framing.originSurface),
+    linkageReasonsText: formatLinkageReasons(framingAvailability.framing.linkageReasons),
+  };
+}
+
 export function createKnowledgeTopicScreenViewData(
   vm: KnowledgeTopicDetailVM | null,
 ): KnowledgeTopicScreenViewData | null {
@@ -90,10 +154,13 @@ export function createKnowledgeTopicScreenViewData(
         'A calm topic view for one PocketPilot concept or strategy. It stays optional and ready when you want more depth.',
       difficultyText: null,
       availabilityMessage: formatAvailabilityMessage(vm.availability.reason),
+      contextFraming: null,
       sections: [],
       relatedTopics: [],
     };
   }
+
+  const contextFraming = createContextFramingViewData(vm.availability.topic.contextFraming);
 
   return {
     title: vm.availability.topic.title,
@@ -102,6 +169,7 @@ export function createKnowledgeTopicScreenViewData(
       ? formatDifficulty(vm.availability.topic.difficulty)
       : null,
     availabilityMessage: null,
+    contextFraming,
     sections: vm.availability.topic.sections.map((section) => ({
       heading: section.heading,
       body: [...section.body],

@@ -70,6 +70,17 @@ Rules:
 - the K5 presentation contract remains intact, so density and placement behavior do not change
 - the lane still never locks execution, disables plans, or changes read-only behavior
 
+## P7-K7 Topic-Detail Context Framing
+Trade Hub keeps the same contextual shelf and the same topic-detail navigation path, but a tap from that shelf can now carry one small prepared context frame into the detail view.
+
+Rules:
+- `services/knowledge/createKnowledgeTopicContextFraming.ts` owns the prepared topic-detail relevance frame
+- `services/knowledge/createKnowledgeTopicDetailVM.ts` threads the frame into the prepared topic detail contract
+- `app/` passes prepared origin metadata only and renders the frame only when the service says it is available
+- the frame stays optional, calm, and subordinate to the topic detail body
+- the shelf still behaves exactly as it did in K4/K5/K6
+- no gating, recommendation feed, inbox, or execution-lock behavior is introduced
+
 ## Surface Contract
 
 Trade Hub consumes a prepared `TradeHubSurfaceModel` from `services/trade/`.
