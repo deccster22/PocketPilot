@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('snapshot briefing placement', () => {
-  it('anchors one canonical Snapshot message zone and one calm 30,000 ft path only on Snapshot in this phase', () => {
+  it('anchors one canonical Snapshot message zone, one calm Since Last Checked section, and one 30,000 ft path only on Snapshot in this phase', () => {
     const snapshotScreenSource = readFileSync(
       join(process.cwd(), 'app', 'screens', 'SnapshotScreen.tsx'),
       'utf8',
@@ -21,6 +21,7 @@ describe('snapshot briefing placement', () => {
     );
 
     expect(snapshotScreenSource).toMatch(/SnapshotBriefingCard/);
+    expect(snapshotScreenSource).toMatch(/SinceLastCheckedCard/);
     expect(snapshotScreenSource).toMatch(/ThirtyThousandFootScreen/);
     expect(snapshotScreenSource).toMatch(/AppState/);
     expect(snapshotScreenSource).toMatch(/refreshSnapshotScreenSurface/);
@@ -32,16 +33,18 @@ describe('snapshot briefing placement', () => {
     expect(snapshotScreenSource).not.toMatch(/reorientationSummaryView/);
     expect(snapshotScreenSource).not.toMatch(/useFocusEffect|useIsFocused/);
     expect(snapshotScreenSource).not.toMatch(/reorientation\.status === 'VISIBLE'/);
-    expect(snapshotScreenSource).not.toMatch(/sinceLastChecked/);
+    expect(snapshotScreenSource).not.toMatch(/eventsSinceLastViewed|createOrientationBriefingItems/);
     expect(snapshotBriefingCardSource).toMatch(/MessageRationaleNote/);
     expect(snapshotBriefingCardSource).not.toMatch(/modal|toast|inbox|badge|notification center/i);
     expect(dashboardScreenSource).toMatch(/MessageRationaleNote/);
     expect(dashboardScreenSource).not.toMatch(/SnapshotBriefingCard/);
+    expect(dashboardScreenSource).not.toMatch(/SinceLastCheckedCard/);
     expect(dashboardScreenSource).not.toMatch(/ThirtyThousandFootScreen/);
     expect(dashboardScreenSource).not.toMatch(/fetchSnapshotSurfaceVM/);
     expect(dashboardScreenSource).not.toMatch(/modal|toast|inbox|badge|notification center/i);
     expect(tradeHubScreenSource).toMatch(/MessageRationaleNote/);
     expect(tradeHubScreenSource).not.toMatch(/SnapshotBriefingCard/);
+    expect(tradeHubScreenSource).not.toMatch(/SinceLastCheckedCard/);
     expect(tradeHubScreenSource).not.toMatch(/ThirtyThousandFootScreen/);
     expect(tradeHubScreenSource).not.toMatch(/modal|toast|inbox|badge|notification center/i);
   });

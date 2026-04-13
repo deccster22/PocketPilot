@@ -6,6 +6,8 @@ Snapshot is PocketPilot's calm, zero-scroll orientation surface. It consumes a p
 
 P6-R5 unifies Snapshot's subordinate orientation layer into one canonical briefing zone.
 It remains optional, quiet, and secondary to the Snapshot core.
+P6-A7 adds one separate calm Since Last Checked section under Strategy Status.
+It remains optional, quiet, and secondary to the Snapshot core.
 PX-C1 adds one separate calm 30,000 ft affordance on the same prepared Snapshot path.
 It remains opt-in, descriptive, and subordinate.
 PX-C2 deepens that same lane with richer service-owned volatility and structural inputs without changing Snapshot's subordinate posture.
@@ -18,14 +20,17 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - `services/snapshot/fetchSnapshotSurfaceVM.ts` shapes one prepared Snapshot surface VM, including the canonical briefing state.
 - `services/messages/fetchMessagePolicyVM.ts` returns one grouped Snapshot message-policy lane for one requested surface.
 - `services/messages/createPreparedMessageRationale.ts` shapes one optional calm rationale for the surfaced Snapshot message.
+- `services/orientation/createSinceLastCheckedVM.ts` shapes one canonical calm Since Last Checked VM for Snapshot.
+- `services/orientation/fetchSinceLastCheckedVM.ts` fetches or reuses that same prepared VM through the service seam.
 - `services/context/fetchThirtyThousandFootVM.ts` builds one canonical broader-context VM for Snapshot's opt-in 30,000 ft lane.
 - `services/messages/applyMessageProfileTuning.ts` keeps alert threshold and profile sensitivity inside that same message-policy seam.
-- `app/` reads the prepared Snapshot surface VM and grouped message-policy lane through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
+- `app/` reads the prepared Snapshot surface VM, grouped message-policy lane, and prepared Since Last Checked view data through the screen-facing helper in `app/screens/snapshotScreenView.ts`.
+- `app/components/SinceLastCheckedCard.tsx` renders the calm prepared Since Last Checked section under Strategy Status.
 - `app/screens/ThirtyThousandFootScreen.tsx` renders the prepared broader-context VM when the user opens the affordance intentionally.
 - P6-R3 keeps dismissal persistence behind that same prepared service path rather than moving visibility rules into `app/`.
 - P6-R4 re-reads that same prepared service path on app foreground return rather than adding a second Snapshot fetch route.
-- P6-R5 keeps reorientation and Since Last Checked on that same path and lets `services/` decide precedence once.
-- P6-R5A removes the retired reorientation-only app presentation helper path so `SnapshotBriefingCard` remains the only active briefing surface in `app/`.
+- P6-R5 keeps reorientation and Since Last Checked on that same briefing-zone path and lets `services/` decide precedence once.
+- P6-R5A removes the retired reorientation-only app presentation helper path so `SnapshotBriefingCard` remains the only active briefing-zone surface in `app/`, while `SinceLastCheckedCard` serves the separate Strategy Status section.
 
 ## Core vs Secondary Discipline
 
@@ -38,6 +43,7 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
   - portfolio value
   - history cue
   - optional Snapshot briefing zone
+  - optional Since Last Checked section
   - optional 30,000 ft affordance
 - Secondary fields must never replace or visually outweigh the core orientation blocks.
 
@@ -52,8 +58,8 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - `services/messages/createMessagePolicyVM.ts` then classifies that prepared result into a Snapshot-facing `REORIENTATION` or `BRIEFING` message, or stays quiet when no message is justified.
 - when a Snapshot message is surfaced, the same service-owned seam may also attach one optional compact rationale explaining why that posture appeared
 - Reorientation owns the zone whenever it is available.
-- Since Last Checked may use the zone only when reorientation is not available.
-- A dismissed reorientation cycle does not fall through to a separate Since Last Checked card.
+- The briefing-zone fallback may use Since Last Checked only when reorientation is not available.
+- The separate Since Last Checked section under Strategy Status is prepared independently and does not change the briefing-zone precedence.
 - Existing reorientation dismissal behavior remains unchanged.
 - Since Last Checked remains non-dismissible in this phase.
 - A thin Snapshot `ALERT` may appear only when no briefing already owns the zone and interpreted context is strong enough after service-owned threshold tuning.
@@ -63,6 +69,16 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - Snapshot rationale must remain explanatory, compact, and non-debuggy.
 - App foreground return re-checks the same prepared Snapshot VM and stays quiet while the app remains active.
 - Snapshot does not become an inbox, alert center, feed, or notification system.
+
+## Since Last Checked Section Rules
+
+- Since Last Checked has one separate calm section under Strategy Status.
+- `services/orientation/createSinceLastCheckedVM.ts` shapes the prepared section from the existing account-scoped event/history/last-viewed seams.
+- `services/orientation/fetchSinceLastCheckedVM.ts` provides one canonical service-owned fetch path for that section.
+- `app/` renders the prepared section only and does not rank, filter, or expand events locally.
+- The section remains compact, meaningful-change-only, and auto-collapses when unavailable.
+- The section remains non-dismissible in this phase.
+- The section does not become an inbox, feed, notification center, badge system, or history browser.
 
 ## 30,000 ft Affordance Rules
 

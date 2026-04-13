@@ -1,7 +1,10 @@
 import type { UserProfile } from '@/core/profile/types';
 import type { MarketEvent } from '@/core/types/marketEvent';
 import type { ReorientationSurfaceState } from '@/services/orientation/createReorientationSurfaceState';
-import type { SnapshotBriefingState } from '@/services/orientation/types';
+import type {
+  SinceLastCheckedAvailability,
+  SnapshotBriefingState,
+} from '@/services/orientation/types';
 
 export type MessagePolicyKind =
   | 'BRIEFING'
@@ -109,6 +112,7 @@ export type MessagePolicySnapshotContext = {
   profile: UserProfile;
   briefing: SnapshotBriefingState;
   reorientation: ReorientationSurfaceState;
+  sinceLastChecked?: SinceLastCheckedAvailability | null;
   sinceLastCheckedSummaryCount: number;
   latestRelevantEvent?: MarketEvent | null;
 };

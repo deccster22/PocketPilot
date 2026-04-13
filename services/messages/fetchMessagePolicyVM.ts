@@ -47,6 +47,7 @@ function createSnapshotContext(surface: SnapshotSurfaceVM): MessagePolicySnapsho
     profile: surface.snapshot.model.profile,
     briefing: surface.briefing,
     reorientation: surface.reorientation,
+    sinceLastChecked: surface.sinceLastChecked ?? null,
     sinceLastCheckedSummaryCount: sinceLastChecked?.summaryCount ?? 0,
     latestRelevantEvent: isMarketEvent(latestRelevantEvent) ? latestRelevantEvent : null,
   };

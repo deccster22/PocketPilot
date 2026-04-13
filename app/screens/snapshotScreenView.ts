@@ -29,6 +29,23 @@ export type SnapshotScreenBriefingItemViewData = {
   detail: string;
 };
 
+export type SnapshotScreenSinceLastCheckedItemViewData = {
+  title: string;
+  summary: string;
+  emphasis: 'NEUTRAL' | 'CHANGE' | 'CONTEXT';
+};
+
+export type SnapshotScreenSinceLastCheckedViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      summary: string;
+      items: ReadonlyArray<SnapshotScreenSinceLastCheckedItemViewData>;
+    };
+
 export type SnapshotScreenMessageViewData =
   | {
       visible: false;
@@ -62,6 +79,7 @@ export type SnapshotScreenViewData = {
   strategyStatusValue: string;
   bundleName?: string;
   portfolioValueText?: string;
+  sinceLastChecked: SnapshotScreenSinceLastCheckedViewData;
   message: SnapshotScreenMessageViewData;
   thirtyThousandFoot: SnapshotScreenThirtyThousandFootViewData;
 };
@@ -157,6 +175,22 @@ export function createSnapshotScreenViewData(
           visible: false as const,
         };
 
+  const sinceLastChecked =
+    surface?.sinceLastChecked?.status === 'AVAILABLE'
+      ? {
+          visible: true as const,
+          title: surface.sinceLastChecked.title,
+          summary: surface.sinceLastChecked.summary,
+          items: surface.sinceLastChecked.items.map((item) => ({
+            title: item.title,
+            summary: item.summary,
+            emphasis: item.emphasis,
+          })),
+        }
+      : {
+          visible: false as const,
+        };
+
   return {
     currentStateLabel: model.core.currentState.label,
     currentStateValue: model.core.currentState.value,
@@ -169,6 +203,7 @@ export function createSnapshotScreenViewData(
       model.secondary?.portfolioValue === undefined
         ? undefined
         : model.secondary.portfolioValue.toFixed(2),
+    sinceLastChecked,
     message,
     thirtyThousandFoot,
   };

@@ -161,6 +161,7 @@ function resolveChangeStrength(event: MarketEvent): PreparedMessageChangeStrengt
 
 function hasSinceLastCheckedContext(snapshot: MessagePolicySnapshotContext): boolean {
   return (
+    snapshot.sinceLastChecked?.status === 'AVAILABLE' ||
     snapshot.sinceLastCheckedSummaryCount > 0 ||
     (snapshot.briefing.status === 'VISIBLE' && snapshot.briefing.kind === 'SINCE_LAST_CHECKED')
   );
