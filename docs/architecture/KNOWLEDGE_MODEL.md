@@ -244,7 +244,7 @@ Rules:
 
 ## Canonical Knowledge Tree
 
-The runtime catalog now has one canonical source path:
+The runtime catalog still has one canonical generation path:
 
 ```text
 docs/knowledge/ + CONTENT_REGISTER
@@ -253,7 +253,17 @@ docs/knowledge/ + CONTENT_REGISTER
 ```
 
 That generated catalog is the live in-app tree used by both shelf and detail shaping.
-This keeps the app aligned with the normalized docs tree instead of leaving an old hand-maintained seed catalog drifting beside it.
+
+`PX-KI1` is a docs-layer import/admin rung. It refreshes the live knowledge corpus under `docs/knowledge/` to the v1.4 family layout for product-facing content:
+- `orientation`
+- `strategies`
+- `glossary`
+- `interpretation`
+- `market-examples`
+- `action-risk`
+- selective `evidence`
+
+This rung does not widen runtime behavior; service contracts and catalog-consumer seams remain unchanged.
 
 ## Service Path
 

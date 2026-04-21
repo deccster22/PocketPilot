@@ -186,12 +186,13 @@ Key docs:
 - `knowledge/README.md`
 - `knowledge/_register/CONTENT_REGISTER.md`
 - `knowledge/_templates/KNOWLEDGE_NODE_TEMPLATE.md`
-- shelf READMEs and topic docs under `00-orientation/`, `10-core-language/`, `20-strategies/`, `30-action-risk/`, `40-reflection/`, and `50-knowledge-system/`
+- live topic docs under `orientation/`, `strategies/`, `glossary/`, `interpretation/`, `market-examples/`, `action-risk/`, and `evidence/`
+- supporting topic docs under `40-reflection/`, `50-knowledge-system/`, and `90-media/`
 
 Current normalization rule:
 
-- The repo keeps the numbered shelf taxonomy.
-- The final canonical pack's word-named shelf folders were treated as content source only, not as a live replacement structure.
+- The v1.4 payload families above are now the live knowledge import baseline.
+- Overlapping numbered legacy shelves were retired to avoid duplicate live homes for the same concepts.
 
 ### 8. Phases
 
@@ -228,6 +229,7 @@ Operational handling folders, not live canon families.
 - `docs/foundations/` was not adopted; founding truth remains split across `docs/founder/` and `docs/governance/`.
 - `docs/models/` was not adopted; object-contract docs land in `docs/architecture/`.
 - `docs/behaviours/` remains the canonical home for cross-cutting behaviour rules even when source packs place them in `docs/product/`.
+- `docs/knowledge/` now uses the v1.4 live family layout (`orientation`, `strategies`, `glossary`, `interpretation`, `market-examples`, `action-risk`, `evidence`) plus retained support families (`40-reflection`, `50-knowledge-system`, `90-media`).
 - `docs/source/` remains provenance storage only. No competing markdown mirror tree was added there.
 
 ## Maps And Traceability
