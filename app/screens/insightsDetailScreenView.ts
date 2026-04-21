@@ -20,10 +20,27 @@ export type InsightsArchiveSectionOptionViewData = {
   isSelected: boolean;
 };
 
+export type SinceLastCheckedContinuityItemViewData = {
+  title: string;
+  summary: string;
+  emphasis: 'NEUTRAL' | 'CHANGE' | 'CONTEXT';
+};
+
+export type SinceLastCheckedContinuityEntryViewData = {
+  title: string;
+  summary: string;
+  surfacedAtText: string | null;
+  viewedAtText: string | null;
+  items: SinceLastCheckedContinuityItemViewData[];
+};
+
 export type InsightsDetailScreenViewData = {
   title: string;
   summary: string;
   availabilityMessage: string | null;
+  continuityTitle: string | null;
+  continuitySummary: string | null;
+  continuityEntries: SinceLastCheckedContinuityEntryViewData[];
   selectedSectionTitle: string | null;
   sectionOptions: InsightsArchiveSectionOptionViewData[];
   items: InsightsDetailCardViewData[];
@@ -54,6 +71,25 @@ function createDetailCardViewData(entry: InsightsDetailEntry): InsightsDetailCar
   };
 }
 
+function createContinuityEntryViewData(
+  entry: Extract<
+    InsightsArchiveVM['sinceLastCheckedContinuity'],
+    { status: 'AVAILABLE' }
+  >['entries'][number],
+): SinceLastCheckedContinuityEntryViewData {
+  return {
+    title: entry.title,
+    summary: entry.summary,
+    surfacedAtText: formatInsightsTimestamp(entry.surfacedAt),
+    viewedAtText: formatInsightsTimestamp(entry.viewedAt),
+    items: entry.items.map((item) => ({
+      title: item.title,
+      summary: item.summary,
+      emphasis: item.emphasis,
+    })),
+  };
+}
+
 export function createInsightsDetailScreenViewData(
   vm: InsightsArchiveVM | null,
 ): InsightsDetailScreenViewData | null {
@@ -67,6 +103,9 @@ export function createInsightsDetailScreenViewData(
       summary:
         'A slightly deeper shelf for interpreted history. It remains selective, factual, and optional.',
       availabilityMessage: formatAvailabilityMessage(vm.availability.reason),
+      continuityTitle: null,
+      continuitySummary: null,
+      continuityEntries: [],
       selectedSectionTitle: null,
       sectionOptions: [],
       items: [],
@@ -77,12 +116,22 @@ export function createInsightsDetailScreenViewData(
     vm.availability.sections.find((section) => section.id === vm.selectedSectionId) ??
     vm.availability.sections[0] ??
     null;
+  const continuityEntries =
+    vm.sinceLastCheckedContinuity.status === 'AVAILABLE'
+      ? vm.sinceLastCheckedContinuity.entries.map(createContinuityEntryViewData)
+      : [];
 
   return {
     title: 'Insights archive',
     summary:
       'A slightly deeper shelf for interpreted history. It remains selective, factual, and optional.',
     availabilityMessage: null,
+    continuityTitle: continuityEntries.length > 0 ? 'Since last checked continuity' : null,
+    continuitySummary:
+      continuityEntries.length > 0
+        ? 'Snapshot clears after view, and continuity remains available here as calm interpreted context.'
+        : null,
+    continuityEntries,
     selectedSectionTitle: selectedSection?.title ?? null,
     sectionOptions: vm.availability.sections.map((section) => ({
       id: section.id,

@@ -46,12 +46,52 @@ describe('createInsightsDetailScreenViewData', () => {
           ],
         },
         selectedSectionId: 'earlier-context',
+        sinceLastCheckedContinuity: {
+          status: 'AVAILABLE',
+          entries: [
+            {
+              title: 'Most recently cleared from Snapshot',
+              summary:
+                'The last Snapshot Since Last Checked briefing was acknowledged and remains available here for continuity.',
+              items: [
+                {
+                  title: 'SOL price context stayed estimated',
+                  summary:
+                    'Recent pricing context for SOL remained estimated, so this part of the picture stayed provisional.',
+                  emphasis: 'CONTEXT',
+                },
+              ],
+              surfacedAt: '2026-03-23T00:00:00.000Z',
+              viewedAt: '2026-03-24T00:00:00.000Z',
+            },
+          ],
+        },
       }),
     ).toEqual({
       title: 'Insights archive',
       summary:
         'A slightly deeper shelf for interpreted history. It remains selective, factual, and optional.',
       availabilityMessage: null,
+      continuityTitle: 'Since last checked continuity',
+      continuitySummary:
+        'Snapshot clears after view, and continuity remains available here as calm interpreted context.',
+      continuityEntries: [
+        {
+          title: 'Most recently cleared from Snapshot',
+          summary:
+            'The last Snapshot Since Last Checked briefing was acknowledged and remains available here for continuity.',
+          surfacedAtText: '2026-03-23 00:00 UTC',
+          viewedAtText: '2026-03-24 00:00 UTC',
+          items: [
+            {
+              title: 'SOL price context stayed estimated',
+              summary:
+                'Recent pricing context for SOL remained estimated, so this part of the picture stayed provisional.',
+              emphasis: 'CONTEXT',
+            },
+          ],
+        },
+      ],
       selectedSectionTitle: 'Earlier context',
       sectionOptions: [
         {
@@ -88,12 +128,19 @@ describe('createInsightsDetailScreenViewData', () => {
           reason: 'INSUFFICIENT_INTERPRETED_HISTORY',
         },
         selectedSectionId: null,
+        sinceLastCheckedContinuity: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_ARCHIVED_CONTINUITY',
+        },
       }),
     ).toEqual({
       title: 'Insights archive',
       summary:
         'A slightly deeper shelf for interpreted history. It remains selective, factual, and optional.',
       availabilityMessage: 'There is not enough deeper interpreted history to open the archive yet.',
+      continuityTitle: null,
+      continuitySummary: null,
+      continuityEntries: [],
       selectedSectionTitle: null,
       sectionOptions: [],
       items: [],
@@ -108,8 +155,9 @@ describe('createInsightsDetailScreenViewData', () => {
 
     expect(source).toMatch(/vm\.availability\.status === 'UNAVAILABLE'/);
     expect(source).toMatch(/selectedSectionId/);
+    expect(source).toMatch(/vm\.sinceLastCheckedContinuity\.status === 'AVAILABLE'/);
     expect(source).not.toMatch(
-      /createInsightsArchiveVM|fetchInsightsArchiveVM|createInsightsHistoryVM|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|unread|inbox|badge/,
+      /createInsightsArchiveVM|fetchInsightsArchiveVM|createSinceLastCheckedArchiveVM|fetchSinceLastCheckedArchiveVM|createInsightsHistoryVM|eventLedger|eventId|strategyId|signalsTriggered|providerId|metadata|unread|inbox|badge|push|notification/,
     );
   });
 

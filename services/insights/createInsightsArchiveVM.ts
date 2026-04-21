@@ -7,6 +7,7 @@ import {
   type InsightsArchiveVM,
   type InsightsContinuitySummary,
   type InsightsHistoryVM,
+  type SinceLastCheckedArchiveAvailability,
 } from './types';
 import {
   countSectionItems,
@@ -56,11 +57,23 @@ function resolveSelectedSectionId(params: {
   return params.sections[0]?.id ?? null;
 }
 
+function resolveSinceLastCheckedContinuity(
+  continuity?: SinceLastCheckedArchiveAvailability | null,
+): SinceLastCheckedArchiveAvailability {
+  return (
+    continuity ?? {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ARCHIVED_CONTINUITY',
+    }
+  );
+}
+
 export function createInsightsArchiveVM(params: {
   generatedAt: string | null;
   history: ReadonlyArray<EventLedgerEntry>;
   historyVM?: InsightsHistoryVM | null;
   continuity?: InsightsContinuitySummary | null;
+  sinceLastCheckedContinuity?: SinceLastCheckedArchiveAvailability | null;
   orientationContext?: Pick<OrientationContext, 'historyContext'> | null;
   selectedSectionId?: string | null;
 }): InsightsArchiveVM {
@@ -72,6 +85,9 @@ export function createInsightsArchiveVM(params: {
         reason: mapHistoryUnavailabilityReason(params.historyVM.availability.reason),
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: resolveSinceLastCheckedContinuity(
+        params.sinceLastCheckedContinuity,
+      ),
     };
   }
 
@@ -98,6 +114,9 @@ export function createInsightsArchiveVM(params: {
         reason: 'NO_ARCHIVE_HISTORY',
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: resolveSinceLastCheckedContinuity(
+        params.sinceLastCheckedContinuity,
+      ),
     };
   }
 
@@ -109,6 +128,9 @@ export function createInsightsArchiveVM(params: {
         reason: 'INSUFFICIENT_INTERPRETED_HISTORY',
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: resolveSinceLastCheckedContinuity(
+        params.sinceLastCheckedContinuity,
+      ),
     };
   }
 
@@ -123,5 +145,8 @@ export function createInsightsArchiveVM(params: {
       selectedSectionId: params.selectedSectionId,
       continuity: params.continuity,
     }),
+    sinceLastCheckedContinuity: resolveSinceLastCheckedContinuity(
+      params.sinceLastCheckedContinuity,
+    ),
   };
 }

@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-13
+Last Updated: 2026-04-21
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-13
+**Last updated:** 2026-04-21
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -69,6 +69,7 @@ Start with:
 - PX-MA4 normalized the selected-account surface shape so Snapshot, Dashboard, Trade Hub, and related support seams reuse one prepared account-context helper instead of rebuilding local branching.
 - Snapshot is sacred. Zero-scroll. Current State, Last 24h Change, Strategy Status.
 - Snapshot also carries one separate calm Since Last Checked section under Strategy Status, and `P6-A8` refines it with service-owned clear-after-view behavior while it stays compact, account-scoped, and non-inbox-like.
+- `P8-I12` keeps that Snapshot clear-after-view behavior intact while adding one service-owned deeper Insights archive continuity seam so the same meaningful-change context can remain available without inbox/feed drift.
 - Interpretation over raw signal output. Users experience meaningful events, not indicator spam.
 - Account-scoped truth. Alignment, fit, risk, alerts, and action support stay account-scoped.
 - Message policy stays grouped as one prepared service-owned lane. User-visible message posture is explained through prepared rationale on that lane, never raw diagnostics or app-owned recomposition.

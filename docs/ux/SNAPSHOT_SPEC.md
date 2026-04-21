@@ -9,6 +9,7 @@ It remains optional, quiet, and secondary to the Snapshot core.
 P6-A7 adds one separate calm Since Last Checked section under Strategy Status.
 It remains optional, quiet, and secondary to the Snapshot core.
 P6-A8 refines that separate section so it clears after view while staying account-scoped, calm, and non-inbox-like.
+P8-I12 preserves that same Snapshot behavior and moves continuity follow-through into one deeper service-owned Insights archive path.
 PX-C1 adds one separate calm 30,000 ft affordance on the same prepared Snapshot path.
 It remains opt-in, descriptive, and subordinate.
 PX-C2 deepens that same lane with richer service-owned volatility and structural inputs without changing Snapshot's subordinate posture.
@@ -80,6 +81,7 @@ PX-C2 deepens that same lane with richer service-owned volatility and structural
 - `app/` renders the prepared section only and does not rank, filter, or expand events locally.
 - The section remains compact, meaningful-change-only, and auto-collapses when unavailable.
 - The section clears after view through service-owned viewed-state handling, but it remains non-dismissible in this phase.
+- P8-I12 keeps Snapshot clear-after-view behavior unchanged and threads continuity into deeper Insights archive via a separate prepared service seam.
 - The section does not become an inbox, feed, notification center, badge system, or history browser.
 
 ## 30,000 ft Affordance Rules

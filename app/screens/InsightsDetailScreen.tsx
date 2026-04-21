@@ -4,6 +4,7 @@ import { InsightsDetailCard } from '@/app/components/InsightsDetailCard';
 import {
   createInsightsDetailScreenViewData,
   type InsightsArchiveSectionOptionViewData,
+  type SinceLastCheckedContinuityEntryViewData,
 } from '@/app/screens/insightsDetailScreenView';
 import type { InsightsArchiveVM } from '@/services/insights/types';
 
@@ -29,6 +30,27 @@ function SectionOptionButton(params: {
         {params.option.title}
       </Text>
     </Pressable>
+  );
+}
+
+function ContinuityEntryCard(params: { entry: SinceLastCheckedContinuityEntryViewData }) {
+  return (
+    <View style={styles.continuityEntryCard}>
+      <Text style={styles.continuityEntryTitle}>{params.entry.title}</Text>
+      <Text style={styles.continuityEntrySummary}>{params.entry.summary}</Text>
+      {params.entry.surfacedAtText ? (
+        <Text style={styles.continuityEntryMeta}>Surfaced: {params.entry.surfacedAtText}</Text>
+      ) : null}
+      {params.entry.viewedAtText ? (
+        <Text style={styles.continuityEntryMeta}>Viewed: {params.entry.viewedAtText}</Text>
+      ) : null}
+      {params.entry.items.map((item) => (
+        <View key={`${item.title}:${item.summary}`} style={styles.continuityItemRow}>
+          <Text style={styles.continuityItemTitle}>{item.title}</Text>
+          <Text style={styles.continuityItemSummary}>{item.summary}</Text>
+        </View>
+      ))}
+    </View>
   );
 }
 
@@ -58,6 +80,18 @@ export function InsightsDetailScreen(params: {
         {screenView.availabilityMessage ? (
           <View style={styles.unavailableCard}>
             <Text style={styles.unavailableText}>{screenView.availabilityMessage}</Text>
+          </View>
+        ) : null}
+
+        {screenView.continuityTitle ? (
+          <View style={styles.continuitySection}>
+            <Text style={styles.continuityTitle}>{screenView.continuityTitle}</Text>
+            {screenView.continuitySummary ? (
+              <Text style={styles.continuitySummary}>{screenView.continuitySummary}</Text>
+            ) : null}
+            {screenView.continuityEntries.map((entry) => (
+              <ContinuityEntryCard key={`${entry.title}:${entry.surfacedAtText ?? 'none'}`} entry={entry} />
+            ))}
           </View>
         ) : null}
 
@@ -135,6 +169,55 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: '#4b5563',
+  },
+  continuitySection: {
+    gap: 8,
+  },
+  continuityTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  continuitySummary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#475569',
+  },
+  continuityEntryCard: {
+    gap: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    backgroundColor: '#ffffff',
+    padding: 12,
+  },
+  continuityEntryTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  continuityEntrySummary: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#334155',
+  },
+  continuityEntryMeta: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#64748b',
+  },
+  continuityItemRow: {
+    gap: 2,
+  },
+  continuityItemTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0f766e',
+  },
+  continuityItemSummary: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#475569',
   },
   sectionOptionsRow: {
     flexDirection: 'row',
