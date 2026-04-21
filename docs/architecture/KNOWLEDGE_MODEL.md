@@ -58,6 +58,12 @@ type KnowledgeCatalogEntry = KnowledgeNode & {
 };
 ```
 
+Runtime note:
+
+- this `family` union is the current runtime grouping contract
+- `PX-KI2` keeps runtime group names unchanged in code, but reconciles docs taxonomy inputs to the live family layout
+- `scripts/generate-knowledge-catalog.js` now maps docs families (`glossary`, `interpretation`, `market-examples`, `evidence`) into the current runtime `core-language` bucket when generation is explicitly run
+
 The library surface remains intentionally smaller:
 
 ```ts
@@ -264,6 +270,8 @@ That generated catalog is the live in-app tree used by both shelf and detail sha
 - selective `evidence`
 
 This rung does not widen runtime behavior; service contracts and catalog-consumer seams remain unchanged.
+
+`PX-KI2` follows by reconciling register/index taxonomy references to that same family layout and updating catalog-generation assumptions without changing runtime contracts or app behavior.
 
 ## Service Path
 

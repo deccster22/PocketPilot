@@ -5,14 +5,29 @@ const ROOT = process.cwd();
 const REGISTER_PATH = path.join(ROOT, 'docs', 'knowledge', '_register', 'CONTENT_REGISTER.csv');
 const OUTPUT_PATH = path.join(ROOT, 'services', 'knowledge', 'knowledgeCatalog.ts');
 
-const FAMILY_ORDER = [
+const DOC_FAMILY_ORDER = [
   'orientation',
-  'core-language',
   'strategies',
+  'glossary',
+  'interpretation',
+  'market-examples',
   'action-risk',
+  'evidence',
   'reflection',
   'knowledge-system',
 ];
+
+const DOC_TO_RUNTIME_FAMILY = {
+  orientation: 'orientation',
+  strategies: 'strategies',
+  glossary: 'core-language',
+  interpretation: 'core-language',
+  'market-examples': 'core-language',
+  'action-risk': 'action-risk',
+  evidence: 'core-language',
+  reflection: 'reflection',
+  'knowledge-system': 'knowledge-system',
+};
 
 const PRIORITY_MAP = {
   now: 'NOW',
@@ -296,9 +311,20 @@ function toPriority(value) {
   return priority;
 }
 
+function toRuntimeFamily(value) {
+  const runtimeFamily = DOC_TO_RUNTIME_FAMILY[value.trim().toLowerCase()];
+
+  if (!runtimeFamily) {
+    throw new Error(`Unsupported docs family value: ${value}`);
+  }
+
+  return runtimeFamily;
+}
+
 function sortCatalog(entries) {
   return [...entries].sort((left, right) => {
-    const familyDelta = FAMILY_ORDER.indexOf(left.family) - FAMILY_ORDER.indexOf(right.family);
+    const familyDelta =
+      DOC_FAMILY_ORDER.indexOf(left.family) - DOC_FAMILY_ORDER.indexOf(right.family);
 
     if (familyDelta !== 0) {
       return familyDelta;
@@ -329,7 +355,7 @@ function main() {
       strategyLinks: [],
       signalLinks: [],
       eventTypeLinks: [],
-      family: row.family.trim(),
+      family: row.family.trim().toLowerCase(),
       priority: toPriority(row.priority),
       sections: preparedSections,
       relatedTopicTitles: relatedSection ? relatedSection.body : [],
@@ -356,7 +382,7 @@ function main() {
       strategyLinks: entry.strategyLinks,
       signalLinks: entry.signalLinks,
       eventTypeLinks: entry.eventTypeLinks,
-      family: entry.family,
+      family: toRuntimeFamily(entry.family),
       priority: entry.priority,
       sections: entry.sections,
       relatedTopicIds,

@@ -50,6 +50,8 @@ The layer should:
 
 The same import also keeps `evidence/` as selective support content and avoids adding research/admin folders as live product copy.
 
+`PX-KI2` follows by reconciling register/index taxonomy references to that same family layout without adding runtime glossary wiring or inline-help behavior.
+
 ## Drift to block
 - encyclopedia drift
 - link spam

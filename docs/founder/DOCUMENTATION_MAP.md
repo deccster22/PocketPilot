@@ -3,7 +3,7 @@
 - Title: PocketPilot Documentation Map
 - Version: v3
 - Source file: reconciled repo docs tree
-- Last updated: 2026-04-09
+- Last updated: 2026-04-21
 
 Purpose: shows where the live canonical docs now live after reconciliation against the final canonical pack.
 
@@ -114,14 +114,17 @@ Canonical in-product learning corpus.
 Canonical home:
 - `docs/knowledge/`
 
-Current shelf taxonomy:
-- `00-orientation/`
-- `10-core-language/`
-- `20-strategies/`
-- `30-action-risk/`
-- `40-reflection/`
-- `50-knowledge-system/`
-- `90-media/`
+Current family taxonomy:
+- `orientation/`
+- `strategies/`
+- `glossary/`
+- `interpretation/`
+- `market-examples/`
+- `action-risk/`
+- `evidence/`
+- `40-reflection/` (support family)
+- `50-knowledge-system/` (support family)
+- `90-media/` (support family)
 
 ### Phases
 
@@ -175,11 +178,11 @@ Operational folders, not live canon families.
 - `docs/foundations/` was not adopted; founding truth remains in `docs/founder/` and `docs/governance/`.
 - `docs/models/` was not adopted; object-contract docs remain in `docs/architecture/`.
 - `docs/behaviours/` remains the live home for `CONFIDENCE_LANGUAGE`, `SIGNAL_EXPOSURE`, and `NOTIFICATION_SYSTEM`.
-- The numbered knowledge shelf taxonomy remains canonical.
+- The family-based knowledge taxonomy is canonical for live docs under `docs/knowledge/`.
 - `docs/source/` remains provenance-only and was not expanded into a competing markdown tree.
 
 ## Practical Notes
 
-- Strategy docs currently live in `docs/knowledge/20-strategies/`, not in a separate `docs/strategies/` tree.
+- Strategy docs currently live in `docs/knowledge/strategies/`, not in a separate `docs/strategies/` tree.
 - Phase and roadmap truth currently lives in `docs/phases/`, not in a separate `docs/roadmap/` tree.
 - Traceability and landing guidance now live in `docs/meta/`, not in placeholder founder notes.

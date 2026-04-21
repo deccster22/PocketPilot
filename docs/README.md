@@ -193,6 +193,7 @@ Current normalization rule:
 
 - The v1.4 payload families above are now the live knowledge import baseline.
 - Overlapping numbered legacy shelves were retired to avoid duplicate live homes for the same concepts.
+- `PX-KI2` reconciles register/index taxonomy references to the same family-based layout and removes stale retired-shelf paths from active navigation docs.
 
 ### 8. Phases
 

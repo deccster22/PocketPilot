@@ -31,6 +31,8 @@ Contextual knowledge follows the same rule: Strategy -> Profile -> Relevance dec
 
 `PX-KI1` keeps this same relevance posture while refreshing the live knowledge corpus to the v1.4 family layout. The import adds core reading families plus selective `evidence/` support and intentionally leaves research/admin packs out of the live layer.
 
+`PX-KI2` keeps the same product posture while normalizing taxonomy/register language to the family-based layout; it does not add runtime glossary clickables, inline-help behavior, or any new relevance logic.
+
 ## Drift to block
 - indicator stacking
 - alert volume inflation

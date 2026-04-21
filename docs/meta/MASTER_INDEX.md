@@ -66,7 +66,8 @@ This is the canonical user-facing learning corpus.
 
 It includes:
 - orientation docs
-- core language / interpretation docs
+- glossary and interpretation docs
+- market examples and evidence support docs
 - strategy explainers
 - action / risk explainers
 - reflection explainers
