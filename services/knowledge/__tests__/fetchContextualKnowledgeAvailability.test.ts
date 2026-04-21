@@ -204,6 +204,10 @@ describe('fetchContextualKnowledgeAvailability', () => {
         sections: [],
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ARCHIVED_CONTINUITY',
+      },
     } as InsightsArchiveVM;
     const reflectionComparison = {
       generatedAt: '2026-04-09T00:00:00.000Z',

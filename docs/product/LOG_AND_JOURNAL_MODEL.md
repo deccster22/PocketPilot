@@ -18,6 +18,7 @@ Reflection should help users remember what mattered, not make them perform self-
 - Export foundation is one calm service-owned preparation seam for reflection output that is already ready under Insights.
 - Journal groundwork now adds one calm service-owned note subsection under Insights with explicit fetch / save / update seams.
 - Since Last Checked is a separate calm Snapshot section for recent meaningful change, not an archive shelf or journal entry lane, and `P6-A8` keeps it clear-after-view on the Snapshot surface while the deeper history spine remains intact.
+- `P8-I12` adds one service-owned deeper continuity representation so a cleared Snapshot Since Last Checked cycle can still be revisited in Insights archive context without turning reflection into an inbox or feed.
 - Export dispatch now adds one calm service-owned file-creation seam plus one narrow journal-aware follow-through path where the current summary context and export format honestly support it.
 - Log remains a later phase; journal scope is still intentionally narrow.
 
@@ -51,6 +52,7 @@ Deeper, slower, and more reflective.
 - compare-window reflections stay calm, bounded, service-owned, and non-moralizing
 - Year in Review stays calm, service-owned, and descriptive rather than evaluative
 - summary archive stays service-owned, descriptive, and browseable without theatre
+- Since Last Checked continuity across Snapshot and deeper Insights archive remains service-owned, account-scoped, and meaningful-change-only
 - reflection exports stay service-owned, explicit about coverage, timezone-labeled, and profile-aware
 - the first journal lane stays service-owned, text-only, context-linked, and optional
 - journal save / update stays explicit and user-authored

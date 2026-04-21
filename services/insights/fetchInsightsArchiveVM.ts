@@ -5,6 +5,7 @@ import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createInsightsArchiveVM } from '@/services/insights/createInsightsArchiveVM';
 import { createInsightsContinuity } from '@/services/insights/createInsightsContinuity';
 import { createInsightsHistoryVM } from '@/services/insights/createInsightsHistoryVM';
+import { fetchSinceLastCheckedArchiveVM } from '@/services/insights/fetchSinceLastCheckedArchiveVM';
 import {
   getInsightsHistoryEntries,
   isInsightsEnabledForSurface,
@@ -35,6 +36,10 @@ export function fetchInsightsArchiveVM(params?: {
         reason: 'NOT_ENABLED_FOR_SURFACE',
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
     };
   }
 
@@ -51,12 +56,14 @@ export function fetchInsightsArchiveVM(params?: {
     historyVM,
     lastViewedBoundary: resolvedInputs.lastViewedBoundary,
   });
+  const sinceLastCheckedArchiveVM = fetchSinceLastCheckedArchiveVM(params);
 
   return createInsightsArchiveVM({
     generatedAt: resolvedInputs.generatedAt,
     history,
     historyVM,
     continuity,
+    sinceLastCheckedContinuity: sinceLastCheckedArchiveVM.availability,
     orientationContext: resolvedInputs.orientationContext,
     selectedSectionId: params?.selectedSectionId,
   });

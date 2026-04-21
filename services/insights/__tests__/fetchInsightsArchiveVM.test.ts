@@ -5,6 +5,7 @@ import { fetchInsightsArchiveVM } from '@/services/insights/fetchInsightsArchive
 import {
   createInMemoryLastViewedState,
   INSIGHTS_LAST_VIEWED_SURFACE_ID,
+  SNAPSHOT_LAST_VIEWED_SURFACE_ID,
 } from '@/services/orientation/lastViewedState';
 
 function createMarketEvent(overrides: Partial<MarketEvent> & Pick<MarketEvent, 'eventId'>): MarketEvent {
@@ -79,6 +80,11 @@ describe('fetchInsightsArchiveVM', () => {
         accountId: 'acct-1',
         timestamp: Date.parse('2026-03-21T12:00:00.000Z'),
       },
+      {
+        surfaceId: SNAPSHOT_LAST_VIEWED_SURFACE_ID,
+        accountId: 'acct-1',
+        timestamp: Date.parse('2026-03-21T12:00:00.000Z'),
+      },
     ]);
 
     const result = fetchInsightsArchiveVM({
@@ -124,6 +130,9 @@ describe('fetchInsightsArchiveVM', () => {
         ],
       },
       selectedSectionId: 'since-last-viewed',
+      sinceLastCheckedContinuity: {
+        status: 'AVAILABLE',
+      },
     });
     expect(JSON.stringify(result)).not.toMatch(/acct-2|broker:live|strategy-alpha|raw_signal_code/);
   });
@@ -208,6 +217,10 @@ describe('fetchInsightsArchiveVM', () => {
         reason: 'NOT_ENABLED_FOR_SURFACE',
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
     });
   });
 
@@ -240,6 +253,10 @@ describe('fetchInsightsArchiveVM', () => {
         reason: 'INSUFFICIENT_INTERPRETED_HISTORY',
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ACCOUNT_CONTEXT',
+      },
     });
   });
 

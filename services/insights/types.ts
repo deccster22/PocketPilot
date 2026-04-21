@@ -1,4 +1,5 @@
 import type { UserProfile } from '@/core/profile/types';
+import type { SinceLastCheckedItem } from '@/services/orientation/types';
 
 export type InsightsEventKind = 'ALIGNMENT' | 'VOLATILITY' | 'STATE_CHANGE' | 'CONTEXT' | 'OTHER';
 
@@ -53,6 +54,29 @@ export type InsightsArchiveAvailability =
       sections: ReadonlyArray<InsightsArchiveSection>;
     };
 
+export type SinceLastCheckedArchiveEntry = {
+  title: string;
+  summary: string;
+  items: ReadonlyArray<SinceLastCheckedItem>;
+  surfacedAt: string | null;
+  viewedAt: string | null;
+};
+
+export type SinceLastCheckedArchiveAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ARCHIVED_CONTINUITY' | 'NO_ACCOUNT_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      entries: ReadonlyArray<SinceLastCheckedArchiveEntry>;
+    };
+
+export type SinceLastCheckedArchiveVM = {
+  generatedAt: string | null;
+  availability: SinceLastCheckedArchiveAvailability;
+};
+
 export type InsightsContinuityState = 'NO_HISTORY' | 'NO_NEW_HISTORY' | 'NEW_HISTORY_AVAILABLE';
 
 export type InsightsLastViewedBoundary = {
@@ -80,6 +104,7 @@ export type InsightsArchiveVM = {
   generatedAt: string | null;
   availability: InsightsArchiveAvailability;
   selectedSectionId: string | null;
+  sinceLastCheckedContinuity: SinceLastCheckedArchiveAvailability;
 };
 
 export type ComparisonWindow =

@@ -148,6 +148,10 @@ describe('createInsightsArchiveVM', () => {
         ],
       },
       selectedSectionId: INSIGHTS_LAST_VIEWED_SECTION_ID,
+      sinceLastCheckedContinuity: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ARCHIVED_CONTINUITY',
+      },
     });
   });
 
@@ -255,6 +259,10 @@ describe('createInsightsArchiveVM', () => {
         reason: 'INSUFFICIENT_INTERPRETED_HISTORY',
       },
       selectedSectionId: null,
+      sinceLastCheckedContinuity: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ARCHIVED_CONTINUITY',
+      },
     });
   });
 
