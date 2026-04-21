@@ -11,7 +11,7 @@ PocketPilot knowledge has two homes:
 - contextual support where explanation actually helps
 
 The rule is simple:
-**knowledge should meet the user where it helps, and get out of the way where it doesn’t.**
+**knowledge should meet the user where it helps, and get out of the way where it does not.**
 
 ## Non-negotiables
 - optional
@@ -38,6 +38,17 @@ The layer should:
 - P7-K7 carries one calm prepared context frame into topic detail so a tapped topic can keep its live-surface relevance without turning topic detail into a feed, gate, or advice surface
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
+
+## Knowledge corpus continuity
+`PX-KI1` keeps one live knowledge tree under `docs/knowledge/` with core user-facing families:
+- `orientation`
+- `strategies`
+- `glossary`
+- `interpretation`
+- `market-examples`
+- `action-risk`
+
+The same import also keeps `evidence/` as selective support content and avoids adding research/admin folders as live product copy.
 
 ## Drift to block
 - encyclopedia drift
