@@ -78,6 +78,7 @@ Start with:
 - P7-K6 deepens contextual topic linkage from live strategy, signal, event, and surface context while keeping the same prepared lane and presentation seams intact.
 - P7-K7 carries one prepared topic-detail context frame from Dashboard and Trade Hub into the existing detail route so the selected topic can explain why it matters there without becoming a gate or advice surface.
 - P7-K8 adds one service-owned inline glossary-help seam plus one service-owned seen-term acknowledgement seam; Dashboard explanation and Trade Hub safety copy may expose narrow beginner-first term links that still route into the same Knowledge Topic detail path.
+- P7-K9 adds one service-owned glossary alias/index normalization seam so canonical terms and approved variants resolve more reliably while preserving K8 scope and keeping app-side matching logic out of `app/`.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.
@@ -195,6 +196,7 @@ Current normalization rule:
 - The v1.4 payload families above are now the live knowledge import baseline.
 - Overlapping numbered legacy shelves were retired to avoid duplicate live homes for the same concepts.
 - `PX-KI2` reconciles register/index taxonomy references to the same family-based layout and removes stale retired-shelf paths from active navigation docs.
+- `P7-K9` refines runtime inline glossary alias matching quality through one service-owned normalization seam without widening glossary rollout surfaces.
 
 ### 8. Phases
 

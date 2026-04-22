@@ -197,6 +197,18 @@ export type ContextualKnowledgeAvailability =
 
 export type InlineGlossarySurface = 'DASHBOARD_EXPLANATION' | 'TRADE_HUB_SAFETY';
 
+export type GlossaryTermVariant = {
+  topicId: string;
+  canonicalTerm: string;
+  matchTerms: ReadonlyArray<string>;
+};
+
+export type GlossaryMatch = {
+  topicId: string;
+  matchedText: string;
+  canonicalTerm: string;
+};
+
 export type InlineGlossarySegment =
   | {
       kind: 'TEXT';

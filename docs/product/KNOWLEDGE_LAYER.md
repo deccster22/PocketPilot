@@ -37,6 +37,7 @@ The layer should:
 - P7-K6 deepens how live context is linked to prepared topics so Dashboard and Trade Hub can surface better prepared topics without turning the lane into a feed or changing the K4/K5 presentation model
 - P7-K7 carries one calm prepared context frame into topic detail so a tapped topic can keep its live-surface relevance without turning topic detail into a feed, gate, or advice surface
 - P7-K8 adds one narrow service-owned inline glossary-help seam on explanatory copy, with beginner-first profile shaping and service-owned seen-term acknowledgement so repeated terms can downgrade quietly
+- P7-K9 improves that same inline glossary seam with service-owned alias/matching normalization so canonical terms and approved variants resolve more reliably without widening surfaces
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
 
@@ -58,6 +59,12 @@ The same import also keeps `evidence/` as selective support content and avoids a
 - one canonical composition seam
 - one canonical seen-term seam
 - one or two calm proof paths (Dashboard explanation + Trade Hub safety copy) that still use the existing topic detail destination
+
+`P7-K9` follows by improving service-owned glossary alias/matching normalization behind that same K8 wiring:
+- one canonical alias/index seam
+- conservative variant normalization (case and punctuation/hyphen forms)
+- explicit suppression of noisy generic over-linking on existing proof paths
+- no new surfaces and no app-owned matching logic
 
 ## Drift to block
 - encyclopedia drift

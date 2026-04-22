@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P7-K8)
+# Trade Hub Spec (P5-X + P7-K8 + P7-K9)
 
 ## Purpose
 
@@ -91,6 +91,16 @@ Rules:
 - term taps route to the existing `KnowledgeTopicScreen` path
 - no app-side term matching, ranking, broad auto-linking, or modal tooltip swarm is introduced
 - no gating, execution lock, push, inbox, or notification behavior is introduced
+
+## P7-K9 Glossary Alias / Matching Normalization
+Trade Hub keeps the same K8 inline glossary proof path, but service-owned matching quality improves through alias normalization.
+
+Rules:
+- `services/knowledge/createGlossaryTermIndex.ts` owns canonical term + alias normalization for Trade Hub safety copy
+- `services/knowledge/selectInlineGlossaryTerms.ts` consumes that normalized index and keeps matching deterministic
+- generic noisy terms are intentionally suppressed rather than broadly linked
+- `app/` keeps render-only behavior and does not perform local term matching
+- no new Trade Hub glossary surfaces, gating behavior, or execution-lock behavior are introduced
 
 ## Surface Contract
 
