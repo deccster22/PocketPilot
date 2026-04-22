@@ -38,16 +38,16 @@ describe('inline glossary help placement', () => {
     expect(explanationCardSource).toMatch(/InlineGlossaryText/);
     expect(explanationCardSource).toMatch(/onOpenGlossaryTopic/);
     expect(explanationCardSource).not.toMatch(
-      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|RegExp\(/,
+      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|RegExp\(/,
     );
     expect(inlineGlossaryTextSource).not.toMatch(
-      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|match\(|exec\(/,
+      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|match\(|exec\(/,
     );
     expect(dashboardScreenSource).not.toMatch(
-      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|createInlineGlossaryAcknowledgementKey|knowledgeCatalog/,
+      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog/,
     );
     expect(tradeHubScreenSource).not.toMatch(
-      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|createInlineGlossaryAcknowledgementKey|knowledgeCatalog/,
+      /createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog/,
     );
   });
 });

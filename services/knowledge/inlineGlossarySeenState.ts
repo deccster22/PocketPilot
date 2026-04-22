@@ -1,4 +1,6 @@
 import type { UserProfile } from '@/core/profile/types';
+import type { InlineGlossarySignalStore } from '@/services/knowledge/inlineGlossarySignalStore';
+import { recordInlineGlossaryAcknowledgedSignals } from '@/services/knowledge/recordInlineGlossarySignals';
 import type { InlineGlossarySurface } from '@/services/knowledge/types';
 
 export type InlineGlossaryAcknowledgementScope = {
@@ -73,9 +75,14 @@ export function createInMemoryInlineGlossarySeenState(
 export function acknowledgeInlineGlossaryTerms(params: {
   acknowledgementKeys: ReadonlyArray<string>;
   seenState?: InlineGlossarySeenState;
+  signalStore?: InlineGlossarySignalStore;
 }): void {
   const seenState = params.seenState ?? defaultInlineGlossarySeenState;
   seenState.acknowledgeMany(params.acknowledgementKeys);
+  recordInlineGlossaryAcknowledgedSignals({
+    acknowledgementKeys: params.acknowledgementKeys,
+    signalStore: params.signalStore,
+  });
 }
 
 export const defaultInlineGlossarySeenState = createInMemoryInlineGlossarySeenState();

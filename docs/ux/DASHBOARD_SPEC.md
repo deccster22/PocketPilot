@@ -1,4 +1,4 @@
-# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2 + PX-MA3 + P7-K8 + P7-K9)
+# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2 + PX-MA3 + P7-K8 + P7-K9 + P7-K10)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
@@ -238,6 +238,15 @@ Rules:
 - app behavior is unchanged: render prepared segments and route taps to existing topic detail
 - generic noisy terms stay suppressed; Dashboard does not become underlined-link clutter
 - no new Dashboard surfaces, gating behavior, or UI-owned matching logic are introduced
+
+## P7-K10 Inline Glossary Exposure Signals / Tuning Hooks
+Dashboard keeps the same K8/K9 inline glossary presentation while services collect compact internal aggregate signals for future tuning.
+
+Rules:
+- surfaced/acknowledged signal recording stays in `services/knowledge`
+- no Dashboard analytics panel, debug widget, or user-facing signal summary is added
+- no network telemetry/export behavior is introduced in this phase
+- no Dashboard action, explanation, or relevance gating is introduced
 
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.

@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P7-K8 + P7-K9)
+# Trade Hub Spec (P5-X + P7-K8 + P7-K9 + P7-K10)
 
 ## Purpose
 
@@ -101,6 +101,15 @@ Rules:
 - generic noisy terms are intentionally suppressed rather than broadly linked
 - `app/` keeps render-only behavior and does not perform local term matching
 - no new Trade Hub glossary surfaces, gating behavior, or execution-lock behavior are introduced
+
+## P7-K10 Inline Glossary Exposure Signals / Tuning Hooks
+Trade Hub keeps the same K8/K9 inline glossary proof path while services collect compact internal aggregate surfaced/acknowledged signals.
+
+Rules:
+- signal recording and summary shaping remain service-owned and invisible to users
+- no Trade Hub analytics/debug panel or operator surface is added
+- no network telemetry/export path is introduced in this phase
+- no execution gating or action-lock behavior is introduced through glossary signals
 
 ## Surface Contract
 

@@ -1,10 +1,12 @@
 import type { UserProfile } from '@/core/profile/types';
+import type { InlineGlossarySignalStore } from '@/services/knowledge/inlineGlossarySignalStore';
 import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
 import {
   createInlineGlossaryAcknowledgementKey,
   defaultInlineGlossarySeenState,
   type InlineGlossarySeenState,
 } from '@/services/knowledge/inlineGlossarySeenState';
+import { recordInlineGlossarySurfacedSignals } from '@/services/knowledge/recordInlineGlossarySignals';
 import {
   selectInlineGlossaryTerms,
   type InlineGlossaryTermCandidate,
@@ -88,6 +90,7 @@ export function createInlineGlossaryHelp(params: {
   accountId?: string | null;
   nodes?: ReadonlyArray<KnowledgeCatalogEntry>;
   seenState?: InlineGlossarySeenState;
+  signalStore?: InlineGlossarySignalStore;
 }): InlineGlossaryAvailability {
   const maxLinkedTerms = MAX_LINKED_TERMS_BY_PROFILE[params.profile];
 
@@ -129,16 +132,25 @@ export function createInlineGlossaryHelp(params: {
     }
   });
 
+  const block = toSegments({
+    text: params.text,
+    candidates: selection.candidates,
+    linkedTopicIds,
+    profile: params.profile,
+    surface: params.surface,
+    accountId: params.accountId,
+    seenState,
+  });
+
+  recordInlineGlossarySurfacedSignals({
+    profile: params.profile,
+    surface: params.surface,
+    topicIds: selection.candidates.map((candidate) => candidate.topicId),
+    signalStore: params.signalStore,
+  });
+
   return {
     status: 'AVAILABLE',
-    block: toSegments({
-      text: params.text,
-      candidates: selection.candidates,
-      linkedTopicIds,
-      profile: params.profile,
-      surface: params.surface,
-      accountId: params.accountId,
-      seenState,
-    }),
+    block,
   };
 }

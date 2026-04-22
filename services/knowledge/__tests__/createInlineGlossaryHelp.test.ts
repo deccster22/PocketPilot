@@ -3,7 +3,9 @@ import {
   acknowledgeInlineGlossaryTerms,
   createInMemoryInlineGlossarySeenState,
 } from '@/services/knowledge/inlineGlossarySeenState';
+import { createInMemoryInlineGlossarySignalStore } from '@/services/knowledge/inlineGlossarySignalStore';
 import { createInlineGlossaryHelp } from '@/services/knowledge/createInlineGlossaryHelp';
+import { fetchInlineGlossarySignalSummary } from '@/services/knowledge/fetchInlineGlossarySignalSummary';
 
 describe('createInlineGlossaryHelp', () => {
   it('gives beginner users linked inline glossary help on first encounter', () => {
@@ -164,6 +166,44 @@ describe('createInlineGlossaryHelp', () => {
       kind: 'GLOSSARY_TERM',
       topicId: 'pp-what-protection-plans-are-for',
       renderMode: 'PLAIN',
+    });
+  });
+
+  it('increments surfaced counters on the same canonical topic across alias variants', () => {
+    const signalStore = createInMemoryInlineGlossarySignalStore();
+
+    const canonical = createInlineGlossaryHelp({
+      profile: 'BEGINNER',
+      surface: 'TRADE_HUB_SAFETY',
+      text: 'Protection plan context stays support-only and optional.',
+      accountId: 'acct-1',
+      nodes: knowledgeCatalog,
+      signalStore,
+    });
+    const alias = createInlineGlossaryHelp({
+      profile: 'BEGINNER',
+      surface: 'TRADE_HUB_SAFETY',
+      text: 'ProtectionPlan context stays support-only and optional.',
+      accountId: 'acct-1',
+      nodes: knowledgeCatalog,
+      signalStore,
+    });
+
+    expect(canonical.status).toBe('AVAILABLE');
+    expect(alias.status).toBe('AVAILABLE');
+    expect(fetchInlineGlossarySignalSummary({ signalStore })).toEqual({
+      status: 'AVAILABLE',
+      signals: [
+        {
+          key: {
+            topicId: 'pp-what-protection-plans-are-for',
+            surface: 'TRADE_HUB',
+            profileTier: 'BEGINNER',
+          },
+          surfacedCount: 2,
+          acknowledgedCount: 0,
+        },
+      ],
     });
   });
 });
