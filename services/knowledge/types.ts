@@ -194,3 +194,33 @@ export type ContextualKnowledgeAvailability =
       surface: KnowledgeContextSurface;
       items: ReadonlyArray<ContextualKnowledgeCandidate>;
     };
+
+export type InlineGlossarySurface = 'DASHBOARD_EXPLANATION' | 'TRADE_HUB_SAFETY';
+
+export type InlineGlossarySegment =
+  | {
+      kind: 'TEXT';
+      text: string;
+    }
+  | {
+      kind: 'GLOSSARY_TERM';
+      text: string;
+      topicId: string;
+      acknowledgementKey: string;
+      renderMode: 'LINKED' | 'PLAIN';
+    };
+
+export type InlineGlossaryBlock = {
+  segments: ReadonlyArray<InlineGlossarySegment>;
+  acknowledgementKeys: ReadonlyArray<string>;
+};
+
+export type InlineGlossaryAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ELIGIBLE_TERMS' | 'NOT_ENABLED_FOR_PROFILE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      block: InlineGlossaryBlock;
+    };

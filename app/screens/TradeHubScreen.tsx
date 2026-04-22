@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import { ContextualKnowledgeCard } from '@/app/components/ContextualKnowledgeCard';
+import { InlineGlossaryText } from '@/app/components/InlineGlossaryText';
 import { MessageRationaleNote } from '@/app/components/MessageRationaleNote';
 import { ProfileSelector } from '@/app/components/ProfileSelector';
 import { DEFAULT_USER_PROFILE, type UserProfile } from '@/app/state/profileState';
@@ -31,6 +32,7 @@ import { fetchConfirmationSessionVM } from '@/services/trade/fetchConfirmationSe
 import { fetchExecutionReadinessVM } from '@/services/trade/fetchExecutionReadinessVM';
 import { fetchExecutionPreviewVM } from '@/services/trade/fetchExecutionPreviewVM';
 import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
+import { acknowledgeInlineGlossaryTerms } from '@/services/knowledge/inlineGlossarySeenState';
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM, type TradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { updatePreferredRiskBasis } from '@/services/trade/updatePreferredRiskBasis';
@@ -211,6 +213,8 @@ export function TradeHubScreen() {
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
   const [contextualKnowledgeLane, setContextualKnowledgeLane] =
     useState<TradeHubVM['contextualKnowledgeLane'] | null>(null);
+  const [inlineGlossaryHelp, setInlineGlossaryHelp] =
+    useState<TradeHubVM['inlineGlossaryHelp'] | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | undefined>();
   const [selectedKnowledgeTopic, setSelectedKnowledgeTopic] = useState<{
     topicId: string;
@@ -258,6 +262,7 @@ export function TradeHubScreen() {
 
         setSurfaceModel(tradeHub.model);
         setContextualKnowledgeLane(tradeHub.contextualKnowledgeLane);
+        setInlineGlossaryHelp(tradeHub.inlineGlossaryHelp);
         setBaselineScan((currentBaseline) => currentBaseline ?? tradeHub.scan);
       })
       .catch(() => {
@@ -267,6 +272,7 @@ export function TradeHubScreen() {
 
         setSurfaceModel(null);
         setContextualKnowledgeLane(null);
+        setInlineGlossaryHelp(null);
       });
 
     return () => {
@@ -285,8 +291,14 @@ export function TradeHubScreen() {
   }, [preferredRiskBasisAccountId]);
 
   const screenView = useMemo(
-    () => createTradeHubScreenViewData(surfaceModel, messagePolicyLane, contextualKnowledgeLane),
-    [contextualKnowledgeLane, messagePolicyLane, surfaceModel],
+    () =>
+      createTradeHubScreenViewData(
+        surfaceModel,
+        messagePolicyLane,
+        contextualKnowledgeLane,
+        inlineGlossaryHelp,
+      ),
+    [contextualKnowledgeLane, inlineGlossaryHelp, messagePolicyLane, surfaceModel],
   );
   const knowledgeTopicVM = useMemo(
     () =>
@@ -650,9 +662,20 @@ export function TradeHubScreen() {
           <Text style={styles.sectionTitle}>Trade Hub</Text>
           <Text style={styles.label}>Profile</Text>
           <ProfileSelector value={profile} onChange={setProfile} />
-          <Text style={styles.supportText}>
-            {screenView?.safetyText ?? 'Preparing Trade Hub...'}
-          </Text>
+          <InlineGlossaryText
+            text={screenView?.safetyText ?? 'Preparing Trade Hub...'}
+            inlineGlossary={screenView?.safetyInlineGlossary}
+            textStyle={styles.supportText}
+            onOpenTopic={({ topicId, acknowledgementKey }) => {
+              acknowledgeInlineGlossaryTerms({
+                acknowledgementKeys: [acknowledgementKey],
+              });
+              handleOpenKnowledgeTopic(topicId, {
+                originSurface: 'TRADE_HUB',
+                linkageReason: 'SURFACE_CONTEXT',
+              });
+            }}
+          />
           <Text style={styles.supportText}>
             {screenView?.confirmationText ?? 'Trade actions remain read-only in this phase.'}
           </Text>

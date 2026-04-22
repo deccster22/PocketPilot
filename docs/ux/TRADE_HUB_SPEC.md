@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X)
+# Trade Hub Spec (P5-X + P7-K8)
 
 ## Purpose
 
@@ -80,6 +80,17 @@ Rules:
 - the frame stays optional, calm, and subordinate to the topic detail body
 - the shelf still behaves exactly as it did in K4/K5/K6
 - no gating, recommendation feed, inbox, or execution-lock behavior is introduced
+
+## P7-K8 Inline Glossary / Keyword Help
+Trade Hub now supports one narrow inline glossary-help proof path on calm explanatory copy.
+
+Rules:
+- `services/knowledge/createInlineGlossaryHelp.ts` prepares the inline block; `app/` only renders prepared segments
+- profile shaping stays service-owned (`BEGINNER` strongest, `MIDDLE` lighter, `ADVANCED` minimal by default)
+- seen-term acknowledgement stays service-owned through `services/knowledge/inlineGlossarySeenState.ts`
+- term taps route to the existing `KnowledgeTopicScreen` path
+- no app-side term matching, ranking, broad auto-linking, or modal tooltip swarm is introduced
+- no gating, execution lock, push, inbox, or notification behavior is introduced
 
 ## Surface Contract
 

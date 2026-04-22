@@ -169,6 +169,10 @@ describe('createTradeHubScreenViewData', () => {
     expect(view).toEqual({
       profileLabel: 'ADVANCED',
       safetyText: 'Trade Hub frames possible actions only. Nothing here executes a trade.',
+      safetyInlineGlossary: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
       confirmationText: 'Every action remains confirmation-safe and non-executing in this phase.',
       message: {
         visible: false,
@@ -366,6 +370,52 @@ describe('createTradeHubScreenViewData', () => {
     });
   });
 
+  it('keeps action-support copy and plan visibility unchanged when inline glossary help is available', () => {
+    const view = createTradeHubScreenViewData(
+      {
+        primaryPlan: null,
+        alternativePlans: [],
+        riskLane: createUnavailableTradeHubRiskLane(),
+        meta: {
+          hasPrimaryPlan: false,
+          profile: 'BEGINNER',
+          requiresConfirmation: true,
+        },
+      },
+      createMessagePolicyLane(unavailableMessagePolicy()),
+      undefined,
+      {
+        status: 'AVAILABLE',
+        block: {
+          acknowledgementKeys: ['ack-key'],
+          segments: [
+            {
+              kind: 'GLOSSARY_TERM',
+              text: 'Trade Hub',
+              topicId: 'pp-what-trade-hub-is-for',
+              acknowledgementKey: 'ack-key',
+              renderMode: 'LINKED',
+            },
+            {
+              kind: 'TEXT',
+              text: ' frames possible actions only.',
+            },
+          ],
+        },
+      },
+    );
+
+    expect(view).toMatchObject({
+      safetyText: 'Trade Hub frames possible actions only. Nothing here executes a trade.',
+      confirmationText: 'Every action remains confirmation-safe and non-executing in this phase.',
+      primaryPlan: null,
+      alternativePlans: [],
+      safetyInlineGlossary: {
+        status: 'AVAILABLE',
+      },
+    });
+  });
+
   it('keeps the screen helper on the prepared message-policy and Trade Hub contracts only', () => {
     const source = readFileSync(join(process.cwd(), 'app', 'screens', 'tradeHubScreenView.ts'), 'utf8');
 
@@ -380,7 +430,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/surface\.riskLane\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);

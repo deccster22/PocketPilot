@@ -344,6 +344,10 @@ describe('fetchTradeHubVM', () => {
     });
     expect(result.contextualKnowledgeLane.topics).toHaveLength(1);
     expect(result.contextualKnowledgeLane.topics[0].reason).toEqual(expect.any(String));
+    expect(result.inlineGlossaryHelp).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_PROFILE',
+    });
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');
     expect(JSON.stringify(result.model)).not.toContain('hidden');
   });

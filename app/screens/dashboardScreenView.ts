@@ -14,6 +14,7 @@ import {
   createContextualKnowledgeSectionViewData,
   type ContextualKnowledgeSectionViewData,
 } from '@/app/screens/contextualKnowledgeView';
+import type { InlineGlossaryAvailability } from '@/services/knowledge/types';
 import { fetchMessagePolicyVM } from '@/services/messages/fetchMessagePolicyVM';
 import type {
   MessagePolicyLane,
@@ -111,6 +112,7 @@ export type DashboardScreenViewData = {
         visible: true;
         title: string;
         summary: string;
+        inlineGlossary: InlineGlossaryAvailability;
         confidenceText: string;
         confidenceNote: string;
         detail:
@@ -398,6 +400,7 @@ export function createDashboardScreenViewData(
             visible: true,
             title: surface.explanation.explanation.title,
             summary: surface.explanation.explanation.summary,
+            inlineGlossary: surface.inlineGlossaryHelp,
             confidenceText: formatConfidenceText(surface.explanation.explanation.confidence),
             confidenceNote: surface.explanation.explanation.confidenceNote,
             detail: hasExplanationDetail ? explanationDetail : null,

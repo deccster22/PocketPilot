@@ -11,13 +11,15 @@ import { fetchDashboardExplanationVM } from '@/services/dashboard/fetchDashboard
 import type { DashboardSurfaceModel } from '@/services/dashboard/types';
 import type { ExplanationAvailability } from '@/services/explanation/types';
 import { createContextualKnowledgeLane } from '@/services/knowledge/createContextualKnowledgeLane';
-import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
+import { createInlineGlossaryHelp } from '@/services/knowledge/createInlineGlossaryHelp';
+import type { ContextualKnowledgeLane, InlineGlossaryAvailability } from '@/services/knowledge/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
 export type DashboardSurfaceVM = {
   accountContext: Awaited<ReturnType<typeof fetchDashboardData>>['accountContext'];
   aggregatePortfolioContext: Awaited<ReturnType<typeof fetchDashboardData>>['aggregatePortfolioContext'];
   contextualKnowledgeLane: ContextualKnowledgeLane;
+  inlineGlossaryHelp: InlineGlossaryAvailability;
   model: DashboardSurfaceModel;
   scan: ForegroundScanResult;
   explanation: ExplanationAvailability;
@@ -58,17 +60,31 @@ export async function fetchDashboardSurfaceVM(params: {
     dashboardSurface: surfaceModel,
     marketEvents: scopedEvents,
   });
+  const explanation = fetchDashboardExplanationVM({
+    surfaceModel,
+    events: scopedEvents,
+    explanationContext: scopedExplanationContext,
+  });
+  const inlineGlossaryHelp: InlineGlossaryAvailability =
+    explanation.status === 'AVAILABLE'
+      ? createInlineGlossaryHelp({
+          profile: params.profile,
+          surface: 'DASHBOARD_EXPLANATION',
+          text: explanation.explanation.summary,
+          accountId: surfaceAccountContext.selectedAccountId,
+        })
+      : {
+          status: 'UNAVAILABLE',
+          reason: 'NO_ELIGIBLE_TERMS',
+        };
 
   return {
     accountContext: dashboardData.accountContext,
     aggregatePortfolioContext: dashboardData.aggregatePortfolioContext,
     contextualKnowledgeLane,
+    inlineGlossaryHelp,
     model: surfaceModel,
     scan: dashboardData.scan,
-    explanation: fetchDashboardExplanationVM({
-      surfaceModel,
-      events: scopedEvents,
-      explanationContext: scopedExplanationContext,
-    }),
+    explanation,
   };
 }

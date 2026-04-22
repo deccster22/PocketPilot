@@ -1,4 +1,4 @@
-# Knowledge Library Spec (P7-K1, P7-K2, P7-K7)
+# Knowledge Library Spec (P7-K1, P7-K2, P7-K7, P7-K8)
 
 ## Purpose
 
@@ -7,6 +7,7 @@ The Knowledge Library is PocketPilot's first dedicated learning surface.
 In `P7-K1` it became one calm, always-accessible reference shelf.
 In `P7-K2` it gains one subordinate topic detail route so a user can move from the shelf into a deeper topic without turning the app into a document browser.
 In `P7-K7` that same topic detail route can receive one small prepared relevance frame when the topic came from the Dashboard or Trade Hub contextual shelf.
+In `P7-K8` that same route is also reused for narrow inline glossary term taps from Dashboard explanation and Trade Hub safety copy.
 
 This is still a baseline knowledge system, not the finished knowledge family.
 
@@ -21,6 +22,7 @@ This is still a baseline knowledge system, not the finished knowledge family.
 - no urgency language
 - no patronising lesson flow
 - no contextual framing when the topic was opened from a non-contextual path
+- no second parallel topic-detail destination for inline glossary taps
 
 If knowledge is unavailable, the surface should show a minimal honest state rather than decorative filler.
 

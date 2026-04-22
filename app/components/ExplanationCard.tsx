@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { InlineGlossaryText } from '@/app/components/InlineGlossaryText';
 import type { DashboardScreenViewData } from '@/app/screens/dashboardScreenView';
 
 type ExplanationCardViewData = Extract<DashboardScreenViewData['explanation'], { visible: true }>;
 
 export function ExplanationCard(params: {
   explanation: ExplanationCardViewData;
+  onOpenGlossaryTopic?: (params: { topicId: string; acknowledgementKey: string }) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -21,7 +23,12 @@ export function ExplanationCard(params: {
       <View style={styles.header}>
         <Text style={styles.eyebrow}>Why</Text>
         <Text style={styles.title}>{params.explanation.title}</Text>
-        <Text style={styles.summary}>{params.explanation.summary}</Text>
+        <InlineGlossaryText
+          text={params.explanation.summary}
+          inlineGlossary={params.explanation.inlineGlossary}
+          textStyle={styles.summary}
+          onOpenTopic={params.onOpenGlossaryTopic}
+        />
       </View>
 
       <View style={styles.section}>

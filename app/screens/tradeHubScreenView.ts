@@ -1,4 +1,5 @@
 import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
+import type { InlineGlossaryAvailability } from '@/services/knowledge/types';
 import {
   createContextualKnowledgeSectionViewData,
   type ContextualKnowledgeSectionViewData,
@@ -17,6 +18,10 @@ import type {
   TradeHubPlanCard,
   TradeHubSurfaceModel,
 } from '@/services/trade/types';
+import {
+  createTradeHubConfirmationText,
+  TRADE_HUB_SAFETY_TEXT,
+} from '@/services/trade/tradeHubCopy';
 
 export type TradeHubScreenPlanViewData = {
   planId: string;
@@ -85,6 +90,7 @@ export type TradeHubRiskLaneViewData = {
 export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
+  safetyInlineGlossary: InlineGlossaryAvailability;
   confirmationText: string;
   message:
     | {
@@ -398,6 +404,7 @@ export function createTradeHubScreenViewData(
   surface: TradeHubSurfaceModel | null,
   messagePolicyLane?: MessagePolicyLane | null,
   contextualKnowledgeLane?: ContextualKnowledgeLane | null,
+  inlineGlossaryHelp?: InlineGlossaryAvailability | null,
 ): TradeHubScreenViewData | null {
   if (!surface) {
     return null;
@@ -405,10 +412,12 @@ export function createTradeHubScreenViewData(
 
   return {
     profileLabel: surface.meta.profile,
-    safetyText: 'Trade Hub frames possible actions only. Nothing here executes a trade.',
-    confirmationText: surface.meta.requiresConfirmation
-      ? 'Every action remains confirmation-safe and non-executing in this phase.'
-      : 'Confirmation rules are not required.',
+    safetyText: TRADE_HUB_SAFETY_TEXT,
+    safetyInlineGlossary: inlineGlossaryHelp ?? {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ELIGIBLE_TERMS',
+    },
+    confirmationText: createTradeHubConfirmationText(surface.meta.requiresConfirmation),
     message: createTradeHubMessageViewData(messagePolicyLane),
     riskLane: createTradeHubRiskLaneViewData(surface),
     contextualKnowledge: createContextualKnowledgeSectionViewData(contextualKnowledgeLane),

@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P9-S2)
 
 ## Purpose
 
@@ -11,6 +11,7 @@
 `P7-K5` refines the live rollout with one explicit density/placement presentation seam without turning it into a feed or gate.
 `P7-K6` improves the canonical live-surface linkage path so the same prepared lane can choose better topics from live strategy, signal, event, and surface context without changing the K4/K5 presentation contract.
 `P7-K7` carries that same relevance judgment into topic detail by letting the selected topic receive one prepared context frame from Dashboard or Trade Hub without adding a gate, inbox, or advice layer.
+`P7-K8` adds one canonical inline glossary-help seam plus one canonical seen-term acknowledgement seam for narrow explanatory-copy proof paths on Dashboard and Trade Hub.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -248,6 +249,40 @@ Rules:
 - the framing stays optional, calm, and subordinate to the selected topic
 - the contract stays small and does not include advice, gating, recommendations, inbox, or push behaviour
 
+`P7-K8` adds one explicit inline glossary-help contract:
+
+```ts
+type InlineGlossaryAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ELIGIBLE_TERMS' | 'NOT_ENABLED_FOR_PROFILE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      block: {
+        segments: readonly Array<
+          | { kind: 'TEXT'; text: string }
+          | {
+              kind: 'GLOSSARY_TERM';
+              text: string;
+              topicId: string;
+              acknowledgementKey: string;
+              renderMode: 'LINKED' | 'PLAIN';
+            }
+        >;
+        acknowledgementKeys: readonly string[];
+      };
+    };
+```
+
+Rules:
+
+- `services/knowledge/selectInlineGlossaryTerms.ts` owns narrow term eligibility and topic resolution
+- `services/knowledge/createInlineGlossaryHelp.ts` owns profile shaping plus seen-term downgrade behavior
+- `services/knowledge/inlineGlossarySeenState.ts` owns acknowledgement-state persistence seam
+- `app/` renders prepared segments only and routes term taps into existing topic detail
+- no UI-side matching/ranking and no gating mechanics are introduced
+
 ## Canonical Knowledge Tree
 
 The runtime catalog still has one canonical generation path:
@@ -292,6 +327,10 @@ knowledgeCatalog
 -> createContextualKnowledgePresentation
 -> createContextualKnowledgeLane
 -> contextual live shelf
+-> selectInlineGlossaryTerms
+-> createInlineGlossaryHelp
+-> inlineGlossarySeenState acknowledge/update seam
+-> narrow Dashboard / Trade Hub inline glossary proof paths
 ```
 
 `P9-S2` then adds a preview-specific follow-through path on top of the same catalog:
@@ -317,6 +356,9 @@ Responsibilities:
 - `services/knowledge/createContextualKnowledgeAvailability.ts` owns contextual candidate shaping
 - `services/knowledge/selectContextualKnowledgeTopics.ts` owns contextual topic ranking and linkage shaping
 - `services/knowledge/fetchContextualKnowledgeAvailability.ts` owns contextual surface interpretation
+- `services/knowledge/selectInlineGlossaryTerms.ts` owns narrow inline term eligibility and term-to-topic resolution
+- `services/knowledge/createInlineGlossaryHelp.ts` owns inline glossary composition from term selection, profile shaping, and seen-state inputs
+- `services/knowledge/inlineGlossarySeenState.ts` owns explicit acknowledgement-state storage and updates for first-encounter shaping
 - `services/strategyNavigator/selectStrategyPreviewKnowledge.ts` owns preview-specific follow-through selection
 - `app/screens/*knowledge*View.ts` files format prepared display text only
 - `app/` does not read docs files, browse markdown, group raw nodes, infer related-topic metadata, or rank contextual candidates locally
@@ -336,6 +378,7 @@ Rules locked in this phase:
 - Dashboard and Trade Hub are the only live-surface consumers in `P7-K4`, `P7-K5`, `P7-K6`, and `P7-K7`
 - `P7-K6` keeps the same live-surface consumers and only improves how their prepared topics are linked
 - `P7-K7` keeps the same live-surface consumers and adds optional detail framing without changing the topic route, shelf ownership, or non-gating posture
+- `P7-K8` keeps the same live surfaces and adds one narrow inline glossary treatment on explanatory copy only; term selection, first-encounter shaping, and acknowledgement state remain service-owned
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
