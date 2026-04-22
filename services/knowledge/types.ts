@@ -236,3 +236,29 @@ export type InlineGlossaryAvailability =
       status: 'AVAILABLE';
       block: InlineGlossaryBlock;
     };
+
+export type InlineGlossarySignalSurface = 'DASHBOARD' | 'TRADE_HUB';
+
+export type InlineGlossarySignalProfileTier = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
+export type InlineGlossarySignalKey = {
+  topicId: string;
+  surface: InlineGlossarySignalSurface;
+  profileTier: InlineGlossarySignalProfileTier;
+};
+
+export type InlineGlossaryAggregateSignal = {
+  key: InlineGlossarySignalKey;
+  surfacedCount: number;
+  acknowledgedCount: number;
+};
+
+export type InlineGlossarySignalSummaryAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_SIGNALS_RECORDED';
+    }
+  | {
+      status: 'AVAILABLE';
+      signals: ReadonlyArray<InlineGlossaryAggregateSignal>;
+    };

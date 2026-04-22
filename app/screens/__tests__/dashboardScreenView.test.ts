@@ -446,7 +446,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
     expect(source).toMatch(/createContextualKnowledgeSectionViewData/);
     expect(source).not.toMatch(
-      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);

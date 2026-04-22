@@ -38,6 +38,7 @@ The layer should:
 - P7-K7 carries one calm prepared context frame into topic detail so a tapped topic can keep its live-surface relevance without turning topic detail into a feed, gate, or advice surface
 - P7-K8 adds one narrow service-owned inline glossary-help seam on explanatory copy, with beginner-first profile shaping and service-owned seen-term acknowledgement so repeated terms can downgrade quietly
 - P7-K9 improves that same inline glossary seam with service-owned alias/matching normalization so canonical terms and approved variants resolve more reliably without widening surfaces
+- P7-K10 adds one narrow internal service-owned exposure/acknowledgement signal layer plus aggregate tuning summaries, invisible to users and without changing glossary surface scope
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
 
@@ -65,6 +66,12 @@ The same import also keeps `evidence/` as selective support content and avoids a
 - conservative variant normalization (case and punctuation/hyphen forms)
 - explicit suppression of noisy generic over-linking on existing proof paths
 - no new surfaces and no app-owned matching logic
+
+`P7-K10` then adds internal tuning hooks behind that same K8/K9 runtime path:
+- one canonical aggregate signal seam for surfaced glossary topics
+- one canonical aggregate signal seam for acknowledged glossary topics
+- one canonical summary fetch seam for future service-owned tuning work
+- no user-facing analytics/debug surface and no network telemetry in this phase
 
 ## Drift to block
 - encyclopedia drift

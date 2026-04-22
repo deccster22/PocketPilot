@@ -430,7 +430,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/surface\.riskLane\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);

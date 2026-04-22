@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P7-K10, P9-S2)
 
 ## Purpose
 
@@ -13,6 +13,7 @@
 `P7-K7` carries that same relevance judgment into topic detail by letting the selected topic receive one prepared context frame from Dashboard or Trade Hub without adding a gate, inbox, or advice layer.
 `P7-K8` adds one canonical inline glossary-help seam plus one canonical seen-term acknowledgement seam for narrow explanatory-copy proof paths on Dashboard and Trade Hub.
 `P7-K9` adds one canonical glossary alias/index normalization seam and threads it into the existing inline selector so canonical and alias variants resolve more reliably without widening surfaces.
+`P7-K10` adds one canonical internal exposure/acknowledgement aggregate signal seam plus one canonical summary seam for future tuning without adding a user-facing analytics surface.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -301,6 +302,28 @@ Rules:
 - generic noisy terms are kept out of the match index unless explicitly approved
 - no matching or alias logic moves into `app/`
 
+`P7-K10` adds one explicit inline glossary aggregate signal contract:
+
+```ts
+type InlineGlossaryAggregateSignal = {
+  key: {
+    topicId: string;
+    surface: 'DASHBOARD' | 'TRADE_HUB';
+    profileTier: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  };
+  surfacedCount: number;
+  acknowledgedCount: number;
+};
+```
+
+Rules:
+
+- `services/knowledge/inlineGlossarySignalStore.ts` owns compact aggregate storage only
+- `services/knowledge/recordInlineGlossarySignals.ts` owns signal normalization and increments
+- `services/knowledge/fetchInlineGlossarySignalSummary.ts` owns prepared aggregate summary retrieval
+- signal hooks remain service-owned, deterministic, and user-invisible
+- no analytics dashboard, debug console, or network telemetry is introduced in this phase
+
 ## Canonical Knowledge Tree
 
 The runtime catalog still has one canonical generation path:
@@ -349,6 +372,8 @@ knowledgeCatalog
 -> selectInlineGlossaryTerms
 -> createInlineGlossaryHelp
 -> inlineGlossarySeenState acknowledge/update seam
+-> recordInlineGlossarySignals
+-> fetchInlineGlossarySignalSummary
 -> narrow Dashboard / Trade Hub inline glossary proof paths
 ```
 
@@ -379,6 +404,9 @@ Responsibilities:
 - `services/knowledge/createGlossaryTermIndex.ts` owns inline glossary alias/index normalization for canonical term variants
 - `services/knowledge/createInlineGlossaryHelp.ts` owns inline glossary composition from term selection, profile shaping, and seen-state inputs
 - `services/knowledge/inlineGlossarySeenState.ts` owns explicit acknowledgement-state storage and updates for first-encounter shaping
+- `services/knowledge/inlineGlossarySignalStore.ts` owns compact surfaced/acknowledged aggregate counters
+- `services/knowledge/recordInlineGlossarySignals.ts` owns normalized signal recording for surfaced and acknowledged terms
+- `services/knowledge/fetchInlineGlossarySignalSummary.ts` owns one canonical aggregate summary seam for future tuning consumers
 - `services/strategyNavigator/selectStrategyPreviewKnowledge.ts` owns preview-specific follow-through selection
 - `app/screens/*knowledge*View.ts` files format prepared display text only
 - `app/` does not read docs files, browse markdown, group raw nodes, infer related-topic metadata, or rank contextual candidates locally
@@ -400,6 +428,7 @@ Rules locked in this phase:
 - `P7-K7` keeps the same live-surface consumers and adds optional detail framing without changing the topic route, shelf ownership, or non-gating posture
 - `P7-K8` keeps the same live surfaces and adds one narrow inline glossary treatment on explanatory copy only; term selection, first-encounter shaping, and acknowledgement state remain service-owned
 - `P7-K9` keeps the same live surfaces and improves service-owned alias/matching quality only; it does not widen rollout or add app-side matching logic
+- `P7-K10` keeps the same live surfaces and adds internal aggregate tuning hooks only; it does not add user-facing analytics UI, debug surfaces, or network shipping
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
