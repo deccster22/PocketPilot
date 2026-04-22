@@ -123,4 +123,47 @@ describe('createInlineGlossaryHelp', () => {
       renderMode: 'PLAIN',
     });
   });
+
+  it('keeps seen-term suppression stable when a later encounter uses an alias variant', () => {
+    const seenState = createInMemoryInlineGlossarySeenState();
+    const first = createInlineGlossaryHelp({
+      profile: 'BEGINNER',
+      surface: 'TRADE_HUB_SAFETY',
+      text: 'Protection plan framing stays optional and support-only.',
+      accountId: 'acct-1',
+      seenState,
+      nodes: knowledgeCatalog,
+    });
+
+    if (first.status !== 'AVAILABLE') {
+      throw new Error('Expected first inline glossary pass to be available.');
+    }
+
+    acknowledgeInlineGlossaryTerms({
+      acknowledgementKeys: first.block.acknowledgementKeys,
+      seenState,
+    });
+
+    const second = createInlineGlossaryHelp({
+      profile: 'BEGINNER',
+      surface: 'TRADE_HUB_SAFETY',
+      text: 'ProtectionPlan framing stays optional and support-only.',
+      accountId: 'acct-1',
+      seenState,
+      nodes: knowledgeCatalog,
+    });
+
+    expect(second.status).toBe('AVAILABLE');
+
+    if (second.status !== 'AVAILABLE') {
+      throw new Error('Expected second inline glossary pass to stay available.');
+    }
+
+    expect(second.block.acknowledgementKeys).toEqual([]);
+    expect(second.block.segments[0]).toMatchObject({
+      kind: 'GLOSSARY_TERM',
+      topicId: 'pp-what-protection-plans-are-for',
+      renderMode: 'PLAIN',
+    });
+  });
 });

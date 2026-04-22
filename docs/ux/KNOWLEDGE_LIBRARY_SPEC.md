@@ -1,4 +1,4 @@
-# Knowledge Library Spec (P7-K1, P7-K2, P7-K7, P7-K8)
+# Knowledge Library Spec (P7-K1, P7-K2, P7-K7, P7-K8, P7-K9)
 
 ## Purpose
 
@@ -8,6 +8,7 @@ In `P7-K1` it became one calm, always-accessible reference shelf.
 In `P7-K2` it gains one subordinate topic detail route so a user can move from the shelf into a deeper topic without turning the app into a document browser.
 In `P7-K7` that same topic detail route can receive one small prepared relevance frame when the topic came from the Dashboard or Trade Hub contextual shelf.
 In `P7-K8` that same route is also reused for narrow inline glossary term taps from Dashboard explanation and Trade Hub safety copy.
+In `P7-K9` those same inline glossary taps get better service-owned alias/variant matching without changing this route or adding a second destination.
 
 This is still a baseline knowledge system, not the finished knowledge family.
 

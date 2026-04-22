@@ -1,4 +1,4 @@
-# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2 + PX-MA3 + P7-K8)
+# Dashboard Spec (P4-5 + PX-E2 + PX-MA1 + PX-MA2 + PX-MA3 + P7-K8 + P7-K9)
 
 ## Purpose
 Dashboard is PocketPilot's structured cross-asset Focus surface for answering: "What matters most right now?" It is prepared in `services/dashboard` and rendered in `app/` without UI-owned ranking, filtering, bucket selection, or data assembly.
@@ -228,6 +228,16 @@ Rules:
 - term taps route to the existing `KnowledgeTopicScreen` path
 - no app-side term matching, ranking, tooltip storms, or whole-surface auto-linking is introduced
 - no gating, lockout, notification, or inbox behavior is introduced
+
+## P7-K9 Glossary Alias / Matching Normalization
+Dashboard keeps the same K8 inline glossary surface scope, but matching quality is improved in services.
+
+Rules:
+- `services/knowledge/createGlossaryTermIndex.ts` owns alias/index normalization for canonical term variants
+- `services/knowledge/selectInlineGlossaryTerms.ts` consumes the normalized index and remains deterministic
+- app behavior is unchanged: render prepared segments and route taps to existing topic detail
+- generic noisy terms stay suppressed; Dashboard does not become underlined-link clutter
+- no new Dashboard surfaces, gating behavior, or UI-owned matching logic are introduced
 
 ## PX-E2 Lineage And Phrasing Rules
 PX-E2 deepens quality rather than breadth.

@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P9-S2)
 
 ## Purpose
 
@@ -12,6 +12,7 @@
 `P7-K6` improves the canonical live-surface linkage path so the same prepared lane can choose better topics from live strategy, signal, event, and surface context without changing the K4/K5 presentation contract.
 `P7-K7` carries that same relevance judgment into topic detail by letting the selected topic receive one prepared context frame from Dashboard or Trade Hub without adding a gate, inbox, or advice layer.
 `P7-K8` adds one canonical inline glossary-help seam plus one canonical seen-term acknowledgement seam for narrow explanatory-copy proof paths on Dashboard and Trade Hub.
+`P7-K9` adds one canonical glossary alias/index normalization seam and threads it into the existing inline selector so canonical and alias variants resolve more reliably without widening surfaces.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -283,6 +284,23 @@ Rules:
 - `app/` renders prepared segments only and routes term taps into existing topic detail
 - no UI-side matching/ranking and no gating mechanics are introduced
 
+`P7-K9` adds one explicit glossary alias/index normalization contract used by that same inline selector:
+
+```ts
+type GlossaryTermVariant = {
+  topicId: string;
+  canonicalTerm: string;
+  matchTerms: readonly string[];
+};
+```
+
+Rules:
+
+- `services/knowledge/createGlossaryTermIndex.ts` owns surface-scoped canonical term/alias normalization
+- selector behavior stays deterministic and service-owned
+- generic noisy terms are kept out of the match index unless explicitly approved
+- no matching or alias logic moves into `app/`
+
 ## Canonical Knowledge Tree
 
 The runtime catalog still has one canonical generation path:
@@ -327,6 +345,7 @@ knowledgeCatalog
 -> createContextualKnowledgePresentation
 -> createContextualKnowledgeLane
 -> contextual live shelf
+-> createGlossaryTermIndex
 -> selectInlineGlossaryTerms
 -> createInlineGlossaryHelp
 -> inlineGlossarySeenState acknowledge/update seam
@@ -357,6 +376,7 @@ Responsibilities:
 - `services/knowledge/selectContextualKnowledgeTopics.ts` owns contextual topic ranking and linkage shaping
 - `services/knowledge/fetchContextualKnowledgeAvailability.ts` owns contextual surface interpretation
 - `services/knowledge/selectInlineGlossaryTerms.ts` owns narrow inline term eligibility and term-to-topic resolution
+- `services/knowledge/createGlossaryTermIndex.ts` owns inline glossary alias/index normalization for canonical term variants
 - `services/knowledge/createInlineGlossaryHelp.ts` owns inline glossary composition from term selection, profile shaping, and seen-state inputs
 - `services/knowledge/inlineGlossarySeenState.ts` owns explicit acknowledgement-state storage and updates for first-encounter shaping
 - `services/strategyNavigator/selectStrategyPreviewKnowledge.ts` owns preview-specific follow-through selection
@@ -379,6 +399,7 @@ Rules locked in this phase:
 - `P7-K6` keeps the same live-surface consumers and only improves how their prepared topics are linked
 - `P7-K7` keeps the same live-surface consumers and adds optional detail framing without changing the topic route, shelf ownership, or non-gating posture
 - `P7-K8` keeps the same live surfaces and adds one narrow inline glossary treatment on explanatory copy only; term selection, first-encounter shaping, and acknowledgement state remain service-owned
+- `P7-K9` keeps the same live surfaces and improves service-owned alias/matching quality only; it does not widen rollout or add app-side matching logic
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`
