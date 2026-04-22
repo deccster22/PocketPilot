@@ -224,6 +224,10 @@ describe('fetchDashboardSurfaceVM', () => {
         title: 'Why BTC is in focus',
       },
     });
+    expect(result.inlineGlossaryHelp).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_PROFILE',
+    });
 
     const serialized = JSON.stringify(result.explanation);
 

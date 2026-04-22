@@ -4,6 +4,8 @@ import type { EventLedgerService } from '@/services/events/eventLedgerService';
 import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import { createContextualKnowledgeLane } from '@/services/knowledge/createContextualKnowledgeLane';
+import { createInlineGlossaryHelp } from '@/services/knowledge/createInlineGlossaryHelp';
+import type { InlineGlossaryAvailability } from '@/services/knowledge/types';
 import { createTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
@@ -11,12 +13,14 @@ import type { GuardrailPreferencesStore } from '@/services/trade/guardrailPrefer
 import type { PreferredRiskBasisStore } from '@/services/trade/preferredRiskBasisStore';
 import { resolveSelectedTradePlan } from '@/services/trade/resolveSelectedTradePlan';
 import { selectAccountScopedProtectionPlans } from '@/services/trade/selectAccountScopedProtectionPlans';
+import { TRADE_HUB_SAFETY_TEXT } from '@/services/trade/tradeHubCopy';
 import type { RiskBasis, TradeHubSurfaceModel } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 
 export type TradeHubVM = {
   contextualKnowledgeLane: ReturnType<typeof createContextualKnowledgeLane>;
+  inlineGlossaryHelp: InlineGlossaryAvailability;
   model: TradeHubSurfaceModel;
   scan: ForegroundScanResult;
 };
@@ -72,6 +76,12 @@ export async function fetchTradeHubVM(params: {
     protectionPlans,
     riskLane,
   });
+  const inlineGlossaryHelp = createInlineGlossaryHelp({
+    profile: params.profile,
+    surface: 'TRADE_HUB_SAFETY',
+    text: TRADE_HUB_SAFETY_TEXT,
+    accountId: surfaceAccountContext.selectedAccountId,
+  });
 
   return {
     contextualKnowledgeLane: createContextualKnowledgeLane({
@@ -80,6 +90,7 @@ export async function fetchTradeHubVM(params: {
       tradeHubSurface: model,
       marketEvents: upstream.marketEvents,
     }),
+    inlineGlossaryHelp,
     model,
     scan: upstream.scan,
   };

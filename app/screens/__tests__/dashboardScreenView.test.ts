@@ -143,6 +143,10 @@ function createSurface(): DashboardSurfaceVM {
       },
       scan: { accountId: 'acct-1' } as never,
       contextualKnowledgeLane: createUnavailableContextualKnowledgeLane(),
+      inlineGlossaryHelp: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_PROFILE',
+      },
       explanation: {
         status: 'AVAILABLE' as const,
         explanation: {
@@ -294,6 +298,10 @@ describe('createDashboardScreenViewData', () => {
         title: 'Why BTC is in focus',
         summary:
           'BTC is in focus because momentum is strengthening in the current interpreted picture.',
+        inlineGlossary: {
+          status: 'UNAVAILABLE',
+          reason: 'NOT_ENABLED_FOR_PROFILE',
+        },
         confidenceText: 'Support: Moderate',
         confidenceNote:
           'Confidence is moderate because more than one prepared input supports this interpretation. It reflects evidence support, not a guaranteed outcome.',
@@ -438,7 +446,7 @@ describe('createDashboardScreenViewData', () => {
     expect(source).toMatch(/messagePolicyLane\?\.rationaleAvailability \?\? policyAvailability\.rationale/);
     expect(source).toMatch(/createContextualKnowledgeSectionViewData/);
     expect(source).not.toMatch(
-      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /selectedAccountId|resolveSelectedAccountContext|switchSelectedAccount|setPrimaryAccount|createAccountSwitchingAvailability|createAggregatePortfolioContext|fetchAggregatePortfolioContext|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/kind === 'REFERRAL'/);
     expect(source).not.toMatch(/kind === 'ALERT'/);
@@ -643,6 +651,10 @@ describe('createDashboardScreenViewData', () => {
           },
           scan: {} as never,
           contextualKnowledgeLane: createUnavailableContextualKnowledgeLane(),
+          inlineGlossaryHelp: {
+            status: 'UNAVAILABLE',
+            reason: 'NO_ELIGIBLE_TERMS',
+          },
           explanation: {
             status: 'UNAVAILABLE',
             reason: 'NO_EXPLANATION_TARGET',

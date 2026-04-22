@@ -214,6 +214,10 @@ function createDashboardSurface(overrides: Partial<DashboardSurfaceVM> = {}): Da
       reason: 'NO_EXPLANATION_TARGET',
     },
     contextualKnowledgeLane,
+    inlineGlossaryHelp: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ELIGIBLE_TERMS',
+    },
     ...overrides,
     aggregatePortfolioContext,
   };

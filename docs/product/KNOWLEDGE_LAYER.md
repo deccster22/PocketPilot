@@ -36,6 +36,7 @@ The layer should:
 - P7-K5 refines that live lane with an explicit presentation contract so Dashboard and Trade Hub can stay calmer, more profile-aware, and more subordinate when relevance is thin
 - P7-K6 deepens how live context is linked to prepared topics so Dashboard and Trade Hub can surface better prepared topics without turning the lane into a feed or changing the K4/K5 presentation model
 - P7-K7 carries one calm prepared context frame into topic detail so a tapped topic can keep its live-surface relevance without turning topic detail into a feed, gate, or advice surface
+- P7-K8 adds one narrow service-owned inline glossary-help seam on explanatory copy, with beginner-first profile shaping and service-owned seen-term acknowledgement so repeated terms can downgrade quietly
 - Snapshot is a caution zone
 - Insights can carry richer follow-on explanation
 
@@ -51,6 +52,12 @@ The layer should:
 The same import also keeps `evidence/` as selective support content and avoids adding research/admin folders as live product copy.
 
 `PX-KI2` follows by reconciling register/index taxonomy references to that same family layout without adding runtime glossary wiring or inline-help behavior.
+
+`P7-K8` then adds the first runtime inline glossary/keyword help wiring on top of that stabilized corpus:
+- one canonical selection seam
+- one canonical composition seam
+- one canonical seen-term seam
+- one or two calm proof paths (Dashboard explanation + Trade Hub safety copy) that still use the existing topic detail destination
 
 ## Drift to block
 - encyclopedia drift

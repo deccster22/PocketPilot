@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-21
+Last Updated: 2026-04-22
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-21
+**Last updated:** 2026-04-22
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -77,6 +77,7 @@ Start with:
 - Contextual knowledge on Dashboard and Trade Hub now also carries a prepared density/placement presentation so the shelf can stay calmer, smaller, or hidden when profile and surface make that the honest choice.
 - P7-K6 deepens contextual topic linkage from live strategy, signal, event, and surface context while keeping the same prepared lane and presentation seams intact.
 - P7-K7 carries one prepared topic-detail context frame from Dashboard and Trade Hub into the existing detail route so the selected topic can explain why it matters there without becoming a gate or advice surface.
+- P7-K8 adds one service-owned inline glossary-help seam plus one service-owned seen-term acknowledgement seam; Dashboard explanation and Trade Hub safety copy may expose narrow beginner-first term links that still route into the same Knowledge Topic detail path.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.

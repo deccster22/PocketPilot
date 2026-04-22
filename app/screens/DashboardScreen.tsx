@@ -17,6 +17,7 @@ import { setPrimaryAccount } from '@/services/accounts/setPrimaryAccount';
 import { switchSelectedAccount } from '@/services/accounts/switchSelectedAccount';
 import type { DashboardSurfaceVM } from '@/services/dashboard/dashboardSurfaceService';
 import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
+import { acknowledgeInlineGlossaryTerms } from '@/services/knowledge/inlineGlossarySeenState';
 import type { KnowledgeTopicContextOrigin } from '@/services/knowledge/types';
 import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -211,7 +212,18 @@ export function DashboardScreen() {
         {screenView?.explanation.visible ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Why</Text>
-            <ExplanationCard explanation={screenView.explanation} />
+            <ExplanationCard
+              explanation={screenView.explanation}
+              onOpenGlossaryTopic={({ topicId, acknowledgementKey }) => {
+                acknowledgeInlineGlossaryTerms({
+                  acknowledgementKeys: [acknowledgementKey],
+                });
+                handleOpenKnowledgeTopic(topicId, {
+                  originSurface: 'DASHBOARD',
+                  linkageReason: 'SURFACE_CONTEXT',
+                });
+              }}
+            />
           </View>
         ) : null}
         {screenView?.aggregatePortfolio.visible ? (
