@@ -1,4 +1,4 @@
-# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6)
 
 ## Purpose
 
@@ -9,6 +9,7 @@
 `P9-S3` adds one service-owned preview-explanation layer that explains why a strategy reacts to the simulated scenario the way it does.
 `P9-S4` deepens the finite scenario layer with interpreted scenario traits plus one service-owned scenario-contrast seam that explains what changes for that strategy in this kind of simulated backdrop.
 `P9-S5` keeps those same service-owned seams and adds one render-only compaction pass in `app/` so the existing prepared preview stays calm as subordinate shelves accumulate.
+`P9-S6` adds one service-owned fit-contrast seam so the same preview lane can answer a compact "why this, not that" question for the current context without adding ranking or recommendation behavior.
 
 The lane now exists to:
 
@@ -16,6 +17,7 @@ The lane now exists to:
 - show how PocketPilot would reinterpret the same backdrop through that strategy
 - show how that strategy's emphasis changes versus calmer or alternative conditions for that same scenario family
 - explain why that simulated backdrop matters to the selected strategy in calm worldview terms
+- explain why the current fit reads stronger than one or two nearby alternatives in that same simulated context
 - optionally offer a small set of prepared knowledge next steps if the user wants more context
 - stay calm, descriptive, educational, and non-directive
 
@@ -88,6 +90,30 @@ type StrategyPreviewContrastAvailability =
       content: StrategyPreviewContrast;
     };
 
+type StrategyContrastReason = {
+  strategyId: string;
+  label: string;
+  lines: readonly string[];
+};
+
+type StrategyFitContrast = {
+  bestFitStrategyId: string;
+  bestFitLabel: string;
+  whyItFits: readonly string[];
+  lessSuitableAlternatives: readonly StrategyContrastReason[];
+  ambiguityNote?: string | null;
+};
+
+type StrategyFitContrastAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_COMPARABLE_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      contrast: StrategyFitContrast;
+    };
+
 type StrategyPreviewKnowledgeLink = {
   topicId: string;
   title: string;
@@ -133,6 +159,7 @@ type StrategyNavigatorVM = {
   availability: StrategyPreviewAvailability;
   explanation: StrategyPreviewExplanationAvailability;
   contrast: StrategyPreviewContrastAvailability;
+  fitContrast: StrategyFitContrastAvailability;
   knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };
 ```
@@ -142,6 +169,7 @@ Rules:
 - one canonical preview contract
 - one canonical preview-explanation contract
 - one canonical preview-contrast contract
+- one canonical fit-contrast contract
 - one canonical preview-to-knowledge follow-through contract
 - no second preview VM family just for compaction
 - one selected strategy at a time
@@ -164,6 +192,7 @@ Within `createStrategyNavigatorVM`, the same service-owned lane now calls:
 
 - `createStrategyPreviewExplanation`
 - `createStrategyPreviewContrast`
+- `createStrategyFitContrast`
 - `selectStrategyPreviewKnowledge`
 
 ## Preview Rules
@@ -201,6 +230,31 @@ The compaction pass may not:
 - create new explanation, contrast, or knowledge-selection logic
 - widen the fetch seam
 - create a second preview contract family
+
+## Fit Contrast Rules
+
+`P9-S6` adds one subordinate fit-contrast shelf inside the same Strategy Navigator VM.
+
+The fit contrast answers four questions only:
+
+- why the current fit reads stronger for this context
+- which one or two nearby alternatives are less suitable right now
+- what makes those alternatives less central in the current simulated backdrop
+- what ambiguity still remains
+
+The fit contrast must:
+
+- stay short, calm, comparative, and interpretation-first
+- reuse prepared strategy, scenario, and focus context from the same preview lane
+- return `UNAVAILABLE` honestly when comparable context is missing
+- avoid ranking, scoring, and winner framing
+
+The fit contrast must not:
+
+- imply recommendation, readiness, or forced switching
+- imply certainty or predictive outcomes
+- expose raw signal lists, provider diagnostics, or runtime metadata
+- create a second strategy engine outside the existing preview lane
 
 ## Preview Contrast Rules
 
@@ -284,6 +338,7 @@ The selector must not:
 - render prepared strategy and scenario options
 - render prepared preview sections
 - render prepared preview-contrast content when `contrast.status === 'AVAILABLE'`
+- render prepared fit-contrast content when `fitContrast.status === 'AVAILABLE'`
 - render prepared preview-explanation content when `explanation.status === 'AVAILABLE'`
 - render prepared knowledge follow-through items when `knowledgeFollowThrough.status === 'AVAILABLE'`
 - group prepared sections into a calmer render hierarchy for focus, supporting context, and optional reading
@@ -296,6 +351,7 @@ The selector must not:
 - shape scenario meaning locally
 - derive event importance locally
 - derive preview contrast wording locally
+- derive fit contrast reasoning, alternative selection, or ambiguity notes locally
 - derive preview explanation wording locally
 - derive knowledge relevance locally
 - read markdown files or docs paths
@@ -329,13 +385,14 @@ That keeps Strategy Preview explanatory without turning the shared Dashboard why
 
 ## Relationship To Later Work
 
-`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, and `P9-S5` are the first five rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, and `P9-S6` are the first six rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 
 - richer scenario framing when the finite starter catalog proves stable
 - deeper scenario contrast depth when the current contrast seam proves useful
 - richer explanation depth when the current preview explanation proves useful
+- richer fit-contrast depth when nearby-alternative framing proves useful
 - richer surface transformations when the product has a stronger reason for them
 - broader or deeper knowledge integration when the current follow-through proves useful
 - more nuanced interpreted scenarios when the starter catalog has proven stable

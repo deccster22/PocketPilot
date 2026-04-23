@@ -73,6 +73,30 @@ export type StrategyPreviewContrastAvailability =
       content: StrategyPreviewContrast;
     };
 
+export type StrategyContrastReason = {
+  strategyId: StrategyId;
+  label: string;
+  lines: ReadonlyArray<string>;
+};
+
+export type StrategyFitContrast = {
+  bestFitStrategyId: StrategyId;
+  bestFitLabel: string;
+  whyItFits: ReadonlyArray<string>;
+  lessSuitableAlternatives: ReadonlyArray<StrategyContrastReason>;
+  ambiguityNote?: string | null;
+};
+
+export type StrategyFitContrastAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_COMPARABLE_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      contrast: StrategyFitContrast;
+    };
+
 export type StrategyPreviewKnowledgeLink = {
   topicId: string;
   title: string;
@@ -118,5 +142,6 @@ export type StrategyNavigatorVM = {
   availability: StrategyPreviewAvailability;
   explanation: StrategyPreviewExplanationAvailability;
   contrast: StrategyPreviewContrastAvailability;
+  fitContrast: StrategyFitContrastAvailability;
   knowledgeFollowThrough?: StrategyPreviewKnowledgeFollowThrough;
 };

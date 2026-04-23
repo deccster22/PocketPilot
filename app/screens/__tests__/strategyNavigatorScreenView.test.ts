@@ -85,6 +85,38 @@ describe('createStrategyNavigatorScreenViewData', () => {
             ],
           },
         },
+        fitContrast: {
+          status: 'AVAILABLE',
+          contrast: {
+            bestFitStrategyId: 'dip_buying',
+            bestFitLabel: 'Dip Buying',
+            whyItFits: [
+              'Current simulated backdrop: volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
+              'Dip Buying fits this context better because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
+              'Current prepared emphasis: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+            ],
+            lessSuitableAlternatives: [
+              {
+                strategyId: 'mean_reversion',
+                label: 'Mean Reversion',
+                lines: [
+                  'Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing, while the dip still carries expansion stress.',
+                  'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+                ],
+              },
+              {
+                strategyId: 'trend_following',
+                label: 'Trend Following',
+                lines: [
+                  'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the dip still carries expansion stress.',
+                  'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+                ],
+              },
+            ],
+            ambiguityNote:
+              'Ambiguity remains: expanding volatility can keep this dip read provisional until conditions settle.',
+          },
+        },
         knowledgeFollowThrough: {
           status: 'AVAILABLE',
           items: [
@@ -187,6 +219,22 @@ describe('createStrategyNavigatorScreenViewData', () => {
             ],
           },
           {
+            sectionId: 'FIT_CONTRAST',
+            label: 'Why this, not that',
+            title: 'Dip Buying in this context',
+            summary:
+              'Current simulated backdrop: volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
+            bullets: [
+              'Dip Buying fits this context better because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
+              'Current prepared emphasis: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+              'Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing, while the dip still carries expansion stress.',
+              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+              'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the dip still carries expansion stress.',
+              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+              'Ambiguity remains: expanding volatility can keep this dip read provisional until conditions settle.',
+            ],
+          },
+          {
             sectionId: 'CONTRAST',
             label: 'Scenario contrast',
             title: 'What changes in this scenario',
@@ -250,6 +298,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
         contrast: {
           status: 'UNAVAILABLE',
           reason: 'NO_CONTRAST_AVAILABLE',
+        },
+        fitContrast: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_COMPARABLE_CONTEXT',
         },
       }),
     ).toEqual({
@@ -346,6 +398,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
           ],
         },
       },
+      fitContrast: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_COMPARABLE_CONTEXT',
+      },
       knowledgeFollowThrough: {
         status: 'UNAVAILABLE',
         reason: 'KNOWLEDGE_UNAVAILABLE',
@@ -416,6 +472,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
             'Preview expression: The Dashboard would bring sustained directional names forward when follow-through remains orderly.',
           ],
         },
+      },
+      fitContrast: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_COMPARABLE_CONTEXT',
       },
       knowledgeFollowThrough: {
         status: 'UNAVAILABLE',
@@ -500,6 +560,10 @@ describe('createStrategyNavigatorScreenViewData', () => {
       contrast: {
         status: 'UNAVAILABLE',
         reason: 'NO_CONTRAST_AVAILABLE',
+      },
+      fitContrast: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_COMPARABLE_CONTEXT',
       },
       knowledgeFollowThrough: {
         status: 'UNAVAILABLE',
@@ -590,6 +654,27 @@ describe('createStrategyNavigatorScreenViewData', () => {
           ],
         },
       },
+      fitContrast: {
+        status: 'AVAILABLE',
+        contrast: {
+          bestFitStrategyId: 'trend_following',
+          bestFitLabel: 'Trend Follow',
+          whyItFits: [
+            'Current simulated backdrop: volatility is contained, structure is directional and orderly, and the condition is more extended than a neutral pause.',
+            'Trend Follow fits this context better because it keeps attention on whether broader directional structure is still holding while continuation remains orderly.',
+          ],
+          lessSuitableAlternatives: [
+            {
+              strategyId: 'momentum_basics',
+              label: 'Momentum Basics',
+              lines: [
+                'Momentum Basics is less suitable right now because it leans on immediate pace language while this continuation already reads structurally mature.',
+              ],
+            },
+          ],
+          ambiguityNote: null,
+        },
+      },
       knowledgeFollowThrough: {
         status: 'AVAILABLE',
         items: [
@@ -611,6 +696,7 @@ describe('createStrategyNavigatorScreenViewData', () => {
     ]);
     expect(result?.preview?.supportingSections.map((section) => section.sectionId)).toEqual([
       'EXPLANATION',
+      'FIT_CONTRAST',
       'CONTRAST',
     ]);
     expect(result?.preview?.knowledgeSection).toEqual({
@@ -637,13 +723,17 @@ describe('createStrategyNavigatorScreenViewData', () => {
     expect(source).toMatch(/vm\.strategyOptions\.map/);
     expect(source).toMatch(/vm\.contrast\.status === 'AVAILABLE'/);
     expect(source).toMatch(/vm\.explanation\.status === 'AVAILABLE'/);
+    expect(source).toMatch(/vm\.fitContrast\.status === 'AVAILABLE'/);
     expect(source).toMatch(/vm\.knowledgeFollowThrough\?\.status === 'AVAILABLE'/);
     expect(source).toMatch(/createPreviewMainSections/);
+    expect(source).toMatch(/createPreviewFitContrastSection/);
+    expect(source).toMatch(/sectionId: 'FIT_CONTRAST'/);
     expect(source).toMatch(/supportingSections/);
     expect(source).toMatch(/knowledgeSection/);
     expect(source).not.toMatch(
-      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyPreviewContrast|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
+      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyFitContrast|createStrategyPreviewContrast|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
     );
+    expect(source).not.toMatch(/top 10|leaderboard|best strategy|winner|prediction score/i);
   });
 
   it('returns null when the prepared Strategy Preview VM is unavailable', () => {

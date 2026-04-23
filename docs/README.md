@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-22
+Last Updated: 2026-04-23
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-22
+**Last updated:** 2026-04-23
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -80,6 +80,7 @@ Start with:
 - P7-K8 adds one service-owned inline glossary-help seam plus one service-owned seen-term acknowledgement seam; Dashboard explanation and Trade Hub safety copy may expose narrow beginner-first term links that still route into the same Knowledge Topic detail path.
 - P7-K9 adds one service-owned glossary alias/index normalization seam so canonical terms and approved variants resolve more reliably while preserving K8 scope and keeping app-side matching logic out of `app/`.
 - P7-K10 adds one service-owned inline glossary exposure/acknowledgement signal seam plus one aggregate summary seam for future tuning, kept invisible to users and without adding analytics UI or network telemetry.
+- P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.

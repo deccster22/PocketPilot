@@ -89,6 +89,37 @@ describe('createStrategyNavigatorVM', () => {
         ],
       },
     });
+    expect(result.fitContrast).toEqual({
+      status: 'AVAILABLE',
+      contrast: {
+        bestFitStrategyId: 'momentum_basics',
+        bestFitLabel: 'Momentum Basics',
+        whyItFits: [
+          'Current simulated backdrop: volatility is contained, structure is directional and orderly, and the condition is more extended than a neutral pause.',
+          'Momentum Basics fits this context better because it keeps attention on orderly follow-through rather than movement speed alone while the backdrop is still extending in an orderly direction.',
+          'Current prepared emphasis: Names still building orderly strength would move closer to the prime zone.',
+        ],
+        lessSuitableAlternatives: [
+          {
+            strategyId: 'trend_following',
+            label: 'Trend Following',
+            lines: [
+              'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the continuation remains extended rather than reset.',
+              'In this lane, Momentum Basics stays the steadier interpretation-first fit while context keeps evolving.',
+            ],
+          },
+          {
+            strategyId: 'dip_buying',
+            label: 'Dip Buying',
+            lines: [
+              'Dip Buying is less suitable right now because it leans on whether weakness is stabilizing into a calmer pullback, while the continuation remains extended rather than reset.',
+              'In this lane, Momentum Basics stays the steadier interpretation-first fit while context keeps evolving.',
+            ],
+          },
+        ],
+        ambiguityNote: null,
+      },
+    });
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'AVAILABLE',
       items: [
@@ -129,6 +160,10 @@ describe('createStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NO_CONTRAST_AVAILABLE',
     });
+    expect(result.fitContrast).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_COMPARABLE_CONTEXT',
+    });
   });
 
   it('returns unavailable honestly when a scenario is missing', () => {
@@ -151,6 +186,10 @@ describe('createStrategyNavigatorVM', () => {
     expect(result.contrast).toEqual({
       status: 'UNAVAILABLE',
       reason: 'NO_CONTRAST_AVAILABLE',
+    });
+    expect(result.fitContrast).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_COMPARABLE_CONTEXT',
     });
   });
 
@@ -177,6 +216,10 @@ describe('createStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_SURFACE',
     });
+    expect(result.fitContrast).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
   });
 
   it('keeps the preview intact and returns follow-through unavailable honestly when knowledge context is missing', () => {
@@ -192,6 +235,7 @@ describe('createStrategyNavigatorVM', () => {
     expect(result.availability.status).toBe('AVAILABLE');
     expect(result.explanation.status).toBe('AVAILABLE');
     expect(result.contrast.status).toBe('AVAILABLE');
+    expect(result.fitContrast.status).toBe('AVAILABLE');
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'UNAVAILABLE',
       reason: 'KNOWLEDGE_UNAVAILABLE',
