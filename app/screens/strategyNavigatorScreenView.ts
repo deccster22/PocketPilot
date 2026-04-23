@@ -26,7 +26,7 @@ export type StrategyPreviewMainSectionViewData = {
 };
 
 export type StrategyPreviewSupportingSectionViewData = {
-  sectionId: 'EXPLANATION' | 'CONTRAST';
+  sectionId: 'EXPLANATION' | 'FIT_CONTRAST' | 'CONTRAST';
   label: string;
   title: string;
   summary: string;
@@ -128,11 +128,35 @@ function createPreviewMainSections(
 
 function createPreviewSupportingSections(params: {
   explanation: StrategyPreviewCardViewData['supportingSections'][number] | null;
+  fitContrast: StrategyPreviewCardViewData['supportingSections'][number] | null;
   contrast: StrategyPreviewCardViewData['supportingSections'][number] | null;
 }): StrategyPreviewCardViewData['supportingSections'] {
-  return [params.explanation, params.contrast].filter(
+  return [params.explanation, params.fitContrast, params.contrast].filter(
     (section): section is StrategyPreviewCardViewData['supportingSections'][number] => section !== null,
   );
+}
+
+function createPreviewFitContrastSection(
+  fitContrast: Extract<StrategyNavigatorVM['fitContrast'], { status: 'AVAILABLE' }>['contrast'],
+): StrategyPreviewCardViewData['supportingSections'][number] | null {
+  if (fitContrast.whyItFits.length === 0 || fitContrast.lessSuitableAlternatives.length === 0) {
+    return null;
+  }
+
+  const summary = fitContrast.whyItFits[0];
+  const bullets = [
+    ...fitContrast.whyItFits.slice(1),
+    ...fitContrast.lessSuitableAlternatives.flatMap((alternative) => alternative.lines),
+    fitContrast.ambiguityNote ?? null,
+  ].filter((line): line is string => Boolean(line));
+
+  return {
+    sectionId: 'FIT_CONTRAST',
+    label: 'Why this, not that',
+    title: `${fitContrast.bestFitLabel} in this context`,
+    summary,
+    bullets,
+  };
 }
 
 function createPreviewKnowledgeSection(
@@ -192,6 +216,7 @@ export function createStrategyNavigatorScreenViewData(
   const selectedStrategy = strategyOptions.find((strategy) => strategy.strategyId === availability.strategyId);
   const contrast = vm.contrast.status === 'AVAILABLE' ? vm.contrast.content : null;
   const explanation = vm.explanation.status === 'AVAILABLE' ? vm.explanation.content : null;
+  const fitContrast = vm.fitContrast.status === 'AVAILABLE' ? vm.fitContrast.contrast : null;
   const knowledgeItems =
     vm.knowledgeFollowThrough?.status === 'AVAILABLE' ? vm.knowledgeFollowThrough.items : [];
 
@@ -223,6 +248,7 @@ export function createStrategyNavigatorScreenViewData(
               bullets: explanation.bullets,
             }
           : null,
+        fitContrast: fitContrast ? createPreviewFitContrastSection(fitContrast) : null,
         contrast: contrast
           ? {
               sectionId: 'CONTRAST',

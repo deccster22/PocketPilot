@@ -26,7 +26,7 @@ describe('strategy navigator preview compaction placement', () => {
     expect(strategyPreviewCardSource).toMatch(/props\.preview\.knowledgeSection/);
     expect(strategyPreviewCardSource).toMatch(/Supporting context/);
     expect(strategyPreviewCardSource).not.toMatch(
-      /trade now|act now|best setup|strategy battle|prediction|forecast|profit|execute|dispatch|broker/i,
+      /trade now|act now|best setup|strategy battle|prediction|forecast|profit|execute|dispatch|broker|top 10|leaderboard|winner/i,
     );
   });
 });

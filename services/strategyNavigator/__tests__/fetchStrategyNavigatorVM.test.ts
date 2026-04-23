@@ -47,6 +47,38 @@ describe('fetchStrategyNavigatorVM', () => {
         ],
       },
     });
+    expect(result.fitContrast).toEqual({
+      status: 'AVAILABLE',
+      contrast: {
+        bestFitStrategyId: 'dip_buying',
+        bestFitLabel: 'Dip Buying',
+        whyItFits: [
+          'Current simulated backdrop: volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
+          'Dip Buying fits this context better because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
+          'Current prepared emphasis: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+        ],
+        lessSuitableAlternatives: [
+          {
+            strategyId: 'mean_reversion',
+            label: 'Mean Reversion',
+            lines: [
+              'Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing, while the dip still carries expansion stress.',
+              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+            ],
+          },
+          {
+            strategyId: 'trend_following',
+            label: 'Trend Following',
+            lines: [
+              'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the dip still carries expansion stress.',
+              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+            ],
+          },
+        ],
+        ambiguityNote:
+          'Ambiguity remains: expanding volatility can keep this dip read provisional until conditions settle.',
+      },
+    });
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'AVAILABLE',
       items: [
@@ -100,6 +132,17 @@ describe('fetchStrategyNavigatorVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NO_CONTRAST_AVAILABLE',
     });
+    expect(
+      fetchStrategyNavigatorVM({
+        surface: 'STRATEGY_NAVIGATOR',
+        selectedStrategyId: 'snapshot_change',
+        selectedScenarioId: 'TREND_CONTINUATION',
+        nowProvider: () => Date.parse('2026-04-05T00:00:00.000Z'),
+      }).fitContrast,
+    ).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NO_COMPARABLE_CONTEXT',
+    });
   });
 
   it('keeps raw internals out of the prepared user-facing preview output', () => {
@@ -131,6 +174,7 @@ describe('fetchStrategyNavigatorVM', () => {
     expect(result.availability.status).toBe('AVAILABLE');
     expect(result.explanation.status).toBe('AVAILABLE');
     expect(result.contrast.status).toBe('AVAILABLE');
+    expect(result.fitContrast.status).toBe('AVAILABLE');
     expect(result.knowledgeFollowThrough).toEqual({
       status: 'UNAVAILABLE',
       reason: 'KNOWLEDGE_UNAVAILABLE',
