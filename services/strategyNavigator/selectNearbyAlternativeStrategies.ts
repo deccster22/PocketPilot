@@ -1,8 +1,14 @@
 import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
 
+import {
+  isSupportStrategyMetadataFamily,
+  resolveStrategyMetadata,
+} from './strategyMetadata';
 import type {
   NearbyAlternativeAvailability,
+  StrategyMetadata,
+  StrategyMetadataTag,
   StrategyNavigatorSurface,
   StrategyPreviewFocus,
   StrategyPreviewScenarioId,
@@ -11,147 +17,43 @@ import type {
 const MAX_NEARBY_ALTERNATIVES = 2;
 const MIN_COMPARABLE_SCORE = 3;
 const SUPPORT_LENS_PENALTY = -2;
-const SUPPORT_LENS_STRATEGY_IDS = new Set<StrategyId>(['data_quality']);
-
 const ENABLED_SURFACES = new Set<StrategyNavigatorSurface>(['STRATEGY_NAVIGATOR']);
 
-const STRATEGY_PROXIMITY: Readonly<
-  Partial<Record<StrategyId, Readonly<Partial<Record<StrategyId, number>>>>>
-> = {
-  data_quality: {
-    momentum_basics: 2,
-    dip_buying: 3,
-    trend_following: 2,
-    mean_reversion: 3,
-    fib_levels: 1,
-  },
-  momentum_basics: {
-    data_quality: 2,
-    dip_buying: 1,
-    trend_following: 5,
-    mean_reversion: 1,
-    fib_levels: 4,
-  },
-  dip_buying: {
-    data_quality: 3,
-    momentum_basics: 1,
-    trend_following: 1,
-    mean_reversion: 5,
-    fib_levels: 4,
-  },
-  trend_following: {
-    data_quality: 2,
-    momentum_basics: 5,
-    dip_buying: 1,
-    mean_reversion: 1,
-    fib_levels: 4,
-  },
-  mean_reversion: {
-    data_quality: 3,
-    momentum_basics: 1,
-    dip_buying: 5,
-    trend_following: 1,
-    fib_levels: 4,
-  },
-  fib_levels: {
-    data_quality: 1,
-    momentum_basics: 4,
-    dip_buying: 4,
-    trend_following: 4,
-    mean_reversion: 4,
-  },
-};
-
-const SCENARIO_BONUS: Readonly<
-  Record<StrategyPreviewScenarioId, Readonly<Partial<Record<StrategyId, number>>>>
-> = {
-  DIP_VOLATILITY: {
-    data_quality: 1,
-    momentum_basics: -1,
-    dip_buying: 2,
-    trend_following: -1,
-    mean_reversion: 2,
-    fib_levels: 1,
-  },
-  TREND_CONTINUATION: {
-    data_quality: 0,
-    momentum_basics: 2,
-    dip_buying: -1,
-    trend_following: 2,
-    mean_reversion: -1,
-    fib_levels: 1,
-  },
-  MIXED_REVERSAL: {
-    data_quality: 1,
-    momentum_basics: 0,
-    dip_buying: 2,
-    trend_following: 0,
-    mean_reversion: 2,
-    fib_levels: 1,
-  },
-  RANGE_COMPRESSION: {
-    data_quality: 1,
-    momentum_basics: 0,
-    dip_buying: 0,
-    trend_following: 1,
-    mean_reversion: 1,
-    fib_levels: 2,
-  },
-};
-
-const FOCUS_BONUS_RULES: ReadonlyArray<{
+const FOCUS_BONUS_CUES: ReadonlyArray<{
   pattern: RegExp;
-  bonuses: Readonly<Partial<Record<StrategyId, number>>>;
+  tags: ReadonlyArray<StrategyMetadataTag>;
 }> = [
   {
     pattern: /\bestimated\b|\bconfirmed\b|\bcertainty\b|\btrustworthy\b|\bcoverage\b/i,
-    bonuses: {
-      data_quality: 2,
-    },
+    tags: ['CERTAINTY_SUPPORT'],
   },
   {
     pattern: /\bcontinuation\b|\bfollow-through\b|\btrend\b|\bdirectional\b|\bstrength\b/i,
-    bonuses: {
-      momentum_basics: 1,
-      trend_following: 2,
-      fib_levels: 1,
-    },
+    tags: [
+      'TREND_CONTINUATION',
+      'ORDERLY_FOLLOW_THROUGH',
+      'TREND_STRUCTURE',
+      'DIRECTIONAL_HOLD',
+    ],
   },
   {
     pattern: /\bdip\b|\bpullback\b|\bweakness\b|\breversal\b|\bovershoot\b/i,
-    bonuses: {
-      dip_buying: 2,
-      mean_reversion: 2,
-      fib_levels: 1,
-    },
+    tags: ['PULLBACK_STABILIZATION', 'MEAN_RESET', 'OVERSHOOT_EASING'],
   },
   {
     pattern: /\blevel\b|\bzone\b|\bstructure\b|\bsupport\b|\bresistance\b|\bretracement\b/i,
-    bonuses: {
-      fib_levels: 2,
-      trend_following: 1,
-      mean_reversion: 1,
-    },
+    tags: ['STRUCTURE_LEVELS', 'RETRACEMENT_BEHAVIOR'],
   },
 ];
 
+type NearbyAlternativeScore = {
+  strategyId: StrategyId;
+  family: StrategyMetadata['family'];
+  score: number;
+};
+
 function isEnabledForSurface(surface: StrategyNavigatorSurface): boolean {
   return ENABLED_SURFACES.has(surface);
-}
-
-function resolveProximityScore(bestFitStrategyId: StrategyId, candidateStrategyId: StrategyId): number {
-  return (
-    STRATEGY_PROXIMITY[bestFitStrategyId]?.[candidateStrategyId] ??
-    STRATEGY_PROXIMITY[candidateStrategyId]?.[bestFitStrategyId] ??
-    0
-  );
-}
-
-function resolveScenarioBonus(
-  scenarioId: StrategyPreviewScenarioId,
-  candidateStrategyId: StrategyId,
-): number {
-  return SCENARIO_BONUS[scenarioId]?.[candidateStrategyId] ?? 0;
 }
 
 function createFocusText(focus: StrategyPreviewFocus | null | undefined): string {
@@ -169,27 +71,83 @@ function createFocusText(focus: StrategyPreviewFocus | null | undefined): string
     .trim();
 }
 
-function resolveFocusBonus(candidateStrategyId: StrategyId, focusText: string): number {
+function collectFocusCueTags(focusText: string): Set<StrategyMetadataTag> {
+  const cueTags = new Set<StrategyMetadataTag>();
+
   if (focusText.length === 0) {
+    return cueTags;
+  }
+
+  for (const cue of FOCUS_BONUS_CUES) {
+    if (!cue.pattern.test(focusText)) {
+      continue;
+    }
+
+    for (const tag of cue.tags) {
+      cueTags.add(tag);
+    }
+  }
+
+  return cueTags;
+}
+
+function countTagOverlap(
+  leftTags: ReadonlyArray<StrategyMetadataTag>,
+  rightTags: ReadonlyArray<StrategyMetadataTag>,
+): number {
+  if (leftTags.length === 0 || rightTags.length === 0) {
     return 0;
   }
 
-  return FOCUS_BONUS_RULES.reduce((score, rule) => {
-    if (!rule.pattern.test(focusText)) {
-      return score;
-    }
+  const rightSet = new Set(rightTags);
+  let overlap = 0;
 
-    return score + (rule.bonuses[candidateStrategyId] ?? 0);
-  }, 0);
+  for (const tag of leftTags) {
+    if (rightSet.has(tag)) {
+      overlap += 1;
+    }
+  }
+
+  return overlap;
+}
+
+function resolveScenarioBonus(
+  candidateMetadata: StrategyMetadata,
+  scenarioId: StrategyPreviewScenarioId,
+): number {
+  return candidateMetadata.scenarioTags.includes(scenarioId) ? 2 : 0;
+}
+
+function resolveFocusBonus(
+  candidateMetadata: StrategyMetadata,
+  cueTags: Set<StrategyMetadataTag>,
+): number {
+  if (cueTags.size === 0) {
+    return 0;
+  }
+
+  const candidateTags = new Set([
+    ...candidateMetadata.postureTags,
+    ...candidateMetadata.contrastNeighborTags,
+  ]);
+  let score = 0;
+
+  for (const tag of cueTags) {
+    if (candidateTags.has(tag)) {
+      score += 1;
+    }
+  }
+
+  return score;
 }
 
 function resolveSupportLensPenalty(
-  bestFitStrategyId: StrategyId,
-  candidateStrategyId: StrategyId,
+  bestFitFamily: StrategyMetadata['family'],
+  candidateFamily: StrategyMetadata['family'],
 ): number {
   if (
-    bestFitStrategyId !== 'data_quality' &&
-    SUPPORT_LENS_STRATEGY_IDS.has(candidateStrategyId)
+    !isSupportStrategyMetadataFamily(bestFitFamily) &&
+    isSupportStrategyMetadataFamily(candidateFamily)
   ) {
     return SUPPORT_LENS_PENALTY;
   }
@@ -197,47 +155,85 @@ function resolveSupportLensPenalty(
   return 0;
 }
 
-type NearbyAlternativeScore = {
-  strategyId: StrategyId;
-  score: number;
-};
-
 function scoreNearbyAlternative(params: {
   bestFitStrategyId: StrategyId;
-  bestFitArchetype: StrategyCatalogEntry['archetype'];
-  candidate: Pick<StrategyCatalogEntry, 'id' | 'archetype'>;
+  bestFitMetadata: StrategyMetadata;
+  candidateStrategyId: StrategyId;
   scenarioId: StrategyPreviewScenarioId;
-  focusText: string;
+  focusCueTags: Set<StrategyMetadataTag>;
 }): NearbyAlternativeScore | null {
-  if (params.candidate.id === params.bestFitStrategyId) {
+  if (params.candidateStrategyId === params.bestFitStrategyId) {
     return null;
   }
 
-  const proximityScore = resolveProximityScore(params.bestFitStrategyId, params.candidate.id);
-  const scenarioBonus = resolveScenarioBonus(params.scenarioId, params.candidate.id);
-  const focusBonus = resolveFocusBonus(params.candidate.id, params.focusText);
-  const supportLensPenalty = resolveSupportLensPenalty(
-    params.bestFitStrategyId,
-    params.candidate.id,
+  const candidateMetadata = resolveStrategyMetadata(params.candidateStrategyId);
+
+  if (!candidateMetadata) {
+    return null;
+  }
+
+  const proximityScore =
+    countTagOverlap(
+      params.bestFitMetadata.contrastNeighborTags,
+      candidateMetadata.contrastNeighborTags,
+    ) * 2;
+  const postureScore = countTagOverlap(
+    params.bestFitMetadata.postureTags,
+    candidateMetadata.postureTags,
   );
-  const sameArchetypeBonus =
-    params.candidate.archetype === params.bestFitArchetype ? 1 : 0;
+  const sameFamilyBonus =
+    params.bestFitMetadata.family === candidateMetadata.family &&
+    !isSupportStrategyMetadataFamily(candidateMetadata.family)
+      ? 1
+      : 0;
+  const scenarioBonus = resolveScenarioBonus(candidateMetadata, params.scenarioId);
+  const focusBonus = resolveFocusBonus(candidateMetadata, params.focusCueTags);
+  const supportLensPenalty = resolveSupportLensPenalty(
+    params.bestFitMetadata.family,
+    candidateMetadata.family,
+  );
   const clearlyDistant =
-    proximityScore <= 1 && scenarioBonus <= 0 && focusBonus === 0 && sameArchetypeBonus === 0;
+    proximityScore === 0 &&
+    postureScore === 0 &&
+    scenarioBonus === 0 &&
+    focusBonus === 0 &&
+    sameFamilyBonus === 0;
 
   if (clearlyDistant) {
     return null;
   }
 
   return {
-    strategyId: params.candidate.id,
+    strategyId: params.candidateStrategyId,
+    family: candidateMetadata.family,
     score:
       proximityScore +
+      postureScore +
+      sameFamilyBonus +
       scenarioBonus +
       focusBonus +
-      sameArchetypeBonus +
       supportLensPenalty,
   };
+}
+
+function pickTopNearbyAlternatives(
+  candidates: ReadonlyArray<NearbyAlternativeScore>,
+): NearbyAlternativeScore[] {
+  if (candidates.length === 0) {
+    return [];
+  }
+
+  const preferred = candidates
+    .filter((candidate) => candidate.score >= MIN_COMPARABLE_SCORE)
+    .slice(0, MAX_NEARBY_ALTERNATIVES);
+
+  if (preferred.length > 0) {
+    return preferred;
+  }
+
+  return candidates
+    .filter((candidate) => candidate.score > 0)
+    .slice(0, MAX_NEARBY_ALTERNATIVES);
 }
 
 export function selectNearbyAlternativeStrategies(params: {
@@ -268,23 +264,24 @@ export function selectNearbyAlternativeStrategies(params: {
   const bestFitStrategy = params.strategies.find(
     (strategy) => strategy.id === bestFitStrategyId,
   );
+  const bestFitMetadata = resolveStrategyMetadata(bestFitStrategyId);
 
-  if (!bestFitStrategy) {
+  if (!bestFitStrategy || !bestFitMetadata) {
     return {
       status: 'UNAVAILABLE',
       reason: 'NO_COMPARABLE_ALTERNATIVES',
     };
   }
 
-  const focusText = createFocusText(params.focus);
+  const focusCueTags = collectFocusCueTags(createFocusText(params.focus));
   const scoredAlternatives = params.strategies
     .map((candidate) =>
       scoreNearbyAlternative({
         bestFitStrategyId,
-        scenarioId: scenarioId,
-        bestFitArchetype: bestFitStrategy.archetype,
-        candidate,
-        focusText,
+        bestFitMetadata,
+        candidateStrategyId: candidate.id,
+        scenarioId,
+        focusCueTags,
       }),
     )
     .filter((score): score is NearbyAlternativeScore => score !== null)
@@ -292,15 +289,17 @@ export function selectNearbyAlternativeStrategies(params: {
       (left, right) =>
         right.score - left.score || left.strategyId.localeCompare(right.strategyId),
     );
-
-  const preferredAlternatives = scoredAlternatives
-    .filter((candidate) => candidate.score >= MIN_COMPARABLE_SCORE)
-    .slice(0, MAX_NEARBY_ALTERNATIVES);
-  const fallbackAlternatives = scoredAlternatives
-    .filter((candidate) => candidate.score > 0)
-    .slice(0, MAX_NEARBY_ALTERNATIVES);
+  const primaryAlternatives = scoredAlternatives.filter(
+    (candidate) => !isSupportStrategyMetadataFamily(candidate.family),
+  );
+  const supportAlternatives = scoredAlternatives.filter((candidate) =>
+    isSupportStrategyMetadataFamily(candidate.family),
+  );
+  const selectedPrimaryAlternatives = pickTopNearbyAlternatives(primaryAlternatives);
   const selectedAlternatives =
-    preferredAlternatives.length > 0 ? preferredAlternatives : fallbackAlternatives;
+    selectedPrimaryAlternatives.length > 0
+      ? selectedPrimaryAlternatives
+      : pickTopNearbyAlternatives(supportAlternatives);
 
   if (selectedAlternatives.length === 0) {
     return {

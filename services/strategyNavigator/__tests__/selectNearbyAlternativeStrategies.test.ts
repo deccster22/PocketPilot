@@ -1,4 +1,7 @@
 import { listCatalog } from '@/core/strategy/catalog';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { selectNearbyAlternativeStrategies } from '@/services/strategyNavigator/selectNearbyAlternativeStrategies';
 
 const PREVIEW_STRATEGY_IDS = new Set([
@@ -160,5 +163,20 @@ describe('selectNearbyAlternativeStrategies', () => {
     expect(result.selection.nearbyAlternativeStrategyIds).toContain('trend_following');
     expect(result.selection.nearbyAlternativeStrategyIds).toContain('fib_levels');
     expect(result.selection.nearbyAlternativeStrategyIds).not.toContain('mean_reversion');
+  });
+
+  it('consumes the canonical strategy metadata seam for nearby-alternative selection', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'services',
+        'strategyNavigator',
+        'selectNearbyAlternativeStrategies.ts',
+      ),
+      'utf8',
+    );
+
+    expect(source).toMatch(/resolveStrategyMetadata/);
+    expect(source).toMatch(/isSupportStrategyMetadataFamily/);
   });
 });

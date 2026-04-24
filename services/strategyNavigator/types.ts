@@ -73,6 +73,37 @@ export type StrategyPreviewContrastAvailability =
       content: StrategyPreviewContrast;
     };
 
+export type StrategyMetadataFamily =
+  | 'MOMENTUM'
+  | 'REVERSAL'
+  | 'PULLBACK'
+  | 'STRUCTURE'
+  | 'RISK_SUPPORT'
+  | 'DATA_SUPPORT';
+
+export type StrategyMetadataTag =
+  | 'CERTAINTY_SUPPORT'
+  | 'TREND_CONTINUATION'
+  | 'ORDERLY_FOLLOW_THROUGH'
+  | 'PULLBACK_STABILIZATION'
+  | 'MEAN_RESET'
+  | 'TREND_STRUCTURE'
+  | 'DIRECTIONAL_HOLD'
+  | 'STRUCTURE_LEVELS'
+  | 'RETRACEMENT_BEHAVIOR'
+  | 'OVERSHOOT_EASING';
+
+export type StrategyMetadata = {
+  strategyId: StrategyId;
+  label: string;
+  family: StrategyMetadataFamily;
+  postureTags: ReadonlyArray<StrategyMetadataTag>;
+  scenarioTags: ReadonlyArray<StrategyPreviewScenarioId>;
+  contrastNeighborTags: ReadonlyArray<StrategyMetadataTag>;
+  fitPrioritySummary: string;
+  knowledgeTopicId?: string | null;
+};
+
 export type StrategyContrastReason = {
   strategyId: StrategyId;
   label: string;

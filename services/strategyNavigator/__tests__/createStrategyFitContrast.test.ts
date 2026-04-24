@@ -1,4 +1,7 @@
 import { listCatalog } from '@/core/strategy/catalog';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { createStrategyFitContrast } from '@/services/strategyNavigator/createStrategyFitContrast';
 import { listStrategyPreviewScenarios } from '@/services/strategyNavigator/strategyPreviewScenarios';
 
@@ -230,5 +233,15 @@ describe('createStrategyFitContrast', () => {
     };
 
     expect(createStrategyFitContrast(params)).toEqual(createStrategyFitContrast(params));
+  });
+
+  it('consumes canonical strategy metadata for labels and fit-priority wording', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'services', 'strategyNavigator', 'createStrategyFitContrast.ts'),
+      'utf8',
+    );
+
+    expect(source).toMatch(/resolveStrategyMetadata/);
+    expect(source).toMatch(/resolveStrategyLabel/);
   });
 });

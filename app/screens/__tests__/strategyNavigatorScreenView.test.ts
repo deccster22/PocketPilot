@@ -725,7 +725,7 @@ describe('createStrategyNavigatorScreenViewData', () => {
     expect(source).toMatch(/supportingSections/);
     expect(source).toMatch(/knowledgeSection/);
     expect(source).not.toMatch(
-      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyFitContrast|selectNearbyAlternativeStrategies|createStrategyPreviewContrast|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
+      /createStrategyNavigatorVM|fetchStrategyNavigatorVM|createStrategyFitContrast|selectNearbyAlternativeStrategies|createStrategyPreviewContrast|createStrategyPreviewExplanation|selectStrategyPreviewKnowledge|resolveStrategyMetadata|listStrategyMetadataRegistry|fetchContextualKnowledgeAvailability|knowledgeCatalog|listCatalog|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime|\border\b|\bbroker\b/,
     );
     expect(source).not.toMatch(/top 10|leaderboard|best strategy|winner|prediction score/i);
   });
