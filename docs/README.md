@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-24
+Last Updated: 2026-04-25
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-24
+**Last updated:** 2026-04-25
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -201,6 +201,7 @@ Current normalization rule:
 - The v1.4 payload families above are now the live knowledge import baseline.
 - Overlapping numbered legacy shelves were retired to avoid duplicate live homes for the same concepts.
 - `PX-KI2` reconciles register/index taxonomy references to the same family-based layout and removes stale retired-shelf paths from active navigation docs.
+- `PX-KI3` adds deterministic register hygiene validation (`npm run validate:knowledge`) and keeps catalog family assumptions aligned through one shared tooling config.
 - `P7-K9` refines runtime inline glossary alias matching quality through one service-owned normalization seam without widening glossary rollout surfaces.
 - `P7-K10` adds internal aggregate exposure/acknowledgement hooks for glossary tuning while keeping runtime behavior calm, non-gating, and user-invisible.
 
@@ -260,4 +261,4 @@ Use these docs when placement or authority is unclear:
 2. Preserve one live home per concept.
 3. Update product, UX, architecture, and phase docs together when behaviour changes.
 4. Treat `docs/source/` as provenance, not day-to-day truth.
-5. Run `npm run verify` after repo changes when normal workflow expects a green verify gate.
+5. Run `npm run verify` after repo changes when normal workflow expects a green verify gate (`verify` includes docs-side knowledge register validation).

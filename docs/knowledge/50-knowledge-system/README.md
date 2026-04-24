@@ -10,3 +10,6 @@ Docs that explain how the Knowledge Library itself behaves: contextual links and
 
 ## Taxonomy note
 `PX-KI2` keeps this family as a support lane only and aligns register/navigation references to the live family taxonomy under `docs/knowledge/`.
+
+## Register hygiene note
+`PX-KI3` adds deterministic register validation (`npm run validate:knowledge`) so catalog generation and contextual-link assumptions keep using live family paths instead of retired numbered shelves.
