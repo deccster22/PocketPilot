@@ -45,10 +45,20 @@ describe('strategy navigator fit-contrast placement', () => {
     expect(strategyNavigatorScreenViewSource).not.toMatch(
       /createStrategyFitContrast|selectNearbyAlternativeStrategies|resolveStrategyMetadata|listStrategyMetadataRegistry|fetchStrategyNavigatorVM|createStrategyNavigatorVM|signalCode|signalsTriggered|providerId|metadata|runtime|score|rank|leaderboard/,
     );
-    expect(strategyPreviewCardSource).toMatch(/section\.items\.map\(\(item, index\)/);
-    expect(strategyPreviewCardSource).toMatch(/section\.bullets\.map\(\(item, index\)/);
+    expect(strategyPreviewCardSource).toMatch(/section\.items\.slice\(0, MAIN_SECTION_COLLAPSED_ITEM_COUNT\)/);
+    expect(strategyPreviewCardSource).toMatch(/createCollapsedSupportingBullets\(\{ section \}\)/);
+    expect(strategyPreviewCardSource).toMatch(/createCollapsedSupportingBullets/);
+    expect(strategyPreviewCardSource).toMatch(/Show more context/);
+    expect(strategyPreviewCardSource).toMatch(/AMBIGUITY_PREFIX = 'Ambiguity remains:'/);
     expect(strategyPreviewCardSource).not.toMatch(/key=\{item\}/);
     expect(strategyPreviewCardSource).not.toMatch(/key=\{`?\$\{item\}`?\}/);
+
+    const mainSectionsIndex = strategyPreviewCardSource.indexOf('props.preview.mainSections');
+    const supportingSectionsIndex = strategyPreviewCardSource.indexOf(
+      'props.preview.supportingSections',
+    );
+    expect(mainSectionsIndex).toBeGreaterThan(-1);
+    expect(supportingSectionsIndex).toBeGreaterThan(mainSectionsIndex);
 
     expect(createStrategyNavigatorVMSource).toMatch(/createStrategyFitContrast/);
     expect(createStrategyNavigatorVMSource).toMatch(/selectNearbyAlternativeStrategies/);

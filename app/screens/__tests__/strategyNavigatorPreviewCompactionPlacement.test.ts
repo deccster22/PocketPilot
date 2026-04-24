@@ -24,6 +24,13 @@ describe('strategy navigator preview compaction placement', () => {
     expect(strategyPreviewCardSource).toMatch(/props\.preview\.mainSections/);
     expect(strategyPreviewCardSource).toMatch(/props\.preview\.supportingSections/);
     expect(strategyPreviewCardSource).toMatch(/props\.preview\.knowledgeSection/);
+    expect(strategyPreviewCardSource).toMatch(/createCollapsedSupportingBullets/);
+    expect(strategyPreviewCardSource).toMatch(/useState\(false\)/);
+    expect(strategyPreviewCardSource).toMatch(/Show more preview detail/);
+    expect(strategyPreviewCardSource).toMatch(/Show more context/);
+    expect(strategyPreviewCardSource).toMatch(/Show more reading/);
+    expect(strategyPreviewCardSource).toMatch(/AMBIGUITY_PREFIX = 'Ambiguity remains:'/);
+    expect(strategyPreviewCardSource).toMatch(/onOpenKnowledgeTopic\?\.\(item\.topicId\)/);
     expect(strategyPreviewCardSource).toMatch(/Supporting context/);
     expect(strategyPreviewCardSource).not.toMatch(
       /trade now|act now|best setup|strategy battle|prediction|forecast|profit|execute|dispatch|broker|top 10|leaderboard|winner/i,

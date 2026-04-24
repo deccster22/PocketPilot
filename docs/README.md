@@ -83,6 +83,7 @@ Start with:
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - P9-S8 adds one canonical service-owned strategy metadata registry so nearby-alternative selection and fit-contrast consume the same explicit metadata base instead of scattered strategy-label assumptions.
+- P9-S9 keeps the same Strategy Navigator semantics while adding conservative mobile progressive disclosure so primary preview meaning stays visible and supporting context remains easier to scan.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.

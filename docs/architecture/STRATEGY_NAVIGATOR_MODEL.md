@@ -1,4 +1,4 @@
-# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7, P9-S8)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7, P9-S8, P9-S9)
 
 ## Purpose
 
@@ -12,6 +12,7 @@
 `P9-S6` adds one service-owned fit-contrast seam so the same preview lane can answer a compact "why this, not that" question for the current context without adding ranking or recommendation behavior.
 `P9-S7` adds one service-owned nearby-alternative selection heuristic seam so fit-contrast compares against more context-adjacent strategies instead of weaker distant alternatives.
 `P9-S8` adds one canonical strategy metadata registry seam so nearby-alternative selection and fit-contrast consume one explicit metadata source for family, posture, adjacency, and calm fit-priority wording.
+`P9-S9` keeps those same semantics and adds one conservative mobile disclosure pass so primary preview context remains visible while secondary detail density is reduced.
 
 The lane now exists to:
 
@@ -276,6 +277,25 @@ The compaction pass may not:
 - widen the fetch seam
 - create a second preview contract family
 
+## P9-S9 Mobile Density Disclosure Rules
+
+`P9-S9` keeps the same prepared service contracts and adds conservative disclosure behavior in `app/components/StrategyPreviewCard.tsx`.
+
+The disclosure pass may:
+
+- keep primary scenario and strategy fit context visible by default
+- collapse secondary detail bullets by default with one clear show more/less control
+- collapse optional reading lists by default with one clear show more/less control
+- keep fit-contrast subordinate in the supporting shelf
+- preserve ambiguity access in collapsed supporting context
+
+The disclosure pass may not:
+
+- derive strategy fit, contrast, or metadata meaning locally
+- re-rank or re-score alternatives in app
+- hide ambiguity behind unreachable controls
+- create nested tab flows or new navigation layers
+
 ## Nearby Alternative Selection Rules
 
 `P9-S7` adds one service-owned selector seam used by fit-contrast.
@@ -421,6 +441,7 @@ The selector must not:
 - render prepared preview-explanation content when `explanation.status === 'AVAILABLE'`
 - render prepared knowledge follow-through items when `knowledgeFollowThrough.status === 'AVAILABLE'`
 - group prepared sections into a calmer render hierarchy for focus, supporting context, and optional reading
+- own local collapsed/expanded disclosure state for already-prepared sections
 - open prepared topic detail by `topicId`
 - format simple display labels and timestamps
 
@@ -432,6 +453,7 @@ The selector must not:
 - derive preview contrast wording locally
 - derive nearby-alternative heuristic selection locally
 - derive fit contrast reasoning, alternative selection, or ambiguity notes locally
+- derive strategy metadata locally
 - derive preview explanation wording locally
 - derive knowledge relevance locally
 - read markdown files or docs paths
@@ -465,7 +487,7 @@ That keeps Strategy Preview explanatory without turning the shared Dashboard why
 
 ## Relationship To Later Work
 
-`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, `P9-S7`, and `P9-S8` are the first eight rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, `P9-S7`, `P9-S8`, and `P9-S9` are the first nine rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 

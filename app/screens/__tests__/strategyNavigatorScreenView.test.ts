@@ -707,6 +707,97 @@ describe('createStrategyNavigatorScreenViewData', () => {
     });
   });
 
+  it('keeps fit-contrast subordinate and preserves ambiguity context in prepared supporting data', () => {
+    const result = createStrategyNavigatorScreenViewData({
+      title: 'Strategy Preview',
+      summary: 'A calm walkthrough of how PocketPilot would shift its read under a simulated market picture.',
+      generatedAt: '2026-04-05T00:00:00.000Z',
+      selectedStrategyId: 'dip_buying',
+      selectedScenarioId: 'MIXED_REVERSAL',
+      strategyOptions: [
+        {
+          strategyId: 'dip_buying',
+          title: 'Dip Buying',
+          summary: 'Flags symbols down >=4% versus baseline for calm dip monitoring.',
+          archetype: 'BEGINNER',
+        },
+      ],
+      scenarios: [
+        {
+          scenarioId: 'MIXED_REVERSAL',
+          title: 'Mixed reversal',
+          summary:
+            'The backdrop starts to change but still carries both continuation and reversal signals.',
+        },
+      ],
+      availability: {
+        status: 'AVAILABLE',
+        strategyId: 'dip_buying',
+        scenario: {
+          scenarioId: 'MIXED_REVERSAL',
+          title: 'Mixed reversal',
+          summary:
+            'The backdrop starts to change but still carries both continuation and reversal signals.',
+        },
+        focus: {
+          snapshotHeadline:
+            'Snapshot would ask whether the prior move has stretched far enough for a steadier rebound attempt to matter.',
+          dashboardFocus: [
+            'The Dashboard would lift names where weakness looks exhausted and the reversal attempt is becoming more orderly.',
+          ],
+          eventHighlights: [
+            'Price-movement events would matter if the rebound becomes broad enough to look more than incidental.',
+          ],
+          alertPosture:
+            'Alerts would describe the reversal attempt as early support-building rather than a finished turn.',
+        },
+      },
+      explanation: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_EXPLANATION_AVAILABLE',
+      },
+      contrast: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_CONTRAST_AVAILABLE',
+      },
+      fitContrast: {
+        status: 'AVAILABLE',
+        contrast: {
+          bestFitStrategyId: 'dip_buying',
+          bestFitLabel: 'Dip Buying',
+          whyItFits: [
+            'Current simulated backdrop: volatility is uneven, structure is mixed, and the condition is still unsettled.',
+            'Dip Buying stays the closer fit because it keeps attention on whether weakness is stabilizing into a calmer pullback while context remains mixed.',
+          ],
+          lessSuitableAlternatives: [
+            {
+              strategyId: 'mean_reversion',
+              label: 'Mean Reversion',
+              lines: [
+                'Compared with Dip Buying, Mean Reversion is less suitable right now because pressure is still uneven across the mixed reversal backdrop.',
+              ],
+            },
+          ],
+          ambiguityNote:
+            'Ambiguity remains: the reversal picture is still mixed, so this contrast is orientation, not a verdict.',
+        },
+      },
+      knowledgeFollowThrough: {
+        status: 'UNAVAILABLE',
+        reason: 'KNOWLEDGE_UNAVAILABLE',
+      },
+    });
+
+    expect(result?.preview?.mainSections[0]?.sectionId).toBe('DASHBOARD_FOCUS');
+    const fitContrastSection = result?.preview?.supportingSections.find(
+      (section) => section.sectionId === 'FIT_CONTRAST',
+    );
+    expect(fitContrastSection).toBeDefined();
+    expect(fitContrastSection?.bullets).toContain(
+      'Ambiguity remains: the reversal picture is still mixed, so this contrast is orientation, not a verdict.',
+    );
+  });
+
   it('keeps the screen helper on the prepared Strategy Preview VM only', () => {
     const source = readFileSync(
       join(process.cwd(), 'app', 'screens', 'strategyNavigatorScreenView.ts'),

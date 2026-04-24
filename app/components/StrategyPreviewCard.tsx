@@ -1,11 +1,53 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { StrategyPreviewCardViewData } from '@/app/screens/strategyNavigatorScreenView';
+
+const MAIN_SECTION_COLLAPSED_ITEM_COUNT = 1;
+const SUPPORTING_SECTION_COLLAPSED_BULLET_COUNT = 1;
+const KNOWLEDGE_SECTION_COLLAPSED_ITEM_COUNT = 1;
+const AMBIGUITY_PREFIX = 'Ambiguity remains:';
+
+function createCollapsedSupportingBullets(params: {
+  section: StrategyPreviewCardViewData['supportingSections'][number];
+}): ReadonlyArray<string> {
+  const { section } = params;
+  const primaryBullets = section.bullets.slice(0, SUPPORTING_SECTION_COLLAPSED_BULLET_COUNT);
+
+  if (section.sectionId !== 'FIT_CONTRAST') {
+    return primaryBullets;
+  }
+
+  const ambiguityBullet = section.bullets.find((bullet) =>
+    bullet.startsWith(AMBIGUITY_PREFIX),
+  );
+
+  if (!ambiguityBullet || primaryBullets.includes(ambiguityBullet)) {
+    return primaryBullets;
+  }
+
+  return [...primaryBullets, ambiguityBullet];
+}
 
 export function StrategyPreviewCard(props: {
   preview: StrategyPreviewCardViewData;
   onOpenKnowledgeTopic?: (topicId: string) => void;
 }) {
+  const [mainDetailExpanded, setMainDetailExpanded] = useState(false);
+  const [supportingDetailExpanded, setSupportingDetailExpanded] = useState(false);
+  const [knowledgeExpanded, setKnowledgeExpanded] = useState(false);
+
+  const hasMoreMainDetail = props.preview.mainSections.some(
+    (section) => section.items.length > MAIN_SECTION_COLLAPSED_ITEM_COUNT,
+  );
+  const hasMoreSupportingDetail = props.preview.supportingSections.some((section) => {
+    const collapsedBullets = createCollapsedSupportingBullets({ section });
+    return section.bullets.length > collapsedBullets.length;
+  });
+  const hasMoreKnowledgeDetail =
+    props.preview.knowledgeSection !== null &&
+    props.preview.knowledgeSection.items.length > KNOWLEDGE_SECTION_COLLAPSED_ITEM_COUNT;
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -26,14 +68,32 @@ export function StrategyPreviewCard(props: {
         {props.preview.mainSections.map((section) => (
           <View key={section.sectionId} style={styles.mainSectionCard}>
             <Text style={styles.sectionLabel}>{section.label}</Text>
-            {section.body ? <Text style={styles.body}>{section.body}</Text> : null}
-            {section.items.map((item, index) => (
+            {section.body ? (
+              <Text numberOfLines={mainDetailExpanded ? undefined : 3} style={styles.body}>
+                {section.body}
+              </Text>
+            ) : null}
+            {(mainDetailExpanded
+              ? section.items
+              : section.items.slice(0, MAIN_SECTION_COLLAPSED_ITEM_COUNT)
+            ).map((item, index) => (
               <Text key={`${section.sectionId}-item-${index}`} style={styles.listItem}>
                 - {item}
               </Text>
             ))}
           </View>
         ))}
+        {hasMoreMainDetail ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setMainDetailExpanded((current) => !current)}
+            style={styles.disclosureButton}
+          >
+            <Text style={styles.disclosureText}>
+              {mainDetailExpanded ? 'Show less preview detail' : 'Show more preview detail'}
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
 
       {props.preview.supportingSections.length > 0 ? (
@@ -43,14 +103,30 @@ export function StrategyPreviewCard(props: {
             <View key={section.sectionId} style={styles.supportingSection}>
               <Text style={styles.supportingSectionLabel}>{section.label}</Text>
               <Text style={styles.supportingTitle}>{section.title}</Text>
-              <Text style={styles.body}>{section.summary}</Text>
-              {section.bullets.map((item, index) => (
+              <Text numberOfLines={supportingDetailExpanded ? undefined : 3} style={styles.body}>
+                {section.summary}
+              </Text>
+              {(supportingDetailExpanded
+                ? section.bullets
+                : createCollapsedSupportingBullets({ section })
+              ).map((item, index) => (
                 <Text key={`${section.sectionId}-bullet-${index}`} style={styles.listItem}>
                   - {item}
                 </Text>
               ))}
             </View>
           ))}
+          {hasMoreSupportingDetail ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setSupportingDetailExpanded((current) => !current)}
+              style={styles.disclosureButton}
+            >
+              <Text style={styles.disclosureText}>
+                {supportingDetailExpanded ? 'Show less context' : 'Show more context'}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
 
@@ -58,7 +134,13 @@ export function StrategyPreviewCard(props: {
         <View style={styles.knowledgeSection}>
           <Text style={styles.supportingGroupLabel}>{props.preview.knowledgeSection.title}</Text>
           <Text style={styles.optionalText}>{props.preview.knowledgeSection.summary}</Text>
-          {props.preview.knowledgeSection.items.map((item) => (
+          {(knowledgeExpanded
+            ? props.preview.knowledgeSection.items
+            : props.preview.knowledgeSection.items.slice(
+                0,
+                KNOWLEDGE_SECTION_COLLAPSED_ITEM_COUNT,
+              )
+          ).map((item) => (
             <Pressable
               key={item.topicId}
               accessibilityRole="button"
@@ -71,6 +153,17 @@ export function StrategyPreviewCard(props: {
               <Text style={styles.knowledgeLink}>Open topic</Text>
             </Pressable>
           ))}
+          {hasMoreKnowledgeDetail ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setKnowledgeExpanded((current) => !current)}
+              style={styles.disclosureButton}
+            >
+              <Text style={styles.disclosureText}>
+                {knowledgeExpanded ? 'Show less reading' : 'Show more reading'}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
     </View>
@@ -192,6 +285,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: '#334155',
+  },
+  disclosureButton: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 999,
+    backgroundColor: '#f8fafc',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  disclosureText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0f766e',
   },
   knowledgeSection: {
     gap: 10,
