@@ -36,14 +36,14 @@ describe('strategy navigator fit-contrast placement', () => {
     expect(strategyNavigatorScreenSource).toMatch(/fetchStrategyNavigatorVM/);
     expect(strategyNavigatorScreenSource).toMatch(/createStrategyNavigatorScreenViewData/);
     expect(strategyNavigatorScreenSource).not.toMatch(
-      /createStrategyFitContrast|selectNearbyAlternativeStrategies|createStrategyNavigatorVM|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime/,
+      /createStrategyFitContrast|selectNearbyAlternativeStrategies|createStrategyNavigatorVM|resolveStrategyMetadata|listStrategyMetadataRegistry|strategyPreviewScenarios|signalCode|signalsTriggered|providerId|metadata|runtime/,
     );
 
     expect(strategyNavigatorScreenViewSource).toMatch(/vm\.fitContrast\.status === 'AVAILABLE'/);
     expect(strategyNavigatorScreenViewSource).toMatch(/createPreviewFitContrastSection/);
     expect(strategyNavigatorScreenViewSource).toMatch(/sectionId: 'FIT_CONTRAST'/);
     expect(strategyNavigatorScreenViewSource).not.toMatch(
-      /createStrategyFitContrast|selectNearbyAlternativeStrategies|fetchStrategyNavigatorVM|createStrategyNavigatorVM|signalCode|signalsTriggered|providerId|metadata|runtime|score|rank|leaderboard/,
+      /createStrategyFitContrast|selectNearbyAlternativeStrategies|resolveStrategyMetadata|listStrategyMetadataRegistry|fetchStrategyNavigatorVM|createStrategyNavigatorVM|signalCode|signalsTriggered|providerId|metadata|runtime|score|rank|leaderboard/,
     );
     expect(strategyPreviewCardSource).toMatch(/section\.items\.map\(\(item, index\)/);
     expect(strategyPreviewCardSource).toMatch(/section\.bullets\.map\(\(item, index\)/);
@@ -53,6 +53,8 @@ describe('strategy navigator fit-contrast placement', () => {
     expect(createStrategyNavigatorVMSource).toMatch(/createStrategyFitContrast/);
     expect(createStrategyNavigatorVMSource).toMatch(/selectNearbyAlternativeStrategies/);
     expect(createStrategyNavigatorVMSource).toMatch(/fitContrast:/);
+    expect(createStrategyFitContrastSource).toMatch(/resolveStrategyMetadata/);
+    expect(selectNearbyAlternativeStrategiesSource).toMatch(/resolveStrategyMetadata/);
     expect(createStrategyFitContrastSource).not.toMatch(
       /execute|execution|dispatch|broker|profit|forecast|prediction|trade now|top 10|leaderboard|winner/i,
     );

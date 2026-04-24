@@ -1,4 +1,4 @@
-# Strategy Navigator Spec (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7)
+# Strategy Navigator Spec (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7, P9-S8)
 
 ## Purpose
 
@@ -8,6 +8,7 @@ Strategy Navigator should feel like a quiet briefing simulator with one gentle n
 `P9-S5` compacts that same card so the preview focus stays primary, supporting context stays lighter, and optional reading stays clearly optional.
 `P9-S6` adds one calm fit-contrast proof path ("why this, not that") using prepared service output only.
 `P9-S7` improves nearby-alternative selection quality for that same fit-contrast path using service-owned heuristics only.
+`P9-S8` keeps that same visible path but normalizes fit/nearby comparison onto one service-owned strategy metadata registry.
 
 It should help a user compare strategy lenses without:
 
@@ -25,6 +26,7 @@ It should help a user compare strategy lenses without:
 - app may render one small prepared scenario-contrast section inside that preview card only when services mark it available
 - app may render one small prepared fit-contrast section inside that preview card only when services mark it available
 - app may not choose nearby alternatives locally; it renders prepared comparator output only
+- app may not resolve strategy metadata locally; metadata ownership stays in services
 - app may render one small prepared explanation section inside that preview card only when services mark it available
 - app may render one small prepared knowledge follow-through section inside that preview card only when services mark it available
 - app may group prepared explanation and contrast into one lighter supporting-context shelf
@@ -119,6 +121,7 @@ It should stay:
 - calm
 - interpretation-first
 - based on service-owned nearby alternatives, not app-side ranking
+- grounded in one canonical service-owned strategy metadata seam
 
 It should not feel like:
 
@@ -185,7 +188,7 @@ Avoid:
 
 Future `P9` UX may introduce richer transformations, context links, or deeper explanation shelves.
 
-`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, and `P9-S7` should still remain the reference for the core mood:
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, `P9-S7`, and `P9-S8` should still remain the reference for the core mood:
 
 - calm
 - exploratory

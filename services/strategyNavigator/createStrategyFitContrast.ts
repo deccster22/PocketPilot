@@ -2,6 +2,7 @@ import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
 
 import { selectNearbyAlternativeStrategies } from './selectNearbyAlternativeStrategies';
+import { resolveStrategyMetadata } from './strategyMetadata';
 import type {
   NearbyAlternativeAvailability,
   StrategyFitContrastAvailability,
@@ -45,22 +46,14 @@ function describeScenarioTraits(scenario: StrategyPreviewScenario): string {
 }
 
 function describeStrategyPriority(strategyId: StrategyId): string {
-  switch (strategyId) {
-    case 'data_quality':
-      return 'certainty boundaries and whether context still looks trustworthy';
-    case 'momentum_basics':
-      return 'orderly follow-through rather than movement speed alone';
-    case 'dip_buying':
-      return 'whether weakness is stabilizing into a calmer pullback';
-    case 'trend_following':
-      return 'whether the broader directional structure is still holding';
-    case 'mean_reversion':
-      return 'stretch-versus-baseline context and whether pressure is easing';
-    case 'fib_levels':
-      return 'how price behaves around nearby structural levels';
-    default:
-      return 'interpreted context quality before directional theatre';
-  }
+  return (
+    resolveStrategyMetadata(strategyId)?.fitPrioritySummary ??
+    'interpreted context quality before directional theatre'
+  );
+}
+
+function resolveStrategyLabel(strategyId: StrategyId, fallbackLabel: string): string {
+  return resolveStrategyMetadata(strategyId)?.label ?? fallbackLabel;
 }
 
 function describeFitWindow(scenarioId: StrategyPreviewScenario['scenarioId']): string {
@@ -213,27 +206,32 @@ export function createStrategyFitContrast(params: {
 
   const fitWindow = describeFitWindow(params.scenario.scenarioId);
   const alternativeWindow = describeAlternativeWindow(params.scenario.scenarioId);
+  const bestFitLabel = resolveStrategyLabel(strategy.id, strategy.name);
 
   return {
     status: 'AVAILABLE',
     contrast: {
       bestFitStrategyId: strategy.id,
-      bestFitLabel: strategy.name,
+      bestFitLabel,
       whyItFits: createUniqueLines([
         `Current simulated backdrop: ${describeScenarioTraits(params.scenario)}.`,
-        `${strategy.name} stays the closer fit because it keeps attention on ${describeStrategyPriority(
+        `${bestFitLabel} stays the closer fit because it keeps attention on ${describeStrategyPriority(
           strategy.id,
         )} while ${fitWindow}.`,
       ]),
-      lessSuitableAlternatives: nearbyAlternatives.map((alternative) => ({
-        strategyId: alternative.id,
-        label: alternative.name,
-        lines: createUniqueLines([
-          `Compared with ${strategy.name}, ${alternative.name} is less suitable right now because it leans on ${describeStrategyPriority(
-            alternative.id,
-          )} while ${alternativeWindow}.`,
-        ]),
-      })),
+      lessSuitableAlternatives: nearbyAlternatives.map((alternative) => {
+        const alternativeLabel = resolveStrategyLabel(alternative.id, alternative.name);
+
+        return {
+          strategyId: alternative.id,
+          label: alternativeLabel,
+          lines: createUniqueLines([
+            `Compared with ${bestFitLabel}, ${alternativeLabel} is less suitable right now because it leans on ${describeStrategyPriority(
+              alternative.id,
+            )} while ${alternativeWindow}.`,
+          ]),
+        };
+      }),
       ambiguityNote: createAmbiguityNote(params.scenario),
     },
   };

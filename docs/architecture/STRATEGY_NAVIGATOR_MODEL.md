@@ -1,4 +1,4 @@
-# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7, P9-S8)
 
 ## Purpose
 
@@ -11,6 +11,7 @@
 `P9-S5` keeps those same service-owned seams and adds one render-only compaction pass in `app/` so the existing prepared preview stays calm as subordinate shelves accumulate.
 `P9-S6` adds one service-owned fit-contrast seam so the same preview lane can answer a compact "why this, not that" question for the current context without adding ranking or recommendation behavior.
 `P9-S7` adds one service-owned nearby-alternative selection heuristic seam so fit-contrast compares against more context-adjacent strategies instead of weaker distant alternatives.
+`P9-S8` adds one canonical strategy metadata registry seam so nearby-alternative selection and fit-contrast consume one explicit metadata source for family, posture, adjacency, and calm fit-priority wording.
 
 The lane now exists to:
 
@@ -19,6 +20,7 @@ The lane now exists to:
 - show how that strategy's emphasis changes versus calmer or alternative conditions for that same scenario family
 - explain why that simulated backdrop matters to the selected strategy in calm worldview terms
 - explain why the current fit reads stronger than one or two nearby alternatives in that same simulated context
+- keep fit and nearby comparison logic grounded in one canonical service-owned strategy metadata source
 - optionally offer a small set of prepared knowledge next steps if the user wants more context
 - stay calm, descriptive, educational, and non-directive
 
@@ -90,6 +92,25 @@ type StrategyPreviewContrastAvailability =
       status: 'AVAILABLE';
       content: StrategyPreviewContrast;
     };
+
+type StrategyMetadataFamily =
+  | 'MOMENTUM'
+  | 'REVERSAL'
+  | 'PULLBACK'
+  | 'STRUCTURE'
+  | 'RISK_SUPPORT'
+  | 'DATA_SUPPORT';
+
+type StrategyMetadata = {
+  strategyId: string;
+  label: string;
+  family: StrategyMetadataFamily;
+  postureTags: readonly string[];
+  scenarioTags: readonly StrategyPreviewScenarioId[];
+  contrastNeighborTags: readonly string[];
+  fitPrioritySummary: string;
+  knowledgeTopicId?: string | null;
+};
 
 type StrategyContrastReason = {
   strategyId: string;
@@ -182,6 +203,7 @@ type StrategyNavigatorVM = {
 
 Rules:
 
+- one canonical strategy metadata contract
 - one canonical preview contract
 - one canonical preview-explanation contract
 - one canonical preview-contrast contract
@@ -200,7 +222,7 @@ Rules:
 
 The current canonical service path is:
 
-`core strategy catalog -> strategyPreviewScenarios -> createStrategyNavigatorVM -> fetchStrategyNavigatorVM`
+`core strategy catalog -> strategyMetadata registry + strategyPreviewScenarios -> createStrategyNavigatorVM -> fetchStrategyNavigatorVM`
 
 `fetchStrategyNavigatorVM` is the single app-facing entry point.
 `app/` consumes the prepared VM through `StrategyNavigatorScreen`.
@@ -212,6 +234,11 @@ Within `createStrategyNavigatorVM`, the same service-owned lane now calls:
 - `selectNearbyAlternativeStrategies`
 - `createStrategyFitContrast`
 - `selectStrategyPreviewKnowledge`
+
+`selectNearbyAlternativeStrategies` and `createStrategyFitContrast` both consume:
+
+- `resolveStrategyMetadata`
+- `isSupportStrategyMetadataFamily` (where support-lens filtering is required)
 
 ## Preview Rules
 
@@ -252,6 +279,7 @@ The compaction pass may not:
 ## Nearby Alternative Selection Rules
 
 `P9-S7` adds one service-owned selector seam used by fit-contrast.
+`P9-S8` normalizes selector inputs onto one canonical metadata registry.
 
 The selector answers three questions only:
 
@@ -264,7 +292,7 @@ The selector may use:
 - selected strategy id
 - finite scenario id
 - prepared preview focus text
-- canonical strategy metadata (id/archetype)
+- canonical strategy metadata (id, family, posture tags, scenario tags, adjacency tags)
 - deterministic service-owned proximity and scenario/focus weighting
 
 The selector must:
@@ -283,6 +311,7 @@ The selector must not:
 ## Fit Contrast Rules
 
 `P9-S6` adds one subordinate fit-contrast shelf inside the same Strategy Navigator VM.
+`P9-S8` keeps the same output contract while normalizing labels and fit-priority wording through the same metadata registry.
 
 The fit contrast answers four questions only:
 
@@ -295,6 +324,7 @@ The fit contrast must:
 
 - stay short, calm, comparative, and interpretation-first
 - reuse prepared strategy, scenario, and focus context from the same preview lane
+- consume canonical strategy metadata for labels and fit-priority wording where available
 - return `UNAVAILABLE` honestly when comparable context is missing
 - avoid ranking, scoring, and winner framing
 
@@ -435,7 +465,7 @@ That keeps Strategy Preview explanatory without turning the shared Dashboard why
 
 ## Relationship To Later Work
 
-`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, and `P9-S7` are the first seven rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, `P9-S7`, and `P9-S8` are the first eight rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 
