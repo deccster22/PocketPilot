@@ -1,33 +1,10 @@
 const fs = require('node:fs');
 const path = require('node:path');
+const { DOC_FAMILY_ORDER, DOC_TO_RUNTIME_FAMILY } = require('./knowledge-catalog-config');
 
 const ROOT = process.cwd();
 const REGISTER_PATH = path.join(ROOT, 'docs', 'knowledge', '_register', 'CONTENT_REGISTER.csv');
 const OUTPUT_PATH = path.join(ROOT, 'services', 'knowledge', 'knowledgeCatalog.ts');
-
-const DOC_FAMILY_ORDER = [
-  'orientation',
-  'strategies',
-  'glossary',
-  'interpretation',
-  'market-examples',
-  'action-risk',
-  'evidence',
-  'reflection',
-  'knowledge-system',
-];
-
-const DOC_TO_RUNTIME_FAMILY = {
-  orientation: 'orientation',
-  strategies: 'strategies',
-  glossary: 'core-language',
-  interpretation: 'core-language',
-  'market-examples': 'core-language',
-  'action-risk': 'action-risk',
-  evidence: 'core-language',
-  reflection: 'reflection',
-  'knowledge-system': 'knowledge-system',
-};
 
 const PRIORITY_MAP = {
   now: 'NOW',

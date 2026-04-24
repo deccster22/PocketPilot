@@ -21,6 +21,12 @@ Controlled live knowledge tree for in-product learning content.
 ## Catalog/register note
 - `docs/knowledge/_register/CONTENT_REGISTER.csv` and `CONTENT_REGISTER.md` now track the live family-based tree directly.
 - `scripts/generate-knowledge-catalog.js` consumes the same family-based register and applies a narrow docs-to-runtime family mapping when generation is explicitly run.
+- `scripts/validate-knowledge-register.js` validates register hygiene before downstream docs/runtime work depends on stale metadata.
+
+## Validation note
+- Run `npm run validate:knowledge` to check register path existence, topic ID uniqueness, retired shelf rejection, family/path alignment, and required core family coverage.
+- `npm run verify` now includes `npm run validate:knowledge` so catalog/register drift is caught in the normal quality gate.
+- Validation is read-only and deterministic; it does not rewrite register or catalog artifacts.
 
 ## Import note
 `PX-KI1` imported the v1.4 knowledge payload into the live families above and retired overlapping legacy numbered shelves to avoid parallel live trees for the same concepts.
