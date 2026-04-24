@@ -27,8 +27,8 @@ export function StrategyPreviewCard(props: {
           <View key={section.sectionId} style={styles.mainSectionCard}>
             <Text style={styles.sectionLabel}>{section.label}</Text>
             {section.body ? <Text style={styles.body}>{section.body}</Text> : null}
-            {section.items.map((item) => (
-              <Text key={item} style={styles.listItem}>
+            {section.items.map((item, index) => (
+              <Text key={`${section.sectionId}-item-${index}`} style={styles.listItem}>
                 - {item}
               </Text>
             ))}
@@ -44,8 +44,8 @@ export function StrategyPreviewCard(props: {
               <Text style={styles.supportingSectionLabel}>{section.label}</Text>
               <Text style={styles.supportingTitle}>{section.title}</Text>
               <Text style={styles.body}>{section.summary}</Text>
-              {section.bullets.map((item) => (
-                <Text key={item} style={styles.listItem}>
+              {section.bullets.map((item, index) => (
+                <Text key={`${section.sectionId}-bullet-${index}`} style={styles.listItem}>
                   - {item}
                 </Text>
               ))}

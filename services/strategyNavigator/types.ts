@@ -97,6 +97,21 @@ export type StrategyFitContrastAvailability =
       contrast: StrategyFitContrast;
     };
 
+export type NearbyAlternativeSelection = {
+  bestFitStrategyId: StrategyId;
+  nearbyAlternativeStrategyIds: ReadonlyArray<StrategyId>;
+};
+
+export type NearbyAlternativeAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_COMPARABLE_ALTERNATIVES' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      selection: NearbyAlternativeSelection;
+    };
+
 export type StrategyPreviewKnowledgeLink = {
   topicId: string;
   title: string;

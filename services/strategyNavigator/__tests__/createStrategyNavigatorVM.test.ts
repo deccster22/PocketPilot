@@ -96,24 +96,21 @@ describe('createStrategyNavigatorVM', () => {
         bestFitLabel: 'Momentum Basics',
         whyItFits: [
           'Current simulated backdrop: volatility is contained, structure is directional and orderly, and the condition is more extended than a neutral pause.',
-          'Momentum Basics fits this context better because it keeps attention on orderly follow-through rather than movement speed alone while the backdrop is still extending in an orderly direction.',
-          'Current prepared emphasis: Names still building orderly strength would move closer to the prime zone.',
+          'Momentum Basics stays the closer fit because it keeps attention on orderly follow-through rather than movement speed alone while the backdrop is still extending in an orderly direction.',
         ],
         lessSuitableAlternatives: [
           {
             strategyId: 'trend_following',
             label: 'Trend Following',
             lines: [
-              'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the continuation remains extended rather than reset.',
-              'In this lane, Momentum Basics stays the steadier interpretation-first fit while context keeps evolving.',
+              'Compared with Momentum Basics, Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding while the continuation remains extended rather than reset.',
             ],
           },
           {
-            strategyId: 'dip_buying',
-            label: 'Dip Buying',
+            strategyId: 'fib_levels',
+            label: 'Fibonacci Levels',
             lines: [
-              'Dip Buying is less suitable right now because it leans on whether weakness is stabilizing into a calmer pullback, while the continuation remains extended rather than reset.',
-              'In this lane, Momentum Basics stays the steadier interpretation-first fit while context keeps evolving.',
+              'Compared with Momentum Basics, Fibonacci Levels is less suitable right now because it leans on how price behaves around nearby structural levels while the continuation remains extended rather than reset.',
             ],
           },
         ],

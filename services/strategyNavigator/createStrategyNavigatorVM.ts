@@ -5,6 +5,7 @@ import type { KnowledgeCatalogEntry } from '@/services/knowledge/types';
 import { createStrategyFitContrast } from './createStrategyFitContrast';
 import { createStrategyPreviewContrast } from './createStrategyPreviewContrast';
 import { createStrategyPreviewExplanation } from './createStrategyPreviewExplanation';
+import { selectNearbyAlternativeStrategies } from './selectNearbyAlternativeStrategies';
 import { selectStrategyPreviewKnowledge } from './selectStrategyPreviewKnowledge';
 import type {
   StrategyNavigatorSurface,
@@ -577,6 +578,13 @@ export function createStrategyNavigatorVM(params: {
     scenario: selectedScenario,
     focus,
   });
+  const nearbyAlternativeAvailability = selectNearbyAlternativeStrategies({
+    surface,
+    bestFitStrategyId: selectedStrategy.id,
+    strategies: params.strategies,
+    scenarioId: selectedScenario.scenarioId,
+    focus,
+  });
 
   return {
     ...baseVm,
@@ -599,6 +607,7 @@ export function createStrategyNavigatorVM(params: {
       strategies: params.strategies,
       scenario: selectedScenario,
       focus,
+      nearbyAlternativeAvailability,
     }),
     knowledgeFollowThrough: selectStrategyPreviewKnowledge({
       surface,

@@ -1,4 +1,4 @@
-# Strategy Navigator Spec (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6)
+# Strategy Navigator Spec (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7)
 
 ## Purpose
 
@@ -7,6 +7,7 @@ Strategy Navigator should feel like a quiet briefing simulator with one gentle n
 `P9-S4` adds one calm scenario-contrast shelf inside that same briefing card.
 `P9-S5` compacts that same card so the preview focus stays primary, supporting context stays lighter, and optional reading stays clearly optional.
 `P9-S6` adds one calm fit-contrast proof path ("why this, not that") using prepared service output only.
+`P9-S7` improves nearby-alternative selection quality for that same fit-contrast path using service-owned heuristics only.
 
 It should help a user compare strategy lenses without:
 
@@ -23,6 +24,7 @@ It should help a user compare strategy lenses without:
 - app renders one prepared preview card only
 - app may render one small prepared scenario-contrast section inside that preview card only when services mark it available
 - app may render one small prepared fit-contrast section inside that preview card only when services mark it available
+- app may not choose nearby alternatives locally; it renders prepared comparator output only
 - app may render one small prepared explanation section inside that preview card only when services mark it available
 - app may render one small prepared knowledge follow-through section inside that preview card only when services mark it available
 - app may group prepared explanation and contrast into one lighter supporting-context shelf
@@ -116,6 +118,7 @@ It should stay:
 - comparative
 - calm
 - interpretation-first
+- based on service-owned nearby alternatives, not app-side ranking
 
 It should not feel like:
 
@@ -182,7 +185,7 @@ Avoid:
 
 Future `P9` UX may introduce richer transformations, context links, or deeper explanation shelves.
 
-`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, and `P9-S6` should still remain the reference for the core mood:
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, and `P9-S7` should still remain the reference for the core mood:
 
 - calm
 - exploratory

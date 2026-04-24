@@ -1,25 +1,16 @@
 import type { StrategyCatalogEntry } from '@/core/strategy/catalogTypes';
 import type { StrategyId } from '@/core/strategy/types';
 
+import { selectNearbyAlternativeStrategies } from './selectNearbyAlternativeStrategies';
 import type {
+  NearbyAlternativeAvailability,
   StrategyFitContrastAvailability,
   StrategyNavigatorSurface,
   StrategyPreviewFocus,
   StrategyPreviewScenario,
 } from './types';
 
-const MAX_ALTERNATIVES = 2;
-
 const ENABLED_SURFACES = new Set<StrategyNavigatorSurface>(['STRATEGY_NAVIGATOR']);
-
-const NEARBY_ALTERNATIVES: Readonly<Partial<Record<StrategyId, ReadonlyArray<StrategyId>>>> = {
-  data_quality: ['momentum_basics', 'trend_following'],
-  momentum_basics: ['trend_following', 'dip_buying'],
-  dip_buying: ['mean_reversion', 'trend_following'],
-  trend_following: ['momentum_basics', 'fib_levels'],
-  mean_reversion: ['dip_buying', 'fib_levels'],
-  fib_levels: ['trend_following', 'mean_reversion'],
-};
 
 function isEnabledForSurface(surface: StrategyNavigatorSurface): boolean {
   return ENABLED_SURFACES.has(surface);
@@ -111,48 +102,59 @@ function createAmbiguityNote(scenario: StrategyPreviewScenario): string | null {
   }
 }
 
-function resolveNearbyAlternatives(params: {
-  bestFitStrategyId: StrategyId;
-  strategies: ReadonlyArray<Pick<StrategyCatalogEntry, 'id' | 'name'>>;
-}): Array<Pick<StrategyCatalogEntry, 'id' | 'name'>> {
-  const strategiesById = new Map(params.strategies.map((strategy) => [strategy.id, strategy] as const));
-  const preferredIds = NEARBY_ALTERNATIVES[params.bestFitStrategyId] ?? [];
-  const selectedIds: StrategyId[] = [];
-
-  preferredIds.forEach((strategyId) => {
-    if (strategyId !== params.bestFitStrategyId && strategiesById.has(strategyId)) {
-      selectedIds.push(strategyId);
-    }
-  });
-
-  if (selectedIds.length < MAX_ALTERNATIVES) {
-    params.strategies.forEach((strategy) => {
-      if (strategy.id === params.bestFitStrategyId || selectedIds.includes(strategy.id)) {
-        return;
-      }
-
-      selectedIds.push(strategy.id);
-    });
+function mapNearbyAlternativeUnavailableReason(
+  reason: Extract<NearbyAlternativeAvailability, { status: 'UNAVAILABLE' }>['reason'],
+): Extract<StrategyFitContrastAvailability, { status: 'UNAVAILABLE' }>['reason'] {
+  if (reason === 'NOT_ENABLED_FOR_SURFACE') {
+    return 'NOT_ENABLED_FOR_SURFACE';
   }
 
-  return selectedIds
-    .slice(0, MAX_ALTERNATIVES)
-    .map((strategyId) => strategiesById.get(strategyId))
-    .filter((strategy): strategy is Pick<StrategyCatalogEntry, 'id' | 'name'> => Boolean(strategy));
+  return 'NO_COMPARABLE_CONTEXT';
 }
 
-function createPreparedEmphasisLine(focus: StrategyPreviewFocus): string {
-  const emphasis = focus.dashboardFocus[0] ?? focus.snapshotHeadline;
+function resolveNearbyAlternatives(params: {
+  strategies: ReadonlyArray<Pick<StrategyCatalogEntry, 'id' | 'name'>>;
+  nearbyAlternativeStrategyIds: ReadonlyArray<StrategyId>;
+}): Array<Pick<StrategyCatalogEntry, 'id' | 'name'>> {
+  const strategiesById = new Map(
+    params.strategies.map((strategy) => [strategy.id, strategy] as const),
+  );
 
-  return `Current prepared emphasis: ${emphasis}`;
+  return params.nearbyAlternativeStrategyIds
+    .map((strategyId) => strategiesById.get(strategyId))
+    .filter(
+      (strategy): strategy is Pick<StrategyCatalogEntry, 'id' | 'name'> =>
+        strategy !== undefined,
+    );
+}
+
+function createUniqueLines(lines: ReadonlyArray<string>): string[] {
+  const dedupedLines: string[] = [];
+  const seen = new Set<string>();
+
+  for (const line of lines) {
+    const normalizedLine = line.trim();
+
+    if (normalizedLine.length === 0 || seen.has(normalizedLine)) {
+      continue;
+    }
+
+    seen.add(normalizedLine);
+    dedupedLines.push(normalizedLine);
+  }
+
+  return dedupedLines;
 }
 
 export function createStrategyFitContrast(params: {
   surface?: StrategyNavigatorSurface;
   strategy?: Pick<StrategyCatalogEntry, 'id' | 'name'> | null;
-  strategies?: ReadonlyArray<Pick<StrategyCatalogEntry, 'id' | 'name'>> | null;
+  strategies?: ReadonlyArray<
+    Pick<StrategyCatalogEntry, 'id' | 'name' | 'archetype'>
+  > | null;
   scenario?: StrategyPreviewScenario | null;
   focus?: StrategyPreviewFocus | null;
+  nearbyAlternativeAvailability?: NearbyAlternativeAvailability | null;
 }): StrategyFitContrastAvailability {
   const surface = params.surface ?? 'STRATEGY_NAVIGATOR';
 
@@ -175,10 +177,31 @@ export function createStrategyFitContrast(params: {
       reason: 'NO_COMPARABLE_CONTEXT',
     };
   }
+  const strategy = params.strategy;
+
+  const nearbyAlternativeAvailability =
+    params.nearbyAlternativeAvailability ??
+    selectNearbyAlternativeStrategies({
+      surface,
+      bestFitStrategyId: strategy.id,
+      strategies: params.strategies,
+      scenarioId: params.scenario.scenarioId,
+      focus: params.focus,
+    });
+
+  if (nearbyAlternativeAvailability.status === 'UNAVAILABLE') {
+    return {
+      status: 'UNAVAILABLE',
+      reason: mapNearbyAlternativeUnavailableReason(
+        nearbyAlternativeAvailability.reason,
+      ),
+    };
+  }
 
   const nearbyAlternatives = resolveNearbyAlternatives({
-    bestFitStrategyId: params.strategy.id,
     strategies: params.strategies,
+    nearbyAlternativeStrategyIds:
+      nearbyAlternativeAvailability.selection.nearbyAlternativeStrategyIds,
   });
 
   if (nearbyAlternatives.length === 0) {
@@ -194,24 +217,22 @@ export function createStrategyFitContrast(params: {
   return {
     status: 'AVAILABLE',
     contrast: {
-      bestFitStrategyId: params.strategy.id,
-      bestFitLabel: params.strategy.name,
-      whyItFits: [
+      bestFitStrategyId: strategy.id,
+      bestFitLabel: strategy.name,
+      whyItFits: createUniqueLines([
         `Current simulated backdrop: ${describeScenarioTraits(params.scenario)}.`,
-        `${params.strategy.name} fits this context better because it keeps attention on ${describeStrategyPriority(
-          params.strategy.id,
+        `${strategy.name} stays the closer fit because it keeps attention on ${describeStrategyPriority(
+          strategy.id,
         )} while ${fitWindow}.`,
-        createPreparedEmphasisLine(params.focus),
-      ],
+      ]),
       lessSuitableAlternatives: nearbyAlternatives.map((alternative) => ({
         strategyId: alternative.id,
         label: alternative.name,
-        lines: [
-          `${alternative.name} is less suitable right now because it leans on ${describeStrategyPriority(
+        lines: createUniqueLines([
+          `Compared with ${strategy.name}, ${alternative.name} is less suitable right now because it leans on ${describeStrategyPriority(
             alternative.id,
-          )}, while ${alternativeWindow}.`,
-          `In this lane, ${params.strategy?.name} stays the steadier interpretation-first fit while context keeps evolving.`,
-        ],
+          )} while ${alternativeWindow}.`,
+        ]),
       })),
       ambiguityNote: createAmbiguityNote(params.scenario),
     },

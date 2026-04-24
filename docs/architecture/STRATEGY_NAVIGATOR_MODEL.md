@@ -1,4 +1,4 @@
-# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6)
+# Strategy Navigator Model (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7)
 
 ## Purpose
 
@@ -10,6 +10,7 @@
 `P9-S4` deepens the finite scenario layer with interpreted scenario traits plus one service-owned scenario-contrast seam that explains what changes for that strategy in this kind of simulated backdrop.
 `P9-S5` keeps those same service-owned seams and adds one render-only compaction pass in `app/` so the existing prepared preview stays calm as subordinate shelves accumulate.
 `P9-S6` adds one service-owned fit-contrast seam so the same preview lane can answer a compact "why this, not that" question for the current context without adding ranking or recommendation behavior.
+`P9-S7` adds one service-owned nearby-alternative selection heuristic seam so fit-contrast compares against more context-adjacent strategies instead of weaker distant alternatives.
 
 The lane now exists to:
 
@@ -114,6 +115,21 @@ type StrategyFitContrastAvailability =
       contrast: StrategyFitContrast;
     };
 
+type NearbyAlternativeSelection = {
+  bestFitStrategyId: string;
+  nearbyAlternativeStrategyIds: readonly string[];
+};
+
+type NearbyAlternativeAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_COMPARABLE_ALTERNATIVES' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      selection: NearbyAlternativeSelection;
+    };
+
 type StrategyPreviewKnowledgeLink = {
   topicId: string;
   title: string;
@@ -170,6 +186,7 @@ Rules:
 - one canonical preview-explanation contract
 - one canonical preview-contrast contract
 - one canonical fit-contrast contract
+- one canonical nearby-alternative selection contract
 - one canonical preview-to-knowledge follow-through contract
 - no second preview VM family just for compaction
 - one selected strategy at a time
@@ -192,6 +209,7 @@ Within `createStrategyNavigatorVM`, the same service-owned lane now calls:
 
 - `createStrategyPreviewExplanation`
 - `createStrategyPreviewContrast`
+- `selectNearbyAlternativeStrategies`
 - `createStrategyFitContrast`
 - `selectStrategyPreviewKnowledge`
 
@@ -230,6 +248,37 @@ The compaction pass may not:
 - create new explanation, contrast, or knowledge-selection logic
 - widen the fetch seam
 - create a second preview contract family
+
+## Nearby Alternative Selection Rules
+
+`P9-S7` adds one service-owned selector seam used by fit-contrast.
+
+The selector answers three questions only:
+
+- which alternatives are context-adjacent to the current fit anchor
+- which alternatives are too distant or weak for useful contrast here
+- whether enough comparable alternatives exist to render fit-contrast honestly
+
+The selector may use:
+
+- selected strategy id
+- finite scenario id
+- prepared preview focus text
+- canonical strategy metadata (id/archetype)
+- deterministic service-owned proximity and scenario/focus weighting
+
+The selector must:
+
+- stay deterministic and conservative
+- prefer 1-2 nearby alternatives over broad compare-against-everything noise
+- return `UNAVAILABLE` honestly when comparable alternatives are not supported
+- keep heuristic ownership in `services/strategyNavigator/`
+
+The selector must not:
+
+- expose scores or ranking ladders to app
+- imply recommendation or switching pressure
+- become a second strategy engine or prediction model
 
 ## Fit Contrast Rules
 
@@ -351,6 +400,7 @@ The selector must not:
 - shape scenario meaning locally
 - derive event importance locally
 - derive preview contrast wording locally
+- derive nearby-alternative heuristic selection locally
 - derive fit contrast reasoning, alternative selection, or ambiguity notes locally
 - derive preview explanation wording locally
 - derive knowledge relevance locally
@@ -385,7 +435,7 @@ That keeps Strategy Preview explanatory without turning the shared Dashboard why
 
 ## Relationship To Later Work
 
-`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, and `P9-S6` are the first six rungs of the Strategy Navigator family.
+`P9-S1`, `P9-S2`, `P9-S3`, `P9-S4`, `P9-S5`, `P9-S6`, and `P9-S7` are the first seven rungs of the Strategy Navigator family.
 
 Later `P9` work can extend this seam with:
 
@@ -393,6 +443,7 @@ Later `P9` work can extend this seam with:
 - deeper scenario contrast depth when the current contrast seam proves useful
 - richer explanation depth when the current preview explanation proves useful
 - richer fit-contrast depth when nearby-alternative framing proves useful
+- richer nearby-alternative selection nuance when additional strategy metadata is intentionally introduced
 - richer surface transformations when the product has a stronger reason for them
 - broader or deeper knowledge integration when the current follow-through proves useful
 - more nuanced interpreted scenarios when the starter catalog has proven stable
