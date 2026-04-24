@@ -81,6 +81,7 @@ Start with:
 - P7-K9 adds one service-owned glossary alias/index normalization seam so canonical terms and approved variants resolve more reliably while preserving K8 scope and keeping app-side matching logic out of `app/`.
 - P7-K10 adds one service-owned inline glossary exposure/acknowledgement signal seam plus one aggregate summary seam for future tuning, kept invisible to users and without adding analytics UI or network telemetry.
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
+- P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - Aggregate portfolio context is separate. Cross-account holdings or exposure views may exist, but they must never become aggregate strategy, fit, alert, risk, or execution truth.
 - Deterministic core. `core/` stays pure and side-effect free.
 - Estimated must never present as confirmed.

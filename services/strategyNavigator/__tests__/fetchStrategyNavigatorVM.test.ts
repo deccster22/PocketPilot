@@ -54,24 +54,21 @@ describe('fetchStrategyNavigatorVM', () => {
         bestFitLabel: 'Dip Buying',
         whyItFits: [
           'Current simulated backdrop: volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
-          'Dip Buying fits this context better because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
-          'Current prepared emphasis: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+          'Dip Buying stays the closer fit because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
         ],
         lessSuitableAlternatives: [
           {
             strategyId: 'mean_reversion',
             label: 'Mean Reversion',
             lines: [
-              'Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing, while the dip still carries expansion stress.',
-              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+              'Compared with Dip Buying, Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing while the dip still carries expansion stress.',
             ],
           },
           {
-            strategyId: 'trend_following',
-            label: 'Trend Following',
+            strategyId: 'fib_levels',
+            label: 'Fibonacci Levels',
             lines: [
-              'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the dip still carries expansion stress.',
-              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+              'Compared with Dip Buying, Fibonacci Levels is less suitable right now because it leans on how price behaves around nearby structural levels while the dip still carries expansion stress.',
             ],
           },
         ],

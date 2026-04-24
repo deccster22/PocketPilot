@@ -32,6 +32,7 @@ function createStrategies() {
     .map((strategy) => ({
       id: strategy.id,
       name: strategy.name,
+      archetype: strategy.archetype,
     }));
 }
 
@@ -54,24 +55,21 @@ describe('createStrategyFitContrast', () => {
         bestFitLabel: 'Dip Buying',
         whyItFits: [
           'Current simulated backdrop: volatility is expanding, structure is pullback under strain, and the condition is less settled than a routine dip.',
-          'Dip Buying fits this context better because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
-          'Current prepared emphasis: The Dashboard would look for orderly weakness and early stabilisation instead of chase-the-drop framing.',
+          'Dip Buying stays the closer fit because it keeps attention on whether weakness is stabilizing into a calmer pullback while the pullback is still stressed and trying to settle.',
         ],
         lessSuitableAlternatives: [
           {
             strategyId: 'mean_reversion',
             label: 'Mean Reversion',
             lines: [
-              'Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing, while the dip still carries expansion stress.',
-              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+              'Compared with Dip Buying, Mean Reversion is less suitable right now because it leans on stretch-versus-baseline context and whether pressure is easing while the dip still carries expansion stress.',
             ],
           },
           {
-            strategyId: 'trend_following',
-            label: 'Trend Following',
+            strategyId: 'fib_levels',
+            label: 'Fibonacci Levels',
             lines: [
-              'Trend Following is less suitable right now because it leans on whether the broader directional structure is still holding, while the dip still carries expansion stress.',
-              'In this lane, Dip Buying stays the steadier interpretation-first fit while context keeps evolving.',
+              'Compared with Dip Buying, Fibonacci Levels is less suitable right now because it leans on how price behaves around nearby structural levels while the dip still carries expansion stress.',
             ],
           },
         ],
@@ -92,6 +90,7 @@ describe('createStrategyFitContrast', () => {
           {
             id: 'dip_buying',
             name: 'Dip Buying',
+            archetype: 'BEGINNER',
           },
         ],
         scenario: listStrategyPreviewScenarios()[0],
@@ -181,6 +180,31 @@ describe('createStrategyFitContrast', () => {
     expect(JSON.stringify(result)).not.toMatch(
       /eventId|signalsTriggered|signalCode|providerId|metadata|runtime|accountId|confidenceScore/i,
     );
+  });
+
+  it('does not repeat visible fit-contrast lines for identical context', () => {
+    const result = createStrategyFitContrast({
+      strategy: {
+        id: 'dip_buying',
+        name: 'Dip Buying',
+      },
+      strategies: createStrategies(),
+      scenario: listStrategyPreviewScenarios()[0],
+      focus: DIP_FOCUS,
+    });
+
+    expect(result.status).toBe('AVAILABLE');
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected fit contrast to be available.');
+    }
+
+    const visibleLines = [
+      ...result.contrast.whyItFits,
+      ...result.contrast.lessSuitableAlternatives.flatMap((alternative) => alternative.lines),
+      result.contrast.ambiguityNote ?? null,
+    ].filter((line): line is string => Boolean(line));
+
+    expect(new Set(visibleLines).size).toBe(visibleLines.length);
   });
 
   it('stays deterministic for identical inputs', () => {
