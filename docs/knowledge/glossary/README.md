@@ -1,37 +1,22 @@
 ---
-title: "glossary batch 02"
+title: "glossary"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-readme"
-purpose: "Introduces the second PocketPilot glossary batch"
+purpose: "Canonical glossary index for active PocketPilot terms"
 depends_on: []
 related_docs: []
-canonical_path: "/docs/knowledge/glossary/README-batch-02.md"
+canonical_path: "/docs/knowledge/glossary/README.md"
 ---
 
-# Glossary Batch 02
+# Glossary
 
-This is the second PocketPilot glossary batch.
+Canonical PocketPilot glossary node family.
 
-## What this batch adds
-- acceptance
-- rejection
-- invalidation
-- volatility
-- liquidity
-- execution risk
-- contagion
-- structural impairment
-- 30,000 ft View
-- peg
-- reserve backing
-- recovery
-- reversal
-- exhaustion
+## Purpose
+- Keep one live home for term-level definitions used by Knowledge, Dashboard, Trade Hub, and Strategy Navigator explainers.
+- Preserve canonical term IDs and slugs used by catalog/register validation and inline glossary routing.
 
-## Why this batch matters
-These terms support:
-- the denser Market Examples
-- volatility and regime teaching
-- strategy-guide retrofits
-- stablecoin and plumbing context
+## Notes
+- Term files in this folder are the active glossary source under the family-based `docs/knowledge/` layout.
+- `PX-KI2` and `PX-KI3` reconciled and validated this family against the live register/catalog assumptions.

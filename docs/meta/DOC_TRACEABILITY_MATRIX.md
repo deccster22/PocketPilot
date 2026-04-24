@@ -40,9 +40,9 @@ This matrix exists so nothing becomes "important but floating."
 |---|---|---|---|---|
 | Doctrine / CANON / Guardrails | `SNAPSHOT_VISION.md`, `RELEVANCE_PRINCIPLE.md`, `NOTIFICATION_PHILOSOPHY.md`, `CONFIDENCE_LANGUAGE.md`, `SIGNAL_EXPOSURE.md` | `SNAPSHOT_SPEC.md`, `NOTIFICATION_EVENT_MATRIX.md`, `STRATEGY_STATUS_RULES.md`, `TRADE_HUB_GUARDRAILS.md` | `SNAPSHOT_SYSTEM.md`, `NOTIFICATION_ROUTER_MODEL.md`, `STRATEGY_STATUS_ENGINE.md`, `MARKET_EVENT_MODEL.md`, `ORIENTATION_CONTEXT.md` | `PHASE_MAP.md`, relevant `P*` / `PX-*` docs |
 | Product behavior layer | `PROFILE_EXPLANATION_MODEL.md`, `LOG_AND_JOURNAL_MODEL.md`, `ASSET_NARRATIVE_MODEL.md`, `AI_EXPLANATION_LAYER.md` | `DASHBOARD_EXPOSURE_RULES.md`, `EVENT_LEDGER_VIEW_MODEL.md`, `KNOWLEDGE_LINKING_RULES.md` | `KNOWLEDGE_LINKING_ARCHITECTURE.md`, `EVENT_LEDGER_ARCHITECTURE.md`, `TRADE_HUB_RUNTIME_MODEL.md`, `RISK_LAYER_MODEL.md` | relevant family docs in `P4`, `P5`, `P6`, `P8`, `P9` |
-| Knowledge layer | `KNOWLEDGE_LAYER.md` | `KNOWLEDGE_LINKING_RULES.md` | `KNOWLEDGE_LINKING_ARCHITECTURE.md`, `KNOWLEDGE_NODE_MODEL.md` | `P7-K1.md`, `P7-K2.md`, `P7-K3.md` |
-| Reflection layer | `LOG_AND_JOURNAL_MODEL.md`, `ASSET_NARRATIVE_MODEL.md` | `EVENT_LEDGER_VIEW_MODEL.md` | `EVENT_LEDGER_ARCHITECTURE.md`, `EVENT_SYSTEM.md` | `P8-I1.md` to `P8-I4.md` |
-| Preview / explanation layer | `AI_EXPLANATION_LAYER.md`, `PROFILE_EXPLANATION_MODEL.md` | relevant Strategy Preview / Snapshot / Dashboard UX docs | `STRATEGY_STATUS_ENGINE.md`, `ORIENTATION_CONTEXT.md`, supporting preview architecture docs already in repo | `P9-S1.md` to `P9-S5.md`, `PX-E1.md`, `PX-E2.md` |
+| Knowledge layer | `KNOWLEDGE_LAYER.md` | `KNOWLEDGE_LINKING_RULES.md` | `KNOWLEDGE_LINKING_ARCHITECTURE.md`, `KNOWLEDGE_NODE_MODEL.md` | `P7-K1.md` to `P7-K10.md`, `PX-KI1.md` to `PX-KI3.md` |
+| Reflection layer | `LOG_AND_JOURNAL_MODEL.md`, `ASSET_NARRATIVE_MODEL.md` | `EVENT_LEDGER_VIEW_MODEL.md` | `EVENT_LEDGER_ARCHITECTURE.md`, `EVENT_SYSTEM.md` | `P8-I1.md` to `P8-I12.md` |
+| Preview / explanation layer | `AI_EXPLANATION_LAYER.md`, `PROFILE_EXPLANATION_MODEL.md` | relevant Strategy Preview / Snapshot / Dashboard UX docs | `STRATEGY_STATUS_ENGINE.md`, `ORIENTATION_CONTEXT.md`, supporting preview architecture docs already in repo | `P9-S1.md` to `P9-S9.md`, `PX-E1.md`, `PX-E2.md` |
 
 ## 4. Reading rule
 Use this matrix in both directions:

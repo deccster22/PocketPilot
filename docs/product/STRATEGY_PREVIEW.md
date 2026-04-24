@@ -1,4 +1,4 @@
-# Strategy Preview (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5)
+# Strategy Preview (P9-S1, P9-S2, P9-S3, P9-S4, P9-S5, P9-S6, P9-S7, P9-S8, P9-S9)
 
 ## Why This Exists
 
@@ -47,6 +47,10 @@ The point is orientation, not persuasion.
 - knowledge follow-through stays clearly optional
 - no new logic family is introduced
 
+`P9-S6`, `P9-S7`, and `P9-S8` keep that same posture while adding one calm fit-contrast lane ("why this, not that") based on nearby alternatives and one canonical strategy metadata registry for those comparisons.
+
+`P9-S9` keeps those same semantics while adding conservative mobile progressive disclosure so primary preview meaning remains visible and secondary detail stays easier to scan.
+
 It is not:
 
 - a live market simulator
@@ -67,6 +71,7 @@ The surface remains intentionally thin:
 - one dominant preview-focus block inside that preview card
 - one compact detail stack for Dashboard shift, Market events, and Alert posture
 - one small optional supporting-context shelf that groups explanation and scenario contrast when the service-owned seams say they are honestly available
+- one small optional fit-contrast shelf when the service-owned seam says nearby-alternative comparison is honestly available
 - one small optional helpful-next-reading section when the service-owned selector says it is honestly relevant
 
 The prepared preview explains:
@@ -148,17 +153,23 @@ That path must not become:
 - AI commentary
 - onboarding orchestration
 - prediction scoring
+- strategy ranking tables
+- recommendation scoring ladders
 - full knowledge recommendation coverage across Snapshot, Dashboard, Trade Hub, or Insights
 
 ## Relationship To Roadmap
 
-Strategy Preview is now the first visible `P9` lane with five linked rungs:
+Strategy Preview is now the first visible `P9` lane with nine linked rungs:
 
 - `P9-S1` established the simulated preview contract
 - `P9-S2` adds the optional knowledge follow-through contract
 - `P9-S3` adds one optional preview explanation layer inside the same prepared VM
 - `P9-S4` adds one optional scenario-contrast layer and richer interpreted scenario traits inside that same prepared VM
 - `P9-S5` compacts that same prepared surface so the main preview stays readable as subordinate shelves accumulate
+- `P9-S6` adds one optional fit-contrast layer so preview can answer a calm "why this, not that" question without ranking theatre
+- `P9-S7` refines nearby-alternative selection so fit-contrast compares against more context-adjacent alternatives
+- `P9-S8` normalizes nearby/fit comparison inputs onto one canonical strategy metadata registry
+- `P9-S9` keeps the same service semantics and adds conservative mobile progressive disclosure for denser secondary context
 
 Later `P9` work can deepen this mode, but it should keep the same product promise:
 
