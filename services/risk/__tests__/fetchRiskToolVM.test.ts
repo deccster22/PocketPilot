@@ -244,6 +244,60 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('timestampMs');
   });
 
+  it('consumes canonical produced stop/target references when the session carries prepared availability context', async () => {
+    const result = await fetchRiskToolVM({
+      confirmationSession: createConfirmationSession({
+        preparedRiskReferences: {
+          entryPrice: 20.5,
+          stopPrice: null,
+          targetPrice: null,
+        },
+        preparedTradeReferences: {
+          status: 'AVAILABLE',
+          references: [
+            {
+              kind: 'STOP',
+              label: 'Prepared stop reference',
+              value: '19',
+              sourceLabel: 'Source: strategy context',
+              limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+            },
+            {
+              kind: 'TARGET',
+              label: 'Prepared target reference',
+              value: '24.5',
+              sourceLabel: 'Source: prepared plan',
+            },
+          ],
+        },
+      }),
+      preparedQuoteScan: createPreparedQuoteScan(),
+      input: {
+        accountSize: null,
+        riskAmount: 100,
+        riskPercent: null,
+        entryPrice: null,
+        stopPrice: null,
+        targetPrice: null,
+        symbol: null,
+        allowPreparedReferences: true,
+      },
+    });
+
+    expect(result.summary.entryReference).toEqual({
+      value: 20.5,
+      source: 'PREPARED_PLAN',
+    });
+    expect(result.summary.stopReference).toEqual({
+      value: 19,
+      source: 'PREPARED_PLAN',
+    });
+    expect(result.summary.targetReference).toEqual({
+      value: 24.5,
+      source: 'PREPARED_PLAN',
+    });
+  });
+
   it('keeps a producer-provided plan entry reference ahead of quote help while exits stay honest', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession({

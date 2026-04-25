@@ -106,6 +106,10 @@ describe('createTradePlanPreview', () => {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      preparedTradeReferences: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_STRATEGY_REFERENCE',
+      },
       risk: createRiskLane(),
       positionSizing: {
         status: 'AVAILABLE',

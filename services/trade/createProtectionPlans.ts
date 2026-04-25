@@ -1,6 +1,7 @@
 import type { EventType, MarketEvent } from '@/core/types/marketEvent';
 import type { OrientationContext } from '@/services/orientation/createOrientationContext';
 import { createPreparedRiskReferences } from '@/services/trade/createPreparedRiskReferences';
+import { createPreparedTradeReferences } from '@/services/trade/createPreparedTradeReferences';
 import type {
   ProtectionPlan,
   ProtectionPlanIntentType,
@@ -284,6 +285,10 @@ export function createProtectionPlans(params: {
       preparedRiskReferences: createPreparedRiskReferences({
         intentType,
         primaryEvent,
+        events: group.events,
+      }),
+      preparedTradeReferencesAvailability: createPreparedTradeReferences({
+        intentType,
         events: group.events,
       }),
       createdAt,

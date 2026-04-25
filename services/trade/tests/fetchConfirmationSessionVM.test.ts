@@ -214,6 +214,23 @@ describe('fetchConfirmationSessionVM', () => {
         stopPrice: 95,
         targetPrice: 112,
       },
+      preparedTradeReferences: {
+        status: 'AVAILABLE',
+        references: [
+          {
+            kind: 'STOP',
+            label: 'Prepared stop reference',
+            value: '95',
+            sourceLabel: 'Source: prepared plan',
+          },
+          {
+            kind: 'TARGET',
+            label: 'Prepared target reference',
+            value: '112',
+            sourceLabel: 'Source: prepared plan',
+          },
+        ],
+      },
       preview: {
         planId: 'acct-live:momentum_basics:BTC:ACCUMULATE:acct-live:momentum_basics:signal:BTC:100',
         headline: {
@@ -239,6 +256,23 @@ describe('fetchConfirmationSessionVM', () => {
         placeholders: {
           orderPreviewAvailable: false,
           executionPreviewAvailable: false,
+        },
+        preparedTradeReferences: {
+          status: 'AVAILABLE',
+          references: [
+            {
+              kind: 'STOP',
+              label: 'Prepared stop reference',
+              value: '95',
+              sourceLabel: 'Source: prepared plan',
+            },
+            {
+              kind: 'TARGET',
+              label: 'Prepared target reference',
+              value: '112',
+              sourceLabel: 'Source: prepared plan',
+            },
+          ],
         },
         risk: {
           activeBasis: 'ACCOUNT_PERCENT',
@@ -411,6 +445,23 @@ describe('fetchConfirmationSessionVM', () => {
       stopPrice: 95,
       targetPrice: 112,
     });
+    expect(result.session.preparedTradeReferences).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '95',
+          sourceLabel: 'Source: prepared plan',
+        },
+        {
+          kind: 'TARGET',
+          label: 'Prepared target reference',
+          value: '112',
+          sourceLabel: 'Source: prepared plan',
+        },
+      ],
+    });
     expect(JSON.stringify(result.session)).not.toContain('providerNote');
     expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
   });
@@ -448,6 +499,18 @@ describe('fetchConfirmationSessionVM', () => {
       stopPrice: 100,
       targetPrice: null,
     });
+    expect(result.session.preparedTradeReferences).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '100',
+          sourceLabel: 'Source: strategy context',
+          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+        },
+      ],
+    });
     expect(JSON.stringify(result.session)).not.toContain('strategyPreparedRiskContext');
     expect(JSON.stringify(result.session)).not.toContain('runtimeNote');
     expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
@@ -474,6 +537,10 @@ describe('fetchConfirmationSessionVM', () => {
       accountId: null,
       executionCapability: null,
       preparedRiskReferences: null,
+      preparedTradeReferences: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_STRATEGY_REFERENCE',
+      },
       preview: null,
       shell: null,
       flow: null,
@@ -519,6 +586,10 @@ describe('fetchConfirmationSessionVM', () => {
       accountId: null,
       executionCapability: null,
       preparedRiskReferences: null,
+      preparedTradeReferences: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_STRATEGY_REFERENCE',
+      },
       preview: null,
       shell: null,
       flow: null,

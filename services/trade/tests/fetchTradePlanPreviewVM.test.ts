@@ -202,6 +202,10 @@ describe('fetchTradePlanPreviewVM', () => {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      preparedTradeReferences: {
+        status: 'UNAVAILABLE',
+        reason: 'NOT_ENABLED_FOR_SURFACE',
+      },
       risk: {
         activeBasis: 'POSITION_PERCENT',
         activeBasisLabel: 'Position %',
@@ -399,6 +403,23 @@ describe('fetchTradePlanPreviewVM', () => {
       intentType: 'ACCUMULATE',
       symbol: 'BTC',
       actionState: 'READY',
+    });
+    expect(result.preview?.preparedTradeReferences).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '95',
+          sourceLabel: 'Source: prepared plan',
+        },
+        {
+          kind: 'TARGET',
+          label: 'Prepared target reference',
+          value: '112',
+          sourceLabel: 'Source: prepared plan',
+        },
+      ],
     });
     expect(result.preview?.risk.activeBasis).toBe('POSITION_PERCENT');
     expect(result.preview?.risk.context).toEqual({

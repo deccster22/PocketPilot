@@ -76,6 +76,10 @@ describe('createProtectionPlans', () => {
           stopPrice: null,
           targetPrice: null,
         },
+        preparedTradeReferencesAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_STRATEGY_REFERENCE',
+        },
         createdAt: 110,
       },
       {
@@ -101,6 +105,10 @@ describe('createProtectionPlans', () => {
           entryPrice: 100,
           stopPrice: null,
           targetPrice: null,
+        },
+        preparedTradeReferencesAvailability: {
+          status: 'UNAVAILABLE',
+          reason: 'NO_STRATEGY_REFERENCE',
         },
         createdAt: 100,
       },
@@ -147,6 +155,23 @@ describe('createProtectionPlans', () => {
       entryPrice: 99.5,
       stopPrice: 95,
       targetPrice: 108,
+    });
+    expect(plan.preparedTradeReferencesAvailability).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '95',
+          sourceLabel: 'Source: prepared plan',
+        },
+        {
+          kind: 'TARGET',
+          label: 'Prepared target reference',
+          value: '108',
+          sourceLabel: 'Source: prepared plan',
+        },
+      ],
     });
   });
 
@@ -198,10 +223,34 @@ describe('createProtectionPlans', () => {
       stopPrice: null,
       targetPrice: 100,
     });
+    expect(result[0]?.preparedTradeReferencesAvailability).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'TARGET',
+          label: 'Prepared target reference',
+          value: '100',
+          sourceLabel: 'Source: strategy context',
+          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+        },
+      ],
+    });
     expect(result[1]?.preparedRiskReferences).toEqual({
       entryPrice: 104,
       stopPrice: 100,
       targetPrice: null,
+    });
+    expect(result[1]?.preparedTradeReferencesAvailability).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '100',
+          sourceLabel: 'Source: strategy context',
+          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+        },
+      ],
     });
   });
 
@@ -234,6 +283,10 @@ describe('createProtectionPlans', () => {
       cooldownActive: true,
     });
     expect(plan.preparedRiskReferences).toBeNull();
+    expect(plan.preparedTradeReferencesAvailability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
   });
 
   it('uses hold when conflicting action events exist for the same scope', () => {
@@ -266,6 +319,10 @@ describe('createProtectionPlans', () => {
     expect(plan.rationale.primaryEventId).toBe('acct-1:mean_reversion:dip:SOL:200');
     expect(plan.riskProfile.certainty).toBe('MEDIUM');
     expect(plan.preparedRiskReferences).toBeNull();
+    expect(plan.preparedTradeReferencesAvailability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_SURFACE',
+    });
   });
 
   it('leaves ambiguous prepared stop and target references unset instead of guessing', () => {
@@ -305,6 +362,10 @@ describe('createProtectionPlans', () => {
       entryPrice: 100,
       stopPrice: null,
       targetPrice: null,
+    });
+    expect(plan.preparedTradeReferencesAvailability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'THIN_CONTEXT',
     });
   });
 
@@ -353,6 +414,10 @@ describe('createProtectionPlans', () => {
       entryPrice: 104,
       stopPrice: null,
       targetPrice: null,
+    });
+    expect(plan.preparedTradeReferencesAvailability).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'THIN_CONTEXT',
     });
   });
 
