@@ -33,6 +33,8 @@ Possible core objects:
 - `PositionSizingAvailability`
 - `RiskInputGuidance`
 - `RiskInputGuidanceAvailability`
+- `PreparedTradeReference`
+- `PreparedTradeReferencesAvailability`
 - `GuardrailPreferences`
 - `GuardrailPreferencesAvailability`
 - `GuardrailPreferencesUpdateResult`
@@ -53,6 +55,7 @@ Possible core objects:
 - provide consistent max loss / position sizing / risk-reward logic
 - shape one canonical prepared sizing/max-loss output from the same service-owned inputs
 - prepare risk-per-trade context without turning it into advice
+- prepare one canonical stop/target reference availability seam from selected strategy/event/trade context where honest
 - prepare one calm risk-input guidance note when sizing / max-loss context is thin or unsupported
 - keep guardrail preferences opt-in, explicit, and off by default
 - expose readiness constraints without silently overriding the user
@@ -68,6 +71,7 @@ Possible core objects:
 - guardrail preferences must stay explicit, account-scoped, and non-blocking by default
 - guardrail evaluation must stay explicit, descriptive, and non-blocking by default
 - grouped Trade Hub risk-lane composition must stay explicit, service-owned, and non-blocking by default
+- prepared stop/target references must stay explicit, service-owned, and unavailable when context is thin
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -94,6 +98,7 @@ Possible core objects:
 - unsupported / incomplete guidance tests
 - support-vs-enforcement boundary tests
 - guardrail-evaluation explicitness tests
+- prepared stop/target availability tests
 
 ## 9. Relationship to other docs
 Sits beside:

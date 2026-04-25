@@ -3,6 +3,7 @@ import type {
   ProtectionPlan,
   TradePlanPreview,
 } from '@/services/trade/types';
+import { normalisePreparedTradeReferencesAvailability } from '@/services/trade/createPreparedTradeReferences';
 import { createPositionSizingOutput } from '@/services/trade/createPositionSizingOutput';
 import { createRiskInputGuidance } from '@/services/trade/createRiskInputGuidance';
 import { resolveTradeHubActionState } from '@/services/trade/resolveTradeHubActionState';
@@ -51,6 +52,9 @@ export function createTradePlanPreview(
       orderPreviewAvailable: false,
       executionPreviewAvailable: false,
     },
+    preparedTradeReferences: normalisePreparedTradeReferencesAvailability(
+      plan.preparedTradeReferencesAvailability,
+    ),
     risk,
     positionSizing,
     riskInputGuidance: createRiskInputGuidance({

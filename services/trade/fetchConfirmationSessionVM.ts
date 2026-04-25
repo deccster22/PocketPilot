@@ -9,6 +9,7 @@ import { createConfirmationFlow } from '@/services/trade/createConfirmationFlow'
 import { createConfirmationFlowActions } from '@/services/trade/createConfirmationFlowActions';
 import { createPreparedTradeRiskLane } from '@/services/trade/createPreparedTradeRiskLane';
 import { normalisePreparedRiskReferences } from '@/services/trade/createPreparedRiskReferences';
+import { normalisePreparedTradeReferencesAvailability } from '@/services/trade/createPreparedTradeReferences';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { fetchPreferredRiskBasis } from '@/services/trade/fetchPreferredRiskBasis';
 import { createTradePlanConfirmationShell } from '@/services/trade/createTradePlanConfirmationShell';
@@ -205,6 +206,7 @@ async function buildConfirmationSession(params: {
       accountId: null,
       executionCapability: null,
       preparedRiskReferences: null,
+      preparedTradeReferences: normalisePreparedTradeReferencesAvailability(null),
       preview: null,
       shell: null,
       flow: null,
@@ -239,6 +241,9 @@ async function buildConfirmationSession(params: {
     accountId: params.plan.accountId,
     executionCapability,
     preparedRiskReferences: normalisePreparedRiskReferences(params.plan.preparedRiskReferences),
+    preparedTradeReferences: normalisePreparedTradeReferencesAvailability(
+      params.plan.preparedTradeReferencesAvailability,
+    ),
     preview,
     shell,
     flow: createConfirmationFlow({ shell }),

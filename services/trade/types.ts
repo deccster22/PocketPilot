@@ -12,6 +12,26 @@ export type PreparedTradePlanRiskReferences = {
   targetPrice: number | null;
 };
 
+export type PreparedTradeReferenceKind = 'STOP' | 'TARGET';
+
+export type PreparedTradeReference = {
+  kind: PreparedTradeReferenceKind;
+  label: string;
+  value: string;
+  sourceLabel: string;
+  limitations?: ReadonlyArray<string>;
+};
+
+export type PreparedTradeReferencesAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_STRATEGY_REFERENCE' | 'THIN_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      references: ReadonlyArray<PreparedTradeReference>;
+    };
+
 export type RiskBasis = 'ACCOUNT_PERCENT' | 'FIXED_CURRENCY' | 'POSITION_PERCENT';
 
 export type GuardrailKey = 'riskLimitPerTrade' | 'dailyLossThreshold' | 'cooldownAfterLoss';
@@ -249,6 +269,7 @@ export type ProtectionPlan = {
     cooldownActive?: boolean;
   };
   preparedRiskReferences: PreparedTradePlanRiskReferences | null;
+  preparedTradeReferencesAvailability?: PreparedTradeReferencesAvailability;
   createdAt: number;
 };
 
@@ -302,6 +323,7 @@ export type TradePlanPreview = {
     orderPreviewAvailable: boolean;
     executionPreviewAvailable: boolean;
   };
+  preparedTradeReferences?: PreparedTradeReferencesAvailability;
   risk: PreparedTradeRiskLane;
   positionSizing: PositionSizingAvailability;
   riskInputGuidance?: RiskInputGuidanceAvailability;
@@ -398,6 +420,7 @@ export type ConfirmationSession = {
   accountId: string | null;
   executionCapability: ExecutionCapabilityResolution | null;
   preparedRiskReferences: PreparedTradePlanRiskReferences | null;
+  preparedTradeReferences?: PreparedTradeReferencesAvailability;
   preview: TradePlanPreview | null;
   shell: TradePlanConfirmationShell | null;
   flow: ConfirmationFlow | null;

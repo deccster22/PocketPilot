@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P7-K8 + P7-K9 + P7-K10)
+# Trade Hub Spec (P5-X + P5-R13 + P7-K8 + P7-K9 + P7-K10)
 
 ## Purpose
 
@@ -157,6 +157,19 @@ The confirmation-session contract shape is:
       stopPrice: number | null,
       targetPrice: number | null
     } | null,
+    preparedTradeReferences: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_STRATEGY_REFERENCE' | 'THIN_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE'
+    } | {
+      status: 'AVAILABLE',
+      references: {
+        kind: 'STOP' | 'TARGET',
+        label: string,
+        value: string,
+        sourceLabel: string,
+        limitations?: string[]
+      }[]
+    } | null,
     preview: TradePlanPreview | null,
     shell: TradePlanConfirmationShell | null,
     flow: ConfirmationFlow | null
@@ -212,6 +225,7 @@ The risk-tool seam is support-only. It consumes prepared confirmation-session co
 Prepared plan references may supply entry, stop, or target values when the selected confirmation session honestly carries them.
 P5-R4 deepens that support by improving the service-owned producer path upstream of the confirmation session, not by adding app-side interpretation.
 P5-R5 keeps that UI contract unchanged and only enriches the upstream producer path when scoped strategy/event context can honestly support a calm prepared stop or target.
+P5-R13 adds one explicit prepared stop/target availability contract with source labels and thin-context unavailability so the same service seams can expose richer references without inventing precision.
 Explicit user values still win, prepared plan references outrank prepared quote help for the same field, and quote help still does not invent exits.
 
 `ExecutionCapabilityResolution` is:
@@ -257,6 +271,19 @@ The preview contract shape is:
     orderPreviewAvailable: boolean,
     executionPreviewAvailable: boolean
   },
+  preparedTradeReferences: {
+    status: 'UNAVAILABLE',
+    reason: 'NO_STRATEGY_REFERENCE' | 'THIN_CONTEXT' | 'NOT_ENABLED_FOR_SURFACE'
+  } | {
+    status: 'AVAILABLE',
+    references: {
+      kind: 'STOP' | 'TARGET',
+      label: string,
+      value: string,
+      sourceLabel: string,
+      limitations?: string[]
+    }[]
+  },
   riskInputGuidance: {
     status: 'UNAVAILABLE' | 'AVAILABLE',
     reason?: 'NO_GUIDANCE_NEEDED' | 'NOT_ENABLED_FOR_SURFACE',
@@ -271,6 +298,7 @@ The preview contract shape is:
 
 The preview is for future confirmation UI scaffolding. It expands exactly one selected plan into safe detail without adding execution behavior.
 When available, the risk-input guidance note stays subordinate to the main preview and explains what the prepared sizing lane still needs without turning into enforcement or troubleshooting theatre.
+Prepared stop/target references stay optional and explicit on the same preview contract, and unavailable states remain quiet when context is thin.
 
 Trade Hub confirmation consumers also consume a prepared `TradePlanConfirmationShell` from `services/trade/`.
 
@@ -553,6 +581,7 @@ Prepared risk references should read like optional support context, not as auto-
 Prepared plan references should become more useful quietly when the selected plan already carries honest producer-owned values; if no honest value exists, the surface should stay quiet.
 Prepared strategy-owned stop or target references should keep the same prepared-plan label and should not introduce extra UI drama or technical source detail.
 Unavailable references should stay visually quiet; "Not set" is enough when the prepared plan has nothing honest to contribute.
+Prepared stop/target availability reasons should remain service-owned and should never be derived in `app/`.
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.
 The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.

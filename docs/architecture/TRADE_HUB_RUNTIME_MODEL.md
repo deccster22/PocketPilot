@@ -21,7 +21,7 @@ Trade Hub consumes prepared action objects and renders execution-safe paths with
 Prepared plan in, bounded action path out.
 
 ## 3. Suggested pipeline
-`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `TradeHubRiskLaneComposer`
+`StrategyContext` + `AccountCapabilities` + `RiskLayer` + `ProtectionPlanGenerator` + `PreparedStopTargetReferenceProducer` + `TradeHubRiskLaneComposer`
 -> `TradeHubAssembler`
 -> `TradeHubModel`
 
@@ -66,6 +66,10 @@ The view renders the selected prepared path only.
 ### Protection plan generator
 Produces canonical plan options.
 
+### Prepared stop/target reference producer
+Produces one explicit prepared stop/target availability contract for selected-plan context.
+It remains service-owned, deterministic, support-first, and returns unavailable when context is thin.
+
 ### Risk basis selector
 Determines which explicit risk bases are supported on the surface and preserves user-selected basis state without silent fallback in the app layer.
 It also seeds the prepared lane from one account-level preferred basis when the service layer has honestly saved one.
@@ -107,6 +111,7 @@ Ensures required confirmation steps remain intact.
 - confirmation-required tests
 - risk-basis explicitness tests
 - prepared risk-context recomputation tests
+- prepared stop/target availability tests
 - prepared sizing-output availability tests
 - guardrail-preference explicitness tests
 - guardrail-evaluation explicitness tests

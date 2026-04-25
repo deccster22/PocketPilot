@@ -1,4 +1,8 @@
 import type { MarketEvent } from '@/core/types/marketEvent';
+import {
+  createPreparedTradeReferences,
+  selectPreparedTradeReferenceValue,
+} from '@/services/trade/createPreparedTradeReferences';
 import { resolveStrategyPreparedField } from '@/services/trade/createStrategyPreparedRiskReferences';
 import type {
   PreparedTradePlanRiskReferences,
@@ -129,17 +133,13 @@ export function createPreparedRiskReferences(params: {
   events: ReadonlyArray<MarketEvent>;
 }): PreparedTradePlanRiskReferences | null {
   const explicitEntry = resolvePreparedField(params.events, 'entryPrice');
-  const explicitStop = resolvePreparedField(params.events, 'stopPrice');
-  const explicitTarget = resolvePreparedField(params.events, 'targetPrice');
   const strategyEntry = explicitEntry.hasExplicitValue
     ? null
     : resolveStrategyPreparedField(params.events, 'entryPrice');
-  const strategyStop = explicitStop.hasExplicitValue
-    ? null
-    : resolveStrategyPreparedField(params.events, 'stopPrice');
-  const strategyTarget = explicitTarget.hasExplicitValue
-    ? null
-    : resolveStrategyPreparedField(params.events, 'targetPrice');
+  const preparedTradeReferencesAvailability = createPreparedTradeReferences({
+    intentType: params.intentType,
+    events: params.events,
+  });
 
   return normalisePreparedRiskReferences({
     entryPrice: explicitEntry.hasExplicitValue
@@ -150,15 +150,13 @@ export function createPreparedRiskReferences(params: {
             intentType: params.intentType,
             primaryEvent: params.primaryEvent,
           }),
-    stopPrice: explicitStop.hasExplicitValue
-      ? explicitStop.value
-      : strategyStop?.hasStrategyContext
-        ? strategyStop.value
-        : null,
-    targetPrice: explicitTarget.hasExplicitValue
-      ? explicitTarget.value
-      : strategyTarget?.hasStrategyContext
-        ? strategyTarget.value
-        : null,
+    stopPrice: selectPreparedTradeReferenceValue({
+      availability: preparedTradeReferencesAvailability,
+      kind: 'STOP',
+    }),
+    targetPrice: selectPreparedTradeReferenceValue({
+      availability: preparedTradeReferencesAvailability,
+      kind: 'TARGET',
+    }),
   });
 }

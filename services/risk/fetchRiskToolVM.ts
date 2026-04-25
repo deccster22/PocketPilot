@@ -5,6 +5,7 @@ import type {
   RiskToolInput,
   RiskToolVM,
 } from '@/services/risk/types';
+import { selectPreparedTradeReferenceValue } from '@/services/trade/createPreparedTradeReferences';
 import type { ConfirmationSession } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
 
@@ -51,16 +52,34 @@ function resolvePreparedQuoteContext(params: {
 function resolvePreparedPlanContext(params: {
   confirmationSession: ConfirmationSession | null;
 }): PreparedRiskPlanContext | null {
-  const preparedRiskReferences = params.confirmationSession?.preparedRiskReferences;
+  const confirmationSession = params.confirmationSession;
+  const preparedRiskReferences = confirmationSession?.preparedRiskReferences;
+  const preparedTradeReferences = confirmationSession?.preparedTradeReferences;
+  const stopFromPreparedTradeReferences = selectPreparedTradeReferenceValue({
+    availability: preparedTradeReferences,
+    kind: 'STOP',
+  });
+  const targetFromPreparedTradeReferences = selectPreparedTradeReferenceValue({
+    availability: preparedTradeReferences,
+    kind: 'TARGET',
+  });
 
   if (!preparedRiskReferences) {
-    return null;
+    if (stopFromPreparedTradeReferences === null && targetFromPreparedTradeReferences === null) {
+      return null;
+    }
+
+    return {
+      entryPrice: null,
+      stopPrice: stopFromPreparedTradeReferences,
+      targetPrice: targetFromPreparedTradeReferences,
+    };
   }
 
   return {
     entryPrice: preparedRiskReferences.entryPrice,
-    stopPrice: preparedRiskReferences.stopPrice,
-    targetPrice: preparedRiskReferences.targetPrice,
+    stopPrice: stopFromPreparedTradeReferences ?? preparedRiskReferences.stopPrice,
+    targetPrice: targetFromPreparedTradeReferences ?? preparedRiskReferences.targetPrice,
   };
 }
 
