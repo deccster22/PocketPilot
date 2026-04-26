@@ -153,7 +153,7 @@ Anchor docs:
 - relevant phase / subphase docs
 
 ### 2.8 Meta / traceability
-This layer helps contributors navigate the stack and avoid duplicate canon.
+This layer helps contributors navigate the stack, avoid duplicate canon, and keep one active backlog/state view.
 
 Primary home:
 - `docs/meta/`
@@ -162,6 +162,7 @@ Key docs:
 - `MASTER_INDEX.md`
 - `REPO_LANDING_MAP.md`
 - `SOURCE_OF_TRUTH_RULES.md`
+- `BACKLOG.md`
 - `DOC_TRACEABILITY_MATRIX.md`
 - `DEPENDENCY_MAP.md`
 

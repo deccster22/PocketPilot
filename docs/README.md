@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-25
+Last Updated: 2026-04-26
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-25
+**Last updated:** 2026-04-26
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -37,8 +37,9 @@ Read these before making architectural or behavioural changes:
 3. `governance/ENGINEERING_CONTRACT.md`
 4. `meta/SOURCE_OF_TRUTH_RULES.md`
 5. `phases/PHASE_MAP.md`
-6. relevant product, behaviour, UX, and architecture docs
-7. relevant phase docs for the family you are touching
+6. `meta/BACKLOG.md`
+7. relevant product, behaviour, UX, and architecture docs
+8. relevant phase docs for the family you are touching
 
 ### If you are reconciling docs or resuming after a gap
 
@@ -49,7 +50,8 @@ Start with:
 3. `meta/MASTER_INDEX.md`
 4. `meta/REPO_LANDING_MAP.md`
 5. `meta/SOURCE_OF_TRUTH_RULES.md`
-6. `phases/PHASE_MAP.md`
+6. `meta/BACKLOG.md`
+7. `phases/PHASE_MAP.md`
 
 ## Non-Negotiables To Keep In RAM
 
@@ -224,6 +226,7 @@ Key docs:
 - `meta/MASTER_INDEX.md`
 - `meta/REPO_LANDING_MAP.md`
 - `meta/SOURCE_OF_TRUTH_RULES.md`
+- `meta/BACKLOG.md`
 - `meta/DOC_TRACEABILITY_MATRIX.md`
 - `meta/DEPENDENCY_MAP.md`
 
@@ -237,7 +240,7 @@ Operational handling folders, not live canon families.
 ## Structural Decisions After Final Canonical Reconciliation
 
 - The current repo taxonomy stays primary.
-- `docs/meta/` is now a small live family for navigation and traceability only.
+- `docs/meta/` is now a small live family for navigation, traceability, and active backlog-state hygiene.
 - `docs/foundations/` was not adopted; founding truth remains split across `docs/founder/` and `docs/governance/`.
 - `docs/models/` was not adopted; object-contract docs land in `docs/architecture/`.
 - `docs/behaviours/` remains the canonical home for cross-cutting behaviour rules even when source packs place them in `docs/product/`.
