@@ -221,13 +221,15 @@ describe('fetchConfirmationSessionVM', () => {
             kind: 'STOP',
             label: 'Prepared stop reference',
             value: '95',
-            sourceLabel: 'Source: prepared plan',
+            sourceLabel: 'Source: prepared plan context',
+            limitations: ['Planning context only; this is not an order instruction.'],
           },
           {
             kind: 'TARGET',
             label: 'Prepared target reference',
             value: '112',
-            sourceLabel: 'Source: prepared plan',
+            sourceLabel: 'Source: prepared plan context',
+            limitations: ['Planning context only; this is not an order instruction.'],
           },
         ],
       },
@@ -264,13 +266,15 @@ describe('fetchConfirmationSessionVM', () => {
               kind: 'STOP',
               label: 'Prepared stop reference',
               value: '95',
-              sourceLabel: 'Source: prepared plan',
+              sourceLabel: 'Source: prepared plan context',
+              limitations: ['Planning context only; this is not an order instruction.'],
             },
             {
               kind: 'TARGET',
               label: 'Prepared target reference',
               value: '112',
-              sourceLabel: 'Source: prepared plan',
+              sourceLabel: 'Source: prepared plan context',
+              limitations: ['Planning context only; this is not an order instruction.'],
             },
           ],
         },
@@ -452,13 +456,15 @@ describe('fetchConfirmationSessionVM', () => {
           kind: 'STOP',
           label: 'Prepared stop reference',
           value: '95',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
         {
           kind: 'TARGET',
           label: 'Prepared target reference',
           value: '112',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
       ],
     });
@@ -506,8 +512,11 @@ describe('fetchConfirmationSessionVM', () => {
           kind: 'STOP',
           label: 'Prepared stop reference',
           value: '100',
-          sourceLabel: 'Source: strategy context',
-          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+          sourceLabel: 'Source: supported strategy context',
+          limitations: [
+            'Planning context only; this is not an order instruction.',
+            'Derived from supported strategy context and omitted when context is thin.',
+          ],
         },
       ],
     });
@@ -608,6 +617,8 @@ describe('fetchConfirmationSessionVM', () => {
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
     expect(serviceSource).not.toMatch(/upstream\.selectedAccountContext\.status === 'AVAILABLE'/);
+    expect(serviceSource).not.toMatch(/Source: /);
+    expect(serviceSource).not.toMatch(/order instruction/);
   });
 
   it('changes the prepared risk frame without changing execution capability or default blocking posture', async () => {

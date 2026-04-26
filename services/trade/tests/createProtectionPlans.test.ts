@@ -163,13 +163,15 @@ describe('createProtectionPlans', () => {
           kind: 'STOP',
           label: 'Prepared stop reference',
           value: '95',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
         {
           kind: 'TARGET',
           label: 'Prepared target reference',
           value: '108',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
       ],
     });
@@ -230,8 +232,11 @@ describe('createProtectionPlans', () => {
           kind: 'TARGET',
           label: 'Prepared target reference',
           value: '100',
-          sourceLabel: 'Source: strategy context',
-          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+          sourceLabel: 'Source: supported strategy context',
+          limitations: [
+            'Planning context only; this is not an order instruction.',
+            'Derived from supported strategy context and omitted when context is thin.',
+          ],
         },
       ],
     });
@@ -247,8 +252,11 @@ describe('createProtectionPlans', () => {
           kind: 'STOP',
           label: 'Prepared stop reference',
           value: '100',
-          sourceLabel: 'Source: strategy context',
-          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+          sourceLabel: 'Source: supported strategy context',
+          limitations: [
+            'Planning context only; this is not an order instruction.',
+            'Derived from supported strategy context and omitted when context is thin.',
+          ],
         },
       ],
     });

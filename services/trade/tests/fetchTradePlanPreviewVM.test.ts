@@ -411,13 +411,15 @@ describe('fetchTradePlanPreviewVM', () => {
           kind: 'STOP',
           label: 'Prepared stop reference',
           value: '95',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
         {
           kind: 'TARGET',
           label: 'Prepared target reference',
           value: '112',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
       ],
     });
@@ -474,5 +476,7 @@ describe('fetchTradePlanPreviewVM', () => {
     expect(serviceSource).not.toMatch(/fetchDashboardSurfaceVM/);
     expect(serviceSource).not.toMatch(/dashboardSurfaceService/);
     expect(serviceSource).not.toMatch(/upstream\.selectedAccountContext\.status === 'AVAILABLE'/);
+    expect(serviceSource).not.toMatch(/Source: /);
+    expect(serviceSource).not.toMatch(/order instruction/);
   });
 });

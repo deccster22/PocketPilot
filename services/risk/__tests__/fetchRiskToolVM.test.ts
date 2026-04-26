@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fetchRiskToolVM } from '@/services/risk/fetchRiskToolVM';
 import type { ConfirmationSession } from '@/services/trade/types';
 import type { ForegroundScanResult } from '@/services/types/scan';
@@ -259,14 +262,18 @@ describe('fetchRiskToolVM', () => {
               kind: 'STOP',
               label: 'Prepared stop reference',
               value: '19',
-              sourceLabel: 'Source: strategy context',
-              limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+              sourceLabel: 'Source: supported strategy context',
+              limitations: [
+                'Planning context only; this is not an order instruction.',
+                'Derived from supported strategy context and omitted when context is thin.',
+              ],
             },
             {
               kind: 'TARGET',
               label: 'Prepared target reference',
               value: '24.5',
-              sourceLabel: 'Source: prepared plan',
+              sourceLabel: 'Source: prepared plan context',
+              limitations: ['Planning context only; this is not an order instruction.'],
             },
           ],
         },
@@ -489,5 +496,13 @@ describe('fetchRiskToolVM', () => {
       value: null,
       source: 'UNAVAILABLE',
     });
+  });
+
+  it('keeps prepared source/limitation wording ownership in trade services instead of risk fetch wiring', () => {
+    const source = readFileSync(join(process.cwd(), 'services', 'risk', 'fetchRiskToolVM.ts'), 'utf8');
+
+    expect(source).not.toMatch(/Source: /);
+    expect(source).not.toMatch(/order instruction/);
+    expect(source).not.toMatch(/omitted when context is thin/);
   });
 });

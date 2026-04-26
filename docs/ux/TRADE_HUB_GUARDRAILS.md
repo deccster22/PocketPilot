@@ -28,6 +28,7 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 - optional guardrail preferences may exist, but they must stay explicit, account-scoped, off by default, and non-blocking unless a future phase says otherwise
 - the prepared risk lane should stay grouped into one service-owned contract rather than splitting basis, sizing, guidance, preferences, and evaluation across separate UI-owned paths
 - prepared stop/target references must travel through one explicit service-owned availability contract and stay unavailable when context is thin
+- prepared stop/target source labels, limitation notes, and unavailable wording must remain service-owned; `app/` must not reinterpret source confidence or rewrite phrasing locally
 - bounded explanatory content
 - strategy / risk / regime layers must not collapse into a silent override engine
 
@@ -59,6 +60,7 @@ Trade Hub must not:
 - hide guardrail preferences behind a global default or auto-blocking default-on posture
 - hide guardrail evaluation behind a global default or auto-blocking default-on posture
 - invent stop/target values when prepared context is thin or unsupported
+- infer source-confidence or limitation wording in `app/` for prepared stop/target references
 - turn incomplete-input guidance into a block, validator, or troubleshooting wall
 - mutate preferred-basis state in app-owned persistence code
 - mutate guardrail-preference state in app-owned persistence code
