@@ -1,6 +1,6 @@
 # Reflection and Memory
 
-Insights-layer explainers: Since Last Checked, Reorientation, Event Ledger, Summary Archive, monthly/quarterly summaries, Year in Review, and future-facing log/journal guidance.
+Insights-layer explainers: Since Last Checked, Reorientation, Event Ledger, Summary Archive, monthly/quarterly summaries, Year in Review, and log/journal guidance with initial runtime grounding plus later expansions.
 
 ## Files
 - `what-event-ledger-is-for.md`

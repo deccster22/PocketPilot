@@ -7,7 +7,7 @@
 - Signals are inputs to interpretation.
 - `MarketEvent` is the canonical interpreted unit.
 - `EventStream` is the ordered in-memory sequence of `MarketEvent` objects produced during a scan/interpretation pass.
-- `EventLedger` is a future persistence layer and is not implemented in P3-1.
+- `EventLedger` became the canonical persistence layer in `P3-2`; this file keeps the original `P3-1` stream seam scope explicit.
 
 ## Current Shape
 The service seam lives at [services/events/eventStream.ts](D:/PocketPilot_Code/PocketPilot/services/events/eventStream.ts).
@@ -22,7 +22,7 @@ Ordering rules:
 - Break ties by `eventId` ascending.
 
 ## Why This Exists Now
-The stream seam lets services hand off interpreted meaning earlier in the flow without introducing persistence or background infrastructure. This keeps Snapshot and future consumers aligned on one event-driven contract.
+The stream seam lets services hand off interpreted meaning earlier in the flow without introducing persistence or background infrastructure. This keeps Snapshot plus downstream Since Last Checked and Insights consumers aligned on one event-driven contract.
 
 ## Non-Goals In P3-1
 - No storage/database.

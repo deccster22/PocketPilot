@@ -1,4 +1,4 @@
-# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5 + P6-A6)
+# Alert And Message Policy (P6-A1 + P6-A2 + P6-A3 + P6-A4 + P6-A5 + P6-A6 + P6-A7 + P6-A8)
 
 ## Why This Exists
 PocketPilot already had calm briefing and reorientation groundwork, but `P6` needed one explicit product spine for messaging.
@@ -150,6 +150,4 @@ Later `P6` phases can build on this foundation by adding:
 - additional surface eligibility only where a natural inline home already exists
 
 Those future phases should extend the same message-policy seam rather than inventing a separate notification stack.
-
-P6-A7 can now extend the same calm Snapshot posture with one separate Since Last Checked section while keeping that section out of the alert-policy lane entirely.
-P6-A8 can now extend that same calm Snapshot posture with clear-after-view refinement while still keeping the section out of any inbox or badge model.
+`P6-A7` and `P6-A8` are now part of the landed baseline for Snapshot's separate Since Last Checked section, and any follow-on message-policy work should keep that section out of inbox or badge semantics.

@@ -37,7 +37,7 @@ In this phase it produces a structured payload:
 }
 ```
 
-This is preparation input for future Snapshot or Insights usage. It does not generate user-facing prose.
+This is preparation input for current Snapshot and Insights usage plus future extensions. It does not generate user-facing prose.
 
 ## Relationship To Orientation Context
 P3-4 adds `OrientationContext` as the next assembly seam above event queries and `Since Last Checked`.
