@@ -1,4 +1,11 @@
 import type { MarketEvent } from '@/core/types/marketEvent';
+import {
+  createPreparedReferenceCopy,
+  createPreparedReferenceLabel,
+  createPreparedReferenceUnavailableCopy,
+  resolvePreparedReferenceSourceFromLabel,
+  type PreparedReferenceSource,
+} from '@/services/trade/createPreparedReferenceCopy';
 import { resolveStrategyPreparedField } from '@/services/trade/createStrategyPreparedRiskReferences';
 import type {
   PreparedTradeReference,
@@ -8,9 +15,6 @@ import type {
 } from '@/services/trade/types';
 
 const ACTIONABLE_INTENT_TYPES = new Set<ProtectionPlanIntentType>(['ACCUMULATE', 'REDUCE']);
-const STRATEGY_CONTEXT_LIMITATIONS = [
-  'Derived from confirmed strategy context and omitted when context is thin.',
-] as const;
 const KIND_ORDER: Record<PreparedTradeReferenceKind, number> = {
   STOP: 0,
   TARGET: 1,
@@ -22,7 +26,6 @@ type PreparedFieldResolution = {
 };
 
 type StopTargetField = 'stopPrice' | 'targetPrice';
-type PreparedReferenceSource = 'PREPARED_PLAN' | 'STRATEGY_CONTEXT';
 type PreparedTradeReferencesUnavailable = Extract<
   PreparedTradeReferencesAvailability,
   { status: 'UNAVAILABLE' }
@@ -127,20 +130,34 @@ function createPreparedTradeReference(params: {
   value: number;
   source: PreparedReferenceSource;
 }): PreparedTradeReference {
-  const label = params.kind === 'STOP' ? 'Prepared stop reference' : 'Prepared target reference';
+  const copy = createPreparedReferenceCopy({
+    kind: params.kind,
+    source: params.source,
+  });
 
   return {
     kind: params.kind,
-    label,
+    label: copy.label,
     value: params.value.toString(),
-    sourceLabel:
-      params.source === 'PREPARED_PLAN' ? 'Source: prepared plan' : 'Source: strategy context',
-    ...(params.source === 'STRATEGY_CONTEXT'
-      ? {
-          limitations: [...STRATEGY_CONTEXT_LIMITATIONS],
-        }
-      : {}),
+    sourceLabel: copy.sourceLabel,
+    limitations: [...copy.limitations],
   };
+}
+
+function normaliseReferenceLimitations(value: unknown): ReadonlyArray<string> | undefined {
+  if (!Array.isArray(value) || value.length === 0) {
+    return undefined;
+  }
+
+  const limitations = value
+    .map((item) => normaliseText(item))
+    .filter((item): item is string => item !== null);
+
+  if (limitations.length === 0) {
+    return undefined;
+  }
+
+  return limitations;
 }
 
 function normalisePreparedTradeReference(reference: unknown): PreparedTradeReference | null {
@@ -157,19 +174,25 @@ function normalisePreparedTradeReference(reference: unknown): PreparedTradeRefer
     return null;
   }
 
-  const limitations =
-    Array.isArray(reference.limitations) && reference.limitations.length > 0
-      ? reference.limitations
-          .map((item) => normaliseText(item))
-          .filter((item): item is string => item !== null)
-      : undefined;
+  const source = resolvePreparedReferenceSourceFromLabel(sourceLabel);
+  const limitations = normaliseReferenceLimitations(reference.limitations);
+  const canonicalCopy =
+    source === null
+      ? null
+      : createPreparedReferenceCopy({
+          kind,
+          source,
+        });
+  const outputLimitations = canonicalCopy?.limitations ?? limitations;
 
   return {
     kind,
-    label,
+    label: canonicalCopy?.label ?? createPreparedReferenceLabel(kind),
     value: value.toString(),
-    sourceLabel,
-    ...(limitations && limitations.length > 0 ? { limitations } : {}),
+    sourceLabel: canonicalCopy?.sourceLabel ?? sourceLabel,
+    ...(outputLimitations && outputLimitations.length > 0
+      ? { limitations: [...outputLimitations] }
+      : {}),
   };
 }
 
@@ -222,6 +245,12 @@ export function createUnavailablePreparedTradeReferences(
   reason: PreparedTradeReferencesUnavailable['reason'],
 ): PreparedTradeReferencesAvailability {
   return createUnavailable(reason);
+}
+
+export function describePreparedTradeReferencesUnavailableReason(
+  reason: PreparedTradeReferencesUnavailable['reason'],
+): string {
+  return createPreparedReferenceUnavailableCopy(reason);
 }
 
 export function normalisePreparedTradeReferencesAvailability(

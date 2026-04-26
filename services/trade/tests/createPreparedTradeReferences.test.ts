@@ -1,5 +1,9 @@
 import type { MarketEvent } from '@/core/types/marketEvent';
-import { createPreparedTradeReferences } from '@/services/trade/createPreparedTradeReferences';
+import {
+  createPreparedTradeReferences,
+  describePreparedTradeReferencesUnavailableReason,
+  normalisePreparedTradeReferencesAvailability,
+} from '@/services/trade/createPreparedTradeReferences';
 
 function createEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
   return {
@@ -55,14 +59,52 @@ describe('createPreparedTradeReferences', () => {
           kind: 'STOP',
           label: 'Prepared stop reference',
           value: '100',
-          sourceLabel: 'Source: strategy context',
-          limitations: ['Derived from confirmed strategy context and omitted when context is thin.'],
+          sourceLabel: 'Source: supported strategy context',
+          limitations: [
+            'Planning context only; this is not an order instruction.',
+            'Derived from supported strategy context and omitted when context is thin.',
+          ],
         },
         {
           kind: 'TARGET',
           label: 'Prepared target reference',
           value: '112',
-          sourceLabel: 'Source: prepared plan',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
+        },
+      ],
+    });
+  });
+
+  it('keeps explicit prepared stop values authoritative over strategy fallback context', () => {
+    const event = createEvent({
+      metadata: {
+        relatedSymbols: ['BTC'],
+        preparedRiskReferences: {
+          stopPrice: 99,
+        },
+        strategyPreparedRiskContext: {
+          stopPrice: {
+            basis: 'BASELINE_PRICE',
+          },
+        },
+      },
+    });
+
+    const result = createPreparedTradeReferences({
+      intentType: 'ACCUMULATE',
+      events: [event],
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '99',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
         },
       ],
     });
@@ -154,6 +196,64 @@ describe('createPreparedTradeReferences', () => {
     });
     const copyText = `${JSON.stringify(available)} ${JSON.stringify(unavailable)}`;
 
-    expect(copyText).not.toMatch(/\bexecution|dispatch|profit|opportunity|guarantee\b/i);
+    expect(copyText).not.toMatch(
+      /\bexecution|dispatch|profit|opportunity|guarantee|recommended|safe|optimal|predict\b/i,
+    );
+  });
+
+  it('normalises legacy source-label wording into canonical source and limitation copy', () => {
+    const result = normalisePreparedTradeReferencesAvailability({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Legacy stop label',
+          value: '99',
+          sourceLabel: 'Source: strategy context',
+          limitations: ['Legacy limitation copy.'],
+        },
+        {
+          kind: 'TARGET',
+          label: 'Legacy target label',
+          value: '108',
+          sourceLabel: 'Source: prepared plan',
+        },
+      ],
+    });
+
+    expect(result).toEqual({
+      status: 'AVAILABLE',
+      references: [
+        {
+          kind: 'STOP',
+          label: 'Prepared stop reference',
+          value: '99',
+          sourceLabel: 'Source: supported strategy context',
+          limitations: [
+            'Planning context only; this is not an order instruction.',
+            'Derived from supported strategy context and omitted when context is thin.',
+          ],
+        },
+        {
+          kind: 'TARGET',
+          label: 'Prepared target reference',
+          value: '108',
+          sourceLabel: 'Source: prepared plan context',
+          limitations: ['Planning context only; this is not an order instruction.'],
+        },
+      ],
+    });
+  });
+
+  it('keeps unavailable reason wording explicit without widening the availability contract', () => {
+    expect(describePreparedTradeReferencesUnavailableReason('NO_STRATEGY_REFERENCE')).toBe(
+      'Unavailable because this context does not publish prepared stop/target references.',
+    );
+    expect(describePreparedTradeReferencesUnavailableReason('THIN_CONTEXT')).toBe(
+      'Unavailable because prepared stop/target context is thin or ambiguous.',
+    );
+    expect(describePreparedTradeReferencesUnavailableReason('NOT_ENABLED_FOR_SURFACE')).toBe(
+      'Unavailable because this surface does not publish prepared stop/target references.',
+    );
   });
 });

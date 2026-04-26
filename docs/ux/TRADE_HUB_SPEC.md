@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P5-R13 + P7-K8 + P7-K9 + P7-K10)
+# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P7-K8 + P7-K9 + P7-K10)
 
 ## Purpose
 
@@ -226,6 +226,7 @@ Prepared plan references may supply entry, stop, or target values when the selec
 P5-R4 deepens that support by improving the service-owned producer path upstream of the confirmation session, not by adding app-side interpretation.
 P5-R5 keeps that UI contract unchanged and only enriches the upstream producer path when scoped strategy/event context can honestly support a calm prepared stop or target.
 P5-R13 adds one explicit prepared stop/target availability contract with source labels and thin-context unavailability so the same service seams can expose richer references without inventing precision.
+P5-R14 keeps that same contract and adds one canonical service-owned copy seam so source labels, limitation notes, and unavailable wording stay calm, explicit, and consistent without downstream rewrites.
 Explicit user values still win, prepared plan references outrank prepared quote help for the same field, and quote help still does not invent exits.
 
 `ExecutionCapabilityResolution` is:
@@ -299,6 +300,7 @@ The preview contract shape is:
 The preview is for future confirmation UI scaffolding. It expands exactly one selected plan into safe detail without adding execution behavior.
 When available, the risk-input guidance note stays subordinate to the main preview and explains what the prepared sizing lane still needs without turning into enforcement or troubleshooting theatre.
 Prepared stop/target references stay optional and explicit on the same preview contract, and unavailable states remain quiet when context is thin.
+Prepared source labels and limitations are service-owned output and should be rendered as-is by downstream consumers.
 
 Trade Hub confirmation consumers also consume a prepared `TradePlanConfirmationShell` from `services/trade/`.
 

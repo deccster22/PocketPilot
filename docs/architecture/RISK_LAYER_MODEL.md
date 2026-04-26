@@ -56,6 +56,7 @@ Possible core objects:
 - shape one canonical prepared sizing/max-loss output from the same service-owned inputs
 - prepare risk-per-trade context without turning it into advice
 - prepare one canonical stop/target reference availability seam from selected strategy/event/trade context where honest
+- keep prepared stop/target source labels, limitation notes, and unavailable-reason wording in one canonical service-owned copy seam
 - prepare one calm risk-input guidance note when sizing / max-loss context is thin or unsupported
 - keep guardrail preferences opt-in, explicit, and off by default
 - expose readiness constraints without silently overriding the user
@@ -72,6 +73,7 @@ Possible core objects:
 - guardrail evaluation must stay explicit, descriptive, and non-blocking by default
 - grouped Trade Hub risk-lane composition must stay explicit, service-owned, and non-blocking by default
 - prepared stop/target references must stay explicit, service-owned, and unavailable when context is thin
+- prepared stop/target copy must stay explicit, calm, non-executional, and free of recommendation/profit framing
 - no hidden action mutation in the UI layer
 
 ## 6. Consumers
@@ -99,6 +101,7 @@ Possible core objects:
 - support-vs-enforcement boundary tests
 - guardrail-evaluation explicitness tests
 - prepared stop/target availability tests
+- prepared stop/target copy-normalization tests
 
 ## 9. Relationship to other docs
 Sits beside:

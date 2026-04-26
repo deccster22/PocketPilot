@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { createTradePlanPreview } from '@/services/trade/createTradePlanPreview';
 import type { PreparedTradeRiskLane, ProtectionPlan } from '@/services/trade/types';
 
@@ -219,5 +222,16 @@ describe('createTradePlanPreview', () => {
     expect(JSON.stringify(preview)).not.toContain('entryPrice');
     expect(JSON.stringify(preview)).not.toContain('stopPrice');
     expect(JSON.stringify(preview)).not.toContain('targetPrice');
+  });
+
+  it('keeps prepared stop/target source wording ownership in producer seams', () => {
+    const source = readFileSync(
+      join(process.cwd(), 'services', 'trade', 'createTradePlanPreview.ts'),
+      'utf8',
+    );
+
+    expect(source).not.toMatch(/Source: /);
+    expect(source).not.toMatch(/order instruction/);
+    expect(source).not.toMatch(/omitted when context is thin/);
   });
 });
