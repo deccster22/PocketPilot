@@ -1,7 +1,7 @@
 # Event Ledger Model (P3-2)
 
 ## Purpose
-`EventLedger` is PocketPilot's persistent event history seam for interpreted events. In P3-2 it stores `MarketEvent` entries so services can retain history for debugging, future reflection features, and later insight generation without adding analytics or UI logic.
+`EventLedger` is PocketPilot's persistent event history seam for interpreted events. In P3-2 it stores `MarketEvent` entries so services can retain history for debugging, current reflection features, and deeper insight generation without adding analytics or UI logic.
 
 In P3-3 it remains the append-only storage seam while product-facing retrieval moves into a separate query layer.
 
@@ -41,8 +41,8 @@ Current design constraints:
 The ledger creates a single persistence spine for:
 - history
 - debugging
-- future user reflection
-- future insights inputs
+- current reflection surfaces
+- current insights inputs plus future extensions
 
 It intentionally does not add:
 - analytics or scoring

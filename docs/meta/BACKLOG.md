@@ -1,8 +1,8 @@
 # PocketPilot Active Backlog / State
 
-Phase anchor: `DOC-D2` (BL-1 intent)  
+Phase anchor: `DOC-D3` (narrative cleanup continuity)  
 Last refreshed: 2026-04-26  
-Scope: docs/admin backlog-state reconciliation only
+Scope: active backlog/state source with docs/admin continuity updates
 
 ## Why This Refresh Happened Now
 
@@ -35,13 +35,13 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 
 ## Recommended Next
 
-- `DOC-D3` (docs/admin): finish low-risk stale narrative cleanup outside core map/index docs as a small, isolated docs pass.
+- `P5` follow-up (narrow): add one or two additional deterministic strategy-owned prepared stop/target reference sources and limitation phrasing variants where context is explicit; keep non-dispatching posture and existing unavailable reasons.
 
 ## Do Soon
 
-- `P5` follow-up (narrow): add one or two additional deterministic strategy-owned prepared stop/target reference sources and limitation phrasing variants where context is explicit; keep non-dispatching posture and existing unavailable reasons.
 - `P7` follow-up (narrow): run one bounded relevance review from `P7-K10` aggregate surfaced/acknowledged signals to decide whether any additional glossary alias coverage is justified.
 - `P9` follow-up (narrow): capture real edge-case misses in nearby-alternative/metadata handling from post-`P9-S9` usage and scope a deterministic service-only tuning rung.
+- docs/admin follow-up: perform another narrow narrative cleanup pass only after a new merge wave creates clear active-doc drift.
 
 ## Parked / Trigger-Based
 
@@ -80,6 +80,7 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 | Snapshot Since Last Checked surface + clear-after-view behavior + deeper archive continuity | completed baseline | `P6-A7`, `P6-A8`, `P8-I12` |
 | Strategy Navigator fit contrast + nearby alternative heuristics + metadata normalization + mobile density refinement | completed baseline | `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9` |
 | docs map/index consistency cleanup after these landings | completed | `DOC-D1` |
+| narrow active-doc narrative cleanup after backlog/state reconciliation | completed | `DOC-D3` |
 | richer prepared stop/target references in Trade Hub service seams | partially completed; narrower follow-up remains active | `P5-R13` (with follow-up still in Do Soon/Parked) |
 
 ## Preview-Check Protocol

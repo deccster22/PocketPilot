@@ -1,8 +1,10 @@
 # Trade Hub Vision
 
-Trade Hub is the future surface for calm, structured action framing.
+Trade Hub is the active surface for calm, structured action framing.
 
 Its job is not to pressure the user into trading. Its job is to show what PocketPilot believes a sensible next action shape could be, why that framing exists, and what constraints or cautions apply.
+
+`P5-R13` now extends that same support-first lane with explicit prepared stop/target reference availability and thin-context unavailability, while preserving manual override precedence and non-dispatching behavior.
 
 For the initial P5 foundation:
 
