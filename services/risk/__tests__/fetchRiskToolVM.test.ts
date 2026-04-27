@@ -247,7 +247,7 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('timestampMs');
   });
 
-  it('consumes canonical produced stop/target references when the session carries prepared availability context', async () => {
+  it('consumes canonical produced stop/target levels when the session carries prepared availability context', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
@@ -260,20 +260,20 @@ describe('fetchRiskToolVM', () => {
           references: [
             {
               kind: 'STOP',
-              label: 'Prepared stop reference',
+              label: 'Prepared stop-loss level',
               value: '19',
               sourceLabel: 'Source: supported strategy context',
               limitations: [
-                'Planning context only; this is not an order instruction.',
+                'Optional planning context from the selected plan. Your own values remain authoritative.',
                 'Derived from supported strategy context and omitted when context is thin.',
               ],
             },
             {
               kind: 'TARGET',
-              label: 'Prepared target reference',
+              label: 'Prepared target level',
               value: '24.5',
               sourceLabel: 'Source: prepared plan context',
-              limitations: ['Planning context only; this is not an order instruction.'],
+              limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
             },
           ],
         },
@@ -305,7 +305,7 @@ describe('fetchRiskToolVM', () => {
     });
   });
 
-  it('keeps a producer-provided plan entry reference ahead of quote help while exits stay honest', async () => {
+  it('keeps a producer-provided plan entry level ahead of quote help while exits stay honest', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
@@ -343,7 +343,7 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('execution-feed');
   });
 
-  it('labels prepared plan stop references as PREPARED_PLAN without implying execution authority', async () => {
+  it('labels prepared plan stop levels as PREPARED_PLAN without implying execution authority', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
@@ -383,7 +383,7 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('BRACKET');
   });
 
-  it('uses a prepared quote entry reference when user entry is absent', async () => {
+  it('uses a prepared quote entry level when user entry is absent', async () => {
     const result = await fetchRiskToolVM({
       confirmationSession: createConfirmationSession(),
       preparedQuoteScan: createPreparedQuoteScan(),

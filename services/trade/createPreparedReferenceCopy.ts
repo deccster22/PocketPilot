@@ -16,7 +16,7 @@ const SOURCE_LABEL_BY_SOURCE: Record<PreparedReferenceSource, string> = {
 };
 
 const COMMON_LIMITATIONS: ReadonlyArray<string> = [
-  'Planning context only; this is not an order instruction.',
+  'Optional planning context from the selected plan. Your own values remain authoritative.',
 ];
 
 const STRATEGY_CONTEXT_LIMITATIONS: ReadonlyArray<string> = [
@@ -26,10 +26,11 @@ const STRATEGY_CONTEXT_LIMITATIONS: ReadonlyArray<string> = [
 
 const UNAVAILABLE_COPY: Record<PreparedReferenceUnavailableReason, string> = {
   NO_STRATEGY_REFERENCE:
-    'Unavailable because this context does not publish prepared stop/target references.',
-  THIN_CONTEXT: 'Unavailable because prepared stop/target context is thin or ambiguous.',
+    'This setup does not publish prepared stop-loss or target levels.',
+  THIN_CONTEXT:
+    'This setup does not provide enough context for prepared stop-loss or target levels yet.',
   NOT_ENABLED_FOR_SURFACE:
-    'Unavailable because this surface does not publish prepared stop/target references.',
+    'Prepared stop-loss or target levels are not shown on this surface.',
 };
 
 function normaliseSourceLabelKey(sourceLabel: string): string {
@@ -37,7 +38,7 @@ function normaliseSourceLabelKey(sourceLabel: string): string {
 }
 
 export function createPreparedReferenceLabel(kind: PreparedTradeReferenceKind): string {
-  return kind === 'STOP' ? 'Prepared stop reference' : 'Prepared target reference';
+  return kind === 'STOP' ? 'Prepared stop-loss level' : 'Prepared target level';
 }
 
 export function createPreparedReferenceSourceLabel(source: PreparedReferenceSource): string {

@@ -29,6 +29,9 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 - the prepared risk lane should stay grouped into one service-owned contract rather than splitting basis, sizing, guidance, preferences, and evaluation across separate UI-owned paths
 - prepared stop/target references must travel through one explicit service-owned availability contract and stay unavailable when context is thin
 - prepared stop/target source labels, limitation notes, and unavailable wording must remain service-owned; `app/` must not reinterpret source confidence or rewrite phrasing locally
+- prepared stop/target rendering must stay compact and subordinate inside existing Trade Hub planning support sections
+- unavailable prepared-reference states must stay quiet and non-blocking; render calm copy only when the service-owned policy says it is useful
+- user-facing Trade Hub/Risk Tool copy should prefer plain-language price terminology (`Entry price`, `Stop-loss price`, `Target price`, `Asset symbol`) and prepared-planning terminology (`Prepared planning levels`, `Prepared stop-loss level`, `Prepared target level`) even if internal contracts retain `reference` naming
 - bounded explanatory content
 - strategy / risk / regime layers must not collapse into a silent override engine
 
@@ -41,6 +44,7 @@ Trade Hub may:
 - show one calm account-level preferred-basis starting point when it exists
 - show one calm grouped prepared risk lane when the prepared service contract supports it
 - show prepared stop/target references only when the prepared service contract marks them available
+- show one quiet unavailable prepared-reference line only when the service-owned unavailable policy says it should be visible
 - show one calm optional guardrail-preferences summary and edit path when the prepared service contract supports it
 - show one calm optional guardrail-evaluation summary when the prepared service contract supports it
 - show prepared risk-per-trade context that explains framing without pushing action
@@ -61,6 +65,7 @@ Trade Hub must not:
 - hide guardrail evaluation behind a global default or auto-blocking default-on posture
 - invent stop/target values when prepared context is thin or unsupported
 - infer source-confidence or limitation wording in `app/` for prepared stop/target references
+- turn unavailable prepared-reference states into alerts, badges, warning walls, or blockers
 - turn incomplete-input guidance into a block, validator, or troubleshooting wall
 - mutate preferred-basis state in app-owned persistence code
 - mutate guardrail-preference state in app-owned persistence code
@@ -141,6 +146,7 @@ The UI renders the prepared path only. It should not contain hidden execution lo
 - calm guidance-placement tests
 - optional guardrail preference summary tests
 - prepared stop/target availability tests
+- prepared stop/target placement and quiet-unavailable tests
 - calm guardrail-evaluation status tests
 - no-enforcement-by-default tests for guardrail preferences
 - no-enforcement-by-default tests for guardrail evaluation

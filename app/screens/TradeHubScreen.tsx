@@ -787,6 +787,10 @@ export function TradeHubScreen() {
             {guardrailPreferencesView?.summaryText ??
               'Optional guardrails stay off by default until an account is available.'}
           </Text>
+          <Text style={styles.supportText}>
+            Guardrails are optional account-level checks for planning. They can help flag risk
+            limits or cooldown settings, but they do not place trades.
+          </Text>
           {guardrailPreferencesView ? (
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Optional, explicit, account-scoped</Text>
@@ -868,6 +872,25 @@ export function TradeHubScreen() {
                   {item.label}: {item.value}
                 </Text>
               ))}
+              {previewView.preparedReferences.visible ? (
+                <View style={styles.subordinateReferenceBlock}>
+                  <Text style={styles.cardMeta}>{previewView.preparedReferences.title}</Text>
+                  {previewView.preparedReferences.rows.map((reference) => (
+                    <Text
+                      key={`${reference.kind}:${reference.value}:${reference.sourceLabel}`}
+                      style={styles.cardMeta}
+                    >
+                      {reference.label}: {reference.value} | {reference.sourceLabel}
+                    </Text>
+                  ))}
+                  {previewView.preparedReferences.limitationText ? (
+                    <Text style={styles.cardId}>{previewView.preparedReferences.limitationText}</Text>
+                  ) : null}
+                  {previewView.preparedReferences.unavailableText ? (
+                    <Text style={styles.cardId}>{previewView.preparedReferences.unavailableText}</Text>
+                  ) : null}
+                </View>
+              ) : null}
               {previewView.riskInputGuidance.status === 'AVAILABLE' ? (
                 <View style={styles.noteCard}>
                   <Text style={styles.noteTitle}>
@@ -915,28 +938,27 @@ export function TradeHubScreen() {
               'Risk framing stays support-only. It does not create an order or imply execution readiness.'}
           </Text>
           <Text style={styles.supportText}>
-            Use the selected plan as context, then add only the entry, stop, and risk inputs you
-            want to frame.
+            Use price levels to estimate position size and risk. These are planning inputs only.
+            They do not place an order.
           </Text>
           <Text style={styles.supportText}>
-            Prepared references stay optional starting points. Your own values remain authoritative
-            whenever you enter them.
+            Your own values override any prepared planning levels.
           </Text>
           <View style={styles.inputGrid}>
             <RiskToolInputField
-              label="Entry reference"
+              label="Entry price"
               onChangeText={(value) => handleRiskToolInputChange('entryPrice', value)}
               placeholder="e.g. 100"
               value={riskToolInput.entryPrice}
             />
             <RiskToolInputField
-              label="Stop reference"
+              label="Stop-loss price"
               onChangeText={(value) => handleRiskToolInputChange('stopPrice', value)}
               placeholder="e.g. 95"
               value={riskToolInput.stopPrice}
             />
             <RiskToolInputField
-              label="Target reference"
+              label="Target price"
               onChangeText={(value) => handleRiskToolInputChange('targetPrice', value)}
               placeholder="optional"
               value={riskToolInput.targetPrice}
@@ -1319,6 +1341,12 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     gap: 2,
+  },
+  subordinateReferenceBlock: {
+    gap: 4,
+    borderLeftWidth: 2,
+    borderLeftColor: '#e5e7eb',
+    paddingLeft: 8,
   },
   guardrailItem: {
     gap: 6,

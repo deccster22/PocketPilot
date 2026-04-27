@@ -3,6 +3,7 @@ import {
   createPreparedTradeReferences,
   describePreparedTradeReferencesUnavailableReason,
   normalisePreparedTradeReferencesAvailability,
+  shouldRenderPreparedTradeReferencesUnavailableReason,
 } from '@/services/trade/createPreparedTradeReferences';
 
 function createEvent(overrides: Partial<MarketEvent> = {}): MarketEvent {
@@ -57,20 +58,20 @@ describe('createPreparedTradeReferences', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '100',
           sourceLabel: 'Source: supported strategy context',
           limitations: [
-            'Planning context only; this is not an order instruction.',
+            'Optional planning context from the selected plan. Your own values remain authoritative.',
             'Derived from supported strategy context and omitted when context is thin.',
           ],
         },
         {
           kind: 'TARGET',
-          label: 'Prepared target reference',
+          label: 'Prepared target level',
           value: '112',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
       ],
     });
@@ -101,10 +102,10 @@ describe('createPreparedTradeReferences', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '99',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
       ],
     });
@@ -226,20 +227,20 @@ describe('createPreparedTradeReferences', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '99',
           sourceLabel: 'Source: supported strategy context',
           limitations: [
-            'Planning context only; this is not an order instruction.',
+            'Optional planning context from the selected plan. Your own values remain authoritative.',
             'Derived from supported strategy context and omitted when context is thin.',
           ],
         },
         {
           kind: 'TARGET',
-          label: 'Prepared target reference',
+          label: 'Prepared target level',
           value: '108',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
       ],
     });
@@ -247,13 +248,23 @@ describe('createPreparedTradeReferences', () => {
 
   it('keeps unavailable reason wording explicit without widening the availability contract', () => {
     expect(describePreparedTradeReferencesUnavailableReason('NO_STRATEGY_REFERENCE')).toBe(
-      'Unavailable because this context does not publish prepared stop/target references.',
+      'This setup does not publish prepared stop-loss or target levels.',
     );
     expect(describePreparedTradeReferencesUnavailableReason('THIN_CONTEXT')).toBe(
-      'Unavailable because prepared stop/target context is thin or ambiguous.',
+      'This setup does not provide enough context for prepared stop-loss or target levels yet.',
     );
     expect(describePreparedTradeReferencesUnavailableReason('NOT_ENABLED_FOR_SURFACE')).toBe(
-      'Unavailable because this surface does not publish prepared stop/target references.',
+      'Prepared stop-loss or target levels are not shown on this surface.',
+    );
+  });
+
+  it('keeps unavailable reference visibility conservative and service-owned', () => {
+    expect(shouldRenderPreparedTradeReferencesUnavailableReason('THIN_CONTEXT')).toBe(true);
+    expect(shouldRenderPreparedTradeReferencesUnavailableReason('NO_STRATEGY_REFERENCE')).toBe(
+      false,
+    );
+    expect(shouldRenderPreparedTradeReferencesUnavailableReason('NOT_ENABLED_FOR_SURFACE')).toBe(
+      false,
     );
   });
 });

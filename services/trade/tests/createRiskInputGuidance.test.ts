@@ -116,7 +116,7 @@ describe('createRiskInputGuidance', () => {
         title: 'Prepared risk context incomplete',
         summary:
           'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
-        items: ['Prepared entry and stop references'],
+        items: ['Prepared entry and stop-loss prices'],
       },
     });
   });

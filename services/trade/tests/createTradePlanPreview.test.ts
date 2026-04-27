@@ -203,7 +203,7 @@ describe('createTradePlanPreview', () => {
           basis: 'FIXED_CURRENCY',
           headline: 'Fixed-currency risk frame',
           summary:
-            'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+            'Shows the capped loss from this prepared plan as a fixed currency amount using prepared planning levels only.',
           items: [
             {
               label: 'Risk per trade',

@@ -12,10 +12,10 @@ describe('createPreparedReferenceCopy', () => {
         source: 'STRATEGY_CONTEXT',
       }),
     ).toEqual({
-      label: 'Prepared stop reference',
+      label: 'Prepared stop-loss level',
       sourceLabel: 'Source: supported strategy context',
       limitations: [
-        'Planning context only; this is not an order instruction.',
+        'Optional planning context from the selected plan. Your own values remain authoritative.',
         'Derived from supported strategy context and omitted when context is thin.',
       ],
     });
@@ -28,21 +28,21 @@ describe('createPreparedReferenceCopy', () => {
         source: 'PREPARED_PLAN',
       }),
     ).toEqual({
-      label: 'Prepared target reference',
+      label: 'Prepared target level',
       sourceLabel: 'Source: prepared plan context',
-      limitations: ['Planning context only; this is not an order instruction.'],
+      limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
     });
   });
 
   it('keeps unavailable copy explicit and deterministic for each unavailable reason', () => {
     expect(createPreparedReferenceUnavailableCopy('NO_STRATEGY_REFERENCE')).toBe(
-      'Unavailable because this context does not publish prepared stop/target references.',
+      'This setup does not publish prepared stop-loss or target levels.',
     );
     expect(createPreparedReferenceUnavailableCopy('THIN_CONTEXT')).toBe(
-      'Unavailable because prepared stop/target context is thin or ambiguous.',
+      'This setup does not provide enough context for prepared stop-loss or target levels yet.',
     );
     expect(createPreparedReferenceUnavailableCopy('NOT_ENABLED_FOR_SURFACE')).toBe(
-      'Unavailable because this surface does not publish prepared stop/target references.',
+      'Prepared stop-loss or target levels are not shown on this surface.',
     );
   });
 

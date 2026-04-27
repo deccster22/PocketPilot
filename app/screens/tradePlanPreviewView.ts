@@ -5,6 +5,11 @@ import type {
   TradeHubActionState,
   TradePlanPreview,
 } from '@/services/trade/types';
+import {
+  describePreparedTradeReferencesUnavailableReason,
+  normalisePreparedTradeReferencesAvailability,
+  shouldRenderPreparedTradeReferencesUnavailableReason,
+} from '@/services/trade/createPreparedTradeReferences';
 
 export type TradePlanSizingViewData = {
   statusText: string;
@@ -16,6 +21,25 @@ export type TradePlanSizingViewData = {
   }>;
   notes: ReadonlyArray<string>;
 };
+
+export type TradePlanPreparedReferenceRowViewData = {
+  kind: 'STOP' | 'TARGET';
+  label: string;
+  value: string;
+  sourceLabel: string;
+};
+
+export type TradePlanPreparedReferencesViewData =
+  | {
+      visible: false;
+    }
+  | {
+      visible: true;
+      title: string;
+      rows: ReadonlyArray<TradePlanPreparedReferenceRowViewData>;
+      limitationText: string | null;
+      unavailableText: string | null;
+    };
 
 export type TradePlanPreviewViewData = {
   planId: string;
@@ -36,6 +60,7 @@ export type TradePlanPreviewViewData = {
     label: string;
     value: string;
   }>;
+  preparedReferences: TradePlanPreparedReferencesViewData;
   riskInputGuidance: RiskInputGuidanceAvailability;
   positionSizing: TradePlanSizingViewData;
 };
@@ -130,6 +155,44 @@ function createRiskInputGuidanceViewData(
   };
 }
 
+function createPreparedReferencesViewData(
+  preview: TradePlanPreview,
+): TradePlanPreparedReferencesViewData {
+  const availability = normalisePreparedTradeReferencesAvailability(preview.preparedTradeReferences);
+
+  if (availability.status === 'AVAILABLE') {
+    return {
+      visible: true,
+      title: 'Prepared planning levels',
+      rows: availability.references.map((reference) => ({
+        kind: reference.kind,
+        label: reference.label,
+        value: reference.value,
+        sourceLabel: reference.sourceLabel,
+      })),
+      limitationText:
+        availability.references
+          .flatMap((reference) => reference.limitations ?? [])
+          .find((limitation) => limitation.trim().length > 0) ?? null,
+      unavailableText: null,
+    };
+  }
+
+  if (!shouldRenderPreparedTradeReferencesUnavailableReason(availability.reason)) {
+    return {
+      visible: false,
+    };
+  }
+
+  return {
+    visible: true,
+    title: 'Prepared planning levels',
+    rows: [],
+    limitationText: null,
+    unavailableText: describePreparedTradeReferencesUnavailableReason(availability.reason),
+  };
+}
+
 export function createTradePlanPreviewViewData(
   preview: TradePlanPreview | null,
 ): TradePlanPreviewViewData | null {
@@ -169,6 +232,7 @@ export function createTradePlanPreviewViewData(
         label: item.label,
         value: item.value,
       })) ?? [],
+    preparedReferences: createPreparedReferencesViewData(preview),
     riskInputGuidance: createRiskInputGuidanceViewData(preview),
     positionSizing: createPositionSizingViewData(preview.positionSizing),
   };

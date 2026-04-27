@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P7-K8 + P7-K9 + P7-K10)
+# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P7-K8 + P7-K9 + P7-K10)
 
 ## Purpose
 
@@ -227,6 +227,17 @@ P5-R4 deepens that support by improving the service-owned producer path upstream
 P5-R5 keeps that UI contract unchanged and only enriches the upstream producer path when scoped strategy/event context can honestly support a calm prepared stop or target.
 P5-R13 adds one explicit prepared stop/target availability contract with source labels and thin-context unavailability so the same service seams can expose richer references without inventing precision.
 P5-R14 keeps that same contract and adds one canonical service-owned copy seam so source labels, limitation notes, and unavailable wording stay calm, explicit, and consistent without downstream rewrites.
+P5-R15 keeps those same service-owned seams and adds one compact Trade Hub preview render path for prepared stop/target availability:
+- available references render as-is from prepared service labels/source/limitations
+- one compact limitation note is shown when present
+- unavailable copy stays quiet and only appears when the service-owned visibility policy says it is useful
+P5-R15 terminology alignment keeps internal service/type naming stable (`*Reference*` contracts) while preferring planning-level wording in user-facing copy:
+- `Entry price`, `Stop-loss price`, `Target price`
+- `Asset symbol` or `Symbol`
+- `Prepared planning levels`
+- `Prepared stop-loss level` and `Prepared target level`
+- `Optional planning context from the selected plan. Your own values remain authoritative.`
+- `Your own values override prepared planning levels`
 Explicit user values still win, prepared plan references outrank prepared quote help for the same field, and quote help still does not invent exits.
 
 `ExecutionCapabilityResolution` is:
@@ -301,6 +312,7 @@ The preview is for future confirmation UI scaffolding. It expands exactly one se
 When available, the risk-input guidance note stays subordinate to the main preview and explains what the prepared sizing lane still needs without turning into enforcement or troubleshooting theatre.
 Prepared stop/target references stay optional and explicit on the same preview contract, and unavailable states remain quiet when context is thin.
 Prepared source labels and limitations are service-owned output and should be rendered as-is by downstream consumers.
+Prepared unavailable wording should be consumed from services without app-side phrasing rules, and visibility should stay conservative and non-blocking.
 
 Trade Hub confirmation consumers also consume a prepared `TradePlanConfirmationShell` from `services/trade/`.
 
@@ -584,6 +596,8 @@ Prepared plan references should become more useful quietly when the selected pla
 Prepared strategy-owned stop or target references should keep the same prepared-plan label and should not introduce extra UI drama or technical source detail.
 Unavailable references should stay visually quiet; "Not set" is enough when the prepared plan has nothing honest to contribute.
 Prepared stop/target availability reasons should remain service-owned and should never be derived in `app/`.
+Prepared stop/target rendering should remain compact and subordinate inside the existing Plan Preview support lane, not as a separate planning widget.
+Prepared terminology in user-facing copy should favor planning-level terms, while internal service contract names may keep reference-oriented naming for stability.
 The screen may format confirmation shell labels for readability, but it must not derive capability paths or execution availability on its own.
 The screen may format confirmation flow labels for readability, but it must not infer steps, blocked states, or progression rules on its own.
 The screen may invoke prepared confirmation-session actions, but it must not own raw confirmation-flow state or recompute preview, shell, or flow locally.

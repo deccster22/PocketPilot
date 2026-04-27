@@ -31,6 +31,28 @@ describe('createTradePlanPreviewViewData', () => {
         orderPreviewAvailable: false,
         executionPreviewAvailable: false,
       },
+      preparedTradeReferences: {
+        status: 'AVAILABLE',
+        references: [
+          {
+            kind: 'STOP',
+            label: 'Prepared stop-loss level',
+            value: '95',
+            sourceLabel: 'Source: prepared plan context',
+            limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
+          },
+          {
+            kind: 'TARGET',
+            label: 'Prepared target level',
+            value: '112',
+            sourceLabel: 'Source: supported strategy context',
+            limitations: [
+              'Optional planning context from the selected plan. Your own values remain authoritative.',
+              'Derived from supported strategy context and omitted when context is thin.',
+            ],
+          },
+        ],
+      },
       risk: {
         activeBasis: 'ACCOUNT_PERCENT',
         activeBasisLabel: 'Account %',
@@ -60,7 +82,7 @@ describe('createTradePlanPreviewViewData', () => {
           basis: 'ACCOUNT_PERCENT',
           headline: 'Account % risk frame',
           summary:
-            'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+            'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
           items: [
             {
               label: 'Risk per trade',
@@ -92,7 +114,7 @@ describe('createTradePlanPreviewViewData', () => {
           title: 'Prepared risk context incomplete',
           summary:
             'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
-          items: ['Prepared entry and stop references', 'Prepared position cap'],
+          items: ['Prepared entry and stop-loss prices', 'Prepared position cap'],
         },
       },
     });
@@ -111,7 +133,7 @@ describe('createTradePlanPreviewViewData', () => {
       riskStatusText: 'Prepared risk context available',
       riskHeadline: 'Account % risk frame',
       riskSummary:
-        'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+        'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
       riskItems: [
         {
           label: 'Risk per trade',
@@ -122,13 +144,33 @@ describe('createTradePlanPreviewViewData', () => {
           value: '$50.00',
         },
       ],
+      preparedReferences: {
+        visible: true,
+        title: 'Prepared planning levels',
+        rows: [
+          {
+            kind: 'STOP',
+            label: 'Prepared stop-loss level',
+            value: '95',
+            sourceLabel: 'Source: prepared plan context',
+          },
+          {
+            kind: 'TARGET',
+            label: 'Prepared target level',
+            value: '112',
+            sourceLabel: 'Source: supported strategy context',
+          },
+        ],
+        limitationText: 'Optional planning context from the selected plan. Your own values remain authoritative.',
+        unavailableText: null,
+      },
       riskInputGuidance: {
         status: 'AVAILABLE',
         guidance: {
           title: 'Prepared risk context incomplete',
           summary:
             'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
-          items: ['Prepared entry and stop references', 'Prepared position cap'],
+          items: ['Prepared entry and stop-loss prices', 'Prepared position cap'],
         },
       },
       positionSizing: {
@@ -160,6 +202,130 @@ describe('createTradePlanPreviewViewData', () => {
     expect(createTradePlanPreviewViewData(null)).toBeNull();
   });
 
+  it('shows one quiet unavailable prepared-reference line when context is thin', () => {
+    const view = createTradePlanPreviewViewData({
+      planId: 'thin-context-plan',
+      headline: {
+        intentType: 'ACCUMULATE',
+        symbol: 'BTC',
+        actionState: 'CAUTION',
+      },
+      rationale: {
+        summary: 'Prepared context is mixed and cannot support one clear stop/target set.',
+        primaryEventId: 'event-thin',
+        supportingEventIds: ['event-thin'],
+        supportingEventCount: 1,
+      },
+      constraints: {
+        requiresConfirmation: true,
+      },
+      readiness: {
+        alignment: 'NEUTRAL',
+        certainty: 'LOW',
+      },
+      placeholders: {
+        orderPreviewAvailable: false,
+        executionPreviewAvailable: false,
+      },
+      preparedTradeReferences: {
+        status: 'UNAVAILABLE',
+        reason: 'THIN_CONTEXT',
+      },
+      risk: {
+        activeBasis: 'ACCOUNT_PERCENT',
+        activeBasisLabel: 'Account %',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'ACCOUNT_PERCENT',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: true,
+            },
+          ],
+        },
+        context: null,
+      },
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
+      riskInputGuidance: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_GUIDANCE_NEEDED',
+      },
+    });
+
+    expect(view?.preparedReferences).toEqual({
+      visible: true,
+      title: 'Prepared planning levels',
+      rows: [],
+      limitationText: null,
+      unavailableText: 'This setup does not provide enough context for prepared stop-loss or target levels yet.',
+    });
+  });
+
+  it('keeps non-informative unavailable prepared-reference states collapsed', () => {
+    const view = createTradePlanPreviewViewData({
+      planId: 'no-reference-plan',
+      headline: {
+        intentType: 'HOLD',
+        symbol: 'ETH',
+        actionState: 'WAIT',
+      },
+      rationale: {
+        summary: 'No prepared stop/target context is expected for this plan.',
+        primaryEventId: 'event-hold',
+        supportingEventIds: ['event-hold'],
+        supportingEventCount: 1,
+      },
+      constraints: {
+        requiresConfirmation: true,
+      },
+      readiness: {
+        alignment: 'NEUTRAL',
+        certainty: 'LOW',
+      },
+      placeholders: {
+        orderPreviewAvailable: false,
+        executionPreviewAvailable: false,
+      },
+      preparedTradeReferences: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_STRATEGY_REFERENCE',
+      },
+      risk: {
+        activeBasis: 'ACCOUNT_PERCENT',
+        activeBasisLabel: 'Account %',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'ACCOUNT_PERCENT',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: true,
+            },
+          ],
+        },
+        context: null,
+      },
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
+      riskInputGuidance: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_GUIDANCE_NEEDED',
+      },
+    });
+
+    expect(view?.preparedReferences).toEqual({
+      visible: false,
+    });
+  });
+
   it('keeps position-sizing math out of the app view helper', () => {
     const source = readFileSync(join(process.cwd(), 'app', 'screens', 'tradePlanPreviewView.ts'), 'utf8');
 
@@ -171,5 +337,78 @@ describe('createTradePlanPreviewViewData', () => {
     expect(source).not.toMatch(/stopPrice\s*===\s*null/);
     expect(source).not.toMatch(/accountContext/);
     expect(source).toMatch(/createPositionSizingViewData/);
+    expect(source).toMatch(/normalisePreparedTradeReferencesAvailability/);
+    expect(source).toMatch(/describePreparedTradeReferencesUnavailableReason/);
+    expect(source).toMatch(/shouldRenderPreparedTradeReferencesUnavailableReason/);
+    expect(source).not.toMatch(/Source: prepared plan context/);
+    expect(source).not.toMatch(/Unavailable because prepared stop\/target context is thin or ambiguous/);
+  });
+
+  it('keeps prepared-reference wording free of recommendation, prediction, and profit language', () => {
+    const view = createTradePlanPreviewViewData({
+      planId: 'language-check-plan',
+      headline: {
+        intentType: 'ACCUMULATE',
+        symbol: 'BTC',
+        actionState: 'READY',
+      },
+      rationale: {
+        summary: 'Prepared planning levels are shown for calm planning context only.',
+        primaryEventId: 'event-language',
+        supportingEventIds: ['event-language'],
+        supportingEventCount: 1,
+      },
+      constraints: {
+        requiresConfirmation: true,
+      },
+      readiness: {
+        alignment: 'ALIGNED',
+        certainty: 'HIGH',
+      },
+      placeholders: {
+        orderPreviewAvailable: false,
+        executionPreviewAvailable: false,
+      },
+      preparedTradeReferences: {
+        status: 'AVAILABLE',
+        references: [
+          {
+            kind: 'STOP',
+            label: 'Prepared stop-loss level',
+            value: '95',
+            sourceLabel: 'Source: prepared plan context',
+            limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
+          },
+        ],
+      },
+      risk: {
+        activeBasis: 'ACCOUNT_PERCENT',
+        activeBasisLabel: 'Account %',
+        basisAvailability: {
+          status: 'AVAILABLE',
+          selectedBasis: 'ACCOUNT_PERCENT',
+          options: [
+            {
+              basis: 'ACCOUNT_PERCENT',
+              label: 'Account %',
+              isSelected: true,
+            },
+          ],
+        },
+        context: null,
+      },
+      positionSizing: {
+        status: 'UNAVAILABLE',
+        reason: 'INSUFFICIENT_INPUTS',
+      },
+      riskInputGuidance: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_GUIDANCE_NEEDED',
+      },
+    });
+
+    const text = JSON.stringify(view?.preparedReferences);
+
+    expect(text).not.toMatch(/\bbest trade|profit|opportunity|predict|prediction|recommended\b/i);
   });
 });

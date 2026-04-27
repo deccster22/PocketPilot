@@ -80,7 +80,7 @@ describe('createPreparedRiskReferences', () => {
     });
   });
 
-  it('keeps strategy-owned stop and target references null when the context is weak or ambiguous', () => {
+  it('keeps strategy-owned stop and target levels null when the context is weak or ambiguous', () => {
     const firstEvent = createEvent({
       eventId: 'acct-1:momentum_basics:event:BTC:100',
       price: 104,
@@ -158,7 +158,7 @@ describe('createPreparedRiskReferences', () => {
     });
   });
 
-  it('keeps explicit prepared references authoritative over strategy-owned publishing context', () => {
+  it('keeps explicit prepared planning levels authoritative over strategy-owned publishing context', () => {
     const event = createEvent({
       metadata: {
         relatedSymbols: ['BTC'],

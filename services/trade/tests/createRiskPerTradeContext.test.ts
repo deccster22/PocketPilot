@@ -46,7 +46,7 @@ describe('createRiskPerTradeContext', () => {
       basis: 'ACCOUNT_PERCENT',
       headline: 'Account % risk frame',
       summary:
-        'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+        'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
       items: [
         {
           label: 'Risk per trade',
@@ -83,7 +83,7 @@ describe('createRiskPerTradeContext', () => {
       basis: 'FIXED_CURRENCY',
       headline: 'Fixed-currency risk frame',
       summary:
-        'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+        'Shows the capped loss from this prepared plan as a fixed currency amount using prepared planning levels only.',
       items: [
         {
           label: 'Risk per trade',

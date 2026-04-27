@@ -219,17 +219,17 @@ describe('fetchConfirmationSessionVM', () => {
         references: [
           {
             kind: 'STOP',
-            label: 'Prepared stop reference',
+            label: 'Prepared stop-loss level',
             value: '95',
             sourceLabel: 'Source: prepared plan context',
-            limitations: ['Planning context only; this is not an order instruction.'],
+            limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
           },
           {
             kind: 'TARGET',
-            label: 'Prepared target reference',
+            label: 'Prepared target level',
             value: '112',
             sourceLabel: 'Source: prepared plan context',
-            limitations: ['Planning context only; this is not an order instruction.'],
+            limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
           },
         ],
       },
@@ -264,17 +264,17 @@ describe('fetchConfirmationSessionVM', () => {
           references: [
             {
               kind: 'STOP',
-              label: 'Prepared stop reference',
+              label: 'Prepared stop-loss level',
               value: '95',
               sourceLabel: 'Source: prepared plan context',
-              limitations: ['Planning context only; this is not an order instruction.'],
+              limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
             },
             {
               kind: 'TARGET',
-              label: 'Prepared target reference',
+              label: 'Prepared target level',
               value: '112',
               sourceLabel: 'Source: prepared plan context',
-              limitations: ['Planning context only; this is not an order instruction.'],
+              limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
             },
           ],
         },
@@ -307,7 +307,7 @@ describe('fetchConfirmationSessionVM', () => {
             basis: 'ACCOUNT_PERCENT',
             headline: 'Account % risk frame',
             summary:
-              'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+              'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
             items: [
               {
                 label: 'Risk per trade',
@@ -421,7 +421,7 @@ describe('fetchConfirmationSessionVM', () => {
     expect(JSON.stringify(result.session)).not.toContain('hidden');
   });
 
-  it('carries explicit prepared stop and target references from the plan producer without leaking metadata', async () => {
+  it('carries explicit prepared stop and target levels from the plan producer without leaking metadata', async () => {
     const preparedEvent = createEvent({
       metadata: {
         hidden: true,
@@ -454,17 +454,17 @@ describe('fetchConfirmationSessionVM', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '95',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
         {
           kind: 'TARGET',
-          label: 'Prepared target reference',
+          label: 'Prepared target level',
           value: '112',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
       ],
     });
@@ -472,7 +472,7 @@ describe('fetchConfirmationSessionVM', () => {
     expect(JSON.stringify(result.session)).not.toContain('do-not-leak');
   });
 
-  it('carries strategy-owned prepared stop and target references through the selected session without leaking internals', async () => {
+  it('carries strategy-owned prepared stop and target levels through the selected session without leaking internals', async () => {
     const momentumEvent = createEvent({
       eventId: 'acct-live:momentum_basics:signal:BTC:140',
       timestamp: 140,
@@ -510,11 +510,11 @@ describe('fetchConfirmationSessionVM', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '100',
           sourceLabel: 'Source: supported strategy context',
           limitations: [
-            'Planning context only; this is not an order instruction.',
+            'Optional planning context from the selected plan. Your own values remain authoritative.',
             'Derived from supported strategy context and omitted when context is thin.',
           ],
         },
