@@ -43,7 +43,7 @@ function formatReferenceSource(
     case 'USER_INPUT':
       return 'Source: your input';
     case 'PREPARED_QUOTE':
-      return 'Source: current reference';
+      return 'Source: current planning context';
     case 'PREPARED_PLAN':
       return 'Source: prepared plan';
     default:
@@ -65,7 +65,7 @@ function formatStateText(state: RiskToolVM['summary']['state']): string {
 function formatStatusText(state: RiskToolVM['summary']['state']): string {
   switch (state) {
     case 'READY':
-      return 'Position size is based on the current entry, stop, and risk basis in this summary.';
+      return 'Position size is calculated from the entry price, stop-loss price, and selected risk basis in this summary.';
     case 'INCOMPLETE':
       return 'Add or adjust the missing price or risk inputs to complete this summary.';
     default:
@@ -85,21 +85,21 @@ export function createRiskToolScreenViewData(
     statusText: formatStatusText(riskTool.summary.state),
     boundaryText:
       'Risk framing stays support-only. It does not create an order or imply execution readiness.',
-    symbolText: `Reference symbol: ${riskTool.summary.symbol ?? 'Not set'}`,
+    symbolText: `Asset symbol: ${riskTool.summary.symbol ?? 'Not set'}`,
     generatedAtText: riskTool.generatedAt ? `Prepared at ${riskTool.generatedAt}` : null,
     detailRows: [
       {
-        label: 'Entry reference',
+        label: 'Entry price',
         value: formatValue(riskTool.summary.entryPrice, 'Not set'),
         supportingText: formatReferenceSource(riskTool.summary.entryReference.source),
       },
       {
-        label: 'Stop reference',
+        label: 'Stop-loss price',
         value: formatValue(riskTool.summary.stopPrice, 'Not set'),
         supportingText: formatReferenceSource(riskTool.summary.stopReference.source),
       },
       {
-        label: 'Target reference',
+        label: 'Target price',
         value: formatValue(riskTool.summary.targetPrice, 'Not set'),
         supportingText: formatReferenceSource(riskTool.summary.targetReference.source),
       },

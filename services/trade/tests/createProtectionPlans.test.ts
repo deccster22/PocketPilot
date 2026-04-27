@@ -115,7 +115,7 @@ describe('createProtectionPlans', () => {
     ]);
   });
 
-  it('uses explicit service-owned prepared references when the grouped plan context expresses one clear value', () => {
+  it('uses explicit service-owned prepared planning levels when the grouped plan context expresses one clear value', () => {
     const momentumEvent = createEvent({
       eventId: 'acct-1:momentum_basics:momentum:BTC:120',
       timestamp: 120,
@@ -161,23 +161,23 @@ describe('createProtectionPlans', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '95',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
         {
           kind: 'TARGET',
-          label: 'Prepared target reference',
+          label: 'Prepared target level',
           value: '108',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
       ],
     });
   });
 
-  it('publishes strategy-owned baseline stop and target references only when the grouped context grounds them', () => {
+  it('publishes strategy-owned baseline stop and target levels only when the grouped context grounds them', () => {
     const momentumEvent = createEvent({
       eventId: 'acct-1:momentum_basics:momentum:BTC:121',
       timestamp: 121,
@@ -230,11 +230,11 @@ describe('createProtectionPlans', () => {
       references: [
         {
           kind: 'TARGET',
-          label: 'Prepared target reference',
+          label: 'Prepared target level',
           value: '100',
           sourceLabel: 'Source: supported strategy context',
           limitations: [
-            'Planning context only; this is not an order instruction.',
+            'Optional planning context from the selected plan. Your own values remain authoritative.',
             'Derived from supported strategy context and omitted when context is thin.',
           ],
         },
@@ -250,11 +250,11 @@ describe('createProtectionPlans', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '100',
           sourceLabel: 'Source: supported strategy context',
           limitations: [
-            'Planning context only; this is not an order instruction.',
+            'Optional planning context from the selected plan. Your own values remain authoritative.',
             'Derived from supported strategy context and omitted when context is thin.',
           ],
         },
@@ -333,7 +333,7 @@ describe('createProtectionPlans', () => {
     });
   });
 
-  it('leaves ambiguous prepared stop and target references unset instead of guessing', () => {
+  it('leaves ambiguous prepared stop and target levels unset instead of guessing', () => {
     const firstEvent = createEvent({
       eventId: 'acct-1:momentum_basics:momentum:BTC:610',
       timestamp: 610,

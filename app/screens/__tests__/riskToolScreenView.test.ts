@@ -34,24 +34,24 @@ describe('createRiskToolScreenViewData', () => {
     expect(view).toEqual({
       stateText: 'Risk framing ready',
       statusText:
-        'Position size is based on the current entry, stop, and risk basis in this summary.',
+        'Position size is calculated from the entry price, stop-loss price, and selected risk basis in this summary.',
       boundaryText:
         'Risk framing stays support-only. It does not create an order or imply execution readiness.',
-      symbolText: 'Reference symbol: BTC',
+      symbolText: 'Asset symbol: BTC',
       generatedAtText: 'Prepared at 2026-04-05T00:00:00.000Z',
       detailRows: [
         {
-          label: 'Entry reference',
+          label: 'Entry price',
           value: '100',
-          supportingText: 'Source: current reference',
+          supportingText: 'Source: current planning context',
         },
         {
-          label: 'Stop reference',
+          label: 'Stop-loss price',
           value: '95',
           supportingText: 'Source: your input',
         },
         {
-          label: 'Target reference',
+          label: 'Target price',
           value: '108',
           supportingText: 'Source: prepared plan',
         },
@@ -110,21 +110,21 @@ describe('createRiskToolScreenViewData', () => {
         riskPercent: null,
         positionSize: null,
         rewardRiskRatio: null,
-        notes: ['Add a stop reference when you want sizing support.'],
+        notes: ['Add a stop-loss price when you want sizing support.'],
       },
     });
 
     expect(view?.detailRows.slice(0, 3)).toEqual([
       {
-        label: 'Entry reference',
+        label: 'Entry price',
         value: 'Not set',
       },
       {
-        label: 'Stop reference',
+        label: 'Stop-loss price',
         value: 'Not set',
       },
       {
-        label: 'Target reference',
+        label: 'Target price',
         value: 'Not set',
       },
     ]);

@@ -68,6 +68,7 @@ Start with:
 - The Trade Hub risk lane stays grouped as one prepared service-owned contract, so selected basis, preferred basis, sizing, guidance, guardrail preferences, and guardrail evaluation travel together without app-owned recomposition.
 - Prepared stop/target references now also travel through one explicit service-owned availability seam; thin or unsupported context must remain unavailable rather than invented.
 - Prepared stop/target source labels, limitation notes, and unavailable-reason wording now also come from one canonical service-owned copy seam; downstream services and `app/` consume prepared output without local reinterpretation.
+- Trade Hub now renders prepared stop/target reference availability in one compact subordinate preview block, using service-owned copy and keeping unavailable states quiet and non-blocking.
 - Prepared risk-input guidance stays service-owned, calm, and non-enforcing when sizing context is thin or unsupported.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - PX-MA4 normalized the selected-account surface shape so Snapshot, Dashboard, Trade Hub, and related support seams reuse one prepared account-context helper instead of rebuilding local branching.

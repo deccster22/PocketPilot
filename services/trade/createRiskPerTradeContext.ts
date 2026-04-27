@@ -131,7 +131,7 @@ function createAccountPercentContext(params: {
     basis: params.selectedBasis,
     headline: 'Account % risk frame',
     summary:
-      'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+      'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
     items: [
       {
         label: 'Risk per trade',
@@ -166,7 +166,7 @@ function createFixedCurrencyContext(params: {
     basis: params.selectedBasis,
     headline: 'Fixed-currency risk frame',
     summary:
-      'Shows the capped loss from this prepared plan as a fixed currency amount using prepared references only.',
+      'Shows the capped loss from this prepared plan as a fixed currency amount using prepared planning levels only.',
     items: [
       {
         label: 'Risk per trade',
@@ -201,7 +201,7 @@ function createPositionPercentContext(params: {
     basis: params.selectedBasis,
     headline: 'Position % risk frame',
     summary:
-      'Shows the capped loss from this prepared plan as a share of the capped position value using prepared references only.',
+      'Shows the capped loss from this prepared plan as a share of the capped position value using prepared planning levels only.',
     items: [
       {
         label: 'Risk per trade',

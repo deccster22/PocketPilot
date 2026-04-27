@@ -39,7 +39,7 @@ describe('selectRiskReferences', () => {
     });
   });
 
-  it('labels a prepared quote entry reference honestly when user input is absent', () => {
+  it('labels a prepared quote entry level honestly when user input is absent', () => {
     const result = selectRiskReferences({
       input: {
         accountSize: null,
@@ -62,7 +62,7 @@ describe('selectRiskReferences', () => {
     });
   });
 
-  it('does not invent stop or target references when no honest prepared plan values exist', () => {
+  it('does not invent stop or target levels when no honest prepared plan values exist', () => {
     const result = selectRiskReferences({
       input: {
         accountSize: null,
@@ -94,7 +94,7 @@ describe('selectRiskReferences', () => {
     });
   });
 
-  it('can leave prepared references disabled even when quote context is available', () => {
+  it('can leave prepared planning levels disabled even when quote context is available', () => {
     const result = selectRiskReferences({
       input: {
         accountSize: null,

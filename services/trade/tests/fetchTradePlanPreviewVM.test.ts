@@ -255,7 +255,7 @@ describe('fetchTradePlanPreviewVM', () => {
           title: 'Prepared risk context incomplete',
           summary:
             'PocketPilot can finish sizing and max-loss framing once the selected plan carries the missing context.',
-          items: ['Prepared entry and stop references', 'Prepared position cap'],
+          items: ['Prepared entry and stop-loss prices', 'Prepared position cap'],
         },
       },
     });
@@ -409,17 +409,17 @@ describe('fetchTradePlanPreviewVM', () => {
       references: [
         {
           kind: 'STOP',
-          label: 'Prepared stop reference',
+          label: 'Prepared stop-loss level',
           value: '95',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
         {
           kind: 'TARGET',
-          label: 'Prepared target reference',
+          label: 'Prepared target level',
           value: '112',
           sourceLabel: 'Source: prepared plan context',
-          limitations: ['Planning context only; this is not an order instruction.'],
+          limitations: ['Optional planning context from the selected plan. Your own values remain authoritative.'],
         },
       ],
     });
@@ -429,7 +429,7 @@ describe('fetchTradePlanPreviewVM', () => {
       basis: 'POSITION_PERCENT',
       headline: 'Position % risk frame',
       summary:
-        'Shows the capped loss from this prepared plan as a share of the capped position value using prepared references only.',
+        'Shows the capped loss from this prepared plan as a share of the capped position value using prepared planning levels only.',
       items: [
         {
           label: 'Risk per trade',

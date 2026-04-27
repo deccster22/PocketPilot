@@ -57,7 +57,7 @@ function createRiskLane(overrides: Partial<PreparedTradeRiskLane> = {}): Prepare
       basis: 'ACCOUNT_PERCENT',
       headline: 'Account % risk frame',
       summary:
-        'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+        'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
       items: [
         {
           label: 'Risk per trade',
@@ -173,7 +173,7 @@ describe('createGuardrailEvaluation', () => {
           basis: 'ACCOUNT_PERCENT',
           headline: 'Account % risk frame',
           summary:
-            'Shows the capped loss from this prepared plan as a share of current account value using prepared references only.',
+            'Shows the capped loss from this prepared plan as a share of current account value using prepared planning levels only.',
           items: [
             {
               label: 'Risk per trade',

@@ -253,6 +253,12 @@ export function describePreparedTradeReferencesUnavailableReason(
   return createPreparedReferenceUnavailableCopy(reason);
 }
 
+export function shouldRenderPreparedTradeReferencesUnavailableReason(
+  reason: PreparedTradeReferencesUnavailable['reason'],
+): boolean {
+  return reason === 'THIN_CONTEXT';
+}
+
 export function normalisePreparedTradeReferencesAvailability(
   availability: PreparedTradeReferencesAvailability | null | undefined,
 ): PreparedTradeReferencesAvailability {

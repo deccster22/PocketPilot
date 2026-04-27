@@ -70,6 +70,7 @@ Produces canonical plan options.
 Produces one explicit prepared stop/target availability contract for selected-plan context.
 It remains service-owned, deterministic, support-first, and returns unavailable when context is thin.
 It also owns canonical copy shaping for prepared reference labels, source labels, limitation notes, and unavailable-reason wording so downstream consumers do not duplicate phrasing logic.
+Trade Hub preview consumers should render that prepared output in one compact subordinate block and keep unavailable output quiet unless the service-owned reason says a calm explanation is useful.
 
 ### Risk basis selector
 Determines which explicit risk bases are supported on the surface and preserves user-selected basis state without silent fallback in the app layer.
@@ -114,6 +115,7 @@ Ensures required confirmation steps remain intact.
 - prepared risk-context recomputation tests
 - prepared stop/target availability tests
 - prepared stop/target copy-normalization tests (source labels, limitation notes, unavailable wording)
+- prepared stop/target preview placement tests (compact, subordinate, and non-blocking)
 - prepared sizing-output availability tests
 - guardrail-preference explicitness tests
 - guardrail-evaluation explicitness tests

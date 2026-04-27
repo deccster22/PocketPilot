@@ -45,14 +45,14 @@ function buildContextItems(params: {
   const hasStopPrice = isPositiveFiniteNumber(stopPrice);
 
   if (!hasEntryPrice && !hasStopPrice) {
-    pushUnique(items, 'Prepared entry and stop references');
+    pushUnique(items, 'Prepared entry and stop-loss prices');
   } else {
     if (!hasEntryPrice) {
-      pushUnique(items, 'Prepared entry reference');
+      pushUnique(items, 'Prepared entry price');
     }
 
     if (!hasStopPrice || (hasEntryPrice && hasStopPrice && entryPrice === stopPrice)) {
-      pushUnique(items, 'Prepared stop reference');
+      pushUnique(items, 'Prepared stop-loss price');
     }
   }
 
