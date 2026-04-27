@@ -43,7 +43,7 @@ describe('createTradeExecutionPreviewViewData', () => {
       }),
     ).toEqual({
       planId: 'plan-btc',
-      adapterText: 'Prepared adapter adapter-preview-bracket',
+      adapterText: 'Adapter status: adapter-preview-bracket',
       pathText: 'BRACKET path | Bracket payload placeholder',
       payloadText: 'BRACKET payload placeholder only | 1 order preview',
       fieldsText: 'Fields: symbol, entryOrderType, stopLossPrice, takeProfitPrice',

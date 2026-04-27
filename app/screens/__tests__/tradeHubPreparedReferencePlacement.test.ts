@@ -22,6 +22,17 @@ describe('trade hub prepared reference placement', () => {
     expect(screenSource).toMatch(/styles\.subordinateReferenceBlock/);
     expect(screenSource).not.toMatch(/<Text style=\{styles\.sectionTitle\}>Prepared planning levels<\/Text>/);
     expect(preparedReferenceRenderBlock).not.toMatch(/badge|warning|alert|blocker/i);
+    expect(screenSource).toMatch(/Planning view for \{screenView\?\.profileLabel \?\? profile\}/);
+    expect(screenSource).toMatch(/Prepared sizing summary/);
+    expect(screenSource).toMatch(/Submission readiness check/);
+    expect(screenSource).toMatch(/Non-submitting safety check/);
+    expect(screenSource).toMatch(/Simulated adapter check/);
+    expect(screenSource).toMatch(/This screen does not place trades\./);
+    expect(screenSource).not.toMatch(/Service-owned sizing summary/);
+    expect(screenSource).not.toMatch(/Service-owned submission gate/);
+    expect(screenSource).not.toMatch(/Prepared non-dispatching seam/);
+    expect(screenSource).not.toMatch(/Simulated-only adapter seam/);
+    expect(screenSource).not.toMatch(/Prepared surface for/);
     expect(screenSource).toMatch(/Use price levels to estimate position size and risk\./);
     expect(screenSource).toMatch(/These are planning inputs only\./);
     expect(screenSource).toMatch(/They do not place an order\./);

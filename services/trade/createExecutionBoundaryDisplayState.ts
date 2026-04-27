@@ -13,7 +13,7 @@ export function createExecutionPreviewDisplayState(preview: ExecutionPreviewVM):
   executableText: string;
 } {
   return {
-    adapterText: `Prepared adapter ${preview.adapterCapability?.adapterId ?? 'unavailable'}`,
+    adapterText: `Adapter status: ${preview.adapterCapability?.adapterId ?? 'unavailable'}`,
     pathText: `${preview.pathPreview?.confirmationPathType ?? 'UNAVAILABLE'} path | ${
       preview.pathPreview?.label ?? 'Execution path unavailable'
     }`,
@@ -38,8 +38,8 @@ export function createExecutionReadinessDisplayState(readiness: ExecutionReadine
 } {
   return {
     eligibilityText: readiness.eligible
-      ? 'Submission is eligible in the prepared readiness gate.'
-      : 'Submission is not eligible in the prepared readiness gate.',
+      ? 'Submission requirements are currently met.'
+      : 'Submission requirements are not yet met.',
     blockerCountText: `${readiness.blockers.length} blocker${
       readiness.blockers.length === 1 ? '' : 's'
     }`,
@@ -51,11 +51,11 @@ export function createExecutionReadinessDisplayState(readiness: ExecutionReadine
         ? 'Required acknowledgement is still pending.'
         : 'Required acknowledgement is complete.',
       readiness.summary.hasUnavailablePath
-        ? 'Prepared execution path is unavailable.'
-        : 'Prepared execution path is available.',
+        ? 'Prepared handoff path is unavailable.'
+        : 'Prepared handoff path is available.',
       readiness.summary.hasCapabilityMismatch
-        ? 'Prepared adapter capability does not match the selected path.'
-        : 'Prepared adapter capability matches the selected path.',
+        ? 'Adapter capability does not match the selected handoff path.'
+        : 'Adapter capability matches the selected handoff path.',
     ],
     blockers: readiness.blockers.map((blocker) => `${blocker.code}: ${blocker.message}`),
     warnings: readiness.warnings.map((warning) => `${warning.code}: ${warning.message}`),
@@ -73,9 +73,9 @@ export function createSubmissionIntentDisplayState(submissionIntent: SubmissionI
 } {
   if (submissionIntent.status === 'BLOCKED') {
     return {
-      statusText: 'Submission intent is blocked at the non-dispatch boundary.',
+      statusText: 'Submission check is blocked at the non-dispatch boundary.',
       detailText:
-        'Blocked until readiness requirements are complete; no simulated adapter handoff is prepared.',
+        'Readiness requirements are still incomplete; no simulated handoff is prepared yet.',
       warningCountText: `${submissionIntent.warnings.length} warning${
         submissionIntent.warnings.length === 1 ? '' : 's'
       }`,
@@ -85,14 +85,14 @@ export function createSubmissionIntentDisplayState(submissionIntent: SubmissionI
       warnings: submissionIntent.warnings.map(
         (warning) => `${warning.code}: ${warning.message}`,
       ),
-      placeholderText: 'No placeholder submission contract is prepared while blockers remain.',
+      placeholderText: 'No placeholder submission details are prepared while blockers remain.',
       payloadSummary: [],
     };
   }
 
   return {
-    statusText: 'Submission intent is ready for simulated adapter handoff.',
-    detailText: `${submissionIntent.adapterType} path prepared for plan ${
+    statusText: 'Submission check is ready for simulated handoff.',
+    detailText: `${submissionIntent.adapterType} handoff prepared for plan ${
       submissionIntent.planId
     }; dispatch remains unavailable.`,
     warningCountText: `${submissionIntent.warnings.length} warning${
@@ -123,22 +123,22 @@ export function createExecutionAdapterDisplayState(adapterAttempt: ExecutionAdap
 } {
   if (adapterAttempt.status === 'BLOCKED') {
     return {
-      statusText: 'Execution adapter remains blocked by submission intent.',
+      statusText: 'Execution handoff check remains blocked by submission status.',
       detailText:
-        'Blocked submission intent passes through unchanged; no simulated adapter response is prepared.',
+        'Blocked submission status passes through unchanged; no simulated handoff response is prepared.',
       warningsText: `${adapterAttempt.warnings.length} warning${
         adapterAttempt.warnings.length === 1 ? '' : 's'
       }`,
       blockers: adapterAttempt.blockers.map((blocker) => `${blocker.code}: ${blocker.message}`),
       warnings: adapterAttempt.warnings.map((warning) => `${warning.code}: ${warning.message}`),
-      orderSummaryText: 'No simulated adapter response is prepared while blockers remain.',
+      orderSummaryText: 'No simulated handoff response is prepared while blockers remain.',
       simulatedOrderIdsText: 'None',
     };
   }
 
   return {
-    statusText: 'Simulated adapter response prepared.',
-    detailText: `${adapterAttempt.adapterType} path produced a simulated adapter record with dispatchEnabled=${adapterAttempt.dispatchEnabled}.`,
+    statusText: 'Simulated handoff response prepared.',
+    detailText: `${adapterAttempt.adapterType} path produced a simulated handoff record with dispatchEnabled=${adapterAttempt.dispatchEnabled}.`,
     warningsText: `${adapterAttempt.warnings.length} warning${
       adapterAttempt.warnings.length === 1 ? '' : 's'
     }`,

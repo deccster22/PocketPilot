@@ -32,6 +32,8 @@ Trade Hub is the action layer. It exists to reduce friction **when the user has 
 - prepared stop/target rendering must stay compact and subordinate inside existing Trade Hub planning support sections
 - unavailable prepared-reference states must stay quiet and non-blocking; render calm copy only when the service-owned policy says it is useful
 - user-facing Trade Hub/Risk Tool copy should prefer plain-language price terminology (`Entry price`, `Stop-loss price`, `Target price`, `Asset symbol`) and prepared-planning terminology (`Prepared planning levels`, `Prepared stop-loss level`, `Prepared target level`) even if internal contracts retain `reference` naming
+- user-facing Trade Hub execution/risk section labels should avoid raw seam jargon (`service-owned`, `seam`) and prefer product wording (`planning view`, `sizing summary`, `readiness check`, `submission check`, `execution handoff`) while keeping the same boundary meaning
+- one explicit non-dispatch line should remain visible in Trade Hub copy (for example, `This screen does not place trades.`)
 - bounded explanatory content
 - strategy / risk / regime layers must not collapse into a silent override engine
 
