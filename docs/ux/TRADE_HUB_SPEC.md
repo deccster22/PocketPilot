@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P7-K8 + P7-K9 + P7-K10)
+# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P5-R16 + P7-K8 + P7-K9 + P7-K10)
 
 ## Purpose
 
@@ -238,6 +238,10 @@ P5-R15 terminology alignment keeps internal service/type naming stable (`*Refere
 - `Prepared stop-loss level` and `Prepared target level`
 - `Optional planning context from the selected plan. Your own values remain authoritative.`
 - `Your own values override prepared planning levels`
+P5-R16 keeps the same semantics and extends plain-language copy cleanup to Trade Hub section labels and execution-boundary status wording:
+- avoid user-facing seam jargon such as `service-owned` and `seam` in section labels
+- prefer labels like `Planning view`, `Prepared sizing summary`, `Submission readiness check`, `Submission check`, and `Execution handoff`
+- keep one explicit non-dispatch boundary line visible on-screen (for example, `This screen does not place trades.`)
 Explicit user values still win, prepared plan references outrank prepared quote help for the same field, and quote help still does not invent exits.
 
 `ExecutionCapabilityResolution` is:
@@ -485,7 +489,7 @@ The submission-intent contract shape is:
 }
 ```
 
-Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, trusts canonical capability instead of inferring adapter type from payload shape, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching. User-facing wording should describe `READY` here as readiness for simulated adapter handoff, not readiness to place a trade.
+Submission intent is the final service-owned seam before any future execution adapter. It consumes the prepared `ConfirmationSession`, `ExecutionPreviewVM`, and `ExecutionReadiness`, trusts readiness instead of recomputing it, trusts canonical capability instead of inferring adapter type from payload shape, and shapes a placeholder-only contract for later adapter work. It remains explicitly non-dispatching. User-facing wording should describe `READY` here as readiness for simulated handoff, not readiness to place a trade.
 
 Trade Hub execution-adapter consumers also consume a prepared `ExecutionAdapterAttemptResult` from `services/trade/`.
 
@@ -529,7 +533,7 @@ The execution-adapter contract shape is:
 }
 ```
 
-The execution-adapter seam sits after submission intent, consumes only submission intent, and returns a deterministic simulated response contract. It does not re-fetch readiness, rebuild submission intent, inspect confirmation internals, or dispatch orders. User-facing wording should describe `SIMULATED` here as a simulated adapter response, not as an accepted or filled live order.
+The execution-adapter seam sits after submission intent, consumes only submission intent, and returns a deterministic simulated response contract. It does not re-fetch readiness, rebuild submission intent, inspect confirmation internals, or dispatch orders. User-facing wording should describe `SIMULATED` here as a simulated handoff response, not as an accepted or filled live order.
 
 P5-7 moves raw flow-state ownership out of `app/` and adds a small service-owned confirmation-session action API:
 
@@ -608,11 +612,12 @@ The screen may render prepared execution-adapter attempt status, summaries, and 
 
 P5-X also requires the following execution-boundary wording rules:
 
-- use calm, explicit labels such as "Execution path unavailable", "Submission intent is blocked", and "Simulated adapter response prepared"
+- use calm, explicit labels such as "Execution path unavailable", "Submission check is blocked", and "Simulated handoff response prepared"
 - do not imply urgency, pressure, or one-click action
 - do not describe blocked or unavailable states like system failures unless that is actually the seam truth
 - do not present simulated states as confirmed execution outcomes
 - keep confirmation wording clearly upstream of dispatch
+- keep one plain-language no-trade boundary line visible on the surface (for example, "This screen does not place trades.")
 
 ## Trade Hub Guarded Stop Note (P6-A2)
 Trade Hub now has one optional message-policy note only:

@@ -16,6 +16,7 @@ Defines the runtime architecture that powers Trade Hub as a prepared, confirmati
 
 ## 1. System role
 Trade Hub consumes prepared action objects and renders execution-safe paths without embedding hidden decision logic in the UI.
+User-facing copy should stay plain-language while preserving service-owned execution/risk semantics.
 
 ## 2. Core rule
 Prepared plan in, bounded action path out.
@@ -57,6 +58,7 @@ The view renders the selected prepared path only.
 - no hidden UI-side risk-basis switching
 - no hidden UI-side guardrail persistence
 - no hidden UI-side guardrail evaluation
+- no UI-side reinterpretation of readiness, submission, or adapter semantics
 - no implicit urgency escalators
 - no plan-creation logic in presentation code
 - no UI-side risk math
@@ -106,6 +108,9 @@ Builds `TradeHubModel` from prepared plan and capability context.
 
 ### Confirmation layer
 Ensures required confirmation steps remain intact.
+
+### Execution-boundary display-state shaper
+Shapes readiness/submission/adapter status text in service-owned helpers so visible labels stay calm, plain-language, and non-dispatching without moving semantic ownership into `app/`.
 
 ## 8. Testing expectations
 - plan contract tests

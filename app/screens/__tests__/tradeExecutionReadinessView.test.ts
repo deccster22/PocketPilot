@@ -28,13 +28,13 @@ describe('createTradeExecutionReadinessViewData', () => {
         },
       }),
     ).toEqual({
-      eligibilityText: 'Submission is not eligible in the prepared readiness gate.',
+      eligibilityText: 'Submission requirements are not yet met.',
       blockerCountText: '1 blocker',
       warningCountText: '1 warning',
       summaryText: [
         'Required acknowledgement is still pending.',
-        'Prepared execution path is available.',
-        'Prepared adapter capability matches the selected path.',
+        'Prepared handoff path is available.',
+        'Adapter capability matches the selected handoff path.',
       ],
       blockers: [
         'NOT_ACKNOWLEDGED: Complete every required acknowledgement before submission can become eligible.',
@@ -63,6 +63,6 @@ describe('createTradeExecutionReadinessViewData', () => {
 
     expect(source).toMatch(/createExecutionReadinessDisplayState/);
     expect(source).not.toMatch(/Required acknowledgement is still pending/);
-    expect(source).not.toMatch(/Submission is not eligible in the prepared readiness gate/);
+    expect(source).not.toMatch(/Submission requirements are not yet met/);
   });
 });

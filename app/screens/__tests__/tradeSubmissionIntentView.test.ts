@@ -23,9 +23,9 @@ describe('createTradeSubmissionIntentViewData', () => {
         ],
       }),
     ).toEqual({
-      statusText: 'Submission intent is blocked at the non-dispatch boundary.',
+      statusText: 'Submission check is blocked at the non-dispatch boundary.',
       detailText:
-        'Blocked until readiness requirements are complete; no simulated adapter handoff is prepared.',
+        'Readiness requirements are still incomplete; no simulated handoff is prepared yet.',
       warningCountText: '1 warning',
       blockers: [
         'NOT_ACKNOWLEDGED: Complete every required acknowledgement before submission can become eligible.',
@@ -33,7 +33,7 @@ describe('createTradeSubmissionIntentViewData', () => {
       warnings: [
         'LOW_CERTAINTY: This plan is prepared with low certainty and should be reviewed carefully.',
       ],
-      placeholderText: 'No placeholder submission contract is prepared while blockers remain.',
+      placeholderText: 'No placeholder submission details are prepared while blockers remain.',
       payloadSummary: [],
     });
   });
@@ -59,8 +59,8 @@ describe('createTradeSubmissionIntentViewData', () => {
         warnings: [],
       }),
     ).toEqual({
-      statusText: 'Submission intent is ready for simulated adapter handoff.',
-      detailText: 'BRACKET path prepared for plan plan-btc; dispatch remains unavailable.',
+      statusText: 'Submission check is ready for simulated handoff.',
+      detailText: 'BRACKET handoff prepared for plan plan-btc; dispatch remains unavailable.',
       warningCountText: '0 warnings',
       blockers: [],
       warnings: [],
@@ -110,7 +110,9 @@ describe('createTradeSubmissionIntentViewData', () => {
     });
 
     expect(`${blocked.statusText} ${blocked.detailText}`).toContain('blocked');
-    expect(`${ready.statusText} ${ready.detailText}`).toContain('simulated adapter handoff');
-    expect(JSON.stringify({ blocked, ready })).not.toMatch(/place order|submit order|buy now/i);
+    expect(`${ready.statusText} ${ready.detailText}`).toContain('simulated handoff');
+    expect(JSON.stringify({ blocked, ready })).not.toMatch(
+      /place order|submit order|buy now|error|failure|failed/i,
+    );
   });
 });

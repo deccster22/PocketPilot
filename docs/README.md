@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-26
+Last Updated: 2026-04-27
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-26
+**Last updated:** 2026-04-27
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -69,6 +69,7 @@ Start with:
 - Prepared stop/target references now also travel through one explicit service-owned availability seam; thin or unsupported context must remain unavailable rather than invented.
 - Prepared stop/target source labels, limitation notes, and unavailable-reason wording now also come from one canonical service-owned copy seam; downstream services and `app/` consume prepared output without local reinterpretation.
 - Trade Hub now renders prepared stop/target reference availability in one compact subordinate preview block, using service-owned copy and keeping unavailable states quiet and non-blocking.
+- Trade Hub user-facing section labels and execution-boundary status copy should stay plain-language (`planning view`, `readiness check`, `submission check`, `execution handoff`) while keeping the same service-owned non-dispatching semantics.
 - Prepared risk-input guidance stays service-owned, calm, and non-enforcing when sizing context is thin or unsupported.
 - Explicit account control. Account switching is user-initiated and primary fallback remains service-owned.
 - PX-MA4 normalized the selected-account surface shape so Snapshot, Dashboard, Trade Hub, and related support seams reuse one prepared account-context helper instead of rebuilding local branching.

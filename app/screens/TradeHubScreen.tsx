@@ -679,6 +679,7 @@ export function TradeHubScreen() {
           <Text style={styles.supportText}>
             {screenView?.confirmationText ?? 'Trade actions remain read-only in this phase.'}
           </Text>
+          <Text style={styles.supportText}>This screen does not place trades.</Text>
         </View>
         {screenView?.message.visible ? (
           <View style={styles.noteCard}>
@@ -698,9 +699,7 @@ export function TradeHubScreen() {
         ) : null}
 
         <View style={styles.section}>
-          <Text style={styles.label}>
-            Prepared surface for {screenView?.profileLabel ?? profile}
-          </Text>
+          <Text style={styles.label}>Planning view for {screenView?.profileLabel ?? profile}</Text>
           {screenView?.primaryPlan ? (
             <TradeHubPlanCard
               title="Primary Plan"
@@ -984,7 +983,7 @@ export function TradeHubScreen() {
           </View>
           {riskToolView ? (
             <View style={styles.card}>
-              <Text style={styles.cardEyebrow}>Service-owned sizing summary</Text>
+              <Text style={styles.cardEyebrow}>Prepared sizing summary</Text>
               <Text style={styles.cardTitle}>{riskToolView.stateText}</Text>
               <Text style={styles.cardMeta}>{riskToolView.statusText}</Text>
               <Text style={styles.cardMeta}>{riskToolView.symbolText}</Text>
@@ -1096,7 +1095,7 @@ export function TradeHubScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Execution Preview</Text>
+          <Text style={styles.sectionTitle}>Execution preview</Text>
           {executionPreviewView ? (
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Non-executing payload boundary</Text>
@@ -1113,10 +1112,10 @@ export function TradeHubScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Execution Readiness</Text>
+          <Text style={styles.sectionTitle}>Submission readiness</Text>
           {executionReadinessView ? (
             <View style={styles.card}>
-              <Text style={styles.cardEyebrow}>Service-owned submission gate</Text>
+              <Text style={styles.cardEyebrow}>Submission readiness check</Text>
               <Text style={styles.cardTitle}>{executionReadinessView.eligibilityText}</Text>
               <Text style={styles.cardMeta}>{executionReadinessView.blockerCountText}</Text>
               <Text style={styles.cardMeta}>{executionReadinessView.warningCountText}</Text>
@@ -1144,10 +1143,10 @@ export function TradeHubScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Submission Intent</Text>
+          <Text style={styles.sectionTitle}>Submission check</Text>
           {submissionIntentView ? (
             <View style={styles.card}>
-              <Text style={styles.cardEyebrow}>Prepared non-dispatching seam</Text>
+              <Text style={styles.cardEyebrow}>Non-submitting safety check</Text>
               <Text style={styles.cardTitle}>{submissionIntentView.statusText}</Text>
               <Text style={styles.cardMeta}>{submissionIntentView.detailText}</Text>
               <Text style={styles.cardMeta}>{submissionIntentView.warningCountText}</Text>
@@ -1177,10 +1176,10 @@ export function TradeHubScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Execution Adapter</Text>
+          <Text style={styles.sectionTitle}>Execution handoff</Text>
           {executionAdapterView ? (
             <View style={styles.card}>
-              <Text style={styles.cardEyebrow}>Simulated-only adapter seam</Text>
+              <Text style={styles.cardEyebrow}>Simulated adapter check</Text>
               <Text style={styles.cardTitle}>{executionAdapterView.statusText}</Text>
               <Text style={styles.cardMeta}>{executionAdapterView.detailText}</Text>
               <Text style={styles.cardMeta}>{executionAdapterView.warningsText}</Text>
@@ -1203,7 +1202,7 @@ export function TradeHubScreen() {
             </View>
           ) : (
             <Text style={styles.emptyState}>
-              No execution adapter response is prepared right now.
+              No execution handoff status is prepared right now.
             </Text>
           )}
         </View>

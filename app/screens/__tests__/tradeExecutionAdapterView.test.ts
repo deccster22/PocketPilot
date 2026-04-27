@@ -23,9 +23,9 @@ describe('createTradeExecutionAdapterViewData', () => {
         ],
       }),
     ).toEqual({
-      statusText: 'Execution adapter remains blocked by submission intent.',
+      statusText: 'Execution handoff check remains blocked by submission status.',
       detailText:
-        'Blocked submission intent passes through unchanged; no simulated adapter response is prepared.',
+        'Blocked submission status passes through unchanged; no simulated handoff response is prepared.',
       warningsText: '1 warning',
       blockers: [
         'NOT_ACKNOWLEDGED: Complete every required acknowledgement before submission can become eligible.',
@@ -33,7 +33,7 @@ describe('createTradeExecutionAdapterViewData', () => {
       warnings: [
         'LOW_CERTAINTY: This plan is prepared with low certainty and should be reviewed carefully.',
       ],
-      orderSummaryText: 'No simulated adapter response is prepared while blockers remain.',
+      orderSummaryText: 'No simulated handoff response is prepared while blockers remain.',
       simulatedOrderIdsText: 'None',
     });
   });
@@ -57,8 +57,8 @@ describe('createTradeExecutionAdapterViewData', () => {
         warnings: [],
       }),
     ).toEqual({
-      statusText: 'Simulated adapter response prepared.',
-      detailText: 'BRACKET path produced a simulated adapter record with dispatchEnabled=false.',
+      statusText: 'Simulated handoff response prepared.',
+      detailText: 'BRACKET path produced a simulated handoff record with dispatchEnabled=false.',
       warningsText: '0 warnings',
       blockers: [],
       warnings: [],
@@ -95,8 +95,9 @@ describe('createTradeExecutionAdapterViewData', () => {
       warnings: [],
     });
 
-    expect(result.statusText).toContain('Simulated adapter response');
+    expect(result.statusText).toContain('Simulated handoff response');
     expect(result.detailText).toContain('dispatchEnabled=false');
     expect(result.detailText).not.toMatch(/accepted|filled|submitted/i);
+    expect(`${result.statusText} ${result.detailText}`).not.toMatch(/error|failure|failed/i);
   });
 });
