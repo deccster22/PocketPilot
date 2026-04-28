@@ -9,6 +9,27 @@ reviewStatus: Normalized draft v1
 
 # Candle Signals
 
+## What this means
+Using candlestick patterns to read behaviour.
+
+## When it shows up
+This strategy is most relevant in conditions like: rejection or hesitation.
+
+## What you're looking for
+Look for rejection or hesitation.
+
+## Why it can work
+Works as real-time signal.
+
+## What can go wrong
+Fails if used alone.
+
+## Common misunderstanding
+Relying on one candle.
+
+---
+
+## Deeper explanation
 ## Quick version
 
 ### Quick overview

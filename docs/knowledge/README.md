@@ -5,6 +5,7 @@ Controlled live knowledge tree for in-product learning content.
 ## Live families
 - `orientation`
 - `strategies`
+- `concepts`
 - `glossary`
 - `trade-hub`
 - `interpretation`
@@ -34,3 +35,5 @@ Controlled live knowledge tree for in-product learning content.
 `PX-KI1` imported the v1.4 knowledge payload into the live families above and retired overlapping legacy numbered shelves to avoid parallel live trees for the same concepts.
 
 `PX-KI4` imports Trade Hub risk-planning teaching topics, matching lightweight glossary terms, and supporting term-map material into the same active family-based tree without adding runtime wiring.
+
+`PX-KI5` merges v0.8 beginner-facing strategy and concept layers into canonical strategy/concept docs, preserves deeper strategy detail under progressive sections, and adds `concepts` as an active validated family.

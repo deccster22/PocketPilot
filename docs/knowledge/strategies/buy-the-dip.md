@@ -11,6 +11,27 @@ canonical_path: "/docs/knowledge/strategies/buy-the-dip.md"
 
 # Buy the Dip
 
+## What this means
+Buying after price drops, expecting it to recover.
+
+## When it shows up
+This strategy is most relevant in conditions like: pullbacks in an upward trend and signs the drop is slowing.
+
+## What you're looking for
+Look for pullbacks in an upward trend and signs the drop is slowing.
+
+## Why it can work
+Works because markets move in waves.
+
+## What can go wrong
+Can fail if the drop continues.
+
+## Common misunderstanding
+Assuming every dip is worth buying.
+
+---
+
+## Deeper explanation
 ## What this strategy is for
 Buy the Dip is for situations where a [dip](../glossary/dip.md) may be creating opportunity without the broader picture being broken beyond repair.
 

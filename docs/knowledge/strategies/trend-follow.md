@@ -11,6 +11,27 @@ canonical_path: "/docs/knowledge/strategies/trend-follow.md"
 
 # Trend Follow
 
+## What this means
+Trading in the direction price is moving.
+
+## When it shows up
+This strategy is most relevant in conditions like: consistent direction and pullbacks.
+
+## What you're looking for
+Look for consistent direction and pullbacks.
+
+## Why it can work
+Works because trends persist.
+
+## What can go wrong
+Fails if trend reverses.
+
+## Common misunderstanding
+Entering too late.
+
+---
+
+## Deeper explanation
 ## What this strategy is for
 Trend Follow is for situations where the market is already moving directionally and continuing to behave that way.
 

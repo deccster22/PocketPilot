@@ -11,6 +11,27 @@ canonical_path: "/docs/knowledge/strategies/range-trader.md"
 
 # Range Trader
 
+## What this means
+Buying low and selling high in a sideways range.
+
+## When it shows up
+This strategy is most relevant in conditions like: clear highs and lows.
+
+## What you're looking for
+Look for clear highs and lows.
+
+## Why it can work
+Works when price repeats behaviour.
+
+## What can go wrong
+Fails if price breaks out.
+
+## Common misunderstanding
+Assuming the range will hold.
+
+---
+
+## Deeper explanation
 ## What this strategy is for
 Range Trader is for markets moving inside a [range](../glossary/range.md) rather than trending strongly.
 

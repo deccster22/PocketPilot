@@ -9,6 +9,27 @@ reviewStatus: Normalized draft v1
 
 # Momentum Pulse
 
+## What this means
+Trading strong fast movement.
+
+## When it shows up
+This strategy is most relevant in conditions like: sharp moves and follow-through.
+
+## What you're looking for
+Look for sharp moves and follow-through.
+
+## Why it can work
+Works because momentum carries price.
+
+## What can go wrong
+Fails if move fades.
+
+## Common misunderstanding
+Chasing late.
+
+---
+
+## Deeper explanation
 ## Quick version
 
 ### Quick overview

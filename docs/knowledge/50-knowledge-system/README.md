@@ -16,3 +16,6 @@ Docs that explain how the Knowledge Library itself behaves: contextual links and
 
 ## Trade Hub continuity note
 `PX-KI4` adds a live `trade-hub/` concept family plus `docs/knowledge/_meta/GLOSSARY_TERM_MAP.md` support metadata so future inline term/help wiring can target one canonical term-to-topic map.
+
+## Strategy + concept continuity note
+`PX-KI5` adds a live `concepts/` family plus `docs/knowledge/_meta/CONCEPT_TO_STRATEGY_MAP.md` support metadata so progressive strategy/concept learning alignment can remain canonical before runtime linkage phases.

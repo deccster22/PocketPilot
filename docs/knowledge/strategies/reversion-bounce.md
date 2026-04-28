@@ -11,6 +11,27 @@ canonical_path: "/docs/knowledge/strategies/reversion-bounce.md"
 
 # Reversion Bounce
 
+## What this means
+Trading a move back after price stretches too far.
+
+## When it shows up
+This strategy is most relevant in conditions like: sharp moves and slowing.
+
+## What you're looking for
+Look for sharp moves and slowing.
+
+## Why it can work
+Works because price rarely moves in straight lines.
+
+## What can go wrong
+Fails if move continues.
+
+## Common misunderstanding
+Entering too early.
+
+---
+
+## Deeper explanation
 ## What this strategy is for
 Reversion Bounce is for situations where price has become stretched enough that a rebound becomes possible even if durable repair is not yet proven.
 
