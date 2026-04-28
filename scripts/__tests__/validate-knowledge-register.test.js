@@ -21,6 +21,11 @@ const BASE_ROWS = [
     canonicalPath: 'docs/knowledge/glossary/glossary-topic.md',
   },
   {
+    topicId: 'trade-hub-topic',
+    family: 'trade-hub',
+    canonicalPath: 'docs/knowledge/trade-hub/trade-hub-topic.md',
+  },
+  {
     topicId: 'interpretation-topic',
     family: 'interpretation',
     canonicalPath: 'docs/knowledge/interpretation/interpretation-topic.md',
@@ -121,8 +126,8 @@ describe('validateKnowledgeRegister', () => {
 
     expect(result.isValid).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.rowCount).toBe(6);
-    expect(result.uniqueTopicIdCount).toBe(6);
+    expect(result.rowCount).toBe(7);
+    expect(result.uniqueTopicIdCount).toBe(7);
   });
 
   test('fails when a canonical path is missing on disk', () => {
