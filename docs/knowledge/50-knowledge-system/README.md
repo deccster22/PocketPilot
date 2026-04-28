@@ -13,3 +13,6 @@ Docs that explain how the Knowledge Library itself behaves: contextual links and
 
 ## Register hygiene note
 `PX-KI3` adds deterministic register validation (`npm run validate:knowledge`) so catalog generation and contextual-link assumptions keep using live family paths instead of retired numbered shelves.
+
+## Trade Hub continuity note
+`PX-KI4` adds a live `trade-hub/` concept family plus `docs/knowledge/_meta/GLOSSARY_TERM_MAP.md` support metadata so future inline term/help wiring can target one canonical term-to-topic map.

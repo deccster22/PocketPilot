@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-27
+Last Updated: 2026-04-28
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-27
+**Last updated:** 2026-04-28
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -199,8 +199,9 @@ Key docs:
 - `knowledge/README.md`
 - `knowledge/_register/CONTENT_REGISTER.md`
 - `knowledge/_templates/KNOWLEDGE_NODE_TEMPLATE.md`
-- live topic docs under `orientation/`, `strategies/`, `glossary/`, `interpretation/`, `market-examples/`, `action-risk/`, and `evidence/`
-- supporting topic docs under `40-reflection/`, `50-knowledge-system/`, and `90-media/`
+- live topic docs under `orientation/`, `strategies/`, `glossary/`, `trade-hub/`, `interpretation/`, `market-examples/`, `action-risk/`, and `evidence/`
+- supporting topic docs under `40-reflection/`, `50-knowledge-system/`, `90-media/`, and `_meta/`
+- docs-only UI support drafts for future help wiring under `ui-support/`
 
 Current normalization rule:
 
@@ -208,6 +209,7 @@ Current normalization rule:
 - Overlapping numbered legacy shelves were retired to avoid duplicate live homes for the same concepts.
 - `PX-KI2` reconciles register/index taxonomy references to the same family-based layout and removes stale retired-shelf paths from active navigation docs.
 - `PX-KI3` adds deterministic register hygiene validation (`npm run validate:knowledge`) and keeps catalog family assumptions aligned through one shared tooling config.
+- `PX-KI4` imports Trade Hub risk-planning concepts plus aligned glossary/term-map support docs into the active family tree while keeping runtime/UI wiring out of scope.
 - `P7-K9` refines runtime inline glossary alias matching quality through one service-owned normalization seam without widening glossary rollout surfaces.
 - `P7-K10` adds internal aggregate exposure/acknowledgement hooks for glossary tuning while keeping runtime behavior calm, non-gating, and user-invisible.
 
