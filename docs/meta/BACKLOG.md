@@ -10,6 +10,7 @@ Recent landed work closed or narrowed multiple previously-open backlog threads:
 
 - `PX-KI1`, `PX-KI2`, `PX-KI3`, `PX-KI4`, `PX-KI5`
 - `P7-K8`, `P7-K9`, `P7-K10`
+- `P7-K11`
 - `P6-A7`, `P6-A8`, `P8-I12`
 - `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9`
 - `DOC-D1`
@@ -40,6 +41,7 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 ## Do Soon
 
 - `P7` follow-up (narrow): run one bounded relevance review from `P7-K10` aggregate surfaced/acknowledged signals to decide whether any additional glossary alias coverage is justified.
+- `P7` follow-up (narrow): implement `P7-K12` service-owned first-rollout Trade Hub term-help wiring from the `P7-K11` plan (`Stop-loss price`, `Target price`, active risk-basis label, and `Guardrails`) with no app-side matching.
 - `P9` follow-up (narrow): capture real edge-case misses in nearby-alternative/metadata handling from post-`P9-S9` usage and scope a deterministic service-only tuning rung.
 - docs/admin follow-up: perform another narrow narrative cleanup pass only after a new merge wave creates clear active-doc drift.
 

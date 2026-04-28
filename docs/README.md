@@ -86,6 +86,7 @@ Start with:
 - P7-K8 adds one service-owned inline glossary-help seam plus one service-owned seen-term acknowledgement seam; Dashboard explanation and Trade Hub safety copy may expose narrow beginner-first term links that still route into the same Knowledge Topic detail path.
 - P7-K9 adds one service-owned glossary alias/index normalization seam so canonical terms and approved variants resolve more reliably while preserving K8 scope and keeping app-side matching logic out of `app/`.
 - P7-K10 adds one service-owned inline glossary exposure/acknowledgement signal seam plus one aggregate summary seam for future tuning, kept invisible to users and without adding analytics UI or network telemetry.
+- P7-K11 adds one bounded Trade Hub term-to-knowledge integration plan so future inline help rollout stays service-owned, profile-aware, and protected from link-soup behavior.
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - P9-S8 adds one canonical service-owned strategy metadata registry so nearby-alternative selection and fit-contrast consume the same explicit metadata base instead of scattered strategy-label assumptions.
@@ -213,6 +214,7 @@ Current normalization rule:
 - `PX-KI5` merges progressive beginner layers into canonical strategy docs, adds canonical concept docs, and keeps richer strategy detail under deeper sections without runtime/UI wiring changes.
 - `P7-K9` refines runtime inline glossary alias matching quality through one service-owned normalization seam without widening glossary rollout surfaces.
 - `P7-K10` adds internal aggregate exposure/acknowledgement hooks for glossary tuning while keeping runtime behavior calm, non-gating, and user-invisible.
+- `P7-K11` adds a docs-side Trade Hub term-to-knowledge integration plan (`docs/knowledge/_meta/TRADE_HUB_HELP_INTEGRATION_PLAN.md`) that defines first-rollout scope, profile/surface treatment, and non-linking guardrails before runtime wiring.
 
 ### 8. Phases
 
