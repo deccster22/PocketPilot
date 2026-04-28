@@ -11,6 +11,27 @@ canonical_path: "/docs/knowledge/strategies/breakout-watcher.md"
 
 # Breakout Watcher
 
+## What this means
+Trading when price moves beyond a key level.
+
+## When it shows up
+This strategy is most relevant in conditions like: repeated tests and pressure.
+
+## What you're looking for
+Look for repeated tests and pressure.
+
+## Why it can work
+Works because breaks can trigger moves.
+
+## What can go wrong
+Fails if breakout fails.
+
+## Common misunderstanding
+Assuming all breakouts continue.
+
+---
+
+## Deeper explanation
 ## What this strategy is for
 Breakout Watcher is for markets pressing against meaningful boundaries where a [breakout](../glossary/breakout.md) may be starting.
 

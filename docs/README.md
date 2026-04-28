@@ -199,7 +199,7 @@ Key docs:
 - `knowledge/README.md`
 - `knowledge/_register/CONTENT_REGISTER.md`
 - `knowledge/_templates/KNOWLEDGE_NODE_TEMPLATE.md`
-- live topic docs under `orientation/`, `strategies/`, `glossary/`, `trade-hub/`, `interpretation/`, `market-examples/`, `action-risk/`, and `evidence/`
+- live topic docs under `orientation/`, `strategies/`, `concepts/`, `glossary/`, `trade-hub/`, `interpretation/`, `market-examples/`, `action-risk/`, and `evidence/`
 - supporting topic docs under `40-reflection/`, `50-knowledge-system/`, `90-media/`, and `_meta/`
 - docs-only UI support drafts for future help wiring under `ui-support/`
 
@@ -210,6 +210,7 @@ Current normalization rule:
 - `PX-KI2` reconciles register/index taxonomy references to the same family-based layout and removes stale retired-shelf paths from active navigation docs.
 - `PX-KI3` adds deterministic register hygiene validation (`npm run validate:knowledge`) and keeps catalog family assumptions aligned through one shared tooling config.
 - `PX-KI4` imports Trade Hub risk-planning concepts plus aligned glossary/term-map support docs into the active family tree while keeping runtime/UI wiring out of scope.
+- `PX-KI5` merges progressive beginner layers into canonical strategy docs, adds canonical concept docs, and keeps richer strategy detail under deeper sections without runtime/UI wiring changes.
 - `P7-K9` refines runtime inline glossary alias matching quality through one service-owned normalization seam without widening glossary rollout surfaces.
 - `P7-K10` adds internal aggregate exposure/acknowledgement hooks for glossary tuning while keeping runtime behavior calm, non-gating, and user-invisible.
 
@@ -249,7 +250,7 @@ Operational handling folders, not live canon families.
 - `docs/foundations/` was not adopted; founding truth remains split across `docs/founder/` and `docs/governance/`.
 - `docs/models/` was not adopted; object-contract docs land in `docs/architecture/`.
 - `docs/behaviours/` remains the canonical home for cross-cutting behaviour rules even when source packs place them in `docs/product/`.
-- `docs/knowledge/` now uses the v1.4 live family layout (`orientation`, `strategies`, `glossary`, `interpretation`, `market-examples`, `action-risk`, `evidence`) plus retained support families (`40-reflection`, `50-knowledge-system`, `90-media`).
+- `docs/knowledge/` now uses the live family layout (`orientation`, `strategies`, `concepts`, `glossary`, `trade-hub`, `interpretation`, `market-examples`, `action-risk`, `evidence`) plus retained support families (`40-reflection`, `50-knowledge-system`, `90-media`, `_meta`).
 - `docs/source/` remains provenance storage only. No competing markdown mirror tree was added there.
 
 ## Maps And Traceability

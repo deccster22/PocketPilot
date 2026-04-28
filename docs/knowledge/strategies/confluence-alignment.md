@@ -11,6 +11,27 @@ canonical_path: "/docs/knowledge/strategies/confluence-alignment.md"
 
 # Confluence Alignment
 
+## What this means
+Combining multiple signals.
+
+## When it shows up
+This strategy is most relevant in conditions like: alignment.
+
+## What you're looking for
+Look for alignment.
+
+## Why it can work
+Works because agreement builds confidence.
+
+## What can go wrong
+Fails if forced.
+
+## Common misunderstanding
+More signals = better trade.
+
+---
+
+## Deeper explanation
 ## What this strategy is for
 Confluence Alignment is for situations where different kinds of evidence begin pointing to the same area or idea.
 

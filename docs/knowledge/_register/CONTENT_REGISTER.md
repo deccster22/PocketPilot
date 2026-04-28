@@ -1,6 +1,6 @@
 # PocketPilot Knowledge Library Register v0.2
 
-Total nodes: **132**
+Total nodes: **147**
 
 ## orientation
 
@@ -27,6 +27,21 @@ Total nodes: **132**
 | `strategy-reversion-bounce` | Reversion Bounce | D | Now | `docs/knowledge/strategies/reversion-bounce.md` |
 | `strategy-trend-follow` | Trend Follow | D | Now | `docs/knowledge/strategies/trend-follow.md` |
 
+## concepts
+
+| topicId | Title | Status | Priority | Path |
+|---|---|---:|---:|---|
+| `concept-breakout` | Breakout | D | Now | `docs/knowledge/concepts/breakout.md` |
+| `concept-candlestick-patterns` | Candlestick Patterns | D | Now | `docs/knowledge/concepts/candlestick-patterns.md` |
+| `concept-confluence` | Confluence | D | Now | `docs/knowledge/concepts/confluence.md` |
+| `concept-fibonacci-levels` | Fibonacci Levels | D | Now | `docs/knowledge/concepts/fibonacci-levels.md` |
+| `concept-momentum` | Momentum | D | Now | `docs/knowledge/concepts/momentum.md` |
+| `concept-resistance` | Resistance | D | Now | `docs/knowledge/concepts/resistance.md` |
+| `concept-reversion` | Reversion | D | Now | `docs/knowledge/concepts/reversion.md` |
+| `concept-support` | Support | D | Now | `docs/knowledge/concepts/support.md` |
+| `concept-trend` | Trend | D | Now | `docs/knowledge/concepts/trend.md` |
+| `concept-volatility` | Volatility | D | Now | `docs/knowledge/concepts/volatility.md` |
+
 ## glossary
 
 | topicId | Title | Status | Priority | Path |
@@ -35,6 +50,7 @@ Total nodes: **132**
 | `glossary-acceptance` | acceptance | D | Now | `docs/knowledge/glossary/acceptance.md` |
 | `glossary-action-bias` | action bias | D | Now | `docs/knowledge/glossary/action-bias.md` |
 | `glossary-breakout` | breakout | D | Now | `docs/knowledge/glossary/breakout.md` |
+| `glossary-candlestick-patterns` | candlestick patterns | D | Now | `docs/knowledge/glossary/candlestick-patterns.md` |
 | `glossary-confirmation` | confirmation | D | Now | `docs/knowledge/glossary/confirmation.md` |
 | `glossary-confirmation-shell-and-non-dispatch-boundary` | Confirmation shell / non-dispatch boundary | D | Now | `docs/knowledge/glossary/confirmation-shell-and-non-dispatch-boundary.md` |
 | `glossary-confirmed-confidence` | confirmed confidence | D | Now | `docs/knowledge/glossary/confirmed-confidence.md` |
@@ -53,6 +69,7 @@ Total nodes: **132**
 | `glossary-exhaustion` | exhaustion | D | Now | `docs/knowledge/glossary/exhaustion.md` |
 | `glossary-exposure` | exposure | D | Now | `docs/knowledge/glossary/exposure.md` |
 | `glossary-false-breakout` | false breakout | D | Now | `docs/knowledge/glossary/false-breakout.md` |
+| `glossary-fibonacci-levels` | fibonacci levels | D | Now | `docs/knowledge/glossary/fibonacci-levels.md` |
 | `glossary-guardrails` | Guardrails | D | Now | `docs/knowledge/glossary/guardrails.md` |
 | `glossary-holder-cost-basis` | holder cost basis | D | Now | `docs/knowledge/glossary/holder-cost-basis.md` |
 | `glossary-invalidation` | invalidation | D | Now | `docs/knowledge/glossary/invalidation.md` |
@@ -60,6 +77,7 @@ Total nodes: **132**
 | `glossary-liquidity` | liquidity | D | Now | `docs/knowledge/glossary/liquidity.md` |
 | `glossary-manual-override` | Manual override | D | Now | `docs/knowledge/glossary/manual-override.md` |
 | `glossary-meaningful-change` | meaningful change | D | Now | `docs/knowledge/glossary/meaningful-change.md` |
+| `glossary-momentum` | momentum | D | Now | `docs/knowledge/glossary/momentum.md` |
 | `glossary-noise` | noise | D | Now | `docs/knowledge/glossary/noise.md` |
 | `glossary-overtrading` | overtrading | D | Now | `docs/knowledge/glossary/overtrading.md` |
 | `glossary-peg` | peg | D | Now | `docs/knowledge/glossary/peg.md` |
@@ -74,6 +92,7 @@ Total nodes: **132**
 | `glossary-reserve-backing` | reserve backing | D | Now | `docs/knowledge/glossary/reserve-backing.md` |
 | `glossary-resistance` | resistance | D | Now | `docs/knowledge/glossary/resistance.md` |
 | `glossary-reversal` | reversal | D | Now | `docs/knowledge/glossary/reversal.md` |
+| `glossary-reversion` | reversion | D | Now | `docs/knowledge/glossary/reversion.md` |
 | `glossary-reward-risk` | Reward/risk | D | Now | `docs/knowledge/glossary/reward-risk.md` |
 | `glossary-risk-amount` | Risk amount | D | Now | `docs/knowledge/glossary/risk-amount.md` |
 | `glossary-risk-limit-per-trade` | Risk limit per trade | D | Now | `docs/knowledge/glossary/risk-limit-per-trade.md` |
@@ -88,6 +107,7 @@ Total nodes: **132**
 | `glossary-support` | support | D | Now | `docs/knowledge/glossary/support.md` |
 | `glossary-target-price` | Target price | D | Now | `docs/knowledge/glossary/target-price.md` |
 | `glossary-thin-market` | thin market | D | Now | `docs/knowledge/glossary/thin-market.md` |
+| `glossary-trend` | trend | D | Now | `docs/knowledge/glossary/trend.md` |
 | `glossary-volatility` | volatility | D | Now | `docs/knowledge/glossary/volatility.md` |
 
 ## trade-hub

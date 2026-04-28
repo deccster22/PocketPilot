@@ -1,6 +1,7 @@
 const SUPPORTED_REGISTER_FAMILIES = Object.freeze([
   'orientation',
   'strategies',
+  'concepts',
   'glossary',
   'trade-hub',
   'interpretation',
@@ -14,6 +15,7 @@ const SUPPORTED_REGISTER_FAMILIES = Object.freeze([
 const REQUIRED_CORE_FAMILIES = Object.freeze([
   'orientation',
   'strategies',
+  'concepts',
   'glossary',
   'trade-hub',
   'interpretation',
@@ -24,6 +26,7 @@ const REQUIRED_CORE_FAMILIES = Object.freeze([
 const DOC_FAMILY_ORDER = Object.freeze([
   'orientation',
   'strategies',
+  'concepts',
   'glossary',
   'trade-hub',
   'interpretation',
@@ -37,6 +40,7 @@ const DOC_FAMILY_ORDER = Object.freeze([
 const FAMILY_PATH_PREFIXES = Object.freeze({
   orientation: 'docs/knowledge/orientation/',
   strategies: 'docs/knowledge/strategies/',
+  concepts: 'docs/knowledge/concepts/',
   glossary: 'docs/knowledge/glossary/',
   'trade-hub': 'docs/knowledge/trade-hub/',
   interpretation: 'docs/knowledge/interpretation/',
@@ -57,6 +61,7 @@ const RETIRED_SHELF_PREFIXES = Object.freeze([
 const DOC_TO_RUNTIME_FAMILY = Object.freeze({
   orientation: 'orientation',
   strategies: 'strategies',
+  concepts: 'core-language',
   glossary: 'core-language',
   'trade-hub': 'action-risk',
   interpretation: 'core-language',

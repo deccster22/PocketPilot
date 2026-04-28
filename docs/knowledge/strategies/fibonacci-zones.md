@@ -9,6 +9,27 @@ reviewStatus: Normalized draft v1
 
 # Fibonacci Zones
 
+## What this means
+Using retracement levels to find reactions.
+
+## When it shows up
+This strategy is most relevant in conditions like: pullbacks into levels.
+
+## What you're looking for
+Look for pullbacks into levels.
+
+## Why it can work
+Works because many watch them.
+
+## What can go wrong
+Fails if ignored.
+
+## Common misunderstanding
+Thinking they always work.
+
+---
+
+## Deeper explanation
 ## Quick version
 
 ### Quick overview

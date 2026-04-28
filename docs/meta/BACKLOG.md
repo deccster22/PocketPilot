@@ -8,7 +8,7 @@ Scope: active backlog/state source with docs/admin continuity updates
 
 Recent landed work closed or narrowed multiple previously-open backlog threads:
 
-- `PX-KI1`, `PX-KI2`, `PX-KI3`, `PX-KI4`
+- `PX-KI1`, `PX-KI2`, `PX-KI3`, `PX-KI4`, `PX-KI5`
 - `P7-K8`, `P7-K9`, `P7-K10`
 - `P6-A7`, `P6-A8`, `P8-I12`
 - `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9`
@@ -74,7 +74,7 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 
 | Backlog thread previously repeated across phase notes | Reconciled status now | Closing evidence |
 | --- | --- | --- |
-| knowledge payload import + taxonomy reconciliation + register/catalog hygiene + Trade Hub risk-planning knowledge import | completed | `PX-KI1`, `PX-KI2`, `PX-KI3`, `PX-KI4` |
+| knowledge payload import + taxonomy reconciliation + register/catalog hygiene + Trade Hub risk-planning import + strategy/concept progressive-layer merge | completed | `PX-KI1`, `PX-KI2`, `PX-KI3`, `PX-KI4`, `PX-KI5` |
 | contextual knowledge rollout, density shaping, linkage, and topic-detail context handoff on live surfaces | completed baseline | `P7-K4`, `P7-K5`, `P7-K6`, `P7-K7` |
 | beginner inline glossary help + alias normalization + tuning hooks | completed baseline | `P7-K8`, `P7-K9`, `P7-K10` |
 | Snapshot Since Last Checked surface + clear-after-view behavior + deeper archive continuity | completed baseline | `P6-A7`, `P6-A8`, `P8-I12` |
