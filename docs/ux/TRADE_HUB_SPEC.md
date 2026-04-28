@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P5-R16 + P7-K8 + P7-K9 + P7-K10)
+# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P5-R16 + P7-K8 + P7-K9 + P7-K10 + P7-K11 plan)
 
 ## Purpose
 
@@ -110,6 +110,17 @@ Rules:
 - no Trade Hub analytics/debug panel or operator surface is added
 - no network telemetry/export path is introduced in this phase
 - no execution gating or action-lock behavior is introduced through glossary signals
+
+## P7-K11 Trade Hub Term-Help Planning Boundary (Docs-Only)
+`P7-K11` adds a docs-side integration plan and keeps runtime behavior unchanged in this phase.
+
+Rules for later wiring:
+- keep term eligibility and glossary/topic routing service-owned (`services/knowledge`)
+- keep `app/` render-only with prepared affordance metadata
+- avoid link soup: do not link every occurrence and do not link multiple terms in one short sentence by default
+- avoid dense numeric-summary linking where scanability drops
+- keep submission/readiness/handoff boundary language plain in critical safety text
+- no UI-side term matching, ranking, or tooltip swarm behavior
 
 ## Surface Contract
 

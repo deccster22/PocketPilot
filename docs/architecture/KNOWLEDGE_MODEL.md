@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P7-K10, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P7-K10, P7-K11 plan, P9-S2)
 
 ## Purpose
 
@@ -14,6 +14,7 @@
 `P7-K8` adds one canonical inline glossary-help seam plus one canonical seen-term acknowledgement seam for narrow explanatory-copy proof paths on Dashboard and Trade Hub.
 `P7-K9` adds one canonical glossary alias/index normalization seam and threads it into the existing inline selector so canonical and alias variants resolve more reliably without widening surfaces.
 `P7-K10` adds one canonical internal exposure/acknowledgement aggregate signal seam plus one canonical summary seam for future tuning without adding a user-facing analytics surface.
+`P7-K11` adds one docs-side Trade Hub term-help integration plan that bounds term eligibility, profile/surface treatment, and no-linking rules before future runtime wiring.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -323,6 +324,12 @@ Rules:
 - `services/knowledge/fetchInlineGlossarySignalSummary.ts` owns prepared aggregate summary retrieval
 - signal hooks remain service-owned, deterministic, and user-invisible
 - no analytics dashboard, debug console, or network telemetry is introduced in this phase
+
+`P7-K11` is planning-only and adds no new runtime contract in this phase. It defines the implementation boundary for later wiring:
+
+- term eligibility, surface/profile treatment, and glossary/topic routing remain service-owned
+- `app/` consumes prepared affordances only and does not perform local term matching/ranking
+- first rollout stays narrow and must avoid dense-link or boundary-weakening behavior
 
 ## Canonical Knowledge Tree
 

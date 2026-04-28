@@ -5,7 +5,8 @@ owner: "founder"
 doc_class: "knowledge-meta"
 purpose: "Maps Trade Hub UI terms to glossary and canonical Trade Hub knowledge topics"
 depends_on: []
-related_docs: []
+related_docs:
+  - "/docs/knowledge/_meta/TRADE_HUB_HELP_INTEGRATION_PLAN.md"
 canonical_path: "/docs/knowledge/_meta/GLOSSARY_TERM_MAP.md"
 ---
 
@@ -31,3 +32,8 @@ Trade Hub term mapping for docs and future UI-help wiring.
 | Daily loss threshold | `docs/knowledge/glossary/daily-loss-threshold.md` | `docs/knowledge/trade-hub/daily-loss-threshold.md` |
 | Cooldown after loss | `docs/knowledge/glossary/cooldown-after-loss.md` | `docs/knowledge/trade-hub/cooldown-after-loss.md` |
 | Confirmation shell / non-dispatch boundary | `docs/knowledge/glossary/confirmation-shell-and-non-dispatch-boundary.md` | `docs/knowledge/trade-hub/confirmation-shell-and-non-dispatch-boundary.md` |
+
+## P7-K11 Integration Planning Note
+
+- `P7-K11` keeps this map as the canonical term-to-topic source and adds rollout priority, profile/surface treatment, and non-linking rules in `docs/knowledge/_meta/TRADE_HUB_HELP_INTEGRATION_PLAN.md`.
+- This map remains mapping-only. It is not runtime wiring, ranking, or link-density policy by itself.
