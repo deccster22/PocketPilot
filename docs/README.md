@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-28
+Last Updated: 2026-04-29
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-28
+**Last updated:** 2026-04-29
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -88,6 +88,7 @@ Start with:
 - P7-K10 adds one service-owned inline glossary exposure/acknowledgement signal seam plus one aggregate summary seam for future tuning, kept invisible to users and without adding analytics UI or network telemetry.
 - P7-K11 adds one bounded Trade Hub term-to-knowledge integration plan so future inline help rollout stays service-owned, profile-aware, and protected from link-soup behavior.
 - P7-K12 lands the first bounded Trade Hub/Risk Tool term-help rollout with one service-owned affordance seam (`createTradeHubHelpAffordances`), wiring only stop-loss price, target price, one active risk-basis label, and guardrails while keeping app rendering passive and low-clutter.
+- P7-K13 adds a runtime catalog sync guard so explicitly runtime-required register topics cannot drift out of `knowledgeCatalog` unnoticed.
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - P9-S8 adds one canonical service-owned strategy metadata registry so nearby-alternative selection and fit-contrast consume the same explicit metadata base instead of scattered strategy-label assumptions.
@@ -217,6 +218,7 @@ Current normalization rule:
 - `P7-K10` adds internal aggregate exposure/acknowledgement hooks for glossary tuning while keeping runtime behavior calm, non-gating, and user-invisible.
 - `P7-K11` adds a docs-side Trade Hub term-to-knowledge integration plan (`docs/knowledge/_meta/TRADE_HUB_HELP_INTEGRATION_PLAN.md`) that defines first-rollout scope, profile/surface treatment, and non-linking guardrails before runtime wiring.
 - `P7-K12` implements that first runtime wiring scope through one service-owned Trade Hub help-affordance seam, keeps first-rollout terms bounded, and preserves non-dispatching Trade Hub boundaries plus scanability guardrails.
+- `P7-K13` adds deterministic runtime catalog sync validation (`npm run validate:knowledge:runtime`) with an explicit runtime-required register topic scope and explicit legacy runtime exceptions.
 
 ### 8. Phases
 
@@ -275,4 +277,4 @@ Use these docs when placement or authority is unclear:
 2. Preserve one live home per concept.
 3. Update product, UX, architecture, and phase docs together when behaviour changes.
 4. Treat `docs/source/` as provenance, not day-to-day truth.
-5. Run `npm run verify` after repo changes when normal workflow expects a green verify gate (`verify` includes docs-side knowledge register validation).
+5. Run `npm run verify` after repo changes when normal workflow expects a green verify gate (`verify` includes both docs-side register validation and runtime catalog sync validation).

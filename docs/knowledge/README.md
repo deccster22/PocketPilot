@@ -24,11 +24,13 @@ Controlled live knowledge tree for in-product learning content.
 ## Catalog/register note
 - `docs/knowledge/_register/CONTENT_REGISTER.csv` and `CONTENT_REGISTER.md` now track the live family-based tree directly.
 - `scripts/generate-knowledge-catalog.js` consumes the same family-based register and applies a narrow docs-to-runtime family mapping when generation is explicitly run.
+- Runtime `services/knowledge/knowledgeCatalog.ts` is currently maintained as a curated/hybrid runtime artifact (not auto-regenerated on every register change).
 - `scripts/validate-knowledge-register.js` validates register hygiene before downstream docs/runtime work depends on stale metadata.
 
 ## Validation note
 - Run `npm run validate:knowledge` to check register path existence, topic ID uniqueness, retired shelf rejection, family/path alignment, and required core family coverage.
-- `npm run verify` now includes `npm run validate:knowledge` so catalog/register drift is caught in the normal quality gate.
+- Run `npm run validate:knowledge:runtime` to verify the explicit runtime-required register topic scope resolves in `services/knowledge/knowledgeCatalog.ts`, detect missing runtime topic IDs, detect duplicate runtime topic IDs, and keep legacy unregistered runtime IDs explicit.
+- `npm run verify` now includes both `npm run validate:knowledge` and `npm run validate:knowledge:runtime` so register/runtime drift is caught in the normal quality gate.
 - Validation is read-only and deterministic; it does not rewrite register or catalog artifacts.
 
 ## Import note
@@ -41,3 +43,5 @@ Controlled live knowledge tree for in-product learning content.
 `P7-K11` adds the first bounded Trade Hub term-to-knowledge integration plan in `docs/knowledge/_meta/TRADE_HUB_HELP_INTEGRATION_PLAN.md`, including first-rollout scope and no-link-soup rules for later service-owned wiring.
 
 `P7-K12` implements that first bounded runtime rollout through one service-owned Trade Hub help-affordance seam, wiring only stop-loss price, target price, active risk-basis label, and guardrails while keeping app-side behavior render-only.
+
+`P7-K13` adds a runtime catalog sync guard that protects the first rollout and other explicitly runtime-required register topics from drifting out of the runtime knowledge catalog.
