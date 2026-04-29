@@ -22,3 +22,20 @@ A buffer you choose to apply.
 ## Common misunderstanding
 Seeing it as a punishment.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+Cooldown after loss creates space between a loss and the next decision.
+
+## How it behaves
+It introduces a pause before planning again.
+
+## What tends to go wrong
+- skipping the pause mentally
+
+## What good looks like
+- slower, more deliberate decisions
+
+## What it connects to
+Daily loss threshold, Behavior control.

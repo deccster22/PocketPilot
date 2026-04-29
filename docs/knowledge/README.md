@@ -45,3 +45,5 @@ Controlled live knowledge tree for in-product learning content.
 `P7-K12` implements that first bounded runtime rollout through one service-owned Trade Hub help-affordance seam, wiring only stop-loss price, target price, active risk-basis label, and guardrails while keeping app-side behavior render-only.
 
 `P7-K13` adds a runtime catalog sync guard that protects the first rollout and other explicitly runtime-required register topics from drifting out of the runtime knowledge catalog.
+
+`P7-K14` completes the Trade Hub Layer 2 docs merge for all 14 canonical trade-hub topics by preserving Layer 1 beginner content first and appending calm deeper-thinking sections; runtime `knowledgeCatalog.ts` Trade Hub topic detail content is updated for those same 14 topic IDs without adding new help terms or changing app UI wiring.

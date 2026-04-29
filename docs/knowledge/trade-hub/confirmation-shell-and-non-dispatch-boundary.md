@@ -22,3 +22,22 @@ PocketPilot supports decisions but does not place trades.
 ## Common misunderstanding
 Assuming the system executes trades automatically.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+This boundary separates planning from action.
+
+## How it behaves
+It presents your plan for acknowledgement before handoff. PocketPilot does not place trades.
+
+## What tends to go wrong
+- skipping the review step
+- treating confirmation as a formality
+
+## What good looks like
+- deliberate confirmation
+- clear understanding of the plan
+
+## What it connects to
+Execution readiness, User control.

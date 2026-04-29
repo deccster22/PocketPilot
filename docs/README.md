@@ -89,6 +89,7 @@ Start with:
 - P7-K11 adds one bounded Trade Hub term-to-knowledge integration plan so future inline help rollout stays service-owned, profile-aware, and protected from link-soup behavior.
 - P7-K12 lands the first bounded Trade Hub/Risk Tool term-help rollout with one service-owned affordance seam (`createTradeHubHelpAffordances`), wiring only stop-loss price, target price, one active risk-basis label, and guardrails while keeping app rendering passive and low-clutter.
 - P7-K13 adds a runtime catalog sync guard so explicitly runtime-required register topics cannot drift out of `knowledgeCatalog` unnoticed.
+- P7-K14 merges Layer 2 deeper-thinking content into all 14 canonical Trade Hub articles, preserves Layer 1 beginner sections first, and updates runtime Trade Hub topic detail content without widening help wiring scope or changing non-dispatching behavior.
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - P9-S8 adds one canonical service-owned strategy metadata registry so nearby-alternative selection and fit-contrast consume the same explicit metadata base instead of scattered strategy-label assumptions.

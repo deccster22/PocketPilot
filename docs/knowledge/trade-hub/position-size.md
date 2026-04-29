@@ -22,3 +22,22 @@ Derived from your planning inputs, not chosen first.
 ## Common misunderstanding
 Choosing size before defining risk.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+Position size should be derived from risk and stop-loss context, not confidence or excitement.
+
+## How it behaves
+It changes with stop distance and chosen risk framing.
+
+## What tends to go wrong
+- sizing from confidence
+- inconsistent sizing across similar setups
+
+## What good looks like
+- adapts to setup conditions
+- keeps risk behavior consistent
+
+## What it connects to
+Risk amount, Stop-loss price, Entry price.

@@ -2714,11 +2714,11 @@ export const knowledgeCatalog = [
     relatedTopicIds: [],
   },
   {
-    topicId: 'trade-hub-stop-loss-price',
-    title: 'Stop-loss price',
-    summary: "The price where you'd exit to avoid further losses.",
+    topicId: 'trade-hub-entry-price',
+    title: 'Entry price',
+    summary: "The price you're planning to enter the trade.",
     content:
-      "What this means\n\nThe price where you'd exit to avoid further losses.\n\nWhy it matters\n\nIt defines your downside before you act.\n\nHow PocketPilot frames it\n\nA planning level showing where the idea no longer holds up.\n\nCommon misunderstanding\n\nTreating it as just how much loss you can tolerate.",
+      "What this means\n\nThe price you're planning to enter the trade.\n\nWhy it matters\n\nThis is your starting planning input. Everything else builds from here.\n\nHow PocketPilot frames it\n\nA planning level, not a certain fill.\n\nCommon misunderstanding\n\nThinking you'll always get that exact price.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nEntry price is where your plan becomes active. It is less about finding the perfect price and more about acting when your idea is clearly defined.\n\nHow it behaves\n\nEntries can be early, confirmed, or late. Each is a trade-off between price and clarity.\n\nWhat tends to go wrong\n\nentering without a setup\n\nchasing missed moves\n\nreacting instead of planning\n\nWhat good looks like\n\nclear reason for the chosen timing\n\naligned with strategy\n\nunderstood trade-offs\n\nWhat it connects to\n\nStop-loss price, Position size, Strategy alignment.",
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2729,19 +2729,148 @@ export const knowledgeCatalog = [
     sections: [
       {
         heading: 'What this means',
-        body: ["The price where you'd exit to avoid further losses."],
+        body: [
+          "The price you're planning to enter the trade.",
+        ],
       },
       {
         heading: 'Why it matters',
-        body: ['It defines your downside before you act.'],
+        body: [
+          'This is your starting planning input. Everything else builds from here.',
+        ],
       },
       {
         heading: 'How PocketPilot frames it',
-        body: ['A planning level showing where the idea no longer holds up.'],
+        body: [
+          'A planning level, not a certain fill.',
+        ],
       },
       {
         heading: 'Common misunderstanding',
-        body: ['Treating it as just how much loss you can tolerate.'],
+        body: [
+          "Thinking you'll always get that exact price.",
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Entry price is where your plan becomes active. It is less about finding the perfect price and more about acting when your idea is clearly defined.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'Entries can be early, confirmed, or late. Each is a trade-off between price and clarity.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'entering without a setup',
+          'chasing missed moves',
+          'reacting instead of planning',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'clear reason for the chosen timing',
+          'aligned with strategy',
+          'understood trade-offs',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Stop-loss price, Position size, Strategy alignment.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-stop-loss-price',
+    title: 'Stop-loss price',
+    summary: "The price where you'd exit to avoid further losses.",
+    content:
+      "What this means\n\nThe price where you'd exit to avoid further losses.\n\nWhy it matters\n\nIt defines your downside before you act.\n\nHow PocketPilot frames it\n\nA planning level showing where the idea no longer holds up.\n\nCommon misunderstanding\n\nTreating it as just how much loss you can tolerate.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nThis is a planning boundary where your idea may no longer be valid. It is not a guarantee of where an exit occurs.\n\nHow it behaves\n\nA stop can be structural, volatility-based, or arbitrary. Structural placement is often the clearest match to plan logic.\n\nWhat tends to go wrong\n\ntoo tight for normal movement\n\nemotionally moved after entry\n\nnot set at all\n\nWhat good looks like\n\nclear invalidation point\n\naccepted loss point\n\nchosen deliberately\n\nWhat it connects to\n\nEntry price, Risk amount, Position size.",
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          "The price where you'd exit to avoid further losses.",
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It defines your downside before you act.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'A planning level showing where the idea no longer holds up.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Treating it as just how much loss you can tolerate.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'This is a planning boundary where your idea may no longer be valid. It is not a guarantee of where an exit occurs.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'A stop can be structural, volatility-based, or arbitrary. Structural placement is often the clearest match to plan logic.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'too tight for normal movement',
+          'emotionally moved after entry',
+          'not set at all',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'clear invalidation point',
+          'accepted loss point',
+          'chosen deliberately',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Entry price, Risk amount, Position size.',
+        ],
       },
     ],
     relatedTopicIds: [],
@@ -2749,10 +2878,9 @@ export const knowledgeCatalog = [
   {
     topicId: 'trade-hub-target-price',
     title: 'Target price',
-    summary:
-      'A price you use to review whether the plan is working or whether an exit may make sense.',
+    summary: 'A price you use to review whether the plan is working or whether an exit may make sense.',
     content:
-      'What this means\n\nA price you use to review whether the plan is working or whether an exit may make sense.\n\nWhy it matters\n\nIt gives you a review point to assess progress.\n\nHow PocketPilot frames it\n\nA review point, not an automatic action. PocketPilot does not place a trade at this level.\n\nCommon misunderstanding\n\nThinking the trade will close automatically at this price.',
+      'What this means\n\nA price you use to review whether the plan is working or whether an exit may make sense.\n\nWhy it matters\n\nIt gives you a review point to assess progress.\n\nHow PocketPilot frames it\n\nA review point, not an automatic action. PocketPilot does not place a trade at this level.\n\nCommon misunderstanding\n\nThinking the trade will close automatically at this price.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nTarget price is a review point, not a prediction.\n\nHow it behaves\n\nTargets can be structure-based, risk-based, or adjusted as context evolves.\n\nWhat tends to go wrong\n\ntreating it as certain\n\nexiting too early without review\n\nholding too long without re-checking context\n\nWhat good looks like\n\nused to assess progress\n\nflexible, context-aware decisions\n\nWhat it connects to\n\nReward/risk, Strategy type, Market structure.',
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2769,7 +2897,9 @@ export const knowledgeCatalog = [
       },
       {
         heading: 'Why it matters',
-        body: ['It gives you a review point to assess progress.'],
+        body: [
+          'It gives you a review point to assess progress.',
+        ],
       },
       {
         heading: 'How PocketPilot frames it',
@@ -2779,7 +2909,127 @@ export const knowledgeCatalog = [
       },
       {
         heading: 'Common misunderstanding',
-        body: ['Thinking the trade will close automatically at this price.'],
+        body: [
+          'Thinking the trade will close automatically at this price.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Target price is a review point, not a prediction.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'Targets can be structure-based, risk-based, or adjusted as context evolves.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'treating it as certain',
+          'exiting too early without review',
+          'holding too long without re-checking context',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'used to assess progress',
+          'flexible, context-aware decisions',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Reward/risk, Strategy type, Market structure.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-prepared-planning-levels',
+    title: 'Prepared planning levels',
+    summary: 'Optional planning levels prepared from the selected plan.',
+    content:
+      'What this means\n\nOptional planning levels prepared from the selected plan.\n\nWhy it matters\n\nThey help you set up planning context quickly.\n\nHow PocketPilot frames it\n\nStarting points for review. Your own inputs remain authoritative.\n\nCommon misunderstanding\n\nThinking they are automatically applied or required.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nPrepared planning levels are optional context to help you start. They are not recommendations.\n\nHow it behaves\n\nThey provide a structured starting point, while your own inputs remain authoritative.\n\nWhat tends to go wrong\n\naccepting values without review\n\nassuming they are required\n\nWhat good looks like\n\nused as a starting point\n\nadjusted with your own reasoning\n\nWhat it connects to\n\nEntry price, Stop-loss price, Target price.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'Optional planning levels prepared from the selected plan.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'They help you set up planning context quickly.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'Starting points for review. Your own inputs remain authoritative.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Thinking they are automatically applied or required.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Prepared planning levels are optional context to help you start. They are not recommendations.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'They provide a structured starting point, while your own inputs remain authoritative.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'accepting values without review',
+          'assuming they are required',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'used as a starting point',
+          'adjusted with your own reasoning',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Entry price, Stop-loss price, Target price.',
+        ],
       },
     ],
     relatedTopicIds: [],
@@ -2789,7 +3039,7 @@ export const knowledgeCatalog = [
     title: 'Risk amount',
     summary: 'How much money you could lose on this trade.',
     content:
-      'What this means\n\nHow much money you could lose on this trade.\n\nWhy it matters\n\nIt shows the real downside before acting.\n\nHow PocketPilot frames it\n\nA planning output derived from your inputs.\n\nCommon misunderstanding\n\nConfusing it with general market volatility.',
+      'What this means\n\nHow much money you could lose on this trade.\n\nWhy it matters\n\nIt shows the real downside before acting.\n\nHow PocketPilot frames it\n\nA planning output derived from your inputs.\n\nCommon misunderstanding\n\nConfusing it with general market volatility.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nRisk amount is your real downside if you are wrong. It is planning risk context, not advice.\n\nHow it behaves\n\nIt is derived from entry, stop-loss, and position size.\n\nWhat tends to go wrong\n\nignoring it\n\nunderestimating it\n\nWhat good looks like\n\nknown before entry\n\nacceptable for your plan\n\nWhat it connects to\n\nPosition size, Stop-loss price, Account size.',
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2800,19 +3050,65 @@ export const knowledgeCatalog = [
     sections: [
       {
         heading: 'What this means',
-        body: ['How much money you could lose on this trade.'],
+        body: [
+          'How much money you could lose on this trade.',
+        ],
       },
       {
         heading: 'Why it matters',
-        body: ['It shows the real downside before acting.'],
+        body: [
+          'It shows the real downside before acting.',
+        ],
       },
       {
         heading: 'How PocketPilot frames it',
-        body: ['A planning output derived from your inputs.'],
+        body: [
+          'A planning output derived from your inputs.',
+        ],
       },
       {
         heading: 'Common misunderstanding',
-        body: ['Confusing it with general market volatility.'],
+        body: [
+          'Confusing it with general market volatility.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Risk amount is your real downside if you are wrong. It is planning risk context, not advice.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It is derived from entry, stop-loss, and position size.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'ignoring it',
+          'underestimating it',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'known before entry',
+          'acceptable for your plan',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Position size, Stop-loss price, Account size.',
+        ],
       },
     ],
     relatedTopicIds: [],
@@ -2822,7 +3118,7 @@ export const knowledgeCatalog = [
     title: 'Risk percent',
     summary: 'The percentage of your account at risk.',
     content:
-      'What this means\n\nThe percentage of your account at risk.\n\nWhy it matters\n\nIt helps keep trades consistent in size.\n\nHow PocketPilot frames it\n\nA way to size trades relative to your account.\n\nCommon misunderstanding\n\nThinking a low percent always means safe.',
+      'What this means\n\nThe percentage of your account at risk.\n\nWhy it matters\n\nIt helps keep trades consistent in size.\n\nHow PocketPilot frames it\n\nA way to size trades relative to your account.\n\nCommon misunderstanding\n\nThinking a low percent always means safe.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nRisk percent helps keep planning risk consistent across trades. It does not remove risk.\n\nHow it behaves\n\nIt standardizes risk relative to account size.\n\nWhat tends to go wrong\n\nchanging risk emotionally\n\nassuming a small percent means no meaningful downside\n\nWhat good looks like\n\nconsistent across trades\n\nstable behavior over time\n\nWhat it connects to\n\nRisk amount, Position size.',
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2833,19 +3129,302 @@ export const knowledgeCatalog = [
     sections: [
       {
         heading: 'What this means',
-        body: ['The percentage of your account at risk.'],
+        body: [
+          'The percentage of your account at risk.',
+        ],
       },
       {
         heading: 'Why it matters',
-        body: ['It helps keep trades consistent in size.'],
+        body: [
+          'It helps keep trades consistent in size.',
+        ],
       },
       {
         heading: 'How PocketPilot frames it',
-        body: ['A way to size trades relative to your account.'],
+        body: [
+          'A way to size trades relative to your account.',
+        ],
       },
       {
         heading: 'Common misunderstanding',
-        body: ['Thinking a low percent always means safe.'],
+        body: [
+          'Thinking a low percent always means safe.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Risk percent helps keep planning risk consistent across trades. It does not remove risk.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It standardizes risk relative to account size.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'changing risk emotionally',
+          'assuming a small percent means no meaningful downside',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'consistent across trades',
+          'stable behavior over time',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Risk amount, Position size.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-position-size',
+    title: 'Position size',
+    summary: 'How big your trade is.',
+    content:
+      "What this means\n\nHow big your trade is.\n\nWhy it matters\n\nIt controls how much you're exposed.\n\nHow PocketPilot frames it\n\nDerived from your planning inputs, not chosen first.\n\nCommon misunderstanding\n\nChoosing size before defining risk.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nPosition size should be derived from risk and stop-loss context, not confidence or excitement.\n\nHow it behaves\n\nIt changes with stop distance and chosen risk framing.\n\nWhat tends to go wrong\n\nsizing from confidence\n\ninconsistent sizing across similar setups\n\nWhat good looks like\n\nadapts to setup conditions\n\nkeeps risk behavior consistent\n\nWhat it connects to\n\nRisk amount, Stop-loss price, Entry price.",
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'How big your trade is.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          "It controls how much you're exposed.",
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'Derived from your planning inputs, not chosen first.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Choosing size before defining risk.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Position size should be derived from risk and stop-loss context, not confidence or excitement.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It changes with stop distance and chosen risk framing.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'sizing from confidence',
+          'inconsistent sizing across similar setups',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'adapts to setup conditions',
+          'keeps risk behavior consistent',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Risk amount, Stop-loss price, Entry price.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-reward-risk',
+    title: 'Reward/risk',
+    summary: 'How much you could gain compared to what you could lose.',
+    content:
+      'What this means\n\nHow much you could gain compared to what you could lose.\n\nWhy it matters\n\nIt helps you judge whether a trade is worth taking.\n\nHow PocketPilot frames it\n\nA comparison tool, not a guarantee.\n\nCommon misunderstanding\n\nAssuming a strong ratio ensures success.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nReward/risk compares potential upside to downside for review. It should support reflection, not force ratios.\n\nHow it behaves\n\nIt is based on entry, stop-loss, and target, and it changes when those inputs change.\n\nWhat tends to go wrong\n\nforcing a ratio without context\n\nignoring strategy fit\n\nWhat good looks like\n\nsupports review decisions\n\naligned with strategy context\n\nWhat it connects to\n\nTarget price, Risk amount.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'How much you could gain compared to what you could lose.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It helps you judge whether a trade is worth taking.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'A comparison tool, not a guarantee.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Assuming a strong ratio ensures success.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Reward/risk compares potential upside to downside for review. It should support reflection, not force ratios.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It is based on entry, stop-loss, and target, and it changes when those inputs change.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'forcing a ratio without context',
+          'ignoring strategy fit',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'supports review decisions',
+          'aligned with strategy context',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Target price, Risk amount.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-manual-override',
+    title: 'Manual override',
+    summary: 'Adjust the values yourself.',
+    content:
+      'What this means\n\nAdjust the values yourself.\n\nWhy it matters\n\nIt keeps you in control of your plan.\n\nHow PocketPilot frames it\n\nThe system supports your decisions, not replaces them.\n\nCommon misunderstanding\n\nThinking it means the system is wrong.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nManual override reinforces user control and deliberate changes.\n\nHow it behaves\n\nIt allows adjustment of planning inputs while keeping prepared context visible.\n\nWhat tends to go wrong\n\nfrequent reactive changes\n\nchanging values without clear reasoning\n\nWhat good looks like\n\ndeliberate, explainable changes\n\nconsistent behavior\n\nWhat it connects to\n\nPrepared planning levels, Risk framing.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'Adjust the values yourself.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It keeps you in control of your plan.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'The system supports your decisions, not replaces them.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Thinking it means the system is wrong.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Manual override reinforces user control and deliberate changes.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It allows adjustment of planning inputs while keeping prepared context visible.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'frequent reactive changes',
+          'changing values without clear reasoning',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'deliberate, explainable changes',
+          'consistent behavior',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Prepared planning levels, Risk framing.',
+        ],
       },
     ],
     relatedTopicIds: [],
@@ -2855,7 +3434,7 @@ export const knowledgeCatalog = [
     title: 'Guardrails',
     summary: 'Optional limits to help manage your risk.',
     content:
-      'What this means\n\nOptional limits to help manage your risk.\n\nWhy it matters\n\nThey help you stay within your own rules.\n\nHow PocketPilot frames it\n\nThey flag and highlight, not block or prevent.\n\nCommon misunderstanding\n\nThinking they restrict what you can do.',
+      'What this means\n\nOptional limits to help manage your risk.\n\nWhy it matters\n\nThey help you stay within your own rules.\n\nHow PocketPilot frames it\n\nThey flag and highlight, not block or prevent.\n\nCommon misunderstanding\n\nThinking they restrict what you can do.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nGuardrails are planning checks and visibility tools, not silent blockers.\n\nHow it behaves\n\nThey flag and highlight context for review. They do not enforce action.\n\nWhat tends to go wrong\n\nignoring repeated signals\n\nturning them off without intent\n\nWhat good looks like\n\nacknowledged and considered\n\nsupports consistent behavior\n\nWhat it connects to\n\nRisk management, Behavior patterns.',
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2866,19 +3445,377 @@ export const knowledgeCatalog = [
     sections: [
       {
         heading: 'What this means',
-        body: ['Optional limits to help manage your risk.'],
+        body: [
+          'Optional limits to help manage your risk.',
+        ],
       },
       {
         heading: 'Why it matters',
-        body: ['They help you stay within your own rules.'],
+        body: [
+          'They help you stay within your own rules.',
+        ],
       },
       {
         heading: 'How PocketPilot frames it',
-        body: ['They flag and highlight, not block or prevent.'],
+        body: [
+          'They flag and highlight, not block or prevent.',
+        ],
       },
       {
         heading: 'Common misunderstanding',
-        body: ['Thinking they restrict what you can do.'],
+        body: [
+          'Thinking they restrict what you can do.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Guardrails are planning checks and visibility tools, not silent blockers.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'They flag and highlight context for review. They do not enforce action.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'ignoring repeated signals',
+          'turning them off without intent',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'acknowledged and considered',
+          'supports consistent behavior',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Risk management, Behavior patterns.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-risk-limit-per-trade',
+    title: 'Risk limit per trade',
+    summary: "The maximum you're willing to risk on one trade.",
+    content:
+      "What this means\n\nThe maximum you're willing to risk on one trade.\n\nWhy it matters\n\nIt prevents a single trade from being too large.\n\nHow PocketPilot frames it\n\nFlags when a plan exceeds your chosen level.\n\nCommon misunderstanding\n\nThinking it stops you from acting.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nThis limit helps you see when one plan exceeds your usual single-trade risk.\n\nHow it behaves\n\nIt flags when your plan is above the selected limit. It does not block action.\n\nWhat tends to go wrong\n\nignoring breaches\n\nchanging limits impulsively\n\nWhat good looks like\n\nstable limits\n\ndeliberate exceptions\n\nWhat it connects to\n\nRisk amount, Position size.",
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          "The maximum you're willing to risk on one trade.",
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It prevents a single trade from being too large.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'Flags when a plan exceeds your chosen level.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Thinking it stops you from acting.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'This limit helps you see when one plan exceeds your usual single-trade risk.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It flags when your plan is above the selected limit. It does not block action.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'ignoring breaches',
+          'changing limits impulsively',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'stable limits',
+          'deliberate exceptions',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Risk amount, Position size.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-daily-loss-threshold',
+    title: 'Daily loss threshold',
+    summary: "A limit for how much you're willing to lose in a day.",
+    content:
+      "What this means\n\nA limit for how much you're willing to lose in a day.\n\nWhy it matters\n\nIt helps you step back when needed.\n\nHow PocketPilot frames it\n\nA planning boundary, not a prediction.\n\nCommon misunderstanding\n\nThinking it predicts losses.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nDaily loss threshold helps you recognize when enough risk has already been taken for one day.\n\nHow it behaves\n\nIt tracks loss context across the day.\n\nWhat tends to go wrong\n\ncontinuing without pause after threshold pressure appears\n\nWhat good looks like\n\nstepping back when triggered\n\nWhat it connects to\n\nRisk behavior, Trade frequency.",
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          "A limit for how much you're willing to lose in a day.",
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It helps you step back when needed.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'A planning boundary, not a prediction.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Thinking it predicts losses.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Daily loss threshold helps you recognize when enough risk has already been taken for one day.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It tracks loss context across the day.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'continuing without pause after threshold pressure appears',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'stepping back when triggered',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Risk behavior, Trade frequency.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-cooldown-after-loss',
+    title: 'Cooldown after loss',
+    summary: 'A pause after a loss before trading again.',
+    content:
+      'What this means\n\nA pause after a loss before trading again.\n\nWhy it matters\n\nIt helps avoid impulsive decisions.\n\nHow PocketPilot frames it\n\nA buffer you choose to apply.\n\nCommon misunderstanding\n\nSeeing it as a punishment.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nCooldown after loss creates space between a loss and the next decision.\n\nHow it behaves\n\nIt introduces a pause before planning again.\n\nWhat tends to go wrong\n\nskipping the pause mentally\n\nWhat good looks like\n\nslower, more deliberate decisions\n\nWhat it connects to\n\nDaily loss threshold, Behavior control.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'A pause after a loss before trading again.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It helps avoid impulsive decisions.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'A buffer you choose to apply.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Seeing it as a punishment.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Cooldown after loss creates space between a loss and the next decision.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It introduces a pause before planning again.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'skipping the pause mentally',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'slower, more deliberate decisions',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Daily loss threshold, Behavior control.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-confirmation-shell-and-non-dispatch-boundary',
+    title: 'Confirmation shell / non-dispatch boundary',
+    summary: 'A final check before you act.',
+    content:
+      'What this means\n\nA final check before you act.\n\nWhy it matters\n\nIt separates planning from execution.\n\nHow PocketPilot frames it\n\nPocketPilot supports decisions but does not place trades.\n\nCommon misunderstanding\n\nAssuming the system executes trades automatically.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nThis boundary separates planning from action.\n\nHow it behaves\n\nIt presents your plan for acknowledgement before handoff. PocketPilot does not place trades.\n\nWhat tends to go wrong\n\nskipping the review step\n\ntreating confirmation as a formality\n\nWhat good looks like\n\ndeliberate confirmation\n\nclear understanding of the plan\n\nWhat it connects to\n\nExecution readiness, User control.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'A final check before you act.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: [
+          'It separates planning from execution.',
+        ],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'PocketPilot supports decisions but does not place trades.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: [
+          'Assuming the system executes trades automatically.',
+        ],
+      },
+      {
+        heading: 'Layer 2: Deeper thinking',
+        body: [
+          'This layer adds optional deeper planning context beneath the beginner foundation.',
+        ],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'This boundary separates planning from action.',
+        ],
+      },
+      {
+        heading: 'How it behaves',
+        body: [
+          'It presents your plan for acknowledgement before handoff. PocketPilot does not place trades.',
+        ],
+      },
+      {
+        heading: 'What tends to go wrong',
+        body: [
+          'skipping the review step',
+          'treating confirmation as a formality',
+        ],
+      },
+      {
+        heading: 'What good looks like',
+        body: [
+          'deliberate confirmation',
+          'clear understanding of the plan',
+        ],
+      },
+      {
+        heading: 'What it connects to',
+        body: [
+          'Execution readiness, User control.',
+        ],
       },
     ],
     relatedTopicIds: [],

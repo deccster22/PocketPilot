@@ -22,3 +22,23 @@ A review point, not an automatic action. PocketPilot does not place a trade at t
 ## Common misunderstanding
 Thinking the trade will close automatically at this price.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+Target price is a review point, not a prediction.
+
+## How it behaves
+Targets can be structure-based, risk-based, or adjusted as context evolves.
+
+## What tends to go wrong
+- treating it as certain
+- exiting too early without review
+- holding too long without re-checking context
+
+## What good looks like
+- used to assess progress
+- flexible, context-aware decisions
+
+## What it connects to
+Reward/risk, Strategy type, Market structure.
