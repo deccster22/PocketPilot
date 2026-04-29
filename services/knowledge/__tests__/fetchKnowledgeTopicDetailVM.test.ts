@@ -103,4 +103,29 @@ describe('fetchKnowledgeTopicDetailVM', () => {
 
     expect(fetchKnowledgeTopicDetailVM(params)).toEqual(fetchKnowledgeTopicDetailVM(params));
   });
+
+  it('resolves P7-K12 first-rollout help topic IDs without using missing-topic fallback', () => {
+    const firstRolloutTopicIds = [
+      'glossary-stop-loss-price',
+      'glossary-target-price',
+      'glossary-risk-amount',
+      'glossary-risk-percent',
+      'glossary-guardrails',
+    ] as const;
+
+    firstRolloutTopicIds.forEach((topicId) => {
+      const result = fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId,
+      });
+
+      expect(result.availability.status).toBe('AVAILABLE');
+
+      if (result.availability.status !== 'AVAILABLE') {
+        throw new Error(`Expected ${topicId} to resolve, received ${result.availability.reason}.`);
+      }
+
+      expect(result.availability.topic.topicId).toBe(topicId);
+    });
+  });
 });

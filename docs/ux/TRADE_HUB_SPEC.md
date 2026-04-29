@@ -1,4 +1,4 @@
-# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P5-R16 + P7-K8 + P7-K9 + P7-K10 + P7-K11 plan)
+# Trade Hub Spec (P5-X + P5-R13 + P5-R14 + P5-R15 + P5-R16 + P7-K8 + P7-K9 + P7-K10 + P7-K11 + P7-K12)
 
 ## Purpose
 
@@ -122,6 +122,23 @@ Rules for later wiring:
 - keep submission/readiness/handoff boundary language plain in critical safety text
 - no UI-side term matching, ranking, or tooltip swarm behavior
 
+## P7-K12 Trade Hub Inline Knowledge Help Wiring (First Rollout)
+`P7-K12` implements only the first bounded runtime rollout from the K11 plan.
+
+Scope:
+- `Stop-loss price`
+- `Target price`
+- one active risk-basis label only (`Risk amount` or `Risk percent`)
+- `Guardrails`
+
+Rules:
+- `services/knowledge/createTradeHubHelpAffordances.ts` owns term eligibility and glossary/topic routing
+- `services/trade/fetchTradeHubVM.ts` and `services/risk/fetchRiskToolVM.ts` expose prepared affordances
+- `app/screens/TradeHubScreen.tsx` renders prepared affordances only and does not derive terms or topic IDs
+- no broad repeated-term linking and no dense numeric-summary linking by default
+- keep the non-trade boundary line explicit (`This screen does not place trades.`)
+- no readiness/submission/handoff semantic changes and no execution posture changes
+
 ## Surface Contract
 
 Trade Hub consumes a prepared `TradeHubSurfaceModel` from `services/trade/`.
@@ -152,6 +169,20 @@ Each `TradeHubPlanCard` contains:
 - `actionState`
 
 No raw market events, signal codes, or hidden strategy metadata are exposed to the UI.
+
+Trade Hub screen consumers also receive one prepared `TradeHubVM` wrapper from `services/trade/fetchTradeHubVM`:
+
+```ts
+{
+  contextualKnowledgeLane: ContextualKnowledgeLane,
+  inlineGlossaryHelp: InlineGlossaryAvailability,
+  inlineHelpAffordances: TradeHubHelpAffordanceAvailability,
+  model: TradeHubSurfaceModel,
+  scan: ForegroundScanResult
+}
+```
+
+The first-rollout affordance set stays bounded and optional. The wrapper does not authorize app-side matching, ranking, or topic ID derivation.
 
 Trade Hub confirmation-session consumers consume a prepared `ConfirmationSession` VM from `services/trade/`.
 
@@ -204,6 +235,28 @@ The risk-tool contract shape is:
 ```ts
 {
   generatedAt: string | null,
+  inlineHelpAffordances: {
+    status: 'UNAVAILABLE',
+    reason: 'NO_ELIGIBLE_TERMS' | 'NOT_ENABLED_FOR_PROFILE' | 'NOT_ENABLED_FOR_SURFACE'
+  } | {
+    status: 'AVAILABLE',
+    affordances: {
+      term: 'STOP_LOSS_PRICE' | 'TARGET_PRICE' | 'RISK_AMOUNT' | 'RISK_PERCENT' | 'GUARDRAILS',
+      slot:
+        | 'TRADE_HUB_GUARDRAILS'
+        | 'RISK_TOOL_STOP_LOSS_PRICE'
+        | 'RISK_TOOL_TARGET_PRICE'
+        | 'RISK_TOOL_ACTIVE_RISK_BASIS',
+      destination: {
+        glossaryTopicId: string,
+        glossaryPath: string,
+        topicId: string,
+        topicPath: string
+      },
+      tapTopicId: string,
+      followThroughTopicId: string
+    }[]
+  },
   summary: {
     state: 'UNAVAILABLE' | 'INCOMPLETE' | 'READY',
     symbol: string | null,
@@ -234,6 +287,7 @@ The risk-tool contract shape is:
 
 The risk-tool seam is support-only. It consumes prepared confirmation-session context, optional prepared quote context, and explicit user inputs and returns a calm sizing summary without constructing orders, implying execution readiness, or leaking provider/runtime detail.
 Prepared plan references may supply entry, stop, or target values when the selected confirmation session honestly carries them.
+First-rollout help affordances remain optional and bounded; they do not alter risk math, readiness semantics, or execution posture.
 P5-R4 deepens that support by improving the service-owned producer path upstream of the confirmation session, not by adding app-side interpretation.
 P5-R5 keeps that UI contract unchanged and only enriches the upstream producer path when scoped strategy/event context can honestly support a calm prepared stop or target.
 P5-R13 adds one explicit prepared stop/target availability contract with source labels and thin-context unavailability so the same service seams can expose richer references without inventing precision.

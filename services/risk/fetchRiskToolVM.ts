@@ -1,3 +1,5 @@
+import type { UserProfile } from '@/core/profile/types';
+import { createTradeHubHelpAffordances } from '@/services/knowledge/createTradeHubHelpAffordances';
 import { createRiskToolVM } from '@/services/risk/createRiskToolVM';
 import { selectRiskReferences } from '@/services/risk/selectRiskReferences';
 import type {
@@ -84,6 +86,7 @@ function resolvePreparedPlanContext(params: {
 }
 
 export async function fetchRiskToolVM(params: {
+  profile: UserProfile;
   confirmationSession: ConfirmationSession | null;
   preparedQuoteScan?: Pick<ForegroundScanResult, 'quotes'> | null;
   input: RiskToolInput;
@@ -107,7 +110,7 @@ export async function fetchRiskToolVM(params: {
     preparedPlanContext,
   });
 
-  return createRiskToolVM({
+  const riskToolVM = createRiskToolVM({
     input: params.input,
     references,
     context: {
@@ -120,4 +123,16 @@ export async function fetchRiskToolVM(params: {
     generatedAt: params.generatedAt,
     generatedAtMs: params.generatedAt === undefined ? params.nowProvider?.() : undefined,
   });
+
+  return {
+    ...riskToolVM,
+    inlineHelpAffordances: createTradeHubHelpAffordances({
+      profile: params.profile,
+      surface: 'RISK_TOOL',
+      activeRiskBasis: params.confirmationSession?.preview?.risk.activeBasis ?? null,
+      includeStopLossPrice: true,
+      includeTargetPrice: true,
+      includeActiveRiskBasis: true,
+    }),
+  };
 }

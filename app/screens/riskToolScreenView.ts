@@ -1,9 +1,11 @@
 import type { RiskToolVM } from '@/services/risk/types';
+import type { TradeHubHelpAffordance } from '@/services/knowledge/types';
 
 export type RiskToolDetailRow = {
   label: string;
   value: string;
   supportingText?: string;
+  helpAffordance?: TradeHubHelpAffordance;
 };
 
 export type RiskToolScreenViewData = {
@@ -73,12 +75,31 @@ function formatStatusText(state: RiskToolVM['summary']['state']): string {
   }
 }
 
+function findAffordance(
+  riskTool: RiskToolVM,
+  slot: TradeHubHelpAffordance['slot'],
+): TradeHubHelpAffordance | undefined {
+  if (riskTool.inlineHelpAffordances.status !== 'AVAILABLE') {
+    return undefined;
+  }
+
+  return riskTool.inlineHelpAffordances.affordances.find((affordance) => affordance.slot === slot);
+}
+
 export function createRiskToolScreenViewData(
   riskTool: RiskToolVM | null,
 ): RiskToolScreenViewData | null {
   if (!riskTool) {
     return null;
   }
+
+  const stopLossHelp = findAffordance(riskTool, 'RISK_TOOL_STOP_LOSS_PRICE');
+  const targetHelp = findAffordance(riskTool, 'RISK_TOOL_TARGET_PRICE');
+  const activeRiskBasisHelp = findAffordance(riskTool, 'RISK_TOOL_ACTIVE_RISK_BASIS');
+  const riskAmountHelp =
+    activeRiskBasisHelp?.term === 'RISK_AMOUNT' ? activeRiskBasisHelp : undefined;
+  const riskPercentHelp =
+    activeRiskBasisHelp?.term === 'RISK_PERCENT' ? activeRiskBasisHelp : undefined;
 
   return {
     stateText: formatStateText(riskTool.summary.state),
@@ -97,11 +118,13 @@ export function createRiskToolScreenViewData(
         label: 'Stop-loss price',
         value: formatValue(riskTool.summary.stopPrice, 'Not set'),
         supportingText: formatReferenceSource(riskTool.summary.stopReference.source),
+        ...(stopLossHelp ? { helpAffordance: stopLossHelp } : {}),
       },
       {
         label: 'Target price',
         value: formatValue(riskTool.summary.targetPrice, 'Not set'),
         supportingText: formatReferenceSource(riskTool.summary.targetReference.source),
+        ...(targetHelp ? { helpAffordance: targetHelp } : {}),
       },
       {
         label: 'Stop distance',
@@ -110,10 +133,12 @@ export function createRiskToolScreenViewData(
       {
         label: 'Risk amount',
         value: formatValue(riskTool.summary.riskAmount),
+        ...(riskAmountHelp ? { helpAffordance: riskAmountHelp } : {}),
       },
       {
         label: 'Risk percent',
         value: formatPercent(riskTool.summary.riskPercent),
+        ...(riskPercentHelp ? { helpAffordance: riskPercentHelp } : {}),
       },
       {
         label: 'Position size',

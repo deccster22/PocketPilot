@@ -53,6 +53,10 @@ describe('createRiskToolVM', () => {
 
     expect(result).toEqual({
       generatedAt: '2023-11-14T22:13:20.000Z',
+      inlineHelpAffordances: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
       summary: {
         state: 'READY',
         symbol: 'BTC',
@@ -210,6 +214,10 @@ describe('createRiskToolVM', () => {
 
     expect(result).toEqual({
       generatedAt: null,
+      inlineHelpAffordances: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
       summary: {
         state: 'UNAVAILABLE',
         symbol: null,
