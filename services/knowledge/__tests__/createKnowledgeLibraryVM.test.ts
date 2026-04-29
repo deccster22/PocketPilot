@@ -32,7 +32,7 @@ describe('createKnowledgeLibraryVM', () => {
       throw new Error('Expected knowledge library to be available.');
     }
 
-    expect(result.sections.map((section) => section.items.length)).toEqual([6, 10, 10, 5]);
+    expect(result.sections.map((section) => section.items.length)).toEqual([6, 15, 10, 10]);
     expect(result.sections[0].items.map((item) => item.topicId)).toEqual([
       'pp-choosing-profile-and-strategy',
       'pp-what-dashboard-is-for',
@@ -53,6 +53,24 @@ describe('createKnowledgeLibraryVM', () => {
       'strategy-trend-follow',
       'pp-what-strategy-preview-strategy-navigator-is-for',
     ]);
+    expect(result.sections[1].items.map((item) => item.topicId)).toEqual(
+      expect.arrayContaining([
+        'glossary-stop-loss-price',
+        'glossary-target-price',
+        'glossary-risk-amount',
+        'glossary-risk-percent',
+        'glossary-guardrails',
+      ]),
+    );
+    expect(result.sections[3].items.map((item) => item.topicId)).toEqual(
+      expect.arrayContaining([
+        'trade-hub-stop-loss-price',
+        'trade-hub-target-price',
+        'trade-hub-risk-amount',
+        'trade-hub-risk-percent',
+        'trade-hub-guardrails',
+      ]),
+    );
   });
 
   it('returns unavailable when no baseline nodes are present', () => {

@@ -237,6 +237,51 @@ export type InlineGlossaryAvailability =
       block: InlineGlossaryBlock;
     };
 
+export type TradeHubHelpAffordanceSurface = 'TRADE_HUB' | 'RISK_TOOL';
+
+export type TradeHubHelpAffordanceSlot =
+  | 'TRADE_HUB_GUARDRAILS'
+  | 'RISK_TOOL_STOP_LOSS_PRICE'
+  | 'RISK_TOOL_TARGET_PRICE'
+  | 'RISK_TOOL_ACTIVE_RISK_BASIS';
+
+export type TradeHubHelpAffordanceTerm =
+  | 'STOP_LOSS_PRICE'
+  | 'TARGET_PRICE'
+  | 'RISK_AMOUNT'
+  | 'RISK_PERCENT'
+  | 'GUARDRAILS';
+
+export type TradeHubHelpAffordanceTreatment = 'GLOSSARY_THEN_TOPIC';
+
+export type TradeHubHelpDestination = {
+  glossaryTopicId: string;
+  glossaryPath: string;
+  topicId: string;
+  topicPath: string;
+};
+
+export type TradeHubHelpAffordance = {
+  term: TradeHubHelpAffordanceTerm;
+  termLabel: string;
+  surface: TradeHubHelpAffordanceSurface;
+  slot: TradeHubHelpAffordanceSlot;
+  treatment: TradeHubHelpAffordanceTreatment;
+  destination: TradeHubHelpDestination;
+  tapTopicId: string;
+  followThroughTopicId: string;
+};
+
+export type TradeHubHelpAffordanceAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ELIGIBLE_TERMS' | 'NOT_ENABLED_FOR_PROFILE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      affordances: ReadonlyArray<TradeHubHelpAffordance>;
+    };
+
 export type InlineGlossarySignalSurface = 'DASHBOARD' | 'TRADE_HUB';
 
 export type InlineGlossarySignalProfileTier = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';

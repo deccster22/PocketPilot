@@ -5,7 +5,11 @@ import type { LastViewedState } from '@/services/orientation/lastViewedState';
 import { createSurfaceAccountContext } from '@/services/accounts/createSurfaceAccountContext';
 import { createContextualKnowledgeLane } from '@/services/knowledge/createContextualKnowledgeLane';
 import { createInlineGlossaryHelp } from '@/services/knowledge/createInlineGlossaryHelp';
-import type { InlineGlossaryAvailability } from '@/services/knowledge/types';
+import { createTradeHubHelpAffordances } from '@/services/knowledge/createTradeHubHelpAffordances';
+import type {
+  InlineGlossaryAvailability,
+  TradeHubHelpAffordanceAvailability,
+} from '@/services/knowledge/types';
 import { createTradeHubRiskLane } from '@/services/trade/createTradeHubRiskLane';
 import { createProtectionPlans } from '@/services/trade/createProtectionPlans';
 import { createTradeHubSurfaceModel } from '@/services/trade/createTradeHubSurfaceModel';
@@ -21,6 +25,7 @@ import { fetchSurfaceContext } from '@/services/upstream/fetchSurfaceContext';
 export type TradeHubVM = {
   contextualKnowledgeLane: ReturnType<typeof createContextualKnowledgeLane>;
   inlineGlossaryHelp: InlineGlossaryAvailability;
+  inlineHelpAffordances: TradeHubHelpAffordanceAvailability;
   model: TradeHubSurfaceModel;
   scan: ForegroundScanResult;
 };
@@ -82,6 +87,11 @@ export async function fetchTradeHubVM(params: {
     text: TRADE_HUB_SAFETY_TEXT,
     accountId: surfaceAccountContext.selectedAccountId,
   });
+  const inlineHelpAffordances = createTradeHubHelpAffordances({
+    profile: params.profile,
+    surface: 'TRADE_HUB',
+    includeGuardrails: true,
+  });
 
   return {
     contextualKnowledgeLane: createContextualKnowledgeLane({
@@ -91,6 +101,7 @@ export async function fetchTradeHubVM(params: {
       marketEvents: upstream.marketEvents,
     }),
     inlineGlossaryHelp,
+    inlineHelpAffordances,
     model,
     scan: upstream.scan,
   };

@@ -4,6 +4,10 @@ describe('createRiskToolScreenViewData', () => {
   it('reads the prepared risk VM without assembling calculations in the app', () => {
     const view = createRiskToolScreenViewData({
       generatedAt: '2026-04-05T00:00:00.000Z',
+      inlineHelpAffordances: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
       summary: {
         state: 'READY',
         symbol: 'BTC',
@@ -87,6 +91,10 @@ describe('createRiskToolScreenViewData', () => {
   it('keeps unavailable references quiet while still showing not-set values', () => {
     const view = createRiskToolScreenViewData({
       generatedAt: null,
+      inlineHelpAffordances: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
       summary: {
         state: 'INCOMPLETE',
         symbol: 'ETH',
@@ -128,5 +136,106 @@ describe('createRiskToolScreenViewData', () => {
         value: 'Not set',
       },
     ]);
+  });
+
+  it('maps prepared help affordances without app-side topic derivation', () => {
+    const view = createRiskToolScreenViewData({
+      generatedAt: null,
+      inlineHelpAffordances: {
+        status: 'AVAILABLE',
+        affordances: [
+          {
+            term: 'STOP_LOSS_PRICE',
+            termLabel: 'Stop-loss price',
+            surface: 'RISK_TOOL',
+            slot: 'RISK_TOOL_STOP_LOSS_PRICE',
+            treatment: 'GLOSSARY_THEN_TOPIC',
+            destination: {
+              glossaryTopicId: 'glossary-stop-loss-price',
+              glossaryPath: 'docs/knowledge/glossary/stop-loss-price.md',
+              topicId: 'trade-hub-stop-loss-price',
+              topicPath: 'docs/knowledge/trade-hub/stop-loss-price.md',
+            },
+            tapTopicId: 'glossary-stop-loss-price',
+            followThroughTopicId: 'trade-hub-stop-loss-price',
+          },
+          {
+            term: 'TARGET_PRICE',
+            termLabel: 'Target price',
+            surface: 'RISK_TOOL',
+            slot: 'RISK_TOOL_TARGET_PRICE',
+            treatment: 'GLOSSARY_THEN_TOPIC',
+            destination: {
+              glossaryTopicId: 'glossary-target-price',
+              glossaryPath: 'docs/knowledge/glossary/target-price.md',
+              topicId: 'trade-hub-target-price',
+              topicPath: 'docs/knowledge/trade-hub/target-price.md',
+            },
+            tapTopicId: 'glossary-target-price',
+            followThroughTopicId: 'trade-hub-target-price',
+          },
+          {
+            term: 'RISK_PERCENT',
+            termLabel: 'Risk percent',
+            surface: 'RISK_TOOL',
+            slot: 'RISK_TOOL_ACTIVE_RISK_BASIS',
+            treatment: 'GLOSSARY_THEN_TOPIC',
+            destination: {
+              glossaryTopicId: 'glossary-risk-percent',
+              glossaryPath: 'docs/knowledge/glossary/risk-percent.md',
+              topicId: 'trade-hub-risk-percent',
+              topicPath: 'docs/knowledge/trade-hub/risk-percent.md',
+            },
+            tapTopicId: 'glossary-risk-percent',
+            followThroughTopicId: 'trade-hub-risk-percent',
+          },
+        ],
+      },
+      summary: {
+        state: 'READY',
+        symbol: 'BTC',
+        entryPrice: 100,
+        stopPrice: 95,
+        targetPrice: 108,
+        entryReference: {
+          value: 100,
+          source: 'PREPARED_QUOTE',
+        },
+        stopReference: {
+          value: 95,
+          source: 'USER_INPUT',
+        },
+        targetReference: {
+          value: 108,
+          source: 'PREPARED_PLAN',
+        },
+        stopDistance: 5,
+        riskAmount: 12.5,
+        riskPercent: 0.125,
+        positionSize: 999,
+        rewardRiskRatio: 7.3,
+        notes: [],
+      },
+    });
+
+    expect(view?.detailRows.find((row) => row.label === 'Stop-loss price')?.helpAffordance?.term).toBe(
+      'STOP_LOSS_PRICE',
+    );
+    expect(
+      view?.detailRows.find((row) => row.label === 'Stop-loss price')?.helpAffordance?.tapTopicId,
+    ).toBe('glossary-stop-loss-price');
+    expect(view?.detailRows.find((row) => row.label === 'Target price')?.helpAffordance?.term).toBe(
+      'TARGET_PRICE',
+    );
+    expect(
+      view?.detailRows.find((row) => row.label === 'Target price')?.helpAffordance?.tapTopicId,
+    ).toBe('glossary-target-price');
+    expect(view?.detailRows.find((row) => row.label === 'Risk percent')?.helpAffordance?.term).toBe(
+      'RISK_PERCENT',
+    );
+    expect(
+      view?.detailRows.find((row) => row.label === 'Risk percent')?.helpAffordance?.tapTopicId,
+    ).toBe('glossary-risk-percent');
+    expect(view?.detailRows.find((row) => row.label === 'Risk amount')?.helpAffordance).toBeUndefined();
   });
 });

@@ -1,5 +1,6 @@
 import type { ContextualKnowledgeLane } from '@/services/knowledge/types';
 import type { InlineGlossaryAvailability } from '@/services/knowledge/types';
+import type { TradeHubHelpAffordanceAvailability } from '@/services/knowledge/types';
 import {
   createContextualKnowledgeSectionViewData,
   type ContextualKnowledgeSectionViewData,
@@ -91,6 +92,7 @@ export type TradeHubScreenViewData = {
   profileLabel: string;
   safetyText: string;
   safetyInlineGlossary: InlineGlossaryAvailability;
+  inlineHelpAffordances: TradeHubHelpAffordanceAvailability;
   confirmationText: string;
   message:
     | {
@@ -405,6 +407,7 @@ export function createTradeHubScreenViewData(
   messagePolicyLane?: MessagePolicyLane | null,
   contextualKnowledgeLane?: ContextualKnowledgeLane | null,
   inlineGlossaryHelp?: InlineGlossaryAvailability | null,
+  inlineHelpAffordances?: TradeHubHelpAffordanceAvailability | null,
 ): TradeHubScreenViewData | null {
   if (!surface) {
     return null;
@@ -414,6 +417,10 @@ export function createTradeHubScreenViewData(
     profileLabel: surface.meta.profile,
     safetyText: TRADE_HUB_SAFETY_TEXT,
     safetyInlineGlossary: inlineGlossaryHelp ?? {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ELIGIBLE_TERMS',
+    },
+    inlineHelpAffordances: inlineHelpAffordances ?? {
       status: 'UNAVAILABLE',
       reason: 'NO_ELIGIBLE_TERMS',
     },

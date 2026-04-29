@@ -1,6 +1,6 @@
 ---
 title: "Trade Hub Help Integration Plan"
-status: "draft"
+status: "active"
 owner: "founder"
 doc_class: "knowledge-meta"
 purpose: "Defines the first bounded Trade Hub and Risk Tool term-to-knowledge integration plan for later service-owned wiring"
@@ -95,6 +95,35 @@ The following guardrails apply to later wiring:
 - Taps on lightweight terms should continue to use existing glossary/help treatment paths from K8/K9.
 - Deeper destinations should route to existing Knowledge Topic detail paths.
 - No new explanation screen is introduced unless an existing route cannot support required treatment.
+
+## P7-K12 First-Rollout Implementation Notes
+
+`P7-K12` implements only the first bounded rollout from this plan:
+
+1. `Stop-loss price`
+2. `Target price`
+3. one active risk-basis label only: `Risk amount` or `Risk percent`
+4. `Guardrails`
+
+Runtime seam:
+- `services/knowledge/createTradeHubHelpAffordances.ts` now owns first-rollout term eligibility and glossary/topic routing.
+- `services/trade/fetchTradeHubVM.ts` and `services/risk/fetchRiskToolVM.ts` expose prepared affordance metadata.
+- `app/screens/TradeHubScreen.tsx` renders prepared affordances only and does not perform local term matching, ranking, or topic ID derivation.
+
+Placement and anti-clutter posture:
+- stop-loss and target help are shown once on Risk Tool input labels
+- active-basis help appears on one basis label only (`Risk amount` or `Risk percent`)
+- guardrails help appears once in Guardrail Preferences support copy
+- dense numeric summaries remain plain for scanability
+- submission/readiness/handoff boundary text remains plain and unlinked
+
+Deliberately unwired in `P7-K12`:
+- entry price, prepared planning levels, position size, reward/risk, and broader guardrail sub-terms
+- broad repeated-term linking across every occurrence
+- tooltip swarm behavior or wiki-style surface expansion
+
+Preview requirement:
+- manual preview remains required for this rollout because it adds new visible/tappable behavior on live Trade Hub and Risk Tool surfaces.
 
 ## Reconciliation Notes
 

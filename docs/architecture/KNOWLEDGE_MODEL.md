@@ -1,4 +1,4 @@
-# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P7-K10, P7-K11 plan, P9-S2)
+# Knowledge Model (P7-K1, P7-K2, P7-K3, P7-K4, P7-K5, P7-K6, P7-K7, P7-K8, P7-K9, P7-K10, P7-K11, P7-K12, P9-S2)
 
 ## Purpose
 
@@ -14,7 +14,8 @@
 `P7-K8` adds one canonical inline glossary-help seam plus one canonical seen-term acknowledgement seam for narrow explanatory-copy proof paths on Dashboard and Trade Hub.
 `P7-K9` adds one canonical glossary alias/index normalization seam and threads it into the existing inline selector so canonical and alias variants resolve more reliably without widening surfaces.
 `P7-K10` adds one canonical internal exposure/acknowledgement aggregate signal seam plus one canonical summary seam for future tuning without adding a user-facing analytics surface.
-`P7-K11` adds one docs-side Trade Hub term-help integration plan that bounds term eligibility, profile/surface treatment, and no-linking rules before future runtime wiring.
+`P7-K11` adds one docs-side Trade Hub term-help integration plan that bounds term eligibility, profile/surface treatment, and no-linking rules before runtime wiring.
+`P7-K12` adds one runtime Trade Hub help-affordance seam for a bounded first-rollout term set and keeps app rendering passive with no local term matching/ranking.
 `P9-S2` adds one preview-owned follow-through seam in `services/strategyNavigator/` that consumes the same canonical knowledge catalog.
 
 The current goal is simple:
@@ -325,11 +326,53 @@ Rules:
 - signal hooks remain service-owned, deterministic, and user-invisible
 - no analytics dashboard, debug console, or network telemetry is introduced in this phase
 
-`P7-K11` is planning-only and adds no new runtime contract in this phase. It defines the implementation boundary for later wiring:
+`P7-K11` defines the wiring boundary:
 
 - term eligibility, surface/profile treatment, and glossary/topic routing remain service-owned
 - `app/` consumes prepared affordances only and does not perform local term matching/ranking
 - first rollout stays narrow and must avoid dense-link or boundary-weakening behavior
+
+`P7-K12` adds one explicit bounded first-rollout help-affordance contract:
+
+```ts
+type TradeHubHelpAffordanceAvailability =
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'NO_ELIGIBLE_TERMS' | 'NOT_ENABLED_FOR_PROFILE' | 'NOT_ENABLED_FOR_SURFACE';
+    }
+  | {
+      status: 'AVAILABLE';
+      affordances: readonly TradeHubHelpAffordance[];
+    };
+```
+
+```ts
+type TradeHubHelpAffordance = {
+  term: 'STOP_LOSS_PRICE' | 'TARGET_PRICE' | 'RISK_AMOUNT' | 'RISK_PERCENT' | 'GUARDRAILS';
+  surface: 'TRADE_HUB' | 'RISK_TOOL';
+  slot:
+    | 'TRADE_HUB_GUARDRAILS'
+    | 'RISK_TOOL_STOP_LOSS_PRICE'
+    | 'RISK_TOOL_TARGET_PRICE'
+    | 'RISK_TOOL_ACTIVE_RISK_BASIS';
+  destination: {
+    glossaryTopicId: string;
+    glossaryPath: string;
+    topicId: string;
+    topicPath: string;
+  };
+  tapTopicId: string;
+  followThroughTopicId: string;
+};
+```
+
+Rules:
+
+- `services/knowledge/createTradeHubHelpAffordances.ts` owns bounded term eligibility and routing
+- first rollout only includes stop-loss price, target price, one active risk-basis label, and guardrails
+- advanced profile treatment stays lighter by default
+- dense numeric summaries remain plain by default to avoid link-soup behavior
+- `app/` renders prepared affordances only and does not derive topic IDs or term eligibility
 
 ## Canonical Knowledge Tree
 
@@ -381,6 +424,8 @@ knowledgeCatalog
 -> inlineGlossarySeenState acknowledge/update seam
 -> recordInlineGlossarySignals
 -> fetchInlineGlossarySignalSummary
+-> createTradeHubHelpAffordances
+-> bounded Trade Hub / Risk Tool first-rollout term affordances
 -> narrow Dashboard / Trade Hub inline glossary proof paths
 ```
 
@@ -410,6 +455,7 @@ Responsibilities:
 - `services/knowledge/selectInlineGlossaryTerms.ts` owns narrow inline term eligibility and term-to-topic resolution
 - `services/knowledge/createGlossaryTermIndex.ts` owns inline glossary alias/index normalization for canonical term variants
 - `services/knowledge/createInlineGlossaryHelp.ts` owns inline glossary composition from term selection, profile shaping, and seen-state inputs
+- `services/knowledge/createTradeHubHelpAffordances.ts` owns bounded first-rollout Trade Hub/Risk Tool term eligibility plus glossary/topic routing
 - `services/knowledge/inlineGlossarySeenState.ts` owns explicit acknowledgement-state storage and updates for first-encounter shaping
 - `services/knowledge/inlineGlossarySignalStore.ts` owns compact surfaced/acknowledged aggregate counters
 - `services/knowledge/recordInlineGlossarySignals.ts` owns normalized signal recording for surfaced and acknowledged terms
@@ -436,6 +482,7 @@ Rules locked in this phase:
 - `P7-K8` keeps the same live surfaces and adds one narrow inline glossary treatment on explanatory copy only; term selection, first-encounter shaping, and acknowledgement state remain service-owned
 - `P7-K9` keeps the same live surfaces and improves service-owned alias/matching quality only; it does not widen rollout or add app-side matching logic
 - `P7-K10` keeps the same live surfaces and adds internal aggregate tuning hooks only; it does not add user-facing analytics UI, debug surfaces, or network shipping
+- `P7-K12` keeps the same live surfaces and adds one bounded first-rollout term-help seam only; it does not add broad auto-linking, app-side matching logic, or gating behavior
 - `P9-S2` keeps actual preview follow-through selection inside `services/strategyNavigator/`
 - other surfaces may still return `NOT_ENABLED_FOR_SURFACE`
 - missing or unsupported topic selection must return explicit `UNAVAILABLE`

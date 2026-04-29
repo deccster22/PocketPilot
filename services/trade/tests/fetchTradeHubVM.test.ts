@@ -348,6 +348,10 @@ describe('fetchTradeHubVM', () => {
       status: 'UNAVAILABLE',
       reason: 'NOT_ENABLED_FOR_PROFILE',
     });
+    expect(result.inlineHelpAffordances).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'NOT_ENABLED_FOR_PROFILE',
+    });
     expect(JSON.stringify(result.model)).not.toContain('hidden-signal');
     expect(JSON.stringify(result.model)).not.toContain('hidden');
   });

@@ -173,6 +173,10 @@ describe('createTradeHubScreenViewData', () => {
         status: 'UNAVAILABLE',
         reason: 'NO_ELIGIBLE_TERMS',
       },
+      inlineHelpAffordances: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
       confirmationText: 'Every action remains confirmation-safe and non-executing in this phase.',
       message: {
         visible: false,
@@ -413,6 +417,69 @@ describe('createTradeHubScreenViewData', () => {
       safetyInlineGlossary: {
         status: 'AVAILABLE',
       },
+      inlineHelpAffordances: {
+        status: 'UNAVAILABLE',
+        reason: 'NO_ELIGIBLE_TERMS',
+      },
+    });
+  });
+
+  it('passes through prepared Trade Hub help affordances without local routing logic', () => {
+    const view = createTradeHubScreenViewData(
+      {
+        primaryPlan: null,
+        alternativePlans: [],
+        riskLane: createUnavailableTradeHubRiskLane(),
+        meta: {
+          hasPrimaryPlan: false,
+          profile: 'BEGINNER',
+          requiresConfirmation: true,
+        },
+      },
+      createMessagePolicyLane(unavailableMessagePolicy()),
+      undefined,
+      undefined,
+      {
+        status: 'AVAILABLE',
+        affordances: [
+          {
+            term: 'GUARDRAILS',
+            termLabel: 'Guardrails',
+            surface: 'TRADE_HUB',
+            slot: 'TRADE_HUB_GUARDRAILS',
+            treatment: 'GLOSSARY_THEN_TOPIC',
+            destination: {
+              glossaryTopicId: 'glossary-guardrails',
+              glossaryPath: 'docs/knowledge/glossary/guardrails.md',
+              topicId: 'trade-hub-guardrails',
+              topicPath: 'docs/knowledge/trade-hub/guardrails.md',
+            },
+            tapTopicId: 'glossary-guardrails',
+            followThroughTopicId: 'trade-hub-guardrails',
+          },
+        ],
+      },
+    );
+
+    expect(view?.inlineHelpAffordances).toEqual({
+      status: 'AVAILABLE',
+      affordances: [
+        {
+          term: 'GUARDRAILS',
+          termLabel: 'Guardrails',
+          surface: 'TRADE_HUB',
+          slot: 'TRADE_HUB_GUARDRAILS',
+          treatment: 'GLOSSARY_THEN_TOPIC',
+          destination: {
+            glossaryTopicId: 'glossary-guardrails',
+            glossaryPath: 'docs/knowledge/glossary/guardrails.md',
+            topicId: 'trade-hub-guardrails',
+            topicPath: 'docs/knowledge/trade-hub/guardrails.md',
+          },
+          tapTopicId: 'glossary-guardrails',
+          followThroughTopicId: 'trade-hub-guardrails',
+        },
+      ],
     });
   });
 
@@ -430,7 +497,7 @@ describe('createTradeHubScreenViewData', () => {
     expect(source).toMatch(/surface\.riskLane\.guardrailEvaluationAvailability/);
     expect(source).not.toMatch(/kind === 'GUARDED_STOP'/);
     expect(source).not.toMatch(
-      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
+      /createPreparedMessageInputs|createPreparedMessageRationale|subjectScope|changeStrength|confirmationSupport|createContextualKnowledgeLane|fetchContextualKnowledgeAvailability|createContextualKnowledgeSelectionContext|selectContextualKnowledgeTopics|createInlineGlossaryHelp|selectInlineGlossaryTerms|createGlossaryTermIndex|recordInlineGlossarySignals|fetchInlineGlossarySignalSummary|inlineGlossarySignalStore|createInlineGlossaryAcknowledgementKey|createTradeHubHelpAffordances|knowledgeCatalog|selectedTopicIds|selectionReason|linkage|KnowledgeTopicScreen|ContextualKnowledgeCard|fetchKnowledgeTopicDetailVM/,
     );
     expect(source).not.toMatch(/executionCapability|unavailableReason|supportsBracketOrders|supportsOCO/);
     expect(source).not.toMatch(/Math\.abs|portfolioValue|maxPositionSize|entryPrice|stopPrice/);

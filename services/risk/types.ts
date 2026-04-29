@@ -1,3 +1,5 @@
+import type { TradeHubHelpAffordanceAvailability } from '@/services/knowledge/types';
+
 export type RiskReferenceSource = 'USER_INPUT' | 'PREPARED_QUOTE' | 'PREPARED_PLAN' | 'UNAVAILABLE';
 
 export type RiskReferenceValue = {
@@ -54,4 +56,5 @@ export type RiskToolSummary = {
 export type RiskToolVM = {
   generatedAt: string | null;
   summary: RiskToolSummary;
+  inlineHelpAffordances: TradeHubHelpAffordanceAvailability;
 };
