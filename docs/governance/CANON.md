@@ -1,15 +1,32 @@
 ---
 Title: PocketPilot - CANON
-Version: 0.5
-Source: docs/source/PocketPilot_CANON.pdf
-Last Updated: 2026-04-09
+Version: 0.6
+Source: project-source CANON v0.6 source refresh + docs/phases/PHASE_MAP.md
+Last Updated: 2026-04-29
 ---
 
-# PocketPilot - CANON v0.5
+# PocketPilot - CANON v0.6
 
 Product philosophy, locked architecture decisions, canonical object definitions, and phased delivery rules.
 
-This revision preserves the major section structure of CANON v0.4, adds missing architectural primitives, coalesces phase models, and records genuine tensions where naming or sequencing diverges across sources.
+This revision preserves the North Star, Anti-Vision, major section structure, and core architecture principles from CANON v0.5 while refreshing authority-layer status language against current repo reality.
+
+It does not rewrite PocketPilot's doctrine. It updates the parts of CANON that had fallen behind the build: prepared service-owned seams, selected-account integrity, Strategy Preview / Navigator maturity, Knowledge Library maturity, reflection-family foundations, and the current phase ledger relationship.
+
+## v0.6 Status Refresh Scope
+
+This source refresh exists because the repo has moved beyond the older v0.5 phase-status snapshot.
+
+The refresh:
+
+- preserves the existing North Star, Anti-Vision, and core architecture posture
+- updates development workstream language so `P6`, `P7`, `P8`, and `P9` are no longer described through stale early checkpoints
+- recognizes `docs/phases/PHASE_MAP.md` as the canonical audited phase taxonomy and implementation-status ledger
+- recognizes prepared service-owned contracts and VMs as the preferred surface pattern
+- recognizes selected-account truth as an explicit service-owned seam
+- recognizes the current Strategy Preview / Navigator, Knowledge Library, Since Last Checked, Insights, and Trade Hub risk-support foundations without claiming those broader families are complete
+
+CANON remains the doctrine and architecture source of truth. `PHASE_MAP.md` remains the detailed build ledger.
 
 ## North Star
 
@@ -82,7 +99,8 @@ Strategy alignment, meaningful events, and action-support logic must be derived 
 - It should update quietly rather than theatrically
 - It must support quick open-close behaviour
 - Snapshot should behave like a financial Primary Flight Display: trend + state + change, not raw data overload
-- Permitted secondary indicators include strategy fit, volatility context, and signals contributing to alignment, but they must remain visually subordinate to the core triad
+- Permitted secondary indicators include strategy fit, volatility context, meaningful-change briefing, and signals contributing to alignment, but they must remain visually subordinate to the core triad
+- Since Last Checked may appear as a compact, account-scoped briefing below Strategy Status, but it must remain non-inbox-like and clear-after-view
 - Snapshot answers "What's going on for my strategy?" in under three seconds
 
 ### 5. 30,000 ft View
@@ -139,6 +157,7 @@ type ProtectionPlan = {
 - Execution layer adapts per platform capability
 - Bracket/OCO supported -> single API flow
 - Separate orders required -> post-trade guided sequence
+- Current repo posture remains support-first and non-dispatching; prepared planning, readiness, confirmation, and submission-intent seams do not authorize live order dispatch
 
 ## Multi-Account Architecture
 
@@ -147,17 +166,21 @@ type ProtectionPlan = {
 - Each account contains platform capability matrix, portfolio value, base currency, risk settings, and strategy assignment
 - Single-account mode hides unnecessary account selection UI
 - Multi-account mode supports a nominated primary account or highest-value fallback
+- Current repo reality includes a selected-account resolver and prepared account-context seam that downstream surfaces consume rather than reconstructing account truth locally
 
 ### 10. Single vs Multi-Account UX
 
 - Single account: no account selector shown; all data implicitly scoped to that account
 - Multi-account: user can nominate primary account; strategy is assignable per account; switching accounts switches strategy context
+- Account switching must remain intentional and service-owned
+- Account cues should stay calm and subordinate; they must not become a full account-management cockpit by accident
 
 ### 11. Aggregation Rules
 
 - Allowed: portfolio value aggregation, exposure aggregation, asset-level position aggregation
-- Not allowed: aggregated global strategy alignment, aggregated fit signals
+- Not allowed: aggregated global strategy alignment, aggregated fit signals, aggregated alert truth, aggregated risk truth, or aggregate action-support truth
 - Signals are account-bound
+- Aggregate holdings or exposure views may appear as context only; they must remain visually and semantically secondary to selected-account strategy truth
 
 ### 12. Snapshot Modes (Multi-Account)
 
@@ -193,6 +216,7 @@ type MarketEvent = {
 - Strategy alignment change, volatility spike, candle pattern formation, regime shift, and price threshold all resolve to `MarketEvent` instances
 - `MarketEvent` is the backbone for alerts, Snapshot updates, Since Last Checked, Event Ledger, reflection, journaling, and exports
 - Do not proliferate ad-hoc event formats
+- In visual design, `MarketEvent` is also the preferred atomic interpreted UI unit; naked indicator tiles are not PocketPilot's core product language
 
 ### 14. EventLedger and UserActionEvent
 
@@ -215,6 +239,7 @@ type EventLedgerEntry = {
 - User actions should record strategy active at the time, alignment state, signal context, price, and action metadata
 - The ledger exists to contextualise, not moralise
 - Reflection summaries may compare aligned vs outside-strategy actions without shaming language
+- Current Insights foundations may summarize, archive, compare, journal, and export ledger-backed context, but those surfaces remain descriptive and non-moralizing
 
 ### 15. StrategyContext Contract
 
@@ -261,6 +286,7 @@ type ProfileVoicePolicy = {
 - `ProfileConfig` is the canonical user-facing behaviour object
 - `ProfileVoicePolicy` is the narration rule layer nested beneath the profile
 - Beginner suggestions must remain observational rather than directive
+- Profiles change density, scaffolding, explanation depth, signal exposure, and feature access; they do not create three separate visual identities or three separate logic systems
 
 ### 17. KnowledgeNode and Knowledge Layer
 
@@ -276,12 +302,14 @@ type KnowledgeNode = {
 };
 ```
 
-- Knowledge now has a landed baseline through library, topic-detail, and contextual-eligibility seams, but it still supports guardrails and orientation without gating features
+- Knowledge now has a landed baseline through library, topic-detail, contextual-eligibility, contextual surface rollout, density shaping, topic-linkage, topic-detail handoff, inline glossary help, alias normalization, exposure/tuning hooks, and Trade Hub term-help planning seams
+- The active knowledge corpus now includes the family-based knowledge tree plus imported Trade Hub risk-planning, strategy, and concept learning layers
 - Beginner access should be stable and obvious
 - Intermediate access should include contextual links during drift or ambiguity
 - Advanced access should remain available without constant surfacing
 - Knowledge Library should exist as a persistent tab and as a contextual support layer
 - Knowledge must remain accessible, optional, and non-intrusive
+- Knowledge supports confidence and comprehension, but must never gate use or punish the user for not reading
 
 ### 18. Relevance Principle and Message Filtering
 
@@ -290,16 +318,20 @@ PocketPilot avoids signal overproduction by filtering output through Strategy ->
 - Users see signals relevant to their strategy, assets, and account context
 - Alert volume must be subordinate to interpreted usefulness
 - No raw-indicator-to-push pipeline is allowed
+- Contextual knowledge, glossary help, message policy, and Strategy Navigator follow-through must use the same relevance discipline and remain service-owned
 
 ### 19. Strategy Preview / Strategy Navigator
 
-PocketPilot now has a prepared first-wave foundation for this exploratory feature family through `P9-S1` to `P9-S5`. Current implementation may use `Strategy Preview` as the visible exploratory surface label while `Strategy Navigator` remains the canonical internal family name.
+PocketPilot now has a prepared foundation for this exploratory feature family through `P9-S1` to `P9-S9`. Current implementation may use `Strategy Preview` as the visible exploratory surface label while `Strategy Navigator` remains the canonical internal family name.
 
 - Shows how interpreted events would appear
 - Shows how alerts behave
 - Shows how the dashboard shifts
 - Reduces beginner commitment anxiety
+- Supports preview-to-knowledge follow-through and explanation deepening
+- Supports bounded scenario contrast, fit contrast, nearby-alternative context, strategy metadata normalization, and conservative mobile progressive disclosure
 - Must remain simulated, descriptive, and non-directive
+- Must not become a ranking engine, recommendation surface, predictive simulator, or execution handoff
 
 ### 20. Quick Action Panel Rules
 
@@ -309,6 +341,7 @@ Quick actions belong inside Trade Hub and should remain constrained.
 - Always require confirmation
 - Prefer alignment-strength or equivalent discipline gate before surfacing high-velocity actions
 - Do not let quick actions collapse PocketPilot into casino behaviour
+- Current Trade Hub posture remains deliberate, confirmation-safe, and non-dispatching
 
 ### 21. Signal Rules
 
@@ -336,6 +369,7 @@ Signal exposure must scale by profile and strategy relevance.
 - Strategy alignment alerts are account-scoped
 - Risk alerts are account-scoped
 - Message policy is a canonical service-owned seam with explicit families: `BRIEFING`, `ALERT`, `REORIENTATION`, `REFERRAL`, and `GUARDED_STOP`
+- Since Last Checked is a calm briefing pattern, not an inbox, feed, badge system, or notification center
 - No global signal aggregation
 - Foreground-only scanning remains the Phase 1 rule
 - Any future push logic must be explicitly phase-gated and cannot rely on background market polling until guardrails are revised
@@ -349,7 +383,25 @@ Baseline knowledge foundation now exists, but the governing posture does not cha
 - Beginner: stable, always-visible strategy knowledge access
 - Intermediate: contextual links during drift
 - Advanced: documentation accessible but not constantly surfaced
-- Knowledge Library must also support multiple media types and contextual linking from signals, strategies, and events
+- Knowledge Library must support multiple media types and contextual linking from signals, strategies, events, preview surfaces, and selected planning terms where explicitly wired
+- Term help and glossary support must remain sparse, service-owned, non-gating, and non-cluttering
+- Broader surface expansion should follow measured relevance, not enthusiasm
+
+## Visual And UX Doctrine
+
+PocketPilot's visual system is governed by the same product laws as its architecture.
+
+- The UI should feel like financial aviation as an information principle, not literal cockpit cosplay
+- Snapshot is the scan surface and must preserve triad supremacy
+- Dashboard is the focus workspace and must preserve Prime / Secondary / Deep hierarchy
+- Trade Hub is deliberate action support and should feel closer to a pre-flight checklist than a trading terminal
+- Profiles change density and scaffolding, not visual identity
+- Color is semantic: neutral structure, restrained blue for information, amber for meaningful change or watchfulness, and very restrained red for exceptional safety states only
+- Motion confirms orientation; it must not manufacture emotion or urgency
+- MarketEvent, status chips, trend vectors, prepared context cards, Trade plan cards, and confirmation step rows are the right kind of product primitives
+- The design system should reject raw indicator walls, red/green casino semantics, alert theatre, profile-specific skins, and one-tap action energy
+
+Detailed visual token, component, and Figma rules live outside CANON. CANON locks the behavioural boundaries those design artifacts must respect.
 
 ## Guardrails Philosophy (Phase 2 and Beyond)
 
@@ -361,6 +413,7 @@ Baseline knowledge foundation now exists, but the governing posture does not cha
 - PocketPilot may alert, suggest, or notify. It must not silently prevent or override by default
 - Guardrails should mirror informed structure and self-chosen discipline rather than external control
 - Strategy logic, market regime, and risk management intersect but do not collapse into one override layer
+- Current guardrail evaluation remains descriptive and non-blocking unless a future explicit opt-in enforcement mode is canonised
 
 ## Open Questions (Parked)
 
@@ -372,6 +425,8 @@ Baseline knowledge foundation now exists, but the governing posture does not cha
 - How much of the financial-PFD metaphor becomes visible language vs internal design principle
 - Exact placement of Year in Review and compare-period tooling within Insights
 - Whether quick actions remain advanced-only forever or become capability-gated by explicit consent
+- Whether and when broader glossary / contextual knowledge surfaces expand beyond the current service-owned lanes
+- Whether future Strategy Navigator depth justifies richer profile-aware disclosure defaults without drifting into recommendation or ranking
 
 ## Phase Targets
 
@@ -412,25 +467,34 @@ Baseline knowledge foundation now exists, but the governing posture does not cha
 
 ## Development Workstream Phasing
 
-Since v0.5, several subphases and cross-cutting groundwork families have landed. In particular, `P5-R1` to `P5-R5`, `P6-A1` to `P6-A4`, `PX-C1`, `PX-C2`, and `PX-MA1`, `P7-K1` to `P7-K3`, `P8-I1` to `P8-I4`, `P9-S1` to `P9-S5`, `PX-E1` and `PX-E2`, and `PX-API1` to `PX-API5` are now part of repo reality.
+The current repo has moved well beyond the original CANON v0.5 phase-language snapshot.
 
-`docs/phases/PHASE_MAP.md` is the canonical taxonomy and implementation-status reconciliation document for landed subphases and PX sequencing. PX families remain cross-cutting and do not imply completion of numbered product families.
+`docs/phases/PHASE_MAP.md` is the canonical taxonomy and implementation-status reconciliation document for landed subphases, PX sequencing, and docs/admin lanes. PX families remain cross-cutting and do not imply completion of numbered product families. DOC families are docs/admin work and do not imply runtime or product-family completion.
 
 ### Historical / Already Landed
 
-- P0: Vision, doctrine, architecture and repo discipline foundation
+- P0: Vision, doctrine, architecture, and repo-discipline foundation
 - P1: Strategy engine foundations
 - P2: Snapshot / provider / governance / debug observatory foundation
-- P3: Event system and orientation layer
-- P4: Snapshot + Dashboard UX shaping
-- P5: Trade Hub and `ProtectionPlan`
+- P3: Event system and orientation spine, including MarketEvent, EventLedger, query seam, Since Last Checked foundation, and OrientationContext
+- P4: Snapshot and Dashboard shaping, including SnapshotModel, profile shaping, Dashboard model, Dashboard surface, and upstream seam split
+- P5: Trade Hub and `ProtectionPlan`, including confirmation, readiness, submission-intent, execution-boundary hardening, risk support, prepared planning levels, guardrail preference/evaluation support, and plain-language Trade Hub copy through `P5-R16`
 
 ### Current Families / Partial Foundations
 
-- P6: Alerts, reorientation, and message policy family; groundwork now exists through the `P6-R*` and `P6-A*` lanes, but the broader family remains incomplete
-- P7: Knowledge baseline family; foundation, topic-detail, and contextual-eligibility seams now exist through `P7-K1` to `P7-K3`
-- P8: Insights, Event Ledger, Since Last Checked, and reflection family; early foundations landed through `P8-I1` to `P8-I4`
-- P9: Pattern Navigator / Strategy Navigator / richer explanation family; a prepared first wave now exists through `P9-S1` to `P9-S5`, while `PX-E*` remains groundwork rather than proof of full `P9` completion
+- P6: Alerts, reorientation, Snapshot briefing, and message policy family; groundwork exists through `P6-R*`, `P6-A1` to `P6-A8`, and related Snapshot/Insights continuity, but the broader family remains incomplete
+- P7: Knowledge baseline family; foundation exists through `P7-K1` to `P7-K11`, with the active knowledge corpus also strengthened by `PX-KI1` to `PX-KI5`, but broader knowledge depth, integration, and visual learning layers remain incomplete
+- P8: Insights, Event Ledger, Since Last Checked, and reflection family; foundations exist through `P8-I1` to `P8-I12`, including history, archive/detail, compare windows, summaries, Year in Review, exports, journal groundwork, and Since Last Checked archive continuity, but the broader reflection family remains incomplete
+- P9: Pattern Navigator / Strategy Navigator / richer explanation family; prepared Strategy Preview / Navigator foundations exist through `P9-S1` to `P9-S9`, including preview, knowledge follow-through, explanation deepening, scenario contrast, fit contrast, nearby alternatives, metadata normalization, and mobile disclosure, but the broader intelligence/explanation family remains incomplete
+
+### Cross-Cutting And Docs/Admin Reality
+
+- `PX-API1` to `PX-API5`: provider, quote, runtime, policy, health-windowing, and diagnostics support lanes
+- `PX-C1` to `PX-C2`: Strategy Fit / 30,000 ft context lane foundations
+- `PX-MA1` to `PX-MA3`: selected-account integrity, account switching, and aggregate holdings/exposure context while preserving selected-account strategy truth
+- `PX-KI1` to `PX-KI5`: knowledge corpus import, taxonomy reconciliation, register/catalog validation, Trade Hub risk-planning knowledge import, and strategy/concept progressive-layer merge
+- `DOC-D1` to `DOC-D3`: docs map/index consistency, backlog/state reconciliation, and active-doc narrative cleanup
+- `DOC-D4`: this CANON status refresh, limited to authority-layer status language and decision-register alignment
 
 ### Later Families
 
@@ -439,7 +503,7 @@ Since v0.5, several subphases and cross-cutting groundwork families have landed.
 
 ## Decision Register
 
-v0.4 retained decisions remain valid unless explicitly superseded below.
+v0.4 and v0.5 retained decisions remain valid unless explicitly superseded below.
 
 - `P1D1`: Strategy Engine skeleton introduced as deterministic contract first
 - `P1D2`: Strategy Catalog and Profile Defaults introduced as pure deterministic layer
@@ -460,10 +524,18 @@ v0.4 retained decisions remain valid unless explicitly superseded below.
 - `P2D9`: `ProfileConfig` is the primary object and `ProfileVoicePolicy` is the nested narration rules subsystem
 - `P2D10`: Strategy Preview vs Strategy Navigator are the same feature family, not two separate roadmap items. Canonical internal family name: Strategy Navigator. Onboarding sub-mode: Strategy Preview. Same concept, two labels. The final product-facing name remains open.
 - `P2D11`: Canonical system lifecycle: Formation -> Development -> Confirmation / Invalidation -> Resolution. Allowed explanatory copy: "aftermath" as human-facing language.
+- `P5D1`: Trade Hub remains a support-first, confirmation-safe, capability-aware, and non-dispatching family. Prepared planning levels, user-entered values, readiness, guardrail preferences, and submission-intent seams support decision quality; they do not authorize hidden execution or action pressure.
 - `P6D1`: Message policy is a canonical service-owned seam with distinct message-family meaning. `BRIEFING`, `ALERT`, `REORIENTATION`, `REFERRAL`, and `GUARDED_STOP` must not be collapsed or inferred locally in `app/`.
-- `PXD1`: Prepared service-owned seams and VMs are the preferred product pattern across Snapshot, Dashboard, Trade Hub, Insights, broader context, and Preview surfaces. `app/` remains a renderer of prepared interpretation, not a local interpretation engine.
-- `PXD2`: Strategy Fit and 30,000 ft are one descriptive, opt-in context lane. They remain secondary to alignment and must not drift into recommendation, urgency, or regime-override behavior.
+- `P6D2`: Since Last Checked is a compact, account-scoped, meaningful-change briefing. It may clear from Snapshot after view, but continuity belongs in deeper Insights/history seams. It must not become an inbox, badge system, feed, or notification center.
+- `P7D1`: Knowledge is now an active product family with library, topic-detail, contextual, glossary, alias, tuning, and Trade Hub term-help planning seams. It remains optional, accessible, service-owned, sparse on live surfaces, and non-gating.
+- `P8D1`: Insights may summarize, archive, compare, export, and support journal notes over ledger-backed context, but reflection remains descriptive, calm, non-moralizing, and free of performance theatre.
 - `P9D1`: Strategy Preview / Strategy Navigator now has a prepared first-wave foundation through `P9-S1` to `P9-S5`. Visible labeling may use Strategy Preview, but the family remains simulated, descriptive, non-directive, and non-executional.
+- `P9D2`: Strategy Navigator fit contrast, nearby alternatives, metadata normalization, and mobile progressive disclosure may deepen explanation, but must not become ranking, recommendation, prediction, or strategy-switch pressure.
+- `PXD1`: Prepared service-owned seams and VMs are the preferred product pattern across Snapshot, Dashboard, Trade Hub, Insights, broader context, message policy, knowledge, and Preview surfaces. `app/` remains a renderer of prepared interpretation, not a local interpretation engine.
+- `PXD2`: Strategy Fit and 30,000 ft are one descriptive, opt-in context lane. They remain secondary to alignment and must not drift into recommendation, urgency, or regime-override behavior.
+- `PXD3`: Selected-account truth is an explicit service-owned seam. Alignment, fit, alerts, risk, message policy, Trade Hub support, and action-support truth remain selected-account scoped; aggregate holdings and exposure may exist only as subordinate context.
+- `UXD1`: PocketPilot's visual language is a calm decision cockpit. Snapshot triad supremacy, Dashboard zone hierarchy, MarketEvent as UI atom, semantic color, stable profile identity, and Trade Hub confirmation-state patterns are doctrine-aligned design constraints, not decorative preferences.
+- `DOCD1`: `PHASE_MAP.md` is the detailed phase taxonomy and implementation-status ledger. CANON records doctrine and architecture truth plus high-level status alignment; it should not duplicate the full ledger or backlog.
 
 Historical implementation reporting continues in `docs/phases/PHASE_MAP.md`; CANON remains the doctrine and architecture source of truth.
 
@@ -478,3 +550,8 @@ The following prior headings in `docs/governance/CANON.md` were replaced due to 
 - P2C Outcomes
 - Current Foundation State
 - Next Focus
+
+v0.6 refresh notes:
+- Updated stale phase-status language from early `P5-R*`, `P6-A*`, `P7-K*`, `P8-I*`, and `P9-S*` checkpoints to current repo reality.
+- Added high-level authority recognition for selected-account seams, prepared service-owned contracts, visual doctrine, knowledge maturity, Since Last Checked continuity, Insights foundations, and Strategy Navigator maturation.
+- Did not rewrite North Star, Anti-Vision, or core product philosophy.
