@@ -36,7 +36,11 @@ import { acknowledgeInlineGlossaryTerms } from '@/services/knowledge/inlineGloss
 import { fetchSubmissionIntentVM } from '@/services/trade/fetchSubmissionIntentVM';
 import { fetchTradeHubVM, type TradeHubVM } from '@/services/trade/fetchTradeHubVM';
 import { updatePreferredRiskBasis } from '@/services/trade/updatePreferredRiskBasis';
-import type { KnowledgeTopicContextOrigin } from '@/services/knowledge/types';
+import type {
+  KnowledgeTopicContextOrigin,
+  TradeHubHelpAffordance,
+  TradeHubHelpAffordanceAvailability,
+} from '@/services/knowledge/types';
 import type { MessagePolicyLane } from '@/services/messages/types';
 import type { ConfirmationSessionVM } from '@/services/trade/fetchConfirmationSessionVM';
 import type { RiskToolVM } from '@/services/risk/types';
@@ -122,10 +126,25 @@ function RiskToolInputField(props: {
   placeholder: string;
   value: string;
   onChangeText(value: string): void;
+  helpAffordance?: TradeHubHelpAffordance | null;
+  onOpenHelpAffordance?(affordance: TradeHubHelpAffordance): void;
 }) {
+  const helpAffordance = props.helpAffordance;
+
   return (
     <View style={styles.inputField}>
-      <Text style={styles.label}>{props.label}</Text>
+      <View style={styles.inputLabelRow}>
+        <Text style={styles.label}>{props.label}</Text>
+        {helpAffordance && props.onOpenHelpAffordance ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => props.onOpenHelpAffordance?.(helpAffordance)}
+            style={({ pressed }) => [pressed ? styles.stepButtonPressed : null]}
+          >
+            <Text style={styles.inlineHelpLink}>Help</Text>
+          </Pressable>
+        ) : null}
+      </View>
       <TextInput
         accessibilityLabel={props.label}
         keyboardType="decimal-pad"
@@ -208,6 +227,17 @@ function formatGuardrailPreferenceActionText(
   return `Set ${GUARDRAIL_PRESET_LABELS[key]}`;
 }
 
+function findInlineHelpAffordance(
+  availability: TradeHubHelpAffordanceAvailability | null | undefined,
+  slot: TradeHubHelpAffordance['slot'],
+): TradeHubHelpAffordance | null {
+  if (!availability || availability.status !== 'AVAILABLE') {
+    return null;
+  }
+
+  return availability.affordances.find((affordance) => affordance.slot === slot) ?? null;
+}
+
 export function TradeHubScreen() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
   const [surfaceModel, setSurfaceModel] = useState<TradeHubSurfaceModel | null>(null);
@@ -215,6 +245,8 @@ export function TradeHubScreen() {
     useState<TradeHubVM['contextualKnowledgeLane'] | null>(null);
   const [inlineGlossaryHelp, setInlineGlossaryHelp] =
     useState<TradeHubVM['inlineGlossaryHelp'] | null>(null);
+  const [inlineHelpAffordances, setInlineHelpAffordances] =
+    useState<TradeHubVM['inlineHelpAffordances'] | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | undefined>();
   const [selectedKnowledgeTopic, setSelectedKnowledgeTopic] = useState<{
     topicId: string;
@@ -263,6 +295,7 @@ export function TradeHubScreen() {
         setSurfaceModel(tradeHub.model);
         setContextualKnowledgeLane(tradeHub.contextualKnowledgeLane);
         setInlineGlossaryHelp(tradeHub.inlineGlossaryHelp);
+        setInlineHelpAffordances(tradeHub.inlineHelpAffordances);
         setBaselineScan((currentBaseline) => currentBaseline ?? tradeHub.scan);
       })
       .catch(() => {
@@ -273,6 +306,7 @@ export function TradeHubScreen() {
         setSurfaceModel(null);
         setContextualKnowledgeLane(null);
         setInlineGlossaryHelp(null);
+        setInlineHelpAffordances(null);
       });
 
     return () => {
@@ -297,8 +331,15 @@ export function TradeHubScreen() {
         messagePolicyLane,
         contextualKnowledgeLane,
         inlineGlossaryHelp,
+        inlineHelpAffordances,
       ),
-    [contextualKnowledgeLane, inlineGlossaryHelp, messagePolicyLane, surfaceModel],
+    [
+      contextualKnowledgeLane,
+      inlineGlossaryHelp,
+      inlineHelpAffordances,
+      messagePolicyLane,
+      surfaceModel,
+    ],
   );
   const knowledgeTopicVM = useMemo(
     () =>
@@ -356,6 +397,26 @@ export function TradeHubScreen() {
     () => (executionAdapterVm ? createTradeExecutionAdapterViewData(executionAdapterVm) : null),
     [executionAdapterVm],
   );
+  const tradeHubGuardrailsHelp = findInlineHelpAffordance(
+    screenView?.inlineHelpAffordances,
+    'TRADE_HUB_GUARDRAILS',
+  );
+  const riskToolStopLossHelp = findInlineHelpAffordance(
+    riskToolVm?.inlineHelpAffordances,
+    'RISK_TOOL_STOP_LOSS_PRICE',
+  );
+  const riskToolTargetHelp = findInlineHelpAffordance(
+    riskToolVm?.inlineHelpAffordances,
+    'RISK_TOOL_TARGET_PRICE',
+  );
+  const riskToolActiveBasisHelp = findInlineHelpAffordance(
+    riskToolVm?.inlineHelpAffordances,
+    'RISK_TOOL_ACTIVE_RISK_BASIS',
+  );
+  const riskToolRiskAmountHelp =
+    riskToolActiveBasisHelp?.term === 'RISK_AMOUNT' ? riskToolActiveBasisHelp : null;
+  const riskToolRiskPercentHelp =
+    riskToolActiveBasisHelp?.term === 'RISK_PERCENT' ? riskToolActiveBasisHelp : null;
 
   function handleOpenKnowledgeTopic(
     topicId: string,
@@ -364,6 +425,13 @@ export function TradeHubScreen() {
     setSelectedKnowledgeTopic({
       topicId,
       contextualOrigin: contextualOrigin ?? null,
+    });
+  }
+
+  function handleOpenHelpAffordance(affordance: TradeHubHelpAffordance) {
+    handleOpenKnowledgeTopic(affordance.tapTopicId, {
+      originSurface: 'TRADE_HUB',
+      linkageReason: 'SURFACE_CONTEXT',
     });
   }
 
@@ -462,6 +530,7 @@ export function TradeHubScreen() {
     let isMounted = true;
 
     fetchRiskToolVM({
+      profile,
       confirmationSession: confirmationSessionVm?.session ?? null,
       preparedQuoteScan: confirmationSessionVm?.scan ?? baselineScan,
       input: parsedRiskToolInput,
@@ -484,7 +553,7 @@ export function TradeHubScreen() {
     return () => {
       isMounted = false;
     };
-  }, [confirmationSessionVm, parsedRiskToolInput]);
+  }, [baselineScan, confirmationSessionVm, parsedRiskToolInput, profile]);
 
   useEffect(() => {
     let isMounted = true;
@@ -790,6 +859,15 @@ export function TradeHubScreen() {
             Guardrails are optional account-level checks for planning. They can help flag risk
             limits or cooldown settings, but they do not place trades.
           </Text>
+          {tradeHubGuardrailsHelp ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => handleOpenHelpAffordance(tradeHubGuardrailsHelp)}
+              style={({ pressed }) => [pressed ? styles.stepButtonPressed : null]}
+            >
+              <Text style={styles.inlineHelpLink}>Help: {tradeHubGuardrailsHelp.termLabel}</Text>
+            </Pressable>
+          ) : null}
           {guardrailPreferencesView ? (
             <View style={styles.card}>
               <Text style={styles.cardEyebrow}>Optional, explicit, account-scoped</Text>
@@ -949,36 +1027,46 @@ export function TradeHubScreen() {
               onChangeText={(value) => handleRiskToolInputChange('entryPrice', value)}
               placeholder="e.g. 100"
               value={riskToolInput.entryPrice}
+              onOpenHelpAffordance={handleOpenHelpAffordance}
             />
             <RiskToolInputField
               label="Stop-loss price"
               onChangeText={(value) => handleRiskToolInputChange('stopPrice', value)}
               placeholder="e.g. 95"
               value={riskToolInput.stopPrice}
+              helpAffordance={riskToolStopLossHelp}
+              onOpenHelpAffordance={handleOpenHelpAffordance}
             />
             <RiskToolInputField
               label="Target price"
               onChangeText={(value) => handleRiskToolInputChange('targetPrice', value)}
               placeholder="optional"
               value={riskToolInput.targetPrice}
+              helpAffordance={riskToolTargetHelp}
+              onOpenHelpAffordance={handleOpenHelpAffordance}
             />
             <RiskToolInputField
               label="Account size"
               onChangeText={(value) => handleRiskToolInputChange('accountSize', value)}
               placeholder="optional"
               value={riskToolInput.accountSize}
+              onOpenHelpAffordance={handleOpenHelpAffordance}
             />
             <RiskToolInputField
               label="Risk amount"
               onChangeText={(value) => handleRiskToolInputChange('riskAmount', value)}
               placeholder="optional"
               value={riskToolInput.riskAmount}
+              helpAffordance={riskToolRiskAmountHelp}
+              onOpenHelpAffordance={handleOpenHelpAffordance}
             />
             <RiskToolInputField
               label="Risk percent"
               onChangeText={(value) => handleRiskToolInputChange('riskPercent', value)}
               placeholder="optional"
               value={riskToolInput.riskPercent}
+              helpAffordance={riskToolRiskPercentHelp}
+              onOpenHelpAffordance={handleOpenHelpAffordance}
             />
           </View>
           {riskToolView ? (
@@ -1238,6 +1326,11 @@ const styles = StyleSheet.create({
     flexBasis: 160,
     gap: 6,
   },
+  inputLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#d1d5db',
@@ -1257,6 +1350,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#4b5563',
     fontWeight: '500',
+  },
+  inlineHelpLink: {
+    fontSize: 12,
+    color: '#0f766e',
+    textDecorationLine: 'underline',
+    textDecorationColor: '#99f6e4',
+    fontWeight: '600',
   },
   supportText: {
     fontSize: 13,

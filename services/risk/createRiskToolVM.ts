@@ -265,6 +265,10 @@ export function createRiskToolVM(params: CreateRiskToolVMParams): RiskToolVM {
 
   return {
     generatedAt: resolveGeneratedAt(params),
+    inlineHelpAffordances: {
+      status: 'UNAVAILABLE',
+      reason: 'NO_ELIGIBLE_TERMS',
+    },
     summary: {
       state,
       symbol,

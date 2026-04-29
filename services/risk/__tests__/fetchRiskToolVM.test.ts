@@ -140,6 +140,7 @@ function createPreparedQuoteScan(
 describe('fetchRiskToolVM', () => {
   it('keeps explicit user prices authoritative over prepared quote references', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
           entryPrice: 21,
@@ -161,33 +162,81 @@ describe('fetchRiskToolVM', () => {
       nowProvider: () => 1_700_000_000_000,
     });
 
-    expect(result).toEqual({
-      generatedAt: '2023-11-14T22:13:20.000Z',
-      summary: {
-        state: 'READY',
-        symbol: 'BTC',
-        entryPrice: 20,
-        stopPrice: 18,
-        targetPrice: 26,
-        entryReference: {
-          value: 20,
-          source: 'USER_INPUT',
-        },
-        stopReference: {
-          value: 18,
-          source: 'USER_INPUT',
-        },
-        targetReference: {
-          value: 26,
-          source: 'USER_INPUT',
-        },
-        stopDistance: 2,
-        riskAmount: 100,
-        riskPercent: 1,
-        positionSize: 50,
-        rewardRiskRatio: 3,
-        notes: [],
+    expect(result.generatedAt).toBe('2023-11-14T22:13:20.000Z');
+    expect(result.summary).toEqual({
+      state: 'READY',
+      symbol: 'BTC',
+      entryPrice: 20,
+      stopPrice: 18,
+      targetPrice: 26,
+      entryReference: {
+        value: 20,
+        source: 'USER_INPUT',
       },
+      stopReference: {
+        value: 18,
+        source: 'USER_INPUT',
+      },
+      targetReference: {
+        value: 26,
+        source: 'USER_INPUT',
+      },
+      stopDistance: 2,
+      riskAmount: 100,
+      riskPercent: 1,
+      positionSize: 50,
+      rewardRiskRatio: 3,
+      notes: [],
+    });
+    expect(result.inlineHelpAffordances).toEqual({
+      status: 'AVAILABLE',
+      affordances: [
+        {
+          term: 'STOP_LOSS_PRICE',
+          termLabel: 'Stop-loss price',
+          surface: 'RISK_TOOL',
+          slot: 'RISK_TOOL_STOP_LOSS_PRICE',
+          treatment: 'GLOSSARY_THEN_TOPIC',
+          destination: {
+            glossaryTopicId: 'glossary-stop-loss-price',
+            glossaryPath: 'docs/knowledge/glossary/stop-loss-price.md',
+            topicId: 'trade-hub-stop-loss-price',
+            topicPath: 'docs/knowledge/trade-hub/stop-loss-price.md',
+          },
+          tapTopicId: 'glossary-stop-loss-price',
+          followThroughTopicId: 'trade-hub-stop-loss-price',
+        },
+        {
+          term: 'TARGET_PRICE',
+          termLabel: 'Target price',
+          surface: 'RISK_TOOL',
+          slot: 'RISK_TOOL_TARGET_PRICE',
+          treatment: 'GLOSSARY_THEN_TOPIC',
+          destination: {
+            glossaryTopicId: 'glossary-target-price',
+            glossaryPath: 'docs/knowledge/glossary/target-price.md',
+            topicId: 'trade-hub-target-price',
+            topicPath: 'docs/knowledge/trade-hub/target-price.md',
+          },
+          tapTopicId: 'glossary-target-price',
+          followThroughTopicId: 'trade-hub-target-price',
+        },
+        {
+          term: 'RISK_PERCENT',
+          termLabel: 'Risk percent',
+          surface: 'RISK_TOOL',
+          slot: 'RISK_TOOL_ACTIVE_RISK_BASIS',
+          treatment: 'GLOSSARY_THEN_TOPIC',
+          destination: {
+            glossaryTopicId: 'glossary-risk-percent',
+            glossaryPath: 'docs/knowledge/glossary/risk-percent.md',
+            topicId: 'trade-hub-risk-percent',
+            topicPath: 'docs/knowledge/trade-hub/risk-percent.md',
+          },
+          tapTopicId: 'glossary-risk-percent',
+          followThroughTopicId: 'trade-hub-risk-percent',
+        },
+      ],
     });
     expect(JSON.stringify(result)).not.toContain('execution-feed');
     expect(JSON.stringify(result)).not.toContain('BRACKET');
@@ -196,6 +245,7 @@ describe('fetchRiskToolVM', () => {
 
   it('uses prepared plan references from the selected trade context when user values are absent', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
           entryPrice: 20.5,
@@ -247,8 +297,51 @@ describe('fetchRiskToolVM', () => {
     expect(JSON.stringify(result)).not.toContain('timestampMs');
   });
 
+  it('maps active fixed-currency basis help to risk amount only', async () => {
+    const seedSession = createConfirmationSession();
+    const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
+      confirmationSession: createConfirmationSession({
+        preview: {
+          ...seedSession.preview!,
+          risk: {
+            ...seedSession.preview!.risk,
+            activeBasis: 'FIXED_CURRENCY',
+            activeBasisLabel: 'Fixed currency',
+          },
+        },
+      }),
+      input: {
+        accountSize: null,
+        riskAmount: null,
+        riskPercent: null,
+        entryPrice: null,
+        stopPrice: null,
+        targetPrice: null,
+        symbol: null,
+        allowPreparedReferences: true,
+      },
+    });
+
+    expect(result.inlineHelpAffordances.status).toBe('AVAILABLE');
+
+    if (result.inlineHelpAffordances.status !== 'AVAILABLE') {
+      throw new Error('Expected inline help affordances to be available.');
+    }
+
+    const activeBasisHelp = result.inlineHelpAffordances.affordances.find(
+      (affordance) => affordance.slot === 'RISK_TOOL_ACTIVE_RISK_BASIS',
+    );
+
+    expect(activeBasisHelp?.term).toBe('RISK_AMOUNT');
+    expect(
+      result.inlineHelpAffordances.affordances.some((affordance) => affordance.term === 'RISK_PERCENT'),
+    ).toBe(false);
+  });
+
   it('consumes canonical produced stop/target levels when the session carries prepared availability context', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
           entryPrice: 20.5,
@@ -307,6 +400,7 @@ describe('fetchRiskToolVM', () => {
 
   it('keeps a producer-provided plan entry level ahead of quote help while exits stay honest', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
           entryPrice: 20.5,
@@ -345,6 +439,7 @@ describe('fetchRiskToolVM', () => {
 
   it('labels prepared plan stop levels as PREPARED_PLAN without implying execution authority', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession({
         preparedRiskReferences: {
           entryPrice: 104,
@@ -385,6 +480,7 @@ describe('fetchRiskToolVM', () => {
 
   it('uses a prepared quote entry level when user entry is absent', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession(),
       preparedQuoteScan: createPreparedQuoteScan(),
       input: {
@@ -431,6 +527,7 @@ describe('fetchRiskToolVM', () => {
 
   it('returns a calm non-result when neither prepared context nor explicit inputs exist', async () => {
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: null,
       input: {
         accountSize: null,
@@ -451,6 +548,7 @@ describe('fetchRiskToolVM', () => {
   it('treats selected-plan context as enough to show an incomplete but honest result', async () => {
     const seedSession = createConfirmationSession();
     const result = await fetchRiskToolVM({
+      profile: 'BEGINNER',
       confirmationSession: createConfirmationSession({
         preview: {
           ...seedSession.preview!,
@@ -506,3 +604,4 @@ describe('fetchRiskToolVM', () => {
     expect(source).not.toMatch(/omitted when context is thin/);
   });
 });
+

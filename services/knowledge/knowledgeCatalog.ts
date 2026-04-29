@@ -2609,4 +2609,278 @@ export const knowledgeCatalog = [
       'pp-what-pocketpilot-is',
     ],
   },
+  {
+    topicId: 'glossary-stop-loss-price',
+    title: 'Stop-loss price',
+    summary: "The price where you'd exit to avoid further losses.",
+    content: "Overview\n\nThe price where you'd exit to avoid further losses.",
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'Overview',
+        body: ["The price where you'd exit to avoid further losses."],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'glossary-target-price',
+    title: 'Target price',
+    summary:
+      'A price you use to review whether the plan is working or whether an exit may make sense.',
+    content:
+      'Overview\n\nA price you use to review whether the plan is working or whether an exit may make sense.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'Overview',
+        body: [
+          'A price you use to review whether the plan is working or whether an exit may make sense.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'glossary-risk-amount',
+    title: 'Risk amount',
+    summary: 'How much money you could lose on this trade.',
+    content: 'Overview\n\nHow much money you could lose on this trade.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'Overview',
+        body: ['How much money you could lose on this trade.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'glossary-risk-percent',
+    title: 'Risk percent',
+    summary: 'The percentage of your account at risk.',
+    content: 'Overview\n\nThe percentage of your account at risk.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'Overview',
+        body: ['The percentage of your account at risk.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'glossary-guardrails',
+    title: 'Guardrails',
+    summary: 'Optional limits to help manage your risk.',
+    content: 'Overview\n\nOptional limits to help manage your risk.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'Overview',
+        body: ['Optional limits to help manage your risk.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-stop-loss-price',
+    title: 'Stop-loss price',
+    summary: "The price where you'd exit to avoid further losses.",
+    content:
+      "What this means\n\nThe price where you'd exit to avoid further losses.\n\nWhy it matters\n\nIt defines your downside before you act.\n\nHow PocketPilot frames it\n\nA planning level showing where the idea no longer holds up.\n\nCommon misunderstanding\n\nTreating it as just how much loss you can tolerate.",
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ["The price where you'd exit to avoid further losses."],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It defines your downside before you act.'],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: ['A planning level showing where the idea no longer holds up.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Treating it as just how much loss you can tolerate.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-target-price',
+    title: 'Target price',
+    summary:
+      'A price you use to review whether the plan is working or whether an exit may make sense.',
+    content:
+      'What this means\n\nA price you use to review whether the plan is working or whether an exit may make sense.\n\nWhy it matters\n\nIt gives you a review point to assess progress.\n\nHow PocketPilot frames it\n\nA review point, not an automatic action. PocketPilot does not place a trade at this level.\n\nCommon misunderstanding\n\nThinking the trade will close automatically at this price.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: [
+          'A price you use to review whether the plan is working or whether an exit may make sense.',
+        ],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It gives you a review point to assess progress.'],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: [
+          'A review point, not an automatic action. PocketPilot does not place a trade at this level.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Thinking the trade will close automatically at this price.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-risk-amount',
+    title: 'Risk amount',
+    summary: 'How much money you could lose on this trade.',
+    content:
+      'What this means\n\nHow much money you could lose on this trade.\n\nWhy it matters\n\nIt shows the real downside before acting.\n\nHow PocketPilot frames it\n\nA planning output derived from your inputs.\n\nCommon misunderstanding\n\nConfusing it with general market volatility.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['How much money you could lose on this trade.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It shows the real downside before acting.'],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: ['A planning output derived from your inputs.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Confusing it with general market volatility.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-risk-percent',
+    title: 'Risk percent',
+    summary: 'The percentage of your account at risk.',
+    content:
+      'What this means\n\nThe percentage of your account at risk.\n\nWhy it matters\n\nIt helps keep trades consistent in size.\n\nHow PocketPilot frames it\n\nA way to size trades relative to your account.\n\nCommon misunderstanding\n\nThinking a low percent always means safe.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['The percentage of your account at risk.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It helps keep trades consistent in size.'],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: ['A way to size trades relative to your account.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Thinking a low percent always means safe.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'trade-hub-guardrails',
+    title: 'Guardrails',
+    summary: 'Optional limits to help manage your risk.',
+    content:
+      'What this means\n\nOptional limits to help manage your risk.\n\nWhy it matters\n\nThey help you stay within your own rules.\n\nHow PocketPilot frames it\n\nThey flag and highlight, not block or prevent.\n\nCommon misunderstanding\n\nThinking they restrict what you can do.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'action-risk',
+    priority: 'NOW',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['Optional limits to help manage your risk.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['They help you stay within your own rules.'],
+      },
+      {
+        heading: 'How PocketPilot frames it',
+        body: ['They flag and highlight, not block or prevent.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Thinking they restrict what you can do.'],
+      },
+    ],
+    relatedTopicIds: [],
+  },
 ] satisfies ReadonlyArray<KnowledgeCatalogEntry>;

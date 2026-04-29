@@ -39,3 +39,5 @@ Controlled live knowledge tree for in-product learning content.
 `PX-KI5` merges v0.8 beginner-facing strategy and concept layers into canonical strategy/concept docs, preserves deeper strategy detail under progressive sections, and adds `concepts` as an active validated family.
 
 `P7-K11` adds the first bounded Trade Hub term-to-knowledge integration plan in `docs/knowledge/_meta/TRADE_HUB_HELP_INTEGRATION_PLAN.md`, including first-rollout scope and no-link-soup rules for later service-owned wiring.
+
+`P7-K12` implements that first bounded runtime rollout through one service-owned Trade Hub help-affordance seam, wiring only stop-loss price, target price, active risk-basis label, and guardrails while keeping app-side behavior render-only.
