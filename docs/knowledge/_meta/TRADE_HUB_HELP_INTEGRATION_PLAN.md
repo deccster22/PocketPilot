@@ -129,6 +129,15 @@ Preview requirement:
 
 `P7-K13` adds a deterministic runtime catalog sync validator (`npm run validate:knowledge:runtime`) so first-rollout register topic IDs wired here cannot drift out of `services/knowledge/knowledgeCatalog.ts` without failing `npm run verify`.
 
+## P7-K14 Layer 2 Content Completion Note
+
+`P7-K14` completes Layer 2 deeper-thinking content inside the same 14 canonical Trade Hub articles listed in this plan:
+
+- no new term affordance terms were added
+- no new help-link placement rules were introduced
+- no Trade Hub or Risk Tool UI copy/layout wiring changed
+- non-dispatching confirmation boundary language remains explicit
+
 ## Reconciliation Notes
 
 ### `docs/knowledge/_meta/GLOSSARY_TERM_MAP.md`

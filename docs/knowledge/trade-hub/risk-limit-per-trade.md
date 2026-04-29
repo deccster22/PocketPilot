@@ -22,3 +22,22 @@ Flags when a plan exceeds your chosen level.
 ## Common misunderstanding
 Thinking it stops you from acting.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+This limit helps you see when one plan exceeds your usual single-trade risk.
+
+## How it behaves
+It flags when your plan is above the selected limit. It does not block action.
+
+## What tends to go wrong
+- ignoring breaches
+- changing limits impulsively
+
+## What good looks like
+- stable limits
+- deliberate exceptions
+
+## What it connects to
+Risk amount, Position size.

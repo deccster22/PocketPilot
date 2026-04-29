@@ -22,3 +22,22 @@ They flag and highlight, not block or prevent.
 ## Common misunderstanding
 Thinking they restrict what you can do.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+Guardrails are planning checks and visibility tools, not silent blockers.
+
+## How it behaves
+They flag and highlight context for review. They do not enforce action.
+
+## What tends to go wrong
+- ignoring repeated signals
+- turning them off without intent
+
+## What good looks like
+- acknowledged and considered
+- supports consistent behavior
+
+## What it connects to
+Risk management, Behavior patterns.

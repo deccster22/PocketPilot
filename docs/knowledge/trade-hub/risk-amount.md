@@ -22,3 +22,22 @@ A planning output derived from your inputs.
 ## Common misunderstanding
 Confusing it with general market volatility.
 
+## Layer 2: Deeper thinking
+This layer adds optional deeper planning context beneath the beginner foundation.
+
+## How to think about it
+Risk amount is your real downside if you are wrong. It is planning risk context, not advice.
+
+## How it behaves
+It is derived from entry, stop-loss, and position size.
+
+## What tends to go wrong
+- ignoring it
+- underestimating it
+
+## What good looks like
+- known before entry
+- acceptable for your plan
+
+## What it connects to
+Position size, Stop-loss price, Account size.

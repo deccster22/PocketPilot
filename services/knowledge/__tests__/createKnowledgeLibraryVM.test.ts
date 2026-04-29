@@ -32,7 +32,7 @@ describe('createKnowledgeLibraryVM', () => {
       throw new Error('Expected knowledge library to be available.');
     }
 
-    expect(result.sections.map((section) => section.items.length)).toEqual([6, 15, 10, 10]);
+    expect(result.sections.map((section) => section.items.length)).toEqual([6, 15, 10, 19]);
     expect(result.sections[0].items.map((item) => item.topicId)).toEqual([
       'pp-choosing-profile-and-strategy',
       'pp-what-dashboard-is-for',
@@ -64,11 +64,20 @@ describe('createKnowledgeLibraryVM', () => {
     );
     expect(result.sections[3].items.map((item) => item.topicId)).toEqual(
       expect.arrayContaining([
+        'trade-hub-entry-price',
         'trade-hub-stop-loss-price',
         'trade-hub-target-price',
+        'trade-hub-prepared-planning-levels',
         'trade-hub-risk-amount',
         'trade-hub-risk-percent',
+        'trade-hub-position-size',
+        'trade-hub-reward-risk',
+        'trade-hub-manual-override',
         'trade-hub-guardrails',
+        'trade-hub-risk-limit-per-trade',
+        'trade-hub-daily-loss-threshold',
+        'trade-hub-cooldown-after-loss',
+        'trade-hub-confirmation-shell-and-non-dispatch-boundary',
       ]),
     );
   });
