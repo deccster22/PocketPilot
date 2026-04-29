@@ -192,11 +192,38 @@ describe('createTradeHubHelpAffordances', () => {
     const affordances = surfaces.flatMap((availability) =>
       availability.status === 'AVAILABLE' ? availability.affordances : [],
     );
+    const firstRolloutTapTopicIds = [
+      'glossary-stop-loss-price',
+      'glossary-target-price',
+      'glossary-risk-amount',
+      'glossary-risk-percent',
+      'glossary-guardrails',
+    ] as const;
+    const firstRolloutFollowThroughTopicIds = [
+      'trade-hub-stop-loss-price',
+      'trade-hub-target-price',
+      'trade-hub-risk-amount',
+      'trade-hub-risk-percent',
+      'trade-hub-guardrails',
+    ] as const;
 
     expect(affordances.length).toBeGreaterThan(0);
     expect(
       affordances.every((affordance) => register.includes(`\"${affordance.tapTopicId}\"`)),
     ).toBe(true);
     expect(affordances.every((affordance) => runtimeTopicIds.has(affordance.tapTopicId))).toBe(true);
+    expect(
+      affordances.every((affordance) => runtimeTopicIds.has(affordance.followThroughTopicId)),
+    ).toBe(true);
+    expect(
+      firstRolloutTapTopicIds.every(
+        (topicId) => register.includes(`\"${topicId}\"`) && runtimeTopicIds.has(topicId),
+      ),
+    ).toBe(true);
+    expect(
+      firstRolloutFollowThroughTopicIds.every(
+        (topicId) => register.includes(`\"${topicId}\"`) && runtimeTopicIds.has(topicId),
+      ),
+    ).toBe(true);
   });
 });

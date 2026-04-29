@@ -125,6 +125,10 @@ Deliberately unwired in `P7-K12`:
 Preview requirement:
 - manual preview remains required for this rollout because it adds new visible/tappable behavior on live Trade Hub and Risk Tool surfaces.
 
+## P7-K13 Runtime Catalog Sync Guard Note
+
+`P7-K13` adds a deterministic runtime catalog sync validator (`npm run validate:knowledge:runtime`) so first-rollout register topic IDs wired here cannot drift out of `services/knowledge/knowledgeCatalog.ts` without failing `npm run verify`.
+
 ## Reconciliation Notes
 
 ### `docs/knowledge/_meta/GLOSSARY_TERM_MAP.md`

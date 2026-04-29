@@ -111,6 +111,11 @@ describe('fetchKnowledgeTopicDetailVM', () => {
       'glossary-risk-amount',
       'glossary-risk-percent',
       'glossary-guardrails',
+      'trade-hub-stop-loss-price',
+      'trade-hub-target-price',
+      'trade-hub-risk-amount',
+      'trade-hub-risk-percent',
+      'trade-hub-guardrails',
     ] as const;
 
     firstRolloutTopicIds.forEach((topicId) => {

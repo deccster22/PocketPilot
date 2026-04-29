@@ -11,7 +11,8 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "test": "jest --runInBand",
     "validate:knowledge": "node scripts/validate-knowledge-register.js",
-    "verify": "npm run lint && npm run test && npm run validate:knowledge",
+    "validate:knowledge:runtime": "node scripts/validate-knowledge-runtime-catalog.js",
+    "verify": "npm run lint && npm run test && npm run validate:knowledge && npm run validate:knowledge:runtime",
     "format": "prettier --write .",
     "generate:knowledge-catalog": "node scripts/generate-knowledge-catalog.js",
     "secret-scan": "node scripts/secret-scan.js"
