@@ -54,3 +54,34 @@ More indicators do not automatically mean more truth.
 - [Bitcoin’s $19k–$20k Bottoming Cluster and the Post-FTX Reclaim](../market-examples/bitcoin-19k-20k-bottoming-cluster-and-the-post-ftx-reclaim.md)
 - [Confluence vs Clutter](../interpretation/confluence-vs-clutter.md)
 - supporting signals vs clutter explainer
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Confluence Alignment looks for multiple independent clues pointing in a similar direction. It focuses on agreement across different types of information.
+
+## What strengthens it
+- independent signals aligning
+- clear overlap between structure, momentum, and context
+- simplicity in interpretation
+
+## What weakens it
+- signals that are similar or redundant
+- conflicting information
+- overcomplication
+
+## How it tends to fail
+Stacking weak or related signals can create false confidence. Alignment does not make the outcome certain.
+
+## How it connects to planning
+Entry price reflects where alignment is interpreted.
+Stop-loss price defines invalidation if alignment breaks.
+Target price acts as a review point if alignment holds.
+Prepared planning levels provide initial structure.
+Risk amount and risk percent manage exposure across aligned setups.
+Guardrails highlight when complexity increases risk.
+
+## What to watch for
+- assuming more signals means better clarity
+- using overlapping indicators
+- forcing alignment where it does not exist

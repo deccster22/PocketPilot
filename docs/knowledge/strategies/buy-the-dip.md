@@ -43,3 +43,34 @@ It looks for weakness happening inside an environment where [recovery](../glossa
 
 ## What weakens fit
 Fit weakens when the move looks more like a [relief rally](../glossary/relief-rally.md) than repair, or when improvement is visible but still not enough to count as [meaningful change](../glossary/meaningful-change.md).
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Buy the Dip responds to pullbacks within a broader move, where price temporarily moves against the prior direction before attempting to stabilise. These dips can be shallow pauses or deeper drawdowns, often accompanied by increased volatility and uncertainty.
+
+## What strengthens it
+- pullbacks into previously active support areas
+- slowing downside movement after a drop
+- broader context that has not clearly broken down
+
+## What weakens it
+- fast, continuous downward movement
+- lack of visible structure where price might stabilise
+- unclear broader context
+
+## How it tends to fail
+A dip can turn into a breakdown. Price may continue lower without stabilising, or briefly pause before continuing downward. What looks like a temporary pullback can be a shift in structure.
+
+## How it connects to planning
+Entry price helps define where the dip is being interpreted.
+Stop-loss price helps define the point where the dip idea may no longer be valid.
+Target price acts as a review point if price recovers.
+Prepared planning levels can offer initial context but require adjustment.
+Risk amount and risk percent help keep downside consistent.
+Guardrails help highlight when risk increases during volatile pullbacks.
+
+## What to watch for
+- assuming every drop is a dip
+- reacting to movement instead of structure
+- letting emotion replace planning once price starts moving quickly

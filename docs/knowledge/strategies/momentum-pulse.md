@@ -108,3 +108,34 @@ PocketPilot should help answer whether short-term acceleration is strengthening,
 - What a MarketEvent Is
 - Estimated vs Confirmed Context
 - Risk/Reward Basics
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Momentum Pulse responds to rapid price acceleration over short periods. These moves can be strong but often short-lived.
+
+## What strengthens it
+- clear directional acceleration
+- strong follow-through over short intervals
+- alignment with broader context
+
+## What weakens it
+- slowing movement after a burst
+- conflicting signals
+- lack of continuation
+
+## How it tends to fail
+Momentum can fade quickly. Price may stall or reverse once the initial burst ends.
+
+## How it connects to planning
+Entry price reflects where momentum is being interpreted.
+Stop-loss price defines invalidation if momentum fades.
+Target price acts as a review point during fast movement.
+Prepared planning levels provide optional context for extension zones.
+Risk amount and risk percent manage exposure during fast conditions.
+Guardrails help highlight when chasing behaviour increases risk.
+
+## What to watch for
+- chasing late-stage momentum
+- assuming speed equals continuation
+- ignoring signs of exhaustion

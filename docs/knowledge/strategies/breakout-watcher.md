@@ -54,3 +54,34 @@ Breakouts are about whether the market actually starts behaving differently.
 - [Bitcoin’s August 2020 Failed Escape Above $12,000](../market-examples/bitcoin-august-2020-failed-escape-above-12000.md)
 - [Support, Resistance, and Structure](../interpretation/support-resistance-and-structure.md)
 - breakout vs acceptance explainer
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Breakout Watcher responds to price approaching and moving beyond key levels. These moments often follow periods of compression or repeated testing.
+
+## What strengthens it
+- repeated interaction with a level
+- tightening price movement before expansion
+- increased activity around the level
+
+## What weakens it
+- inconsistent pressure at the level
+- wide, unstable movement
+- lack of follow-through after initial break
+
+## How it tends to fail
+Breakouts can reverse quickly. Price may move beyond a level and then return, creating a false breakout.
+
+## How it connects to planning
+Entry price reflects where the breakout is being interpreted.
+Stop-loss price helps define invalidation if price returns to prior range.
+Target price acts as a review point if expansion continues.
+Prepared planning levels can outline breakout zones.
+Risk amount and risk percent help manage volatility around levels.
+Guardrails highlight when behaviour becomes unstable.
+
+## What to watch for
+- assuming every breakout will continue
+- reacting to the first move without confirmation
+- ignoring failed breakout behaviour

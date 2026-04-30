@@ -54,3 +54,34 @@ You do not need the exact low for Trend Follow to matter.
 - [Bitcoin Above the Old High](../market-examples/bitcoin-above-the-old-high.md)
 - [From Liquidity Tailwind to Deleveraging Grind](../market-examples/from-liquidity-tailwind-to-deleveraging-grind.md)
 - continuation vs reversal explainer
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Trend Follow responds to persistent directional movement where price continues forming structure in one direction. Trends often include pullbacks and pauses rather than moving in a straight line.
+
+## What strengthens it
+- consistent directional structure
+- orderly pullbacks within the trend
+- continued acceptance of higher or lower levels
+
+## What weakens it
+- choppy or sideways movement
+- inconsistent structure
+- signs of exhaustion or slowing
+
+## How it tends to fail
+Trends can stall or reverse. Price may stop progressing and begin to move sideways or shift direction entirely.
+
+## How it connects to planning
+Entry price reflects where within the trend the idea is being interpreted.
+Stop-loss price helps define where structure breaks.
+Target price acts as a review point as the trend progresses.
+Prepared planning levels can outline potential continuation areas.
+Risk amount and risk percent manage exposure over multiple trend attempts.
+Guardrails help highlight overextension or increasing risk.
+
+## What to watch for
+- entering late after extended movement
+- assuming the trend will continue indefinitely
+- ignoring weakening structure
