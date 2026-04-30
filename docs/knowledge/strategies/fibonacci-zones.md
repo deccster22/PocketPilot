@@ -139,3 +139,13 @@ Guardrails highlight overreliance on single tools.
 - treating levels as precise predictions
 - ignoring broader structure
 - overloading charts with levels
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- Reaction at confluence zone (mapped for a future example topic; see Layer 3 integration map)
+
+### When conditions became less reliable
+- Clean break through zone (mapped for a future example topic; see Layer 3 integration map)

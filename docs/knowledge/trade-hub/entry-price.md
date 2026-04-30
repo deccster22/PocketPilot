@@ -43,3 +43,7 @@ Entries can be early, confirmed, or late. Each is a trade-off between price and 
 
 ## What it connects to
 Stop-loss price, Position size, Strategy alignment.
+
+## How this shows up
+- Early entry in pullback
+- Late entry in continuation

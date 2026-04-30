@@ -885,7 +885,7 @@ export const knowledgeCatalog = [
     title: 'Breakout Watcher',
     summary: 'Breakout Watcher is a strategy built around the idea that price sometimes spends long periods contained inside a clear structure, then escapes that structure in a way that begins a new directional move. It is less about predicting every breakout in advance and more about recognizing when containment is ending in a meaningful way.',
     content:
-      "What this means\n\nTrading when price moves beyond a key level.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: repeated tests and pressure.\n\nWhat you're looking for\n\nLook for repeated tests and pressure.\n\nWhy it can work\n\nWorks because breaks can trigger moves.\n\nWhat can go wrong\n\nFails if breakout fails.\n\nCommon misunderstanding\n\nAssuming all breakouts continue.\n\nWhat this strategy is for\n\nBreakout Watcher is for markets pressing against meaningful boundaries where a breakout may be starting.\n\nWhat it looks for\n\nIt cares about whether price moves through a meaningful area and begins to build acceptance outside the old structure.\n\nWhat improves fit\n\nFit improves when the market is building structure outside the old boundary and increasing confirmed confidence.\n\nWhat weakens fit\n\nFit weakens when the move runs into rejection, returns to the old area, becomes a false breakout, or triggers fast invalidation.\n\nWhat PocketPilot would emphasize\n\nA spike through a level is interesting. A hold matters more.\n\nWhat a user should learn\n\nBreakouts are about whether the market actually starts behaving differently.\n\nWhat to read next\n\nBitcoin’s August 2020 Failed Escape Above $12,000\n\nSupport, Resistance, and Structure\n\nbreakout vs acceptance explainer\n\nHow it behaves\n\nBreakout Watcher responds to price approaching and moving beyond key levels. These moments often follow periods of compression or repeated testing.\n\nWhat strengthens it\n\nrepeated interaction with a level\n\ntightening price movement before expansion\n\nincreased activity around the level\n\nWhat weakens it\n\ninconsistent pressure at the level\n\nwide, unstable movement\n\nlack of follow-through after initial break\n\nHow it tends to fail\n\nBreakouts can reverse quickly. Price may move beyond a level and then return, creating a false breakout.\n\nHow it connects to planning\n\nEntry price reflects where the breakout is being interpreted. Stop-loss price helps define invalidation if price returns to prior range. Target price acts as a review point if expansion continues. Prepared planning levels can outline breakout zones. Risk amount and risk percent help manage volatility around levels. Guardrails highlight when behaviour becomes unstable.\n\nWhat to watch for\n\nassuming every breakout will continue\n\nreacting to the first move without confirmation\n\nignoring failed breakout behaviour",
+      "What this means\n\nTrading when price moves beyond a key level.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: repeated tests and pressure.\n\nWhat you're looking for\n\nLook for repeated tests and pressure.\n\nWhy it can work\n\nWorks because breaks can trigger moves.\n\nWhat can go wrong\n\nFails if breakout fails.\n\nCommon misunderstanding\n\nAssuming all breakouts continue.\n\nWhat this strategy is for\n\nBreakout Watcher is for markets pressing against meaningful boundaries where a breakout may be starting.\n\nWhat it looks for\n\nIt cares about whether price moves through a meaningful area and begins to build acceptance outside the old structure.\n\nWhat improves fit\n\nFit improves when the market is building structure outside the old boundary and increasing confirmed confidence.\n\nWhat weakens fit\n\nFit weakens when the move runs into rejection, returns to the old area, becomes a false breakout, or triggers fast invalidation.\n\nWhat PocketPilot would emphasize\n\nA spike through a level is interesting. A hold matters more.\n\nWhat a user should learn\n\nBreakouts are about whether the market actually starts behaving differently.\n\nWhat to read next\n\nBitcoin’s August 2020 Failed Escape Above $12,000\n\nSupport, Resistance, and Structure\n\nbreakout vs acceptance explainer\n\nHow it behaves\n\nBreakout Watcher responds to price approaching and moving beyond key levels. These moments often follow periods of compression or repeated testing.\n\nWhat strengthens it\n\nrepeated interaction with a level\n\ntightening price movement before expansion\n\nincreased activity around the level\n\nWhat weakens it\n\ninconsistent pressure at the level\n\nwide, unstable movement\n\nlack of follow-through after initial break\n\nHow it tends to fail\n\nBreakouts can reverse quickly. Price may move beyond a level and then return, creating a false breakout.\n\nHow it connects to planning\n\nEntry price reflects where the breakout is being interpreted. Stop-loss price helps define invalidation if price returns to prior range. Target price acts as a review point if expansion continues. Prepared planning levels can outline breakout zones. Risk amount and risk percent help manage volatility around levels. Guardrails highlight when behaviour becomes unstable.\n\nWhat to watch for\n\nassuming every breakout will continue\n\nreacting to the first move without confirmation\n\nignoring failed breakout behaviour\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nBitcoin above the old high (worked)\n\nWhen conditions became less reliable\n\nFailed breakout and snapback (caution)",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -1016,6 +1016,24 @@ export const knowledgeCatalog = [
           'ignoring failed breakout behaviour',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Bitcoin above the old high (worked)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Failed breakout and snapback (caution)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -1031,7 +1049,7 @@ export const knowledgeCatalog = [
     title: 'Buy the Dip',
     summary: 'Buy the Dip is a strategy built around looking for temporary pullbacks inside a broader upward market structure. It is less about chasing every red candle and more about judging whether a setback looks like a pause inside strength rather than the start of something weaker.',
     content:
-      "What this means\n\nBuying after price drops, expecting it to recover.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: pullbacks in an upward trend and signs the drop is slowing.\n\nWhat you're looking for\n\nLook for pullbacks in an upward trend and signs the drop is slowing.\n\nWhy it can work\n\nWorks because markets move in waves.\n\nWhat can go wrong\n\nCan fail if the drop continues.\n\nCommon misunderstanding\n\nAssuming every dip is worth buying.\n\nWhat this strategy is for\n\nBuy the Dip is for situations where a dip may be creating opportunity without the broader picture being broken beyond repair.\n\nWhat it looks for\n\nIt looks for weakness happening inside an environment where recovery still feels plausible.\n\nWhat improves fit\n\nStrategy fit improves when the broader structure still looks supportive and the market is not obviously degrading into a harsher regime.\n\nWhat weakens fit\n\nFit weakens when the move looks more like a relief rally than repair, or when improvement is visible but still not enough to count as meaningful change.\n\nHow it behaves\n\nBuy the Dip responds to pullbacks within a broader move, where price temporarily moves against the prior direction before attempting to stabilise. These dips can be shallow pauses or deeper drawdowns, often accompanied by increased volatility and uncertainty.\n\nWhat strengthens it\n\npullbacks into previously active support areas\n\nslowing downside movement after a drop\n\nbroader context that has not clearly broken down\n\nWhat weakens it\n\nfast, continuous downward movement\n\nlack of visible structure where price might stabilise\n\nunclear broader context\n\nHow it tends to fail\n\nA dip can turn into a breakdown. Price may continue lower without stabilising, or briefly pause before continuing downward. What looks like a temporary pullback can be a shift in structure.\n\nHow it connects to planning\n\nEntry price helps define where the dip is being interpreted. Stop-loss price helps define the point where the dip idea may no longer be valid. Target price acts as a review point if price recovers. Prepared planning levels can offer initial context but require adjustment. Risk amount and risk percent help keep downside consistent. Guardrails help highlight when risk increases during volatile pullbacks.\n\nWhat to watch for\n\nassuming every drop is a dip\n\nreacting to movement instead of structure\n\nletting emotion replace planning once price starts moving quickly",
+      "What this means\n\nBuying after price drops, expecting it to recover.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: pullbacks in an upward trend and signs the drop is slowing.\n\nWhat you're looking for\n\nLook for pullbacks in an upward trend and signs the drop is slowing.\n\nWhy it can work\n\nWorks because markets move in waves.\n\nWhat can go wrong\n\nCan fail if the drop continues.\n\nCommon misunderstanding\n\nAssuming every dip is worth buying.\n\nWhat this strategy is for\n\nBuy the Dip is for situations where a dip may be creating opportunity without the broader picture being broken beyond repair.\n\nWhat it looks for\n\nIt looks for weakness happening inside an environment where recovery still feels plausible.\n\nWhat improves fit\n\nStrategy fit improves when the broader structure still looks supportive and the market is not obviously degrading into a harsher regime.\n\nWhat weakens fit\n\nFit weakens when the move looks more like a relief rally than repair, or when improvement is visible but still not enough to count as meaningful change.\n\nHow it behaves\n\nBuy the Dip responds to pullbacks within a broader move, where price temporarily moves against the prior direction before attempting to stabilise. These dips can be shallow pauses or deeper drawdowns, often accompanied by increased volatility and uncertainty.\n\nWhat strengthens it\n\npullbacks into previously active support areas\n\nslowing downside movement after a drop\n\nbroader context that has not clearly broken down\n\nWhat weakens it\n\nfast, continuous downward movement\n\nlack of visible structure where price might stabilise\n\nunclear broader context\n\nHow it tends to fail\n\nA dip can turn into a breakdown. Price may continue lower without stabilising, or briefly pause before continuing downward. What looks like a temporary pullback can be a shift in structure.\n\nHow it connects to planning\n\nEntry price helps define where the dip is being interpreted. Stop-loss price helps define the point where the dip idea may no longer be valid. Target price acts as a review point if price recovers. Prepared planning levels can offer initial context but require adjustment. Risk amount and risk percent help keep downside consistent. Guardrails help highlight when risk increases during volatile pullbacks.\n\nWhat to watch for\n\nassuming every drop is a dip\n\nreacting to movement instead of structure\n\nletting emotion replace planning once price starts moving quickly\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nRecovery after pullback (worked)\n\nWhen conditions became less reliable\n\nContinued sell-off (caution)",
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -1142,6 +1160,24 @@ export const knowledgeCatalog = [
           'letting emotion replace planning once price starts moving quickly',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Recovery after pullback (worked)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Continued sell-off (caution)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -1157,7 +1193,7 @@ export const knowledgeCatalog = [
     title: 'Candle Signals',
     summary: 'Candle Signals is a strategy built around the idea that individual candles and small candle formations can reveal short-term shifts in pressure, hesitation, rejection, or reversal. It is less about treating patterns as promises and more about reading them as compact clues about market behavior.',
     content:
-      "What this means\n\nUsing candlestick patterns to read behaviour.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: rejection or hesitation.\n\nWhat you're looking for\n\nLook for rejection or hesitation.\n\nWhy it can work\n\nWorks as real-time signal.\n\nWhat can go wrong\n\nFails if used alone.\n\nCommon misunderstanding\n\nRelying on one candle.\n\nQuick overview\n\nCandle Signals focuses on what candlesticks may be saying about market behavior in the moment.\n\nWho this strategy tends to suit\n\nThis strategy often suits visually oriented users who like reading price action directly and who are comfortable working with small, fast clues rather than waiting only for slower structural confirmation.\n\nWhat this strategy is trying to do\n\nThe goal is to identify short-term signals of reversal, rejection, exhaustion, or continuation by reading candle behavior in context.\n\nConditions it tends to like\n\nclear price action around meaningful levels\n\nmoments where buyers and sellers are visibly contesting control\n\npatterns that form near support, resistance, or other relevant structure\n\nenvironments where candle behavior adds useful context rather than random noise\n\nConditions it tends to dislike\n\nmessy low-clarity chop\n\ncandle patterns forming in the middle of nowhere\n\nover-reliance on one candle without broader context\n\nenvironments where fast noise overwhelms readable structure\n\nHow this appears in PocketPilot\n\nPocketPilot should frame this strategy around pattern formation, strengthening, confirmation, invalidation, and resolution.\n\nConditions this strategy tends to like\n\nThis strategy tends to work best when the chart is readable enough that small formations actually mean something.\n\nConditions this strategy tends to dislike\n\nThis strategy struggles when candle shapes are technically visible but strategically meaningless.\n\nRisk and readiness\n\nThe main risk is over-reading small evidence.\n\nCommon misunderstandings\n\nA candle pattern is always reliable.\n\nPattern name is all that matters.\n\nOne strong candle means the market has turned.\n\nThis strategy is separate from the rest of the market context.\n\nWorked example\n\nImagine price drops into an area that has mattered before, then prints a candle with a long lower wick and a strong close back upward. A user through this lens asks where it happened, what the rejection suggests, and whether the signal is forming, strengthening, or losing relevance.\n\nKey terms to know\n\nRejection wick\n\nEngulfing pattern\n\nHammer / shooting star\n\nConfirmation\n\nInvalidation\n\nHow it behaves\n\nCandle Signals use individual or grouped candles as context clues about buying and selling behaviour. Their meaning depends heavily on where they appear.\n\nWhat strengthens it\n\nclear location near meaningful levels\n\nalignment with broader context\n\nconfirmation from surrounding candles\n\nWhat weakens it\n\nappearing in random or noisy areas\n\nconflicting surrounding behaviour\n\nlack of follow-through\n\nHow it tends to fail\n\nCandles can mislead when taken in isolation. Patterns may appear without meaningful context and fail quickly.\n\nHow it connects to planning\n\nEntry price reflects where the signal is being interpreted. Stop-loss price defines invalidation if behaviour does not follow through. Target price acts as a review point if movement develops. Prepared planning levels can provide structural context. Risk amount and risk percent manage uncertainty. Guardrails help highlight when signals appear in weak context.\n\nWhat to watch for\n\ntreating patterns as standalone signals\n\nignoring location and context\n\noverinterpreting single candles",
+      "What this means\n\nUsing candlestick patterns to read behaviour.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: rejection or hesitation.\n\nWhat you're looking for\n\nLook for rejection or hesitation.\n\nWhy it can work\n\nWorks as real-time signal.\n\nWhat can go wrong\n\nFails if used alone.\n\nCommon misunderstanding\n\nRelying on one candle.\n\nQuick overview\n\nCandle Signals focuses on what candlesticks may be saying about market behavior in the moment.\n\nWho this strategy tends to suit\n\nThis strategy often suits visually oriented users who like reading price action directly and who are comfortable working with small, fast clues rather than waiting only for slower structural confirmation.\n\nWhat this strategy is trying to do\n\nThe goal is to identify short-term signals of reversal, rejection, exhaustion, or continuation by reading candle behavior in context.\n\nConditions it tends to like\n\nclear price action around meaningful levels\n\nmoments where buyers and sellers are visibly contesting control\n\npatterns that form near support, resistance, or other relevant structure\n\nenvironments where candle behavior adds useful context rather than random noise\n\nConditions it tends to dislike\n\nmessy low-clarity chop\n\ncandle patterns forming in the middle of nowhere\n\nover-reliance on one candle without broader context\n\nenvironments where fast noise overwhelms readable structure\n\nHow this appears in PocketPilot\n\nPocketPilot should frame this strategy around pattern formation, strengthening, confirmation, invalidation, and resolution.\n\nConditions this strategy tends to like\n\nThis strategy tends to work best when the chart is readable enough that small formations actually mean something.\n\nConditions this strategy tends to dislike\n\nThis strategy struggles when candle shapes are technically visible but strategically meaningless.\n\nRisk and readiness\n\nThe main risk is over-reading small evidence.\n\nCommon misunderstandings\n\nA candle pattern is always reliable.\n\nPattern name is all that matters.\n\nOne strong candle means the market has turned.\n\nThis strategy is separate from the rest of the market context.\n\nWorked example\n\nImagine price drops into an area that has mattered before, then prints a candle with a long lower wick and a strong close back upward. A user through this lens asks where it happened, what the rejection suggests, and whether the signal is forming, strengthening, or losing relevance.\n\nKey terms to know\n\nRejection wick\n\nEngulfing pattern\n\nHammer / shooting star\n\nConfirmation\n\nInvalidation\n\nHow it behaves\n\nCandle Signals use individual or grouped candles as context clues about buying and selling behaviour. Their meaning depends heavily on where they appear.\n\nWhat strengthens it\n\nclear location near meaningful levels\n\nalignment with broader context\n\nconfirmation from surrounding candles\n\nWhat weakens it\n\nappearing in random or noisy areas\n\nconflicting surrounding behaviour\n\nlack of follow-through\n\nHow it tends to fail\n\nCandles can mislead when taken in isolation. Patterns may appear without meaningful context and fail quickly.\n\nHow it connects to planning\n\nEntry price reflects where the signal is being interpreted. Stop-loss price defines invalidation if behaviour does not follow through. Target price acts as a review point if movement develops. Prepared planning levels can provide structural context. Risk amount and risk percent manage uncertainty. Guardrails help highlight when signals appear in weak context.\n\nWhat to watch for\n\ntreating patterns as standalone signals\n\nignoring location and context\n\noverinterpreting single candles\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nSignal at key level (mapped for a future example topic; see Layer 3 integration map)\n\nWhen conditions became less reliable\n\nSignal in noise (mapped for a future example topic; see Layer 3 integration map)",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -1329,6 +1365,24 @@ export const knowledgeCatalog = [
           'overinterpreting single candles',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Signal at key level (mapped for a future example topic; see Layer 3 integration map)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Signal in noise (mapped for a future example topic; see Layer 3 integration map)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-a-marketevent-is',
@@ -1344,7 +1398,7 @@ export const knowledgeCatalog = [
     title: 'Confluence Alignment',
     summary: 'Confluence Alignment is a strategy built around the idea that a market setup becomes more meaningful when different kinds of evidence point in the same direction. It is less about finding more reasons to act and more about filtering out weak or isolated signals until the broader picture makes clearer sense.',
     content:
-      "What this means\n\nCombining multiple signals.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: alignment.\n\nWhat you're looking for\n\nLook for alignment.\n\nWhy it can work\n\nWorks because agreement builds confidence.\n\nWhat can go wrong\n\nFails if forced.\n\nCommon misunderstanding\n\nMore signals = better trade.\n\nWhat this strategy is for\n\nConfluence Alignment is for situations where different kinds of evidence begin pointing to the same area or idea.\n\nWhat it looks for\n\nIt starts with confluence, meaning layered agreement rather than repeated copies of the same signal.\n\nWhat improves fit\n\nFit improves when the agreement is independent and strong enough to support meaningful change in interpretation. As the market proves the read more clearly, confirmed confidence can improve.\n\nWhat weakens fit\n\nFit weakens when the “confluence” is really just clutter or when the evidence stack starts breaking apart under stress.\n\nWhat PocketPilot would emphasize\n\nConfluence is disciplined agreement, not magical certainty.\n\nWhat a user should learn\n\nMore indicators do not automatically mean more truth.\n\nWhat to read next\n\nBitcoin’s $19k–$20k Bottoming Cluster and the Post-FTX Reclaim\n\nConfluence vs Clutter\n\nsupporting signals vs clutter explainer\n\nHow it behaves\n\nConfluence Alignment looks for multiple independent clues pointing in a similar direction. It focuses on agreement across different types of information.\n\nWhat strengthens it\n\nindependent signals aligning\n\nclear overlap between structure, momentum, and context\n\nsimplicity in interpretation\n\nWhat weakens it\n\nsignals that are similar or redundant\n\nconflicting information\n\novercomplication\n\nHow it tends to fail\n\nStacking weak or related signals can create false confidence. Alignment does not make the outcome certain.\n\nHow it connects to planning\n\nEntry price reflects where alignment is interpreted. Stop-loss price defines invalidation if alignment breaks. Target price acts as a review point if alignment holds. Prepared planning levels provide initial structure. Risk amount and risk percent manage exposure across aligned setups. Guardrails highlight when complexity increases risk.\n\nWhat to watch for\n\nassuming more signals means better clarity\n\nusing overlapping indicators\n\nforcing alignment where it does not exist",
+      "What this means\n\nCombining multiple signals.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: alignment.\n\nWhat you're looking for\n\nLook for alignment.\n\nWhy it can work\n\nWorks because agreement builds confidence.\n\nWhat can go wrong\n\nFails if forced.\n\nCommon misunderstanding\n\nMore signals = better trade.\n\nWhat this strategy is for\n\nConfluence Alignment is for situations where different kinds of evidence begin pointing to the same area or idea.\n\nWhat it looks for\n\nIt starts with confluence, meaning layered agreement rather than repeated copies of the same signal.\n\nWhat improves fit\n\nFit improves when the agreement is independent and strong enough to support meaningful change in interpretation. As the market proves the read more clearly, confirmed confidence can improve.\n\nWhat weakens fit\n\nFit weakens when the “confluence” is really just clutter or when the evidence stack starts breaking apart under stress.\n\nWhat PocketPilot would emphasize\n\nConfluence is disciplined agreement, not magical certainty.\n\nWhat a user should learn\n\nMore indicators do not automatically mean more truth.\n\nWhat to read next\n\nBitcoin’s $19k–$20k Bottoming Cluster and the Post-FTX Reclaim\n\nConfluence vs Clutter\n\nsupporting signals vs clutter explainer\n\nHow it behaves\n\nConfluence Alignment looks for multiple independent clues pointing in a similar direction. It focuses on agreement across different types of information.\n\nWhat strengthens it\n\nindependent signals aligning\n\nclear overlap between structure, momentum, and context\n\nsimplicity in interpretation\n\nWhat weakens it\n\nsignals that are similar or redundant\n\nconflicting information\n\novercomplication\n\nHow it tends to fail\n\nStacking weak or related signals can create false confidence. Alignment does not make the outcome certain.\n\nHow it connects to planning\n\nEntry price reflects where alignment is interpreted. Stop-loss price defines invalidation if alignment breaks. Target price acts as a review point if alignment holds. Prepared planning levels provide initial structure. Risk amount and risk percent manage exposure across aligned setups. Guardrails highlight when complexity increases risk.\n\nWhat to watch for\n\nassuming more signals means better clarity\n\nusing overlapping indicators\n\nforcing alignment where it does not exist\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nAligned independent signals (worked)\n\nWhen conditions became less reliable\n\nStacked weak signals (caution)",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -1475,6 +1529,24 @@ export const knowledgeCatalog = [
           'forcing alignment where it does not exist',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Aligned independent signals (worked)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Stacked weak signals (caution)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -1490,7 +1562,7 @@ export const knowledgeCatalog = [
     title: 'Fibonacci Zones',
     summary: 'Fibonacci Zones is a strategy built around the idea that markets often pause, react, or reverse around certain retracement and extension areas after a meaningful move. It is less about treating those zones like magical numbers and more about using them as structured reference points inside a broader market context.',
     content:
-      "What this means\n\nUsing retracement levels to find reactions.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: pullbacks into levels.\n\nWhat you're looking for\n\nLook for pullbacks into levels.\n\nWhy it can work\n\nWorks because many watch them.\n\nWhat can go wrong\n\nFails if ignored.\n\nCommon misunderstanding\n\nThinking they always work.\n\nQuick overview\n\nFibonacci Zones focuses on areas where a market may pause, react, or change character after a strong move.\n\nWho this strategy tends to suit\n\nThis strategy often suits users who like structure, visual reference points, and layered context.\n\nWhat this strategy is trying to do\n\nThe goal is to use retracement and extension areas as structured context for where price may react, stall, continue, or reverse.\n\nConditions it tends to like\n\na clear prior move to measure from\n\nmarkets where structure is readable\n\nreactions happening near meaningful levels\n\nsituations where Fibonacci areas line up with other useful context\n\nConditions it tends to dislike\n\nrandom, structureless markets\n\nforcing levels onto weak or messy price action\n\ntreating one ratio as decisive without broader context\n\nenvironments where nothing else is supporting the zone’s relevance\n\nHow this appears in PocketPilot\n\nPocketPilot should frame this strategy around measured zones, likely reaction areas, and confluence rather than presenting Fibonacci levels as destiny.\n\nConditions this strategy tends to like\n\nThis strategy tends to work best when the prior market move is clear enough to measure and the surrounding structure is readable.\n\nConditions this strategy tends to dislike\n\nThis strategy struggles when the chart is too messy for measurement to mean much.\n\nRisk and readiness\n\nThe main risk is false precision.\n\nCommon misunderstandings\n\nFibonacci levels are magical.\n\nIf price reaches a Fibonacci level, it must react.\n\nOne ratio is enough by itself.\n\nThis strategy is about exact numbers.\n\nWorked example\n\nImagine an asset makes a strong upward move, then begins pulling back. A user through this lens asks what part of the prior move is being retraced, whether price is entering an area that often becomes interesting, and whether the zone lines up with anything else meaningful.\n\nKey terms to know\n\nRetracement\n\nExtension\n\nSwing high / swing low\n\nConfluence\n\nZone\n\nHow it behaves\n\nFibonacci Zones identify areas where price may react during retracements or extensions. These are zones of interest rather than exact levels.\n\nWhat strengthens it\n\nalignment with existing support or resistance\n\nuse within a clear trend or structure\n\nclustering of multiple levels\n\nWhat weakens it\n\nisolated levels without context\n\nunclear trend direction\n\nconflicting signals\n\nHow it tends to fail\n\nPrice may ignore zones entirely or pass through them without reacting. Lines do not enforce behaviour.\n\nHow it connects to planning\n\nEntry price reflects where the zone is being interpreted. Stop-loss price defines invalidation beyond the zone. Target price acts as a review point at further zones. Prepared planning levels can include Fibonacci context. Risk amount and risk percent manage exposure. Guardrails highlight overreliance on single tools.\n\nWhat to watch for\n\ntreating levels as precise predictions\n\nignoring broader structure\n\noverloading charts with levels",
+      "What this means\n\nUsing retracement levels to find reactions.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: pullbacks into levels.\n\nWhat you're looking for\n\nLook for pullbacks into levels.\n\nWhy it can work\n\nWorks because many watch them.\n\nWhat can go wrong\n\nFails if ignored.\n\nCommon misunderstanding\n\nThinking they always work.\n\nQuick overview\n\nFibonacci Zones focuses on areas where a market may pause, react, or change character after a strong move.\n\nWho this strategy tends to suit\n\nThis strategy often suits users who like structure, visual reference points, and layered context.\n\nWhat this strategy is trying to do\n\nThe goal is to use retracement and extension areas as structured context for where price may react, stall, continue, or reverse.\n\nConditions it tends to like\n\na clear prior move to measure from\n\nmarkets where structure is readable\n\nreactions happening near meaningful levels\n\nsituations where Fibonacci areas line up with other useful context\n\nConditions it tends to dislike\n\nrandom, structureless markets\n\nforcing levels onto weak or messy price action\n\ntreating one ratio as decisive without broader context\n\nenvironments where nothing else is supporting the zone’s relevance\n\nHow this appears in PocketPilot\n\nPocketPilot should frame this strategy around measured zones, likely reaction areas, and confluence rather than presenting Fibonacci levels as destiny.\n\nConditions this strategy tends to like\n\nThis strategy tends to work best when the prior market move is clear enough to measure and the surrounding structure is readable.\n\nConditions this strategy tends to dislike\n\nThis strategy struggles when the chart is too messy for measurement to mean much.\n\nRisk and readiness\n\nThe main risk is false precision.\n\nCommon misunderstandings\n\nFibonacci levels are magical.\n\nIf price reaches a Fibonacci level, it must react.\n\nOne ratio is enough by itself.\n\nThis strategy is about exact numbers.\n\nWorked example\n\nImagine an asset makes a strong upward move, then begins pulling back. A user through this lens asks what part of the prior move is being retraced, whether price is entering an area that often becomes interesting, and whether the zone lines up with anything else meaningful.\n\nKey terms to know\n\nRetracement\n\nExtension\n\nSwing high / swing low\n\nConfluence\n\nZone\n\nHow it behaves\n\nFibonacci Zones identify areas where price may react during retracements or extensions. These are zones of interest rather than exact levels.\n\nWhat strengthens it\n\nalignment with existing support or resistance\n\nuse within a clear trend or structure\n\nclustering of multiple levels\n\nWhat weakens it\n\nisolated levels without context\n\nunclear trend direction\n\nconflicting signals\n\nHow it tends to fail\n\nPrice may ignore zones entirely or pass through them without reacting. Lines do not enforce behaviour.\n\nHow it connects to planning\n\nEntry price reflects where the zone is being interpreted. Stop-loss price defines invalidation beyond the zone. Target price acts as a review point at further zones. Prepared planning levels can include Fibonacci context. Risk amount and risk percent manage exposure. Guardrails highlight overreliance on single tools.\n\nWhat to watch for\n\ntreating levels as precise predictions\n\nignoring broader structure\n\noverloading charts with levels\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nReaction at confluence zone (mapped for a future example topic; see Layer 3 integration map)\n\nWhen conditions became less reliable\n\nClean break through zone (mapped for a future example topic; see Layer 3 integration map)",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -1662,6 +1734,24 @@ export const knowledgeCatalog = [
           'overloading charts with levels',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Reaction at confluence zone (mapped for a future example topic; see Layer 3 integration map)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Clean break through zone (mapped for a future example topic; see Layer 3 integration map)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -1677,7 +1767,7 @@ export const knowledgeCatalog = [
     title: 'Momentum Pulse',
     summary: 'Momentum Pulse is a strategy built around short-term bursts of accelerating price movement. It is less about following a long trend from afar and more about recognizing when a move is gaining speed fast enough to become temporarily meaningful.',
     content:
-      "What this means\n\nTrading strong fast movement.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: sharp moves and follow-through.\n\nWhat you're looking for\n\nLook for sharp moves and follow-through.\n\nWhy it can work\n\nWorks because momentum carries price.\n\nWhat can go wrong\n\nFails if move fades.\n\nCommon misunderstanding\n\nChasing late.\n\nQuick overview\n\nMomentum Pulse is designed for moments when price movement suddenly accelerates.\n\nWho this strategy tends to suit\n\nThis strategy often suits active users who are comfortable with shorter-duration setups and closer monitoring.\n\nWhat this strategy is trying to do\n\nThe goal is to participate in a short-term burst of price acceleration while that burst still has energy.\n\nConditions it tends to like\n\nvisibly increasing speed of price movement\n\nstrong participation and volume\n\ncleaner short-term directional movement\n\nconditions where acceleration looks real rather than random\n\nConditions it tends to dislike\n\nsideways and choppy markets\n\nlow-liquidity moves\n\nbrief spikes that reverse immediately\n\nenvironments where acceleration looks fragile rather than sustained even for the short term\n\nHow this appears in PocketPilot\n\nPocketPilot should frame this strategy around pace, energy, and whether a move is accelerating or fading.\n\nConditions this strategy tends to like\n\nThis strategy tends to work best when the market is not just moving, but moving faster in a way that looks well-supported.\n\nConditions this strategy tends to dislike\n\nThis strategy struggles when the market is noisy rather than energetic.\n\nRisk and readiness\n\nThe main risk is the sudden reversal after entry.\n\nCommon misunderstandings\n\nMomentum means the asset must be fundamentally strong.\n\nThis is the same as trend-following.\n\nIf price is moving fast, that alone is enough.\n\nA strong pulse should keep going indefinitely.\n\nWorked example\n\nImagine an asset begins climbing much faster than its recent pace. A user through a Momentum Pulse lens is asking whether the move is accelerating, whether the speed looks well-supported, and whether the pulse is still active or starting to flatten out.\n\nKey terms to know\n\nMomentum\n\nVelocity\n\nVolume participation\n\nWhipsaw\n\nChoppy market\n\nHow it behaves\n\nMomentum Pulse responds to rapid price acceleration over short periods. These moves can be strong but often short-lived.\n\nWhat strengthens it\n\nclear directional acceleration\n\nstrong follow-through over short intervals\n\nalignment with broader context\n\nWhat weakens it\n\nslowing movement after a burst\n\nconflicting signals\n\nlack of continuation\n\nHow it tends to fail\n\nMomentum can fade quickly. Price may stall or reverse once the initial burst ends.\n\nHow it connects to planning\n\nEntry price reflects where momentum is being interpreted. Stop-loss price defines invalidation if momentum fades. Target price acts as a review point during fast movement. Prepared planning levels provide optional context for extension zones. Risk amount and risk percent manage exposure during fast conditions. Guardrails help highlight when chasing behaviour increases risk.\n\nWhat to watch for\n\nchasing late-stage momentum\n\nassuming speed equals continuation\n\nignoring signs of exhaustion",
+      "What this means\n\nTrading strong fast movement.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: sharp moves and follow-through.\n\nWhat you're looking for\n\nLook for sharp moves and follow-through.\n\nWhy it can work\n\nWorks because momentum carries price.\n\nWhat can go wrong\n\nFails if move fades.\n\nCommon misunderstanding\n\nChasing late.\n\nQuick overview\n\nMomentum Pulse is designed for moments when price movement suddenly accelerates.\n\nWho this strategy tends to suit\n\nThis strategy often suits active users who are comfortable with shorter-duration setups and closer monitoring.\n\nWhat this strategy is trying to do\n\nThe goal is to participate in a short-term burst of price acceleration while that burst still has energy.\n\nConditions it tends to like\n\nvisibly increasing speed of price movement\n\nstrong participation and volume\n\ncleaner short-term directional movement\n\nconditions where acceleration looks real rather than random\n\nConditions it tends to dislike\n\nsideways and choppy markets\n\nlow-liquidity moves\n\nbrief spikes that reverse immediately\n\nenvironments where acceleration looks fragile rather than sustained even for the short term\n\nHow this appears in PocketPilot\n\nPocketPilot should frame this strategy around pace, energy, and whether a move is accelerating or fading.\n\nConditions this strategy tends to like\n\nThis strategy tends to work best when the market is not just moving, but moving faster in a way that looks well-supported.\n\nConditions this strategy tends to dislike\n\nThis strategy struggles when the market is noisy rather than energetic.\n\nRisk and readiness\n\nThe main risk is the sudden reversal after entry.\n\nCommon misunderstandings\n\nMomentum means the asset must be fundamentally strong.\n\nThis is the same as trend-following.\n\nIf price is moving fast, that alone is enough.\n\nA strong pulse should keep going indefinitely.\n\nWorked example\n\nImagine an asset begins climbing much faster than its recent pace. A user through a Momentum Pulse lens is asking whether the move is accelerating, whether the speed looks well-supported, and whether the pulse is still active or starting to flatten out.\n\nKey terms to know\n\nMomentum\n\nVelocity\n\nVolume participation\n\nWhipsaw\n\nChoppy market\n\nHow it behaves\n\nMomentum Pulse responds to rapid price acceleration over short periods. These moves can be strong but often short-lived.\n\nWhat strengthens it\n\nclear directional acceleration\n\nstrong follow-through over short intervals\n\nalignment with broader context\n\nWhat weakens it\n\nslowing movement after a burst\n\nconflicting signals\n\nlack of continuation\n\nHow it tends to fail\n\nMomentum can fade quickly. Price may stall or reverse once the initial burst ends.\n\nHow it connects to planning\n\nEntry price reflects where momentum is being interpreted. Stop-loss price defines invalidation if momentum fades. Target price acts as a review point during fast movement. Prepared planning levels provide optional context for extension zones. Risk amount and risk percent manage exposure during fast conditions. Guardrails help highlight when chasing behaviour increases risk.\n\nWhat to watch for\n\nchasing late-stage momentum\n\nassuming speed equals continuation\n\nignoring signs of exhaustion\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nMomentum continuation burst (worked)\n\nWhen conditions became less reliable\n\nMomentum exhaustion stall (caution)",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -1849,6 +1939,24 @@ export const knowledgeCatalog = [
           'ignoring signs of exhaustion',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Momentum continuation burst (worked)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Momentum exhaustion stall (caution)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -1864,7 +1972,7 @@ export const knowledgeCatalog = [
     title: 'Range Trader',
     summary: 'Range Trader is a strategy built around markets that are moving sideways inside a reasonably clear floor-and-ceiling structure. It is less about chasing big directional moves and more about recognizing when price is oscillating inside a contained environment.',
     content:
-      "What this means\n\nBuying low and selling high in a sideways range.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: clear highs and lows.\n\nWhat you're looking for\n\nLook for clear highs and lows.\n\nWhy it can work\n\nWorks when price repeats behaviour.\n\nWhat can go wrong\n\nFails if price breaks out.\n\nCommon misunderstanding\n\nAssuming the range will hold.\n\nWhat this strategy is for\n\nRange Trader is for markets moving inside a range rather than trending strongly.\n\nWhat it looks for\n\nIt cares about where price is inside the box and whether the market is being pushed away in rejection rather than escaping into something more directional.\n\nWhat improves fit\n\nFit improves when the boundaries keep mattering and volatility is active but not chaotic enough to make the box meaningless.\n\nWhat weakens fit\n\nFit weakens when the range is degrading, repeated tests are wearing the zone down, or a more durable escape is beginning.\n\nHow it behaves\n\nRange Trader responds to price moving between relatively stable upper and lower boundaries. Price tends to oscillate between these areas rather than trend strongly in one direction.\n\nWhat strengthens it\n\nclearly defined boundaries that price respects repeatedly\n\nrelatively stable volatility within the range\n\nconsistent behaviour at extremes\n\nWhat weakens it\n\nuneven or expanding boundaries\n\ninconsistent reactions at range edges\n\nincreasing momentum toward a breakout\n\nHow it tends to fail\n\nRanges eventually break. Price can move beyond boundaries and not return, turning a range into a directional move.\n\nHow it connects to planning\n\nEntry price helps define where within the range the idea is being interpreted. Stop-loss price helps define invalidation if the range breaks. Target price acts as a review point near the opposite boundary. Prepared planning levels can help frame the range but should be reviewed. Risk amount and risk percent keep exposure consistent across repeated plans. Guardrails help highlight when behaviour shifts away from range conditions.\n\nWhat to watch for\n\ntreating boundaries as fixed rules\n\nignoring signs of breakout pressure\n\ntrading in the middle of the range without clear context",
+      "What this means\n\nBuying low and selling high in a sideways range.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: clear highs and lows.\n\nWhat you're looking for\n\nLook for clear highs and lows.\n\nWhy it can work\n\nWorks when price repeats behaviour.\n\nWhat can go wrong\n\nFails if price breaks out.\n\nCommon misunderstanding\n\nAssuming the range will hold.\n\nWhat this strategy is for\n\nRange Trader is for markets moving inside a range rather than trending strongly.\n\nWhat it looks for\n\nIt cares about where price is inside the box and whether the market is being pushed away in rejection rather than escaping into something more directional.\n\nWhat improves fit\n\nFit improves when the boundaries keep mattering and volatility is active but not chaotic enough to make the box meaningless.\n\nWhat weakens fit\n\nFit weakens when the range is degrading, repeated tests are wearing the zone down, or a more durable escape is beginning.\n\nHow it behaves\n\nRange Trader responds to price moving between relatively stable upper and lower boundaries. Price tends to oscillate between these areas rather than trend strongly in one direction.\n\nWhat strengthens it\n\nclearly defined boundaries that price respects repeatedly\n\nrelatively stable volatility within the range\n\nconsistent behaviour at extremes\n\nWhat weakens it\n\nuneven or expanding boundaries\n\ninconsistent reactions at range edges\n\nincreasing momentum toward a breakout\n\nHow it tends to fail\n\nRanges eventually break. Price can move beyond boundaries and not return, turning a range into a directional move.\n\nHow it connects to planning\n\nEntry price helps define where within the range the idea is being interpreted. Stop-loss price helps define invalidation if the range breaks. Target price acts as a review point near the opposite boundary. Prepared planning levels can help frame the range but should be reviewed. Risk amount and risk percent keep exposure consistent across repeated plans. Guardrails help highlight when behaviour shifts away from range conditions.\n\nWhat to watch for\n\ntreating boundaries as fixed rules\n\nignoring signs of breakout pressure\n\ntrading in the middle of the range without clear context\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nClean range oscillation (mapped for a future example topic; see Layer 3 integration map)\n\nWhen conditions became less reliable\n\nRange break and instability (caution)",
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -1975,6 +2083,24 @@ export const knowledgeCatalog = [
           'trading in the middle of the range without clear context',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Clean range oscillation (mapped for a future example topic; see Layer 3 integration map)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Range break and instability (caution)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -1990,7 +2116,7 @@ export const knowledgeCatalog = [
     title: 'Reversion Bounce',
     summary: 'Reversion Bounce is a strategy built around the idea that severe, fast downward moves can sometimes produce a short-lived rebound. It is less about calling a long-term recovery and more about recognizing when a market may be temporarily overstretched and capable of snapping back toward a more normal level.',
     content:
-      'What this means\n\nTrading a move back after price stretches too far.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: sharp moves and slowing.\n\nWhat you\'re looking for\n\nLook for sharp moves and slowing.\n\nWhy it can work\n\nWorks because price rarely moves in straight lines.\n\nWhat can go wrong\n\nFails if move continues.\n\nCommon misunderstanding\n\nEntering too early.\n\nWhat this strategy is for\n\nReversion Bounce is for situations where price has become stretched enough that a rebound becomes possible even if durable repair is not yet proven.\n\nWhat it looks for\n\nIt often begins with exhaustion and the first improvement often looks like a relief rally, not a clean reversal.\n\nWhat improves fit\n\nFit improves when the move is stretched enough to justify rebound attention and estimated confidence can improve without the product claiming a full reversal.\n\nWhat weakens fit\n\nFit weakens when rebounds keep failing to become real recovery, or when the broader structure remains too damaged to trust the bounce.\n\nWhat PocketPilot would emphasize\n\nPossible rebound conditions are not the same thing as “the low is in.”\n\nWhat a user should learn\n\nRelief and recovery are not the same thing.\n\nWhat to read next\n\nBitcoin June to August 2022: Relief Rally Inside a Broken Structure\n\nBounce vs Recovery vs Reversal\n\nrelief rally vs recovery explainer\n\nHow it behaves\n\nReversion Bounce responds to stretched price movement that may move back toward a more typical level. These moves often occur after sharp directional pressure.\n\nWhat strengthens it\n\nclear signs of overextension\n\nslowing movement after a strong push\n\nproximity to areas where price previously stabilised\n\nWhat weakens it\n\ncontinued strong directional pressure\n\nabsence of any slowing behaviour\n\nunclear reference point for "normal" levels\n\nHow it tends to fail\n\nPrice may continue moving in the same direction without reverting. What appears stretched can become more stretched.\n\nHow it connects to planning\n\nEntry price reflects where the stretched move is being interpreted. Stop-loss price defines where continuation invalidates the bounce idea. Target price acts as a review point if price moves back toward balance. Prepared planning levels provide optional context for mean areas. Risk amount and risk percent manage downside if continuation occurs. Guardrails highlight when conditions remain directional rather than reverting.\n\nWhat to watch for\n\nassuming reversion must happen\n\nentering too early without signs of slowing\n\nconfusing a bounce with a full reversal',
+      'What this means\n\nTrading a move back after price stretches too far.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: sharp moves and slowing.\n\nWhat you\'re looking for\n\nLook for sharp moves and slowing.\n\nWhy it can work\n\nWorks because price rarely moves in straight lines.\n\nWhat can go wrong\n\nFails if move continues.\n\nCommon misunderstanding\n\nEntering too early.\n\nWhat this strategy is for\n\nReversion Bounce is for situations where price has become stretched enough that a rebound becomes possible even if durable repair is not yet proven.\n\nWhat it looks for\n\nIt often begins with exhaustion and the first improvement often looks like a relief rally, not a clean reversal.\n\nWhat improves fit\n\nFit improves when the move is stretched enough to justify rebound attention and estimated confidence can improve without the product claiming a full reversal.\n\nWhat weakens fit\n\nFit weakens when rebounds keep failing to become real recovery, or when the broader structure remains too damaged to trust the bounce.\n\nWhat PocketPilot would emphasize\n\nPossible rebound conditions are not the same thing as “the low is in.”\n\nWhat a user should learn\n\nRelief and recovery are not the same thing.\n\nWhat to read next\n\nBitcoin June to August 2022: Relief Rally Inside a Broken Structure\n\nBounce vs Recovery vs Reversal\n\nrelief rally vs recovery explainer\n\nHow it behaves\n\nReversion Bounce responds to stretched price movement that may move back toward a more typical level. These moves often occur after sharp directional pressure.\n\nWhat strengthens it\n\nclear signs of overextension\n\nslowing movement after a strong push\n\nproximity to areas where price previously stabilised\n\nWhat weakens it\n\ncontinued strong directional pressure\n\nabsence of any slowing behaviour\n\nunclear reference point for "normal" levels\n\nHow it tends to fail\n\nPrice may continue moving in the same direction without reverting. What appears stretched can become more stretched.\n\nHow it connects to planning\n\nEntry price reflects where the stretched move is being interpreted. Stop-loss price defines where continuation invalidates the bounce idea. Target price acts as a review point if price moves back toward balance. Prepared planning levels provide optional context for mean areas. Risk amount and risk percent manage downside if continuation occurs. Guardrails highlight when conditions remain directional rather than reverting.\n\nWhat to watch for\n\nassuming reversion must happen\n\nentering too early without signs of slowing\n\nconfusing a bounce with a full reversal\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nOvershoot then return (mapped for a future example topic; see Layer 3 integration map)\n\nWhen conditions became less reliable\n\nContinued directional pressure (caution)',
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2121,6 +2247,24 @@ export const knowledgeCatalog = [
           'confusing a bounce with a full reversal',
         ],
       },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Overshoot then return (mapped for a future example topic; see Layer 3 integration map)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Continued directional pressure (caution)',
+        ],
+      },
     ],
     relatedTopicIds: [
       'pp-what-strategy-alignment-means',
@@ -2136,7 +2280,7 @@ export const knowledgeCatalog = [
     title: 'Trend Follow',
     summary: 'Trend Follow is a strategy built around the idea that markets can move in sustained directions for longer than people expect. It is less about buying the exact bottom or selling the exact top, and more about recognizing when a directional move is established enough to follow.',
     content:
-      "What this means\n\nTrading in the direction price is moving.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: consistent direction and pullbacks.\n\nWhat you're looking for\n\nLook for consistent direction and pullbacks.\n\nWhy it can work\n\nWorks because trends persist.\n\nWhat can go wrong\n\nFails if trend reverses.\n\nCommon misunderstanding\n\nEntering too late.\n\nWhat this strategy is for\n\nTrend Follow is for situations where the market is already moving directionally and continuing to behave that way.\n\nWhat it looks for\n\nIt often becomes more relevant after a breakout, reclaim, or broader structural shift.\n\nWhat improves fit\n\nStrategy fit improves when the broader regime is supportive and the market keeps proving the direction.\n\nWhat weakens fit\n\nFit weakens when the direction is fragile, the environment remains damaged, or the market looks more like temporary rebound than durable continuation.\n\nWhat PocketPilot would emphasize\n\nTrend Follow is persistence-aware rather than prediction-obsessed.\n\nWhat a user should learn\n\nYou do not need the exact low for Trend Follow to matter.\n\nWhat to read next\n\nBitcoin Above the Old High\n\nFrom Liquidity Tailwind to Deleveraging Grind\n\ncontinuation vs reversal explainer\n\nHow it behaves\n\nTrend Follow responds to persistent directional movement where price continues forming structure in one direction. Trends often include pullbacks and pauses rather than moving in a straight line.\n\nWhat strengthens it\n\nconsistent directional structure\n\norderly pullbacks within the trend\n\ncontinued acceptance of higher or lower levels\n\nWhat weakens it\n\nchoppy or sideways movement\n\ninconsistent structure\n\nsigns of exhaustion or slowing\n\nHow it tends to fail\n\nTrends can stall or reverse. Price may stop progressing and begin to move sideways or shift direction entirely.\n\nHow it connects to planning\n\nEntry price reflects where within the trend the idea is being interpreted. Stop-loss price helps define where structure breaks. Target price acts as a review point as the trend progresses. Prepared planning levels can outline potential continuation areas. Risk amount and risk percent manage exposure over multiple trend attempts. Guardrails help highlight overextension or increasing risk.\n\nWhat to watch for\n\nentering late after extended movement\n\nassuming the trend will continue indefinitely\n\nignoring weakening structure",
+      "What this means\n\nTrading in the direction price is moving.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: consistent direction and pullbacks.\n\nWhat you're looking for\n\nLook for consistent direction and pullbacks.\n\nWhy it can work\n\nWorks because trends persist.\n\nWhat can go wrong\n\nFails if trend reverses.\n\nCommon misunderstanding\n\nEntering too late.\n\nWhat this strategy is for\n\nTrend Follow is for situations where the market is already moving directionally and continuing to behave that way.\n\nWhat it looks for\n\nIt often becomes more relevant after a breakout, reclaim, or broader structural shift.\n\nWhat improves fit\n\nStrategy fit improves when the broader regime is supportive and the market keeps proving the direction.\n\nWhat weakens fit\n\nFit weakens when the direction is fragile, the environment remains damaged, or the market looks more like temporary rebound than durable continuation.\n\nWhat PocketPilot would emphasize\n\nTrend Follow is persistence-aware rather than prediction-obsessed.\n\nWhat a user should learn\n\nYou do not need the exact low for Trend Follow to matter.\n\nWhat to read next\n\nBitcoin Above the Old High\n\nFrom Liquidity Tailwind to Deleveraging Grind\n\ncontinuation vs reversal explainer\n\nHow it behaves\n\nTrend Follow responds to persistent directional movement where price continues forming structure in one direction. Trends often include pullbacks and pauses rather than moving in a straight line.\n\nWhat strengthens it\n\nconsistent directional structure\n\norderly pullbacks within the trend\n\ncontinued acceptance of higher or lower levels\n\nWhat weakens it\n\nchoppy or sideways movement\n\ninconsistent structure\n\nsigns of exhaustion or slowing\n\nHow it tends to fail\n\nTrends can stall or reverse. Price may stop progressing and begin to move sideways or shift direction entirely.\n\nHow it connects to planning\n\nEntry price reflects where within the trend the idea is being interpreted. Stop-loss price helps define where structure breaks. Target price acts as a review point as the trend progresses. Prepared planning levels can outline potential continuation areas. Risk amount and risk percent manage exposure over multiple trend attempts. Guardrails help highlight overextension or increasing risk.\n\nWhat to watch for\n\nentering late after extended movement\n\nassuming the trend will continue indefinitely\n\nignoring weakening structure\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nBitcoin above the old high (worked)\n\nWhen conditions became less reliable\n\nLiquidity tailwind to deleveraging grind (caution)",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2265,6 +2409,24 @@ export const knowledgeCatalog = [
           'entering late after extended movement',
           'assuming the trend will continue indefinitely',
           'ignoring weakening structure',
+        ],
+      },
+      {
+        heading: 'See examples',
+        body: [
+          'These examples show how this strategy can appear in real market conditions.',
+        ],
+      },
+      {
+        heading: 'When it played out as expected',
+        body: [
+          'Bitcoin above the old high (worked)',
+        ],
+      },
+      {
+        heading: 'When conditions became less reliable',
+        body: [
+          'Liquidity tailwind to deleveraging grind (caution)',
         ],
       },
     ],
@@ -3191,7 +3353,7 @@ export const knowledgeCatalog = [
     title: 'Entry price',
     summary: "The price you're planning to enter the trade.",
     content:
-      "What this means\n\nThe price you're planning to enter the trade.\n\nWhy it matters\n\nThis is your starting planning input. Everything else builds from here.\n\nHow PocketPilot frames it\n\nA planning level, not a certain fill.\n\nCommon misunderstanding\n\nThinking you'll always get that exact price.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nEntry price is where your plan becomes active. It is less about finding the perfect price and more about acting when your idea is clearly defined.\n\nHow it behaves\n\nEntries can be early, confirmed, or late. Each is a trade-off between price and clarity.\n\nWhat tends to go wrong\n\nentering without a setup\n\nchasing missed moves\n\nreacting instead of planning\n\nWhat good looks like\n\nclear reason for the chosen timing\n\naligned with strategy\n\nunderstood trade-offs\n\nWhat it connects to\n\nStop-loss price, Position size, Strategy alignment.",
+      "What this means\n\nThe price you're planning to enter the trade.\n\nWhy it matters\n\nThis is your starting planning input. Everything else builds from here.\n\nHow PocketPilot frames it\n\nA planning level, not a certain fill.\n\nCommon misunderstanding\n\nThinking you'll always get that exact price.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nEntry price is where your plan becomes active. It is less about finding the perfect price and more about acting when your idea is clearly defined.\n\nHow it behaves\n\nEntries can be early, confirmed, or late. Each is a trade-off between price and clarity.\n\nWhat tends to go wrong\n\nentering without a setup\n\nchasing missed moves\n\nreacting instead of planning\n\nWhat good looks like\n\nclear reason for the chosen timing\n\naligned with strategy\n\nunderstood trade-offs\n\nWhat it connects to\n\nStop-loss price, Position size, Strategy alignment.\n\nHow this shows up\n\nEarly entry in pullback\n\nLate entry in continuation",
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -3264,15 +3426,24 @@ export const knowledgeCatalog = [
           'Stop-loss price, Position size, Strategy alignment.',
         ],
       },
+      {
+        heading: 'How this shows up',
+        body: [
+          'Early entry in pullback',
+          'Late entry in continuation',
+        ],
+      },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: [
+
+    ],
   },
   {
     topicId: 'trade-hub-stop-loss-price',
     title: 'Stop-loss price',
     summary: "The price where you'd exit to avoid further losses.",
     content:
-      "What this means\n\nThe price where you'd exit to avoid further losses.\n\nWhy it matters\n\nIt defines your downside before you act.\n\nHow PocketPilot frames it\n\nA planning level showing where the idea no longer holds up.\n\nCommon misunderstanding\n\nTreating it as just how much loss you can tolerate.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nThis is a planning boundary where your idea may no longer be valid. It is not a guarantee of where an exit occurs.\n\nHow it behaves\n\nA stop can be structural, volatility-based, or arbitrary. Structural placement is often the clearest match to plan logic.\n\nWhat tends to go wrong\n\ntoo tight for normal movement\n\nemotionally moved after entry\n\nnot set at all\n\nWhat good looks like\n\nclear invalidation point\n\naccepted loss point\n\nchosen deliberately\n\nWhat it connects to\n\nEntry price, Risk amount, Position size.",
+      "What this means\n\nThe price where you'd exit to avoid further losses.\n\nWhy it matters\n\nIt defines your downside before you act.\n\nHow PocketPilot frames it\n\nA planning level showing where the idea no longer holds up.\n\nCommon misunderstanding\n\nTreating it as just how much loss you can tolerate.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nThis is a planning boundary where your idea may no longer be valid. It is not a guarantee of where an exit occurs.\n\nHow it behaves\n\nA stop can be structural, volatility-based, or arbitrary. Structural placement is often the clearest match to plan logic.\n\nWhat tends to go wrong\n\ntoo tight for normal movement\n\nemotionally moved after entry\n\nnot set at all\n\nWhat good looks like\n\nclear invalidation point\n\naccepted loss point\n\nchosen deliberately\n\nWhat it connects to\n\nEntry price, Risk amount, Position size.\n\nHow this shows up\n\nStructure holds\n\nStructure breaks",
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -3345,15 +3516,24 @@ export const knowledgeCatalog = [
           'Entry price, Risk amount, Position size.',
         ],
       },
+      {
+        heading: 'How this shows up',
+        body: [
+          'Structure holds',
+          'Structure breaks',
+        ],
+      },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: [
+
+    ],
   },
   {
     topicId: 'trade-hub-target-price',
     title: 'Target price',
     summary: 'A price you use to review whether the plan is working or whether an exit may make sense.',
     content:
-      'What this means\n\nA price you use to review whether the plan is working or whether an exit may make sense.\n\nWhy it matters\n\nIt gives you a review point to assess progress.\n\nHow PocketPilot frames it\n\nA review point, not an automatic action. PocketPilot does not place a trade at this level.\n\nCommon misunderstanding\n\nThinking the trade will close automatically at this price.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nTarget price is a review point, not a prediction.\n\nHow it behaves\n\nTargets can be structure-based, risk-based, or adjusted as context evolves.\n\nWhat tends to go wrong\n\ntreating it as certain\n\nexiting too early without review\n\nholding too long without re-checking context\n\nWhat good looks like\n\nused to assess progress\n\nflexible, context-aware decisions\n\nWhat it connects to\n\nReward/risk, Strategy type, Market structure.',
+      'What this means\n\nA price you use to review whether the plan is working or whether an exit may make sense.\n\nWhy it matters\n\nIt gives you a review point to assess progress.\n\nHow PocketPilot frames it\n\nA review point, not an automatic action. PocketPilot does not place a trade at this level.\n\nCommon misunderstanding\n\nThinking the trade will close automatically at this price.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nTarget price is a review point, not a prediction.\n\nHow it behaves\n\nTargets can be structure-based, risk-based, or adjusted as context evolves.\n\nWhat tends to go wrong\n\ntreating it as certain\n\nexiting too early without review\n\nholding too long without re-checking context\n\nWhat good looks like\n\nused to assess progress\n\nflexible, context-aware decisions\n\nWhat it connects to\n\nReward/risk, Strategy type, Market structure.\n\nHow this shows up\n\nTarget used as review point\n\nTarget missed but trade context may still be valid',
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -3425,8 +3605,17 @@ export const knowledgeCatalog = [
           'Reward/risk, Strategy type, Market structure.',
         ],
       },
+      {
+        heading: 'How this shows up',
+        body: [
+          'Target used as review point',
+          'Target missed but trade context may still be valid',
+        ],
+      },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: [
+
+    ],
   },
   {
     topicId: 'trade-hub-prepared-planning-levels',
@@ -3749,7 +3938,7 @@ export const knowledgeCatalog = [
     title: 'Reward/risk',
     summary: 'How much you could gain compared to what you could lose.',
     content:
-      'What this means\n\nHow much you could gain compared to what you could lose.\n\nWhy it matters\n\nIt helps you judge whether a trade is worth taking.\n\nHow PocketPilot frames it\n\nA comparison tool, not a guarantee.\n\nCommon misunderstanding\n\nAssuming a strong ratio ensures success.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nReward/risk compares potential upside to downside for review. It should support reflection, not force ratios.\n\nHow it behaves\n\nIt is based on entry, stop-loss, and target, and it changes when those inputs change.\n\nWhat tends to go wrong\n\nforcing a ratio without context\n\nignoring strategy fit\n\nWhat good looks like\n\nsupports review decisions\n\naligned with strategy context\n\nWhat it connects to\n\nTarget price, Risk amount.',
+      'What this means\n\nHow much you could gain compared to what you could lose.\n\nWhy it matters\n\nIt helps you judge whether a trade is worth taking.\n\nHow PocketPilot frames it\n\nA comparison tool, not a guarantee.\n\nCommon misunderstanding\n\nAssuming a strong ratio ensures success.\n\nLayer 2: Deeper thinking\n\nThis layer adds optional deeper planning context beneath the beginner foundation.\n\nHow to think about it\n\nReward/risk compares potential upside to downside for review. It should support reflection, not force ratios.\n\nHow it behaves\n\nIt is based on entry, stop-loss, and target, and it changes when those inputs change.\n\nWhat tends to go wrong\n\nforcing a ratio without context\n\nignoring strategy fit\n\nWhat good looks like\n\nsupports review decisions\n\naligned with strategy context\n\nWhat it connects to\n\nTarget price, Risk amount.\n\nHow this shows up\n\nBalanced setup\n\nPoor reward versus risk',
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -3820,8 +4009,17 @@ export const knowledgeCatalog = [
           'Target price, Risk amount.',
         ],
       },
+      {
+        heading: 'How this shows up',
+        body: [
+          'Balanced setup',
+          'Poor reward versus risk',
+        ],
+      },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: [
+
+    ],
   },
   {
     topicId: 'trade-hub-manual-override',

@@ -74,3 +74,13 @@ Guardrails help highlight when behaviour shifts away from range conditions.
 - treating boundaries as fixed rules
 - ignoring signs of breakout pressure
 - trading in the middle of the range without clear context
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- Clean range oscillation (mapped for a future example topic; see Layer 3 integration map)
+
+### When conditions became less reliable
+- [Range break and instability (caution)](../evidence/range-trader-bitcoin-august-2020-failed-escape-caution.md)

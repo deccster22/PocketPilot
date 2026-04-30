@@ -27,3 +27,9 @@ Assuming strong momentum cannot reverse quickly.
 
 ## Deeper explanation
 This canonical concept currently starts with a beginner-facing layer from the v0.8 progressive merge. Deeper context can be layered here in future phases without creating duplicate concept homes.
+
+## See how this appears
+These examples show how this concept appears in different conditions.
+
+- [Momentum continuation burst (worked)](../evidence/momentum-pulse-bitcoin-above-the-old-high-worked.md)
+- [Momentum exhaustion stall (caution)](../evidence/momentum-pulse-bitcoin-june-to-august-2022-caution.md)

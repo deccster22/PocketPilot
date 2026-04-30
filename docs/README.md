@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-04-29
+Last Updated: 2026-04-30
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-04-29
+**Last updated:** 2026-04-30
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -91,6 +91,7 @@ Start with:
 - P7-K13 adds a runtime catalog sync guard so explicitly runtime-required register topics cannot drift out of `knowledgeCatalog` unnoticed.
 - P7-K14 merges Layer 2 deeper-thinking content into all 14 canonical Trade Hub articles, preserves Layer 1 beginner sections first, and updates runtime Trade Hub topic detail content without widening help wiring scope or changing non-dispatching behavior.
 - P7-K15 merges Layer 2 deeper-behaviour content into all 9 canonical strategy articles, preserves Layer 1 beginner-first structure, and updates runtime strategy topic detail content without changing Strategy Navigator/Preview behavior or help wiring scope.
+- P7-K16 merges compact Layer 3 example-wiring bridges into canonical strategy, concept, and covered Trade Hub articles, reuses existing canonical example/evidence topics when available, and maps non-live example slugs for future integration without runtime UI behavior changes.
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - P9-S8 adds one canonical service-owned strategy metadata registry so nearby-alternative selection and fit-contrast consume the same explicit metadata base instead of scattered strategy-label assumptions.

@@ -43,3 +43,7 @@ A stop can be structural, volatility-based, or arbitrary. Structural placement i
 
 ## What it connects to
 Entry price, Risk amount, Position size.
+
+## How this shows up
+- Structure holds
+- Structure breaks

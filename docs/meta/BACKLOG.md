@@ -15,6 +15,7 @@ Recent landed work closed or narrowed multiple previously-open backlog threads:
 - `P7-K13`
 - `P7-K14`
 - `P7-K15`
+- `P7-K16`
 - `P6-A7`, `P6-A8`, `P8-I12`
 - `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9`
 - `DOC-D1`
@@ -54,7 +55,7 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 - `P5` account-scoped prepared-reference preference settings: parked until a dedicated settings phase is approved.
 - `P7` broader inline glossary surfaces (including Snapshot) and richer glossary affordances: parked until measured relevance justifies expansion.
 - `P7` broader alias coverage beyond current seams: parked until signal review shows repeated unresolved terms.
-- `P7` Trade Hub Layer 3 examples integration: parked until a bounded example pilot scope is approved.
+- `P7` Layer 3 narrative example/evidence content import for mapped future slugs: parked until a bounded narrative-content phase is approved.
 - `P7` Concept Layer 2 deepening: parked until explicit sequence is opened after Strategy Layer 2 stabilization.
 - `P7` strategy/concept evidence cleanup pass: parked until a bounded evidence cleanup scope is approved.
 - `P8` richer period/archive/journal variants: parked unless reflection-family prioritization explicitly promotes them.
@@ -89,6 +90,7 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 | Trade Hub first-rollout term-help wiring plus runtime catalog sync guard to prevent unresolved help-topic routing drift | completed baseline | `P7-K12`, `P7-K13` |
 | Trade Hub canonical article layering completion (Layer 1 preserved + Layer 2 merged across all 14 topics) | completed baseline | `P7-K14` |
 | Strategy canonical article layering completion (Layer 1 preserved + Layer 2 merged across all 9 launch strategies) | completed baseline | `P7-K15` |
+| Layer 3 example wiring bridges across strategy/concept/trade-hub docs with non-live slug mapping fallback | completed baseline | `P7-K16` |
 | Snapshot Since Last Checked surface + clear-after-view behavior + deeper archive continuity | completed baseline | `P6-A7`, `P6-A8`, `P8-I12` |
 | Strategy Navigator fit contrast + nearby alternative heuristics + metadata normalization + mobile density refinement | completed baseline | `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9` |
 | docs map/index consistency cleanup after these landings | completed | `DOC-D1` |

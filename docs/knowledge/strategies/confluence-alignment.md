@@ -85,3 +85,13 @@ Guardrails highlight when complexity increases risk.
 - assuming more signals means better clarity
 - using overlapping indicators
 - forcing alignment where it does not exist
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- [Aligned independent signals (worked)](../evidence/confluence-alignment-bitcoin-19k-20k-post-ftx-reclaim-worked.md)
+
+### When conditions became less reliable
+- [Stacked weak signals (caution)](../evidence/confluence-alignment-terra-exit-spiral-caution.md)
