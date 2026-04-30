@@ -83,7 +83,7 @@ This strategy struggles when candle shapes are technically visible but strategic
 The main risk is over-reading small evidence.
 
 ### 7. Common misunderstandings
-- A candle pattern is a guarantee.
+- A candle pattern is always reliable.
 - Pattern name is all that matters.
 - One strong candle means the market has turned.
 - This strategy is separate from the rest of the market context.
@@ -108,3 +108,34 @@ PocketPilot should help users learn candle behavior through live interpreted sta
 - What Strategy Alignment Means
 - What Strategy Fit Means
 - What Market Regime Means
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Candle Signals use individual or grouped candles as context clues about buying and selling behaviour. Their meaning depends heavily on where they appear.
+
+## What strengthens it
+- clear location near meaningful levels
+- alignment with broader context
+- confirmation from surrounding candles
+
+## What weakens it
+- appearing in random or noisy areas
+- conflicting surrounding behaviour
+- lack of follow-through
+
+## How it tends to fail
+Candles can mislead when taken in isolation. Patterns may appear without meaningful context and fail quickly.
+
+## How it connects to planning
+Entry price reflects where the signal is being interpreted.
+Stop-loss price defines invalidation if behaviour does not follow through.
+Target price acts as a review point if movement develops.
+Prepared planning levels can provide structural context.
+Risk amount and risk percent manage uncertainty.
+Guardrails help highlight when signals appear in weak context.
+
+## What to watch for
+- treating patterns as standalone signals
+- ignoring location and context
+- overinterpreting single candles

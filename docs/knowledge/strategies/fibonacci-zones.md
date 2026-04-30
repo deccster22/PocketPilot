@@ -108,3 +108,34 @@ PocketPilot should help answer whether price is approaching a measured reaction 
 - What a MarketEvent Is
 - Estimated vs Confirmed Context
 - Confluence Alignment
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Fibonacci Zones identify areas where price may react during retracements or extensions. These are zones of interest rather than exact levels.
+
+## What strengthens it
+- alignment with existing support or resistance
+- use within a clear trend or structure
+- clustering of multiple levels
+
+## What weakens it
+- isolated levels without context
+- unclear trend direction
+- conflicting signals
+
+## How it tends to fail
+Price may ignore zones entirely or pass through them without reacting. Lines do not enforce behaviour.
+
+## How it connects to planning
+Entry price reflects where the zone is being interpreted.
+Stop-loss price defines invalidation beyond the zone.
+Target price acts as a review point at further zones.
+Prepared planning levels can include Fibonacci context.
+Risk amount and risk percent manage exposure.
+Guardrails highlight overreliance on single tools.
+
+## What to watch for
+- treating levels as precise predictions
+- ignoring broader structure
+- overloading charts with levels

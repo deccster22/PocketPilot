@@ -47,3 +47,5 @@ Controlled live knowledge tree for in-product learning content.
 `P7-K13` adds a runtime catalog sync guard that protects the first rollout and other explicitly runtime-required register topics from drifting out of the runtime knowledge catalog.
 
 `P7-K14` completes the Trade Hub Layer 2 docs merge for all 14 canonical trade-hub topics by preserving Layer 1 beginner content first and appending calm deeper-thinking sections; runtime `knowledgeCatalog.ts` Trade Hub topic detail content is updated for those same 14 topic IDs without adding new help terms or changing app UI wiring.
+
+`P7-K15` completes the Strategy Layer 2 merge for all 9 canonical launch strategies by preserving Layer 1 beginner content first and appending a bounded `Layer 2: Deeper behaviour` section set; runtime `knowledgeCatalog.ts` strategy topic detail content is updated for the same 9 strategy topic IDs without changing Strategy Navigator/Preview runtime behavior or help placement.

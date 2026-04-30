@@ -54,3 +54,34 @@ Relief and recovery are not the same thing.
 - [Bitcoin June to August 2022: Relief Rally Inside a Broken Structure](../market-examples/bitcoin-june-to-august-2022-relief-rally-inside-a-broken-structure.md)
 - [Bounce vs Recovery vs Reversal](../interpretation/bounce-vs-recovery-vs-reversal.md)
 - relief rally vs recovery explainer
+
+## Layer 2: Deeper behaviour
+
+## How it behaves
+Reversion Bounce responds to stretched price movement that may move back toward a more typical level. These moves often occur after sharp directional pressure.
+
+## What strengthens it
+- clear signs of overextension
+- slowing movement after a strong push
+- proximity to areas where price previously stabilised
+
+## What weakens it
+- continued strong directional pressure
+- absence of any slowing behaviour
+- unclear reference point for "normal" levels
+
+## How it tends to fail
+Price may continue moving in the same direction without reverting. What appears stretched can become more stretched.
+
+## How it connects to planning
+Entry price reflects where the stretched move is being interpreted.
+Stop-loss price defines where continuation invalidates the bounce idea.
+Target price acts as a review point if price moves back toward balance.
+Prepared planning levels provide optional context for mean areas.
+Risk amount and risk percent manage downside if continuation occurs.
+Guardrails highlight when conditions remain directional rather than reverting.
+
+## What to watch for
+- assuming reversion must happen
+- entering too early without signs of slowing
+- confusing a bounce with a full reversal
