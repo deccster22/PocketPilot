@@ -139,3 +139,13 @@ Guardrails help highlight when chasing behaviour increases risk.
 - chasing late-stage momentum
 - assuming speed equals continuation
 - ignoring signs of exhaustion
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- [Momentum continuation burst (worked)](../evidence/momentum-pulse-bitcoin-above-the-old-high-worked.md)
+
+### When conditions became less reliable
+- [Momentum exhaustion stall (caution)](../evidence/momentum-pulse-bitcoin-june-to-august-2022-caution.md)

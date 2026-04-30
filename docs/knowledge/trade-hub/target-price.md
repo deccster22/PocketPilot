@@ -42,3 +42,7 @@ Targets can be structure-based, risk-based, or adjusted as context evolves.
 
 ## What it connects to
 Reward/risk, Strategy type, Market structure.
+
+## How this shows up
+- Target used as review point
+- Target missed but trade context may still be valid

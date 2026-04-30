@@ -27,3 +27,9 @@ Assuming support will always hold.
 
 ## Deeper explanation
 This canonical concept currently starts with a beginner-facing layer from the v0.8 progressive merge. Deeper context can be layered here in future phases without creating duplicate concept homes.
+
+## See how this appears
+These examples show how this concept appears in different conditions.
+
+- Clean range oscillation (mapped for a future example topic; see Layer 3 integration map)
+- Range break into trend (mapped for a future example topic; see Layer 3 integration map)

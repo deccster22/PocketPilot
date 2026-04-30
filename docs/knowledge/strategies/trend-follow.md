@@ -85,3 +85,13 @@ Guardrails help highlight overextension or increasing risk.
 - entering late after extended movement
 - assuming the trend will continue indefinitely
 - ignoring weakening structure
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- [Bitcoin above the old high (worked)](../evidence/trend-follow-bitcoin-above-the-old-high-worked.md)
+
+### When conditions became less reliable
+- [Liquidity tailwind to deleveraging grind (caution)](../evidence/trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution.md)

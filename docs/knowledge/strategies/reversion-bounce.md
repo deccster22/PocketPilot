@@ -85,3 +85,13 @@ Guardrails highlight when conditions remain directional rather than reverting.
 - assuming reversion must happen
 - entering too early without signs of slowing
 - confusing a bounce with a full reversal
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- Overshoot then return (mapped for a future example topic; see Layer 3 integration map)
+
+### When conditions became less reliable
+- [Continued directional pressure (caution)](../evidence/reversion-bounce-bitcoin-june-to-august-2022-caution.md)

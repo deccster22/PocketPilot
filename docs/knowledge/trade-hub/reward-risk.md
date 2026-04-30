@@ -41,3 +41,7 @@ It is based on entry, stop-loss, and target, and it changes when those inputs ch
 
 ## What it connects to
 Target price, Risk amount.
+
+## How this shows up
+- Balanced setup
+- Poor reward versus risk

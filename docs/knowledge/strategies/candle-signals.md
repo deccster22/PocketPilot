@@ -139,3 +139,13 @@ Guardrails help highlight when signals appear in weak context.
 - treating patterns as standalone signals
 - ignoring location and context
 - overinterpreting single candles
+
+## See examples
+
+These examples show how this strategy can appear in real market conditions.
+
+### When it played out as expected
+- Signal at key level (mapped for a future example topic; see Layer 3 integration map)
+
+### When conditions became less reliable
+- Signal in noise (mapped for a future example topic; see Layer 3 integration map)
