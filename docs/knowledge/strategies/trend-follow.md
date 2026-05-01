@@ -91,7 +91,7 @@ Guardrails help highlight overextension or increasing risk.
 These examples show how this strategy can appear in real market conditions.
 
 ### When it played out as expected
-- [Bitcoin above the old high (worked)](../evidence/trend-follow-bitcoin-above-the-old-high-worked.md)
+- [Trend continuation after a major breakout](../evidence/trend-follow-bitcoin-above-the-old-high-worked.md)
 
 ### When conditions became less reliable
-- [Liquidity tailwind to deleveraging grind (caution)](../evidence/trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution.md)
+- [When continuation conditions became less reliable](../evidence/trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution.md)

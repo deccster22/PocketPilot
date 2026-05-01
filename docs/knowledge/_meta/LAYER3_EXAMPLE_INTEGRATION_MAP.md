@@ -3,23 +3,26 @@ title: "Layer 3 Example Integration Map"
 status: "active"
 owner: "founder"
 doc_class: "knowledge-meta"
-purpose: "Tracks Layer 3 market-example and evidence standardization coverage, status, and deliberate gaps after P7-K17"
+purpose: "Tracks Layer 3 example/evidence standardization plus first-wave runtime follow-through routing state"
 depends_on:
   - "P7-K13"
-  - "P7-K16"
+  - "P7-K17"
+  - "P7-K18"
+  - "P7-K19"
 related_docs:
   - "/docs/knowledge/_register/CONTENT_REGISTER.csv"
   - "/docs/knowledge/market-examples/"
   - "/docs/knowledge/evidence/"
   - "/docs/phases/P7-K17.md"
+  - "/docs/phases/P7-K19.md"
 canonical_path: "/docs/knowledge/_meta/LAYER3_EXAMPLE_INTEGRATION_MAP.md"
 ---
 
 # Layer 3 Example Integration Map
 
-This map records the P7-K17 standardization pass across existing Layer 3-ish canonical example topics.
+This map tracks the Layer 3 example/evidence corpus after standardization (`P7-K17`) and first-wave runtime follow-through surfacing (`P7-K19`).
 
-## Audit-aligned status snapshot
+## Current scope snapshot
 
 - Total Layer 3-ish topics in scope: 18
 - Market-example topics: 6
@@ -27,51 +30,62 @@ This map records the P7-K17 standardization pass across existing Layer 3-ish can
 - KEEP: 14
 - UPGRADE: 4
 - HOLD BACK: 0
-- Main issue addressed: format and framing consistency, not missing broad content
 
-## Live canonical topics standardized in P7-K17
+## Runtime surfacing model
+
+- First wave uses hidden runtime-resolvable follow-through topics.
+- No visible Examples shelf is enabled.
+- Evidence topics only in first wave.
+- Market-example topics remain docs-side in this phase.
+- Trade Hub example links remain off in this phase.
+
+## Canonical topic routing status
 
 Status key:
-- `KEEP`: structure standardized, core narrative preserved
-- `UPGRADE`: structure standardized plus sharpened behavior framing
+- `docs-only`: canonical topic exists but is not runtime-routable in this wave
+- `runtime-first-wave-hidden`: runtime-routable follow-through topic, hidden from top-level library shelves
 
-| Canonical topic path | Family | Status | Related strategies | Related concepts | Runtime topic route exists |
-| --- | --- | --- | --- | --- | --- |
-| `docs/knowledge/market-examples/bitcoin-above-the-old-high.md` | market-examples | KEEP | `trend-follow`, `breakout-watcher`, `buy-the-dip`, `momentum-pulse` | `trend`, `breakout`, `momentum`, `support`, `resistance` | `no` |
-| `docs/knowledge/market-examples/bitcoin-june-to-august-2022-relief-rally-inside-a-broken-structure.md` | market-examples | KEEP | `reversion-bounce`, `buy-the-dip`, `momentum-pulse`, `range-trader` | `reversion`, `momentum`, `trend`, `support`, `resistance`, `volatility` | `no` |
-| `docs/knowledge/market-examples/bitcoin-19k-20k-bottoming-cluster-and-the-post-ftx-reclaim.md` | market-examples | KEEP | `confluence-alignment`, `trend-follow`, `breakout-watcher` | `confluence`, `trend`, `support`, `resistance`, `volatility` | `no` |
-| `docs/knowledge/market-examples/bitcoin-august-2020-failed-escape-above-12000.md` | market-examples | KEEP | `breakout-watcher`, `range-trader`, `confluence-alignment` | `breakout`, `momentum`, `trend`, `support`, `resistance` | `no` |
-| `docs/knowledge/market-examples/from-liquidity-tailwind-to-deleveraging-grind.md` | market-examples | KEEP | `trend-follow`, `breakout-watcher`, `buy-the-dip`, `confluence-alignment` | `trend`, `momentum`, `volatility`, `confluence`, `support`, `resistance` | `no` |
-| `docs/knowledge/market-examples/terra-from-peg-wobble-to-exit-spiral.md` | market-examples | KEEP | `confluence-alignment`, `trend-follow`, `reversion-bounce` | `volatility`, `confluence`, `trend`, `support`, `resistance` | `no` |
-| `docs/knowledge/evidence/trend-follow-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `trend-follow` | `trend`, `breakout`, `momentum`, `support` | `no` |
-| `docs/knowledge/evidence/trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution.md` | evidence | KEEP | `trend-follow` | `trend`, `momentum`, `volatility`, `confluence` | `no` |
-| `docs/knowledge/evidence/breakout-watcher-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `breakout-watcher` | `breakout`, `trend`, `support`, `resistance` | `no` |
-| `docs/knowledge/evidence/breakout-watcher-bitcoin-august-2020-failed-escape-caution.md` | evidence | KEEP | `breakout-watcher` | `breakout`, `momentum`, `support`, `resistance` | `no` |
-| `docs/knowledge/evidence/buy-the-dip-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `buy-the-dip` | `reversion`, `trend`, `support`, `momentum` | `no` |
-| `docs/knowledge/evidence/buy-the-dip-bitcoin-june-to-august-2022-caution.md` | evidence | KEEP | `buy-the-dip` | `reversion`, `trend`, `support`, `volatility` | `no` |
-| `docs/knowledge/evidence/momentum-pulse-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `momentum-pulse` | `momentum`, `trend`, `breakout`, `volatility` | `no` |
-| `docs/knowledge/evidence/confluence-alignment-bitcoin-19k-20k-post-ftx-reclaim-worked.md` | evidence | KEEP | `confluence-alignment` | `confluence`, `trend`, `support`, `resistance`, `volatility` | `no` |
-| `docs/knowledge/evidence/momentum-pulse-bitcoin-june-to-august-2022-caution.md` | evidence | UPGRADE | `momentum-pulse` | `momentum`, `trend`, `volatility`, `reversion` | `no` |
-| `docs/knowledge/evidence/range-trader-bitcoin-august-2020-failed-escape-caution.md` | evidence | UPGRADE | `range-trader`, `breakout-watcher` | `support`, `resistance`, `breakout`, `volatility` | `no` |
-| `docs/knowledge/evidence/reversion-bounce-bitcoin-june-to-august-2022-caution.md` | evidence | UPGRADE | `reversion-bounce`, `buy-the-dip` | `reversion`, `momentum`, `trend`, `support`, `volatility` | `no` |
-| `docs/knowledge/evidence/confluence-alignment-terra-exit-spiral-caution.md` | evidence | UPGRADE | `confluence-alignment`, `trend-follow` | `confluence`, `volatility`, `trend`, `support`, `resistance` | `no` |
+| Canonical topic path | Family | KEEP/UPGRADE | First-wave runtime status | Notes |
+| --- | --- | --- | --- | --- |
+| `docs/knowledge/market-examples/bitcoin-above-the-old-high.md` | market-examples | KEEP | `docs-only` | held as docs-side narrative for now |
+| `docs/knowledge/market-examples/bitcoin-june-to-august-2022-relief-rally-inside-a-broken-structure.md` | market-examples | KEEP | `docs-only` | held as docs-side narrative for now |
+| `docs/knowledge/market-examples/bitcoin-19k-20k-bottoming-cluster-and-the-post-ftx-reclaim.md` | market-examples | KEEP | `docs-only` | held as docs-side narrative for now |
+| `docs/knowledge/market-examples/bitcoin-august-2020-failed-escape-above-12000.md` | market-examples | KEEP | `docs-only` | held as docs-side narrative for now |
+| `docs/knowledge/market-examples/from-liquidity-tailwind-to-deleveraging-grind.md` | market-examples | KEEP | `docs-only` | held as docs-side narrative for now |
+| `docs/knowledge/market-examples/terra-from-peg-wobble-to-exit-spiral.md` | market-examples | KEEP | `docs-only` | held as docs-side narrative for now |
+| `docs/knowledge/evidence/trend-follow-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `runtime-first-wave-hidden` | first-wave strategy follow-through |
+| `docs/knowledge/evidence/trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution.md` | evidence | KEEP | `runtime-first-wave-hidden` | first-wave strategy follow-through |
+| `docs/knowledge/evidence/breakout-watcher-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `runtime-first-wave-hidden` | first-wave strategy follow-through |
+| `docs/knowledge/evidence/breakout-watcher-bitcoin-august-2020-failed-escape-caution.md` | evidence | KEEP | `runtime-first-wave-hidden` | first-wave strategy follow-through |
+| `docs/knowledge/evidence/buy-the-dip-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `runtime-first-wave-hidden` | first-wave strategy follow-through |
+| `docs/knowledge/evidence/buy-the-dip-bitcoin-june-to-august-2022-caution.md` | evidence | KEEP | `runtime-first-wave-hidden` | first-wave strategy follow-through |
+| `docs/knowledge/evidence/momentum-pulse-bitcoin-above-the-old-high-worked.md` | evidence | KEEP | `docs-only` | second wave candidate |
+| `docs/knowledge/evidence/confluence-alignment-bitcoin-19k-20k-post-ftx-reclaim-worked.md` | evidence | KEEP | `docs-only` | second wave candidate |
+| `docs/knowledge/evidence/momentum-pulse-bitcoin-june-to-august-2022-caution.md` | evidence | UPGRADE | `docs-only` | second wave candidate |
+| `docs/knowledge/evidence/range-trader-bitcoin-august-2020-failed-escape-caution.md` | evidence | UPGRADE | `docs-only` | held pending cleaner played-out counterpart |
+| `docs/knowledge/evidence/reversion-bounce-bitcoin-june-to-august-2022-caution.md` | evidence | UPGRADE | `docs-only` | held pending cleaner played-out counterpart |
+| `docs/knowledge/evidence/confluence-alignment-terra-exit-spiral-caution.md` | evidence | UPGRADE | `docs-only` | second wave candidate |
 
-## Naming and framing normalization
+## First-wave source-link scope in runtime
 
-- Visible "Worked Example" wording was removed from standardized headings/titles.
-- File slugs and topic IDs that contain `worked` were intentionally kept unchanged for compatibility.
-- Framing was shifted to behavior-first labels such as continuation, acceptance, caution, failed-hold, and danger-confluence.
+Runtime follow-through links were added from these source strategy topics only:
 
-## Missing coverage gaps (not created in this phase)
+- `strategy-trend-follow` -> 2 first-wave trend-follow evidence topics
+- `strategy-breakout-watcher` -> 2 first-wave breakout-watcher evidence topics
+- `strategy-buy-the-dip` -> 2 first-wave buy-the-dip evidence topics
+
+Concept-source linking was intentionally deferred in `P7-K19` because concept topic IDs are not currently runtime-routable, and adding them would widen this wave beyond the accepted first-wave scope.
+
+## Missing coverage gaps (still visible)
 
 - Range Trader still needs a clean played-out example topic (future).
 - Reversion Bounce still needs a clean played-out example topic (future).
 - Candle Signals does not yet have a proper Layer 3 evidence topic.
 - Fibonacci Zones does not yet have a proper Layer 3 evidence topic.
 
-## Future topics not yet created and not surfaced
+## Future slugs not yet created and not routable
 
-These slugs were mapped in prior wiring work, but they still have no canonical live topic doc and should not be surfaced as runtime links yet:
+These slugs remain non-live and non-routable:
 
 - `range-oscillation`
 - `range-break`
@@ -80,8 +94,9 @@ These slugs were mapped in prior wiring work, but they still have no canonical l
 - `candle-signal-valid`
 - `candle-signal-noise`
 
-## Link-surfacing guardrail
+## Guardrails carried forward
 
-- Do not add runtime routes for non-existent future topics.
-- Do not add Trade Hub example links in this pass.
-- Keep example integration descriptive and optional until missing coverage topics are authored and accepted.
+- Do not surface non-live future slugs as runtime routes.
+- Do not enable Trade Hub example links in this phase.
+- Do not create a visible Examples shelf in this phase.
+- Do not surface all 18 topics at once; keep first-wave scope bounded.

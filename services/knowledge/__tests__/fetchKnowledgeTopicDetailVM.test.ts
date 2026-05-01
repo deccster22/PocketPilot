@@ -1,4 +1,5 @@
 import { fetchKnowledgeTopicDetailVM } from '@/services/knowledge/fetchKnowledgeTopicDetailVM';
+import { knowledgeCatalog } from '@/services/knowledge/knowledgeCatalog';
 
 describe('fetchKnowledgeTopicDetailVM', () => {
   it('returns one canonical topic detail VM for the Knowledge Library surface', () => {
@@ -131,6 +132,135 @@ describe('fetchKnowledgeTopicDetailVM', () => {
       }
 
       expect(result.availability.topic.topicId).toBe(topicId);
+    });
+  });
+
+  it('resolves all six P7-K19 first-wave evidence topic IDs as available hidden follow-through routes', () => {
+    const firstWaveEvidenceTopicIds = [
+      'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+      'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+      'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+      'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+      'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+      'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+    ] as const;
+
+    firstWaveEvidenceTopicIds.forEach((topicId) => {
+      const result = fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId,
+      });
+
+      expect(result.availability.status).toBe('AVAILABLE');
+
+      if (result.availability.status !== 'AVAILABLE') {
+        throw new Error(`Expected ${topicId} to resolve, received ${result.availability.reason}.`);
+      }
+
+      expect(result.availability.topic.topicId).toBe(topicId);
+    });
+  });
+
+  it('exposes exactly two first-wave evidence links from each first-wave source strategy topic', () => {
+    const expectedByStrategy = {
+      'strategy-trend-follow': [
+        'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+        'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+      ],
+      'strategy-breakout-watcher': [
+        'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+        'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+      ],
+      'strategy-buy-the-dip': [
+        'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+        'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+      ],
+    } as const;
+
+    (Object.entries(expectedByStrategy) as ReadonlyArray<[string, ReadonlyArray<string>]>).forEach(
+      ([strategyTopicId, expectedEvidenceTopicIds]) => {
+        const result = fetchKnowledgeTopicDetailVM({
+          surface: 'KNOWLEDGE_LIBRARY',
+          topicId: strategyTopicId,
+        });
+
+        expect(result.availability.status).toBe('AVAILABLE');
+
+        if (result.availability.status !== 'AVAILABLE') {
+          throw new Error(
+            `Expected ${strategyTopicId} to resolve, received ${result.availability.reason}.`,
+          );
+        }
+
+        const evidenceRelatedTopicIds = result.availability.topic.relatedTopicIds.filter((topicId) =>
+          topicId.startsWith('evidence-'),
+        );
+
+        expect(evidenceRelatedTopicIds).toEqual(expectedEvidenceTopicIds);
+
+        const evidenceRelatedTitles = result.availability.topic.relatedTopics
+          .filter((topic) => topic.topicId.startsWith('evidence-'))
+          .map((topic) => topic.title.toLowerCase());
+
+        evidenceRelatedTitles.forEach((title) => {
+          expect(title).not.toMatch(
+            /worked|winning trade|good trade|should enter|should exit|buy signal|sell signal|safe trade|profit/i,
+          );
+        });
+      },
+    );
+  });
+
+  it('keeps non-first-wave market-example and future-slug topics unavailable in runtime detail', () => {
+    const nonRoutableTopicIds = [
+      'market-examples-bitcoin-above-the-old-high',
+      'market-examples-bitcoin-august-2020-failed-escape-above-12000',
+      'market-examples-bitcoin-june-to-august-2022-relief-rally-inside-a-broken-structure',
+      'market-examples-bitcoin-19k-20k-bottoming-cluster-and-the-post-ftx-reclaim',
+      'market-examples-from-liquidity-tailwind-to-deleveraging-grind',
+      'market-examples-terra-from-peg-wobble-to-exit-spiral',
+      'range-oscillation',
+      'range-break',
+      'fibonacci-reaction',
+      'fibonacci-failure',
+      'candle-signal-valid',
+      'candle-signal-noise',
+    ] as const;
+
+    nonRoutableTopicIds.forEach((topicId) => {
+      const result = fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId,
+      });
+
+      expect(result).toEqual({
+        generatedAt: null,
+        availability: {
+          status: 'UNAVAILABLE',
+          reason: 'TOPIC_NOT_FOUND',
+        },
+      });
+    });
+  });
+
+  it('does not add first-wave evidence related links onto Trade Hub topics in this phase', () => {
+    const tradeHubTopicIds = knowledgeCatalog
+      .map((entry) => entry.topicId)
+      .filter((topicId) => topicId.startsWith('trade-hub-'));
+
+    tradeHubTopicIds.forEach((topicId) => {
+      const result = fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId,
+      });
+
+      expect(result.availability.status).toBe('AVAILABLE');
+
+      if (result.availability.status !== 'AVAILABLE') {
+        throw new Error(`Expected ${topicId} to resolve, received ${result.availability.reason}.`);
+      }
+
+      expect(result.availability.topic.relatedTopicIds.some((related) => related.startsWith('evidence-'))).toBe(false);
     });
   });
 });

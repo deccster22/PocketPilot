@@ -91,7 +91,7 @@ Guardrails highlight when behaviour becomes unstable.
 These examples show how this strategy can appear in real market conditions.
 
 ### When it played out as expected
-- [Bitcoin above the old high (worked)](../evidence/breakout-watcher-bitcoin-above-the-old-high-worked.md)
+- [Breakout acceptance above an old high](../evidence/breakout-watcher-bitcoin-above-the-old-high-worked.md)
 
 ### When conditions became less reliable
-- [Failed breakout and snapback (caution)](../evidence/breakout-watcher-bitcoin-august-2020-failed-escape-caution.md)
+- [Failed hold after a breakout attempt](../evidence/breakout-watcher-bitcoin-august-2020-failed-escape-caution.md)

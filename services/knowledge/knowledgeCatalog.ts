@@ -885,7 +885,7 @@ export const knowledgeCatalog = [
     title: 'Breakout Watcher',
     summary: 'Breakout Watcher is a strategy built around the idea that price sometimes spends long periods contained inside a clear structure, then escapes that structure in a way that begins a new directional move. It is less about predicting every breakout in advance and more about recognizing when containment is ending in a meaningful way.',
     content:
-      "What this means\n\nTrading when price moves beyond a key level.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: repeated tests and pressure.\n\nWhat you're looking for\n\nLook for repeated tests and pressure.\n\nWhy it can work\n\nWorks because breaks can trigger moves.\n\nWhat can go wrong\n\nFails if breakout fails.\n\nCommon misunderstanding\n\nAssuming all breakouts continue.\n\nWhat this strategy is for\n\nBreakout Watcher is for markets pressing against meaningful boundaries where a breakout may be starting.\n\nWhat it looks for\n\nIt cares about whether price moves through a meaningful area and begins to build acceptance outside the old structure.\n\nWhat improves fit\n\nFit improves when the market is building structure outside the old boundary and increasing confirmed confidence.\n\nWhat weakens fit\n\nFit weakens when the move runs into rejection, returns to the old area, becomes a false breakout, or triggers fast invalidation.\n\nWhat PocketPilot would emphasize\n\nA spike through a level is interesting. A hold matters more.\n\nWhat a user should learn\n\nBreakouts are about whether the market actually starts behaving differently.\n\nWhat to read next\n\nBitcoin’s August 2020 Failed Escape Above $12,000\n\nSupport, Resistance, and Structure\n\nbreakout vs acceptance explainer\n\nHow it behaves\n\nBreakout Watcher responds to price approaching and moving beyond key levels. These moments often follow periods of compression or repeated testing.\n\nWhat strengthens it\n\nrepeated interaction with a level\n\ntightening price movement before expansion\n\nincreased activity around the level\n\nWhat weakens it\n\ninconsistent pressure at the level\n\nwide, unstable movement\n\nlack of follow-through after initial break\n\nHow it tends to fail\n\nBreakouts can reverse quickly. Price may move beyond a level and then return, creating a false breakout.\n\nHow it connects to planning\n\nEntry price reflects where the breakout is being interpreted. Stop-loss price helps define invalidation if price returns to prior range. Target price acts as a review point if expansion continues. Prepared planning levels can outline breakout zones. Risk amount and risk percent help manage volatility around levels. Guardrails highlight when behaviour becomes unstable.\n\nWhat to watch for\n\nassuming every breakout will continue\n\nreacting to the first move without confirmation\n\nignoring failed breakout behaviour\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nBitcoin above the old high (worked)\n\nWhen conditions became less reliable\n\nFailed breakout and snapback (caution)",
+      "What this means\n\nTrading when price moves beyond a key level.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: repeated tests and pressure.\n\nWhat you're looking for\n\nLook for repeated tests and pressure.\n\nWhy it can work\n\nWorks because breaks can trigger moves.\n\nWhat can go wrong\n\nFails if breakout fails.\n\nCommon misunderstanding\n\nAssuming all breakouts continue.\n\nWhat this strategy is for\n\nBreakout Watcher is for markets pressing against meaningful boundaries where a breakout may be starting.\n\nWhat it looks for\n\nIt cares about whether price moves through a meaningful area and begins to build acceptance outside the old structure.\n\nWhat improves fit\n\nFit improves when the market is building structure outside the old boundary and increasing confirmed confidence.\n\nWhat weakens fit\n\nFit weakens when the move runs into rejection, returns to the old area, becomes a false breakout, or triggers fast invalidation.\n\nWhat PocketPilot would emphasize\n\nA spike through a level is interesting. A hold matters more.\n\nWhat a user should learn\n\nBreakouts are about whether the market actually starts behaving differently.\n\nWhat to read next\n\nBitcoin’s August 2020 Failed Escape Above $12,000\n\nSupport, Resistance, and Structure\n\nbreakout vs acceptance explainer\n\nHow it behaves\n\nBreakout Watcher responds to price approaching and moving beyond key levels. These moments often follow periods of compression or repeated testing.\n\nWhat strengthens it\n\nrepeated interaction with a level\n\ntightening price movement before expansion\n\nincreased activity around the level\n\nWhat weakens it\n\ninconsistent pressure at the level\n\nwide, unstable movement\n\nlack of follow-through after initial break\n\nHow it tends to fail\n\nBreakouts can reverse quickly. Price may move beyond a level and then return, creating a false breakout.\n\nHow it connects to planning\n\nEntry price reflects where the breakout is being interpreted. Stop-loss price helps define invalidation if price returns to prior range. Target price acts as a review point if expansion continues. Prepared planning levels can outline breakout zones. Risk amount and risk percent help manage volatility around levels. Guardrails highlight when behaviour becomes unstable.\n\nWhat to watch for\n\nassuming every breakout will continue\n\nreacting to the first move without confirmation\n\nignoring failed breakout behaviour\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nBreakout acceptance above an old high\n\nWhen conditions became less reliable\n\nFailed hold after a breakout attempt",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -1025,13 +1025,13 @@ export const knowledgeCatalog = [
       {
         heading: 'When it played out as expected',
         body: [
-          'Bitcoin above the old high (worked)',
+          'Breakout acceptance above an old high',
         ],
       },
       {
         heading: 'When conditions became less reliable',
         body: [
-          'Failed breakout and snapback (caution)',
+          'Failed hold after a breakout attempt',
         ],
       },
     ],
@@ -1042,6 +1042,8 @@ export const knowledgeCatalog = [
       'pp-what-a-marketevent-is',
       'pp-estimated-vs-confirmed-context',
       'pp-risk-reward-basics',
+      'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+      'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
     ],
   },
   {
@@ -1049,7 +1051,7 @@ export const knowledgeCatalog = [
     title: 'Buy the Dip',
     summary: 'Buy the Dip is a strategy built around looking for temporary pullbacks inside a broader upward market structure. It is less about chasing every red candle and more about judging whether a setback looks like a pause inside strength rather than the start of something weaker.',
     content:
-      "What this means\n\nBuying after price drops, expecting it to recover.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: pullbacks in an upward trend and signs the drop is slowing.\n\nWhat you're looking for\n\nLook for pullbacks in an upward trend and signs the drop is slowing.\n\nWhy it can work\n\nWorks because markets move in waves.\n\nWhat can go wrong\n\nCan fail if the drop continues.\n\nCommon misunderstanding\n\nAssuming every dip is worth buying.\n\nWhat this strategy is for\n\nBuy the Dip is for situations where a dip may be creating opportunity without the broader picture being broken beyond repair.\n\nWhat it looks for\n\nIt looks for weakness happening inside an environment where recovery still feels plausible.\n\nWhat improves fit\n\nStrategy fit improves when the broader structure still looks supportive and the market is not obviously degrading into a harsher regime.\n\nWhat weakens fit\n\nFit weakens when the move looks more like a relief rally than repair, or when improvement is visible but still not enough to count as meaningful change.\n\nHow it behaves\n\nBuy the Dip responds to pullbacks within a broader move, where price temporarily moves against the prior direction before attempting to stabilise. These dips can be shallow pauses or deeper drawdowns, often accompanied by increased volatility and uncertainty.\n\nWhat strengthens it\n\npullbacks into previously active support areas\n\nslowing downside movement after a drop\n\nbroader context that has not clearly broken down\n\nWhat weakens it\n\nfast, continuous downward movement\n\nlack of visible structure where price might stabilise\n\nunclear broader context\n\nHow it tends to fail\n\nA dip can turn into a breakdown. Price may continue lower without stabilising, or briefly pause before continuing downward. What looks like a temporary pullback can be a shift in structure.\n\nHow it connects to planning\n\nEntry price helps define where the dip is being interpreted. Stop-loss price helps define the point where the dip idea may no longer be valid. Target price acts as a review point if price recovers. Prepared planning levels can offer initial context but require adjustment. Risk amount and risk percent help keep downside consistent. Guardrails help highlight when risk increases during volatile pullbacks.\n\nWhat to watch for\n\nassuming every drop is a dip\n\nreacting to movement instead of structure\n\nletting emotion replace planning once price starts moving quickly\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nRecovery after pullback (worked)\n\nWhen conditions became less reliable\n\nContinued sell-off (caution)",
+      "What this means\n\nBuying after price drops, expecting it to recover.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: pullbacks in an upward trend and signs the drop is slowing.\n\nWhat you're looking for\n\nLook for pullbacks in an upward trend and signs the drop is slowing.\n\nWhy it can work\n\nWorks because markets move in waves.\n\nWhat can go wrong\n\nCan fail if the drop continues.\n\nCommon misunderstanding\n\nAssuming every dip is worth buying.\n\nWhat this strategy is for\n\nBuy the Dip is for situations where a dip may be creating opportunity without the broader picture being broken beyond repair.\n\nWhat it looks for\n\nIt looks for weakness happening inside an environment where recovery still feels plausible.\n\nWhat improves fit\n\nStrategy fit improves when the broader structure still looks supportive and the market is not obviously degrading into a harsher regime.\n\nWhat weakens fit\n\nFit weakens when the move looks more like a relief rally than repair, or when improvement is visible but still not enough to count as meaningful change.\n\nHow it behaves\n\nBuy the Dip responds to pullbacks within a broader move, where price temporarily moves against the prior direction before attempting to stabilise. These dips can be shallow pauses or deeper drawdowns, often accompanied by increased volatility and uncertainty.\n\nWhat strengthens it\n\npullbacks into previously active support areas\n\nslowing downside movement after a drop\n\nbroader context that has not clearly broken down\n\nWhat weakens it\n\nfast, continuous downward movement\n\nlack of visible structure where price might stabilise\n\nunclear broader context\n\nHow it tends to fail\n\nA dip can turn into a breakdown. Price may continue lower without stabilising, or briefly pause before continuing downward. What looks like a temporary pullback can be a shift in structure.\n\nHow it connects to planning\n\nEntry price helps define where the dip is being interpreted. Stop-loss price helps define the point where the dip idea may no longer be valid. Target price acts as a review point if price recovers. Prepared planning levels can offer initial context but require adjustment. Risk amount and risk percent help keep downside consistent. Guardrails help highlight when risk increases during volatile pullbacks.\n\nWhat to watch for\n\nassuming every drop is a dip\n\nreacting to movement instead of structure\n\nletting emotion replace planning once price starts moving quickly\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nDip behaviour inside supported structure\n\nWhen conditions became less reliable\n\nRelief bounce without full repair",
     mediaType: 'ARTICLE',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -1169,13 +1171,13 @@ export const knowledgeCatalog = [
       {
         heading: 'When it played out as expected',
         body: [
-          'Recovery after pullback (worked)',
+          'Dip behaviour inside supported structure',
         ],
       },
       {
         heading: 'When conditions became less reliable',
         body: [
-          'Continued sell-off (caution)',
+          'Relief bounce without full repair',
         ],
       },
     ],
@@ -1186,6 +1188,8 @@ export const knowledgeCatalog = [
       'pp-estimated-vs-confirmed-context',
       'pp-stop-loss-basics',
       'pp-risk-reward-basics',
+      'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+      'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
     ],
   },
   {
@@ -1965,6 +1969,8 @@ export const knowledgeCatalog = [
       'pp-what-a-marketevent-is',
       'pp-estimated-vs-confirmed-context',
       'pp-risk-reward-basics',
+      'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+      'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
     ],
   },
   {
@@ -2109,6 +2115,8 @@ export const knowledgeCatalog = [
       'pp-what-market-regime-means',
       'pp-estimated-vs-confirmed-context',
       'pp-risk-reward-basics',
+      'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+      'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
     ],
   },
   {
@@ -2280,7 +2288,7 @@ export const knowledgeCatalog = [
     title: 'Trend Follow',
     summary: 'Trend Follow is a strategy built around the idea that markets can move in sustained directions for longer than people expect. It is less about buying the exact bottom or selling the exact top, and more about recognizing when a directional move is established enough to follow.',
     content:
-      "What this means\n\nTrading in the direction price is moving.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: consistent direction and pullbacks.\n\nWhat you're looking for\n\nLook for consistent direction and pullbacks.\n\nWhy it can work\n\nWorks because trends persist.\n\nWhat can go wrong\n\nFails if trend reverses.\n\nCommon misunderstanding\n\nEntering too late.\n\nWhat this strategy is for\n\nTrend Follow is for situations where the market is already moving directionally and continuing to behave that way.\n\nWhat it looks for\n\nIt often becomes more relevant after a breakout, reclaim, or broader structural shift.\n\nWhat improves fit\n\nStrategy fit improves when the broader regime is supportive and the market keeps proving the direction.\n\nWhat weakens fit\n\nFit weakens when the direction is fragile, the environment remains damaged, or the market looks more like temporary rebound than durable continuation.\n\nWhat PocketPilot would emphasize\n\nTrend Follow is persistence-aware rather than prediction-obsessed.\n\nWhat a user should learn\n\nYou do not need the exact low for Trend Follow to matter.\n\nWhat to read next\n\nBitcoin Above the Old High\n\nFrom Liquidity Tailwind to Deleveraging Grind\n\ncontinuation vs reversal explainer\n\nHow it behaves\n\nTrend Follow responds to persistent directional movement where price continues forming structure in one direction. Trends often include pullbacks and pauses rather than moving in a straight line.\n\nWhat strengthens it\n\nconsistent directional structure\n\norderly pullbacks within the trend\n\ncontinued acceptance of higher or lower levels\n\nWhat weakens it\n\nchoppy or sideways movement\n\ninconsistent structure\n\nsigns of exhaustion or slowing\n\nHow it tends to fail\n\nTrends can stall or reverse. Price may stop progressing and begin to move sideways or shift direction entirely.\n\nHow it connects to planning\n\nEntry price reflects where within the trend the idea is being interpreted. Stop-loss price helps define where structure breaks. Target price acts as a review point as the trend progresses. Prepared planning levels can outline potential continuation areas. Risk amount and risk percent manage exposure over multiple trend attempts. Guardrails help highlight overextension or increasing risk.\n\nWhat to watch for\n\nentering late after extended movement\n\nassuming the trend will continue indefinitely\n\nignoring weakening structure\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nBitcoin above the old high (worked)\n\nWhen conditions became less reliable\n\nLiquidity tailwind to deleveraging grind (caution)",
+      "What this means\n\nTrading in the direction price is moving.\n\nWhen it shows up\n\nThis strategy is most relevant in conditions like: consistent direction and pullbacks.\n\nWhat you're looking for\n\nLook for consistent direction and pullbacks.\n\nWhy it can work\n\nWorks because trends persist.\n\nWhat can go wrong\n\nFails if trend reverses.\n\nCommon misunderstanding\n\nEntering too late.\n\nWhat this strategy is for\n\nTrend Follow is for situations where the market is already moving directionally and continuing to behave that way.\n\nWhat it looks for\n\nIt often becomes more relevant after a breakout, reclaim, or broader structural shift.\n\nWhat improves fit\n\nStrategy fit improves when the broader regime is supportive and the market keeps proving the direction.\n\nWhat weakens fit\n\nFit weakens when the direction is fragile, the environment remains damaged, or the market looks more like temporary rebound than durable continuation.\n\nWhat PocketPilot would emphasize\n\nTrend Follow is persistence-aware rather than prediction-obsessed.\n\nWhat a user should learn\n\nYou do not need the exact low for Trend Follow to matter.\n\nWhat to read next\n\nBitcoin Above the Old High\n\nFrom Liquidity Tailwind to Deleveraging Grind\n\ncontinuation vs reversal explainer\n\nHow it behaves\n\nTrend Follow responds to persistent directional movement where price continues forming structure in one direction. Trends often include pullbacks and pauses rather than moving in a straight line.\n\nWhat strengthens it\n\nconsistent directional structure\n\norderly pullbacks within the trend\n\ncontinued acceptance of higher or lower levels\n\nWhat weakens it\n\nchoppy or sideways movement\n\ninconsistent structure\n\nsigns of exhaustion or slowing\n\nHow it tends to fail\n\nTrends can stall or reverse. Price may stop progressing and begin to move sideways or shift direction entirely.\n\nHow it connects to planning\n\nEntry price reflects where within the trend the idea is being interpreted. Stop-loss price helps define where structure breaks. Target price acts as a review point as the trend progresses. Prepared planning levels can outline potential continuation areas. Risk amount and risk percent manage exposure over multiple trend attempts. Guardrails help highlight overextension or increasing risk.\n\nWhat to watch for\n\nentering late after extended movement\n\nassuming the trend will continue indefinitely\n\nignoring weakening structure\n\nSee examples\n\nThese examples show how this strategy can appear in real market conditions.\n\nWhen it played out as expected\n\nTrend continuation after a major breakout\n\nWhen conditions became less reliable\n\nWhen continuation conditions became less reliable",
     mediaType: 'ARTICLE',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2420,13 +2428,13 @@ export const knowledgeCatalog = [
       {
         heading: 'When it played out as expected',
         body: [
-          'Bitcoin above the old high (worked)',
+          'Trend continuation after a major breakout',
         ],
       },
       {
         heading: 'When conditions became less reliable',
         body: [
-          'Liquidity tailwind to deleveraging grind (caution)',
+          'When continuation conditions became less reliable',
         ],
       },
     ],
@@ -2437,7 +2445,298 @@ export const knowledgeCatalog = [
       'pp-what-market-regime-means',
       'pp-estimated-vs-confirmed-context',
       'pp-risk-reward-basics',
+      'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+      'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
     ],
+  },
+
+  {
+    topicId: 'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+    title: 'Breakout acceptance above an old high',
+    summary: 'An acceptance example where price moved above a major boundary and continued behaving in new territory.',
+    content:
+      'Context\n\nThe market was pressing a major historical ceiling where acceptance above the level mattered more than a brief print.\n\nSetup\n\nA breakout watcher could track whether the break held and whether post-break behaviour stayed constructive.\n\nWhat happened\n\nPrice moved above the old high and continued behaving as accepted structure rather than quickly snapping back.\n\nWhat to take from it\n\nBreakout quality is about hold plus follow-through, not only the first break.\n\nWhere this fits\n\nStrategies: Breakout Watcher.\n\nConcepts: breakout, trend, support, resistance.',
+    mediaType: 'CASE_STUDY',
+    difficulty: 'INTERMEDIATE',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'Context',
+        body: [
+          'The market was pressing a major historical ceiling where acceptance above the level mattered more than a brief print.',
+        ],
+      },
+      {
+        heading: 'Setup',
+        body: [
+          'A breakout watcher could track whether the break held and whether post-break behaviour stayed constructive.',
+        ],
+      },
+      {
+        heading: 'What happened',
+        body: [
+          'Price moved above the old high and continued behaving as accepted structure rather than quickly snapping back.',
+        ],
+      },
+      {
+        heading: 'What to take from it',
+        body: [
+          'Breakout quality is about hold plus follow-through, not only the first break.',
+        ],
+      },
+      {
+        heading: 'Where this fits',
+        body: [
+          'Strategies: Breakout Watcher.',
+          'Concepts: breakout, trend, support, resistance.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+    title: 'Failed hold after a breakout attempt',
+    summary: 'A caution example where a breakout print appeared, but acceptance did not follow and price returned to prior structure.',
+    content:
+      'Context\n\nBitcoin pressed a major resistance area where transition risk was high.\n\nSetup\n\nA breakout watcher could monitor whether the level break became durable acceptance.\n\nWhat happened\n\nPrice briefly moved above the boundary, then failed to hold and returned to prior range behaviour.\n\nWhat to take from it\n\nA level cross is not equivalent to durable acceptance.\n\nWhere this fits\n\nStrategies: Breakout Watcher.\n\nConcepts: breakout, resistance, support, momentum.',
+    mediaType: 'CASE_STUDY',
+    difficulty: 'INTERMEDIATE',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'Context',
+        body: [
+          'Bitcoin pressed a major resistance area where transition risk was high.',
+        ],
+      },
+      {
+        heading: 'Setup',
+        body: [
+          'A breakout watcher could monitor whether the level break became durable acceptance.',
+        ],
+      },
+      {
+        heading: 'What happened',
+        body: [
+          'Price briefly moved above the boundary, then failed to hold and returned to prior range behaviour.',
+        ],
+      },
+      {
+        heading: 'What to take from it',
+        body: [
+          'A level cross is not equivalent to durable acceptance.',
+        ],
+      },
+      {
+        heading: 'Where this fits',
+        body: [
+          'Strategies: Breakout Watcher.',
+          'Concepts: breakout, resistance, support, momentum.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+    title: 'Dip behaviour inside supported structure',
+    summary: 'A continuation example where pullbacks appeared but broader structure stayed supportive.',
+    content:
+      'Context\n\nThe market had already moved through a major boundary and continuation structure remained intact.\n\nSetup\n\nA buy-the-dip lens could assess whether pullback weakness looked temporary inside stronger structure.\n\nWhat happened\n\nPullbacks occurred, but continuation behaviour held and price repeatedly recovered.\n\nWhat to take from it\n\nDip context is stronger when weakness and structural support align.\n\nWhere this fits\n\nStrategies: Buy the Dip.\n\nConcepts: reversion, trend, support, momentum.',
+    mediaType: 'CASE_STUDY',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'Context',
+        body: [
+          'The market had already moved through a major boundary and continuation structure remained intact.',
+        ],
+      },
+      {
+        heading: 'Setup',
+        body: [
+          'A buy-the-dip lens could assess whether pullback weakness looked temporary inside stronger structure.',
+        ],
+      },
+      {
+        heading: 'What happened',
+        body: [
+          'Pullbacks occurred, but continuation behaviour held and price repeatedly recovered.',
+        ],
+      },
+      {
+        heading: 'What to take from it',
+        body: [
+          'Dip context is stronger when weakness and structural support align.',
+        ],
+      },
+      {
+        heading: 'Where this fits',
+        body: [
+          'Strategies: Buy the Dip.',
+          'Concepts: reversion, trend, support, momentum.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+    title: 'Relief bounce without full repair',
+    summary: 'A caution example where rebound behaviour appeared before broader structural repair became durable.',
+    content:
+      'Context\n\nBitcoin rebounded after deep stress, but higher-timeframe damage remained unresolved.\n\nSetup\n\nA buy-the-dip lens could read rebound strength as improving conditions while still checking for durable repair.\n\nWhat happened\n\nThe rebound was real, but later weakness showed structure had not fully repaired.\n\nWhat to take from it\n\nRelief and durable repair are related but not interchangeable.\n\nWhere this fits\n\nStrategies: Buy the Dip.\n\nConcepts: reversion, trend, support, volatility.',
+    mediaType: 'CASE_STUDY',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'Context',
+        body: [
+          'Bitcoin rebounded after deep stress, but higher-timeframe damage remained unresolved.',
+        ],
+      },
+      {
+        heading: 'Setup',
+        body: [
+          'A buy-the-dip lens could read rebound strength as improving conditions while still checking for durable repair.',
+        ],
+      },
+      {
+        heading: 'What happened',
+        body: [
+          'The rebound was real, but later weakness showed structure had not fully repaired.',
+        ],
+      },
+      {
+        heading: 'What to take from it',
+        body: [
+          'Relief and durable repair are related but not interchangeable.',
+        ],
+      },
+      {
+        heading: 'Where this fits',
+        body: [
+          'Strategies: Buy the Dip.',
+          'Concepts: reversion, trend, support, volatility.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+    title: 'Trend continuation after a major breakout',
+    summary: 'A continuation example where direction persisted after a major breakout and pullbacks did not break structure.',
+    content:
+      'Context\n\nBitcoin had moved through a major historical ceiling and was testing continuation quality above prior resistance.\n\nSetup\n\nA trend-follow lens could track directional persistence through pullbacks.\n\nWhat happened\n\nPrice continued higher for months after the breakout while pullbacks stayed within broader trend structure.\n\nWhat to take from it\n\nTrend context is about sustained behaviour over time, not a single perfect entry.\n\nWhere this fits\n\nStrategies: Trend Follow.\n\nConcepts: trend, breakout, momentum, support.',
+    mediaType: 'CASE_STUDY',
+    difficulty: 'INTERMEDIATE',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'Context',
+        body: [
+          'Bitcoin had moved through a major historical ceiling and was testing continuation quality above prior resistance.',
+        ],
+      },
+      {
+        heading: 'Setup',
+        body: [
+          'A trend-follow lens could track directional persistence through pullbacks.',
+        ],
+      },
+      {
+        heading: 'What happened',
+        body: [
+          'Price continued higher for months after the breakout while pullbacks stayed within broader trend structure.',
+        ],
+      },
+      {
+        heading: 'What to take from it',
+        body: [
+          'Trend context is about sustained behaviour over time, not a single perfect entry.',
+        ],
+      },
+      {
+        heading: 'Where this fits',
+        body: [
+          'Strategies: Trend Follow.',
+          'Concepts: trend, breakout, momentum, support.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+    title: 'When continuation conditions became less reliable',
+    summary: 'A caution example where regime deterioration reduced continuation reliability despite earlier trend behaviour.',
+    content:
+      'Context\n\nA supportive expansion backdrop shifted toward deleveraging pressure.\n\nSetup\n\nA trend-follow lens could still see continuation behavior while reassessing whether conditions remained supportive.\n\nWhat happened\n\nAs stress stacked, continuation became less reliable and prior assumptions weakened.\n\nWhat to take from it\n\nTrend-follow fit depends on environment quality, not only recent direction.\n\nWhere this fits\n\nStrategies: Trend Follow.\n\nConcepts: trend, momentum, volatility, confluence.',
+    mediaType: 'CASE_STUDY',
+    difficulty: 'INTERMEDIATE',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'Context',
+        body: [
+          'A supportive expansion backdrop shifted toward deleveraging pressure.',
+        ],
+      },
+      {
+        heading: 'Setup',
+        body: [
+          'A trend-follow lens could still see continuation behavior while reassessing whether conditions remained supportive.',
+        ],
+      },
+      {
+        heading: 'What happened',
+        body: [
+          'As stress stacked, continuation became less reliable and prior assumptions weakened.',
+        ],
+      },
+      {
+        heading: 'What to take from it',
+        body: [
+          'Trend-follow fit depends on environment quality, not only recent direction.',
+        ],
+      },
+      {
+        heading: 'Where this fits',
+        body: [
+          'Strategies: Trend Follow.',
+          'Concepts: trend, momentum, volatility, confluence.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
   },
   {
     topicId: 'pp-what-strategy-preview-strategy-navigator-is-for',
