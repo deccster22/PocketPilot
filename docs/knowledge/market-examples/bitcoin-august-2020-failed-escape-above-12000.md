@@ -1,5 +1,5 @@
----
-title: "Bitcoin’s August 2020 Failed Escape Above $12,000"
+﻿---
+title: "Example: Bitcoin August 2020 Failed Escape Above 12,000"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
@@ -9,29 +9,31 @@ related_docs: []
 canonical_path: "/docs/knowledge/market-examples/bitcoin-august-2020-failed-escape-above-12000.md"
 ---
 
-# Bitcoin’s August 2020 Failed Escape Above $12,000
+# Example: Bitcoin August 2020 Failed Escape Above 12,000
 
-## What this case shows
-This case shows the difference between a [breakout](../glossary/breakout.md) print and a breakout hold.
+## Context
+Bitcoin was pressing into a long-watched resistance area where many participants expected a structural breakout if acceptance followed.
+
+## Setup
+A strategy user could see a push above the level and early signs that looked like breakout behavior. The key interpretation task was to separate the breakout print from the quality of the hold after the push.
 
 ## What happened
-Bitcoin pushed into the long-watched $12,000 area in August 2020, briefly moved above it, then failed to hold the zone and fell back into prior structure.
+Price moved above 12,000 briefly, but acceptance did not follow. The move failed to hold and price returned to prior structure.
 
-## Why it mattered
-The bullish evidence was partly real. What failed was the hold. That makes this a strong teaching case for false breakout behavior rather than a cartoon fakeout.
+## What to take from it
+- Crossing resistance is only the first step; behavior after the break carries more weight.
+- Failed holds can happen even when the initial setup looked reasonable.
+- This example is about acceptance versus rejection behavior, not about judging who should have bought or sold.
 
-## How PocketPilot would read it
-PocketPilot would treat this as breakout attempt, rejection, and persistence of old structure rather than immediately promoting the move to a confirmed structural shift.
-
-## Strategy lens comparison
-This case is strongest for:
+## Where this fits
+Strategies:
 - [Breakout Watcher](../strategies/breakout-watcher.md)
 - [Range Trader](../strategies/range-trader.md)
 - [Confluence Alignment](../strategies/confluence-alignment.md)
 
-## What a user could learn
-A move above resistance is not the same thing as durable acceptance.
-
-## Related follow-ons
-- [Support, Resistance, and Structure](../interpretation/support-resistance-and-structure.md)
-- [Confirmation vs Invalidation](../interpretation/confirmation-vs-invalidation.md)
+Concepts:
+- [breakout](../concepts/breakout.md)
+- [resistance](../concepts/resistance.md)
+- [support](../concepts/support.md)
+- [momentum](../concepts/momentum.md)
+- [trend](../concepts/trend.md)

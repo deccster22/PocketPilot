@@ -1,29 +1,36 @@
----
-title: "Momentum Pulse Caution Example: Bitcoin June to August 2022 Relief Rally"
+﻿---
+title: "Example: Momentum Pulse Caution - Bitcoin June to August 2022 Relief Rally"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Caution evidence node for Momentum Pulse"
+purpose: "Caution evidence node for Momentum Pulse where speed outpaces repair"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/momentum-pulse-bitcoin-june-to-august-2022-caution.md"
 ---
 
-# Momentum Pulse Caution Example: Bitcoin June to August 2022 Relief Rally
+# Example: Momentum Pulse Caution - Bitcoin June to August 2022 Relief Rally
+
+## Context
+Bitcoin rebounded after heavy downside pressure, creating visible speed and enthusiasm in a still-damaged environment.
+
+## Setup
+A Momentum Pulse user could see clear acceleration and improving short-term behavior, while still needing to test whether structure was repairing or only rebounding.
 
 ## What happened
-Bitcoin rebounded sharply after severe downside stress, producing a move with real acceleration and visible energy.
+Momentum rose quickly through July and mid-August. Later behavior failed to hold the same quality, and the broader damaged structure remained influential.
 
-## Why this looked tempting
-This is exactly the kind of environment that can attract a Momentum Pulse read.
+## What to take from it
+- Speed can appear before durable structure repairs.
+- Pulse strength is most reliable when acceleration and structure move in the same direction.
+- The key risk is reading short-term velocity as full regime repair.
 
-## What made the fit fragile
-- acceleration happened inside a broader damaged structure
-- the move did not automatically prove durable repair
-- speed created temptation to over-read the move as cleaner than it was
+## Where this fits
+Strategies:
+- [Momentum Pulse](../strategies/momentum-pulse.md)
 
-## What later weakened or invalidated the case
-Later weakness made it clear that the pulse had not by itself repaired the broader environment.
-
-## What a user could learn
-Fast is not the same thing as safe.
+Concepts:
+- [momentum](../concepts/momentum.md)
+- [trend](../concepts/trend.md)
+- [volatility](../concepts/volatility.md)
+- [reversion](../concepts/reversion.md)

@@ -1,29 +1,36 @@
----
-title: "Breakout Watcher Caution Example: Bitcoin’s August 2020 Failed Escape Above $12,000"
+﻿---
+title: "Example: Breakout Watcher Failed-Hold Caution - Bitcoin August 2020"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Caution evidence node for Breakout Watcher"
+purpose: "Caution evidence node for Breakout Watcher failed-hold behavior"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/breakout-watcher-bitcoin-august-2020-failed-escape-caution.md"
 ---
 
-# Breakout Watcher Caution Example: Bitcoin’s August 2020 Failed Escape Above $12,000
+# Example: Breakout Watcher Failed-Hold Caution - Bitcoin August 2020
+
+## Context
+Bitcoin was challenging 12,000, a level with strong historical attention and transition potential.
+
+## Setup
+A Breakout Watcher user could see the push above resistance and test whether acceptance would follow through sustained structure.
 
 ## What happened
-Bitcoin briefly pushed above a major resistance area, but the move failed to hold and price fell back into the prior structure.
+Price briefly moved above the boundary, but acceptance did not follow and the move returned to prior range structure.
 
-## Why this looked tempting
-The market did reach an important level and produced the kind of move that can easily be read as a breakout starting.
+## What to take from it
+- A breakout print can appear before the market proves acceptance.
+- Failed holds are behavior outcomes, not proof that the initial setup was irrational.
+- The key risk is treating any level cross as equivalent to durable transition.
 
-## What made the fit fragile
-- the hold was weaker than the print
-- acceptance never became convincing enough
-- the move lost support quickly enough that old structure still dominated
+## Where this fits
+Strategies:
+- [Breakout Watcher](../strategies/breakout-watcher.md)
 
-## What later weakened or invalidated the case
-The market returned to the prior area instead of proving durable life above it.
-
-## What a user could learn
-The market touching or crossing a level is not the same as the market accepting that new territory.
+Concepts:
+- [breakout](../concepts/breakout.md)
+- [resistance](../concepts/resistance.md)
+- [support](../concepts/support.md)
+- [momentum](../concepts/momentum.md)

@@ -1,29 +1,38 @@
----
-title: "Confluence Alignment Caution Example: Terra From Peg Wobble to Exit Spiral"
+﻿---
+title: "Example: Confluence Alignment Danger-Confluence Caution - Terra Exit Spiral"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Caution evidence node for Confluence Alignment"
+purpose: "Caution evidence node for Confluence Alignment under stacked risk"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/confluence-alignment-terra-exit-spiral-caution.md"
 ---
 
-# Confluence Alignment Caution Example: Terra From Peg Wobble to Exit Spiral
+# Example: Confluence Alignment Danger-Confluence Caution - Terra Exit Spiral
+
+## Context
+Terra was already fragile inside a broader risk-off backdrop, with market trust and liquidity conditions deteriorating before full failure.
+
+## Setup
+A Confluence Alignment user could see multiple independent warning strands stacking together: peg instability, reserve stress, liquidity strain, contagion risk, and execution-quality deterioration.
 
 ## What happened
-Terra moved from early instability into a much more destructive failure sequence, with multiple warning signals and stress behaviors piling up around the same deteriorating situation.
+These signals aligned in the direction of deeper fragility rather than stabilization. Conditions escalated from wobble to structural failure behavior, including severe depeg persistence and execution impairment.
 
-## Why this looked important
-This case contains a kind of confluence, but not the reassuring kind. Multiple evidence strands aligned around rising fragility rather than around a clean opportunity.
+## What to take from it
+- Confluence can confirm danger, not only supportive setups.
+- Stacked independent risk signals can outweigh localized bounce behavior.
+- The key risk is treating dense signal agreement as safety when the agreement points to deterioration.
 
-## What made the fit fragile
-- the evidence stack pointed toward systemic weakness, not safety
-- structural impairment mattered more than any neat setup logic
-- execution and contagion risks became inseparable from price behavior
+## Where this fits
+Strategies:
+- [Confluence Alignment](../strategies/confluence-alignment.md)
+- [Trend Follow](../strategies/trend-follow.md)
 
-## What later weakened or invalidated the case
-The market moved beyond ordinary setup fragility into outright failure behavior.
-
-## What a user could learn
-Confluence can confirm danger just as easily as it can support opportunity.
+Concepts:
+- [confluence](../concepts/confluence.md)
+- [volatility](../concepts/volatility.md)
+- [trend](../concepts/trend.md)
+- [support](../concepts/support.md)
+- [resistance](../concepts/resistance.md)

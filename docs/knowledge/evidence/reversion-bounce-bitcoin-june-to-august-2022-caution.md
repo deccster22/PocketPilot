@@ -1,29 +1,38 @@
----
-title: "Reversion Bounce Caution Example: Bitcoin June to August 2022 Relief Rally"
+﻿---
+title: "Example: Reversion Bounce Caution - Bitcoin June to August 2022 Relief Rally"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Caution evidence node for Reversion Bounce"
+purpose: "Caution evidence node for Reversion Bounce where relief outpaces repair"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/reversion-bounce-bitcoin-june-to-august-2022-caution.md"
 ---
 
-# Reversion Bounce Caution Example: Bitcoin June to August 2022 Relief Rally
+# Example: Reversion Bounce Caution - Bitcoin June to August 2022 Relief Rally
+
+## Context
+After severe downside extension, Bitcoin entered a phase where bounce behavior was visible but higher-timeframe damage remained unresolved.
+
+## Setup
+A Reversion Bounce user could see stretched conditions and a strong rebound, with the key interpretation challenge being whether this was relief behavior or durable repair.
 
 ## What happened
-After a severe downside stretch, Bitcoin rebounded strongly through July and into August, creating a genuine sense that conditions might be improving.
+The rebound continued through July and mid-August with genuine recovery energy. Later weakness showed that structural repair had not yet become durable.
 
-## Why this looked tempting
-This is a classic Reversion Bounce temptation case. The market had clearly become stretched, the rebound was visible, and users could plausibly read the move as the start of something better.
+## What to take from it
+- Reversion behavior can be real without becoming a lasting trend repair.
+- Relief and repair are related but not interchangeable.
+- The key risk is promoting bounce evidence into stronger structural confidence too early.
 
-## What made the fit fragile
-- the larger structure remained damaged
-- rebound strength outran structural proof
-- relief and repair were too easy to blur together
+## Where this fits
+Strategies:
+- [Reversion Bounce](../strategies/reversion-bounce.md)
+- [Buy the Dip](../strategies/buy-the-dip.md)
 
-## What later weakened or invalidated the case
-Later weakness showed that the rally had not yet matured into durable repair.
-
-## What a user could learn
-A rebound can be genuine and still not be enough.
+Concepts:
+- [reversion](../concepts/reversion.md)
+- [momentum](../concepts/momentum.md)
+- [trend](../concepts/trend.md)
+- [support](../concepts/support.md)
+- [volatility](../concepts/volatility.md)
