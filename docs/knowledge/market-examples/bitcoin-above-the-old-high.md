@@ -1,5 +1,5 @@
----
-title: "Bitcoin Above the Old High"
+﻿---
+title: "Example: Bitcoin Above the Old High"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
@@ -9,29 +9,32 @@ related_docs: []
 canonical_path: "/docs/knowledge/market-examples/bitcoin-above-the-old-high.md"
 ---
 
-# Bitcoin Above the Old High
+# Example: Bitcoin Above the Old High
 
-## What this case shows
-This case shows why persistence can matter more than perfect bottom-picking.
+## Context
+Bitcoin was transitioning from a long consolidation into a new cycle phase in late 2020, with attention focused on whether old resistance could become durable support.
+
+## Setup
+A strategy user could see repeated pressure into the prior cycle high, then a decisive move above it. The key interpretation question was not only the breakout print, but whether the market could keep accepting higher structure after the break.
 
 ## What happened
-Bitcoin broke decisively above its old cycle high in December 2020 and continued higher for months into April 2021 despite meaningful pullbacks and stress.
+Price moved above the old high in December 2020 and then continued higher for months. Pullbacks occurred, but the broader structure kept holding and the move did not quickly collapse back into the old range.
 
-## Why it mattered
-This is a strong continuation case because it teaches that waiting for more visible structure did not automatically mean the opportunity was gone.
+## What to take from it
+- Continuation becomes clearer when higher structure survives stress, not only when price first crosses a level.
+- A pullback inside a still-intact trend can be normal behavior rather than immediate structural failure.
+- This example is about persistence and acceptance behavior, not about finding a perfect entry.
 
-## How PocketPilot would read it
-PocketPilot would treat the break of the old high as the key structural change, then judge whether the continuation kept holding through stress.
-
-## Strategy lens comparison
-This case is strongest for:
+## Where this fits
+Strategies:
 - [Trend Follow](../strategies/trend-follow.md)
-- [Buy the Dip](../strategies/buy-the-dip.md)
 - [Breakout Watcher](../strategies/breakout-watcher.md)
+- [Buy the Dip](../strategies/buy-the-dip.md)
+- [Momentum Pulse](../strategies/momentum-pulse.md)
 
-## What a user could learn
-“Not the bottom” does not mean “not useful.”
-
-## Related follow-ons
-- [Why Strategy Fit Matters](../interpretation/why-strategy-fit-matters.md)
-- [Estimated vs Confirmed Confidence](../interpretation/estimated-vs-confirmed-confidence.md)
+Concepts:
+- [trend](../concepts/trend.md)
+- [breakout](../concepts/breakout.md)
+- [momentum](../concepts/momentum.md)
+- [resistance](../concepts/resistance.md)
+- [support](../concepts/support.md)

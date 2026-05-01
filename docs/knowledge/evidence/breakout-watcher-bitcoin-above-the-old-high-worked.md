@@ -1,30 +1,36 @@
----
-title: "Breakout Watcher Worked Example: Bitcoin Above the Old High"
+﻿---
+title: "Example: Breakout Watcher Acceptance - Bitcoin Above the Old High"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Worked evidence node for Breakout Watcher"
+purpose: "Evidence node for Breakout Watcher acceptance behavior"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/breakout-watcher-bitcoin-above-the-old-high-worked.md"
 ---
 
-# Breakout Watcher Worked Example: Bitcoin Above the Old High
+# Example: Breakout Watcher Acceptance - Bitcoin Above the Old High
+
+## Context
+The market was pressing a major historical ceiling, where the key question was whether new territory would be accepted.
+
+## Setup
+A Breakout Watcher user could see a decisive move above the level and then monitor post-break behavior for acceptance versus immediate rejection.
 
 ## What happened
-Bitcoin moved decisively above its old cycle high and kept behaving like the market was accepting life in new territory rather than merely printing a brief escape.
+Price moved above the old high and continued behaving as accepted new structure rather than a short-lived escape.
 
-## Why this fit the strategy
-The move did not just cross a meaningful level. It held, continued, and built stronger evidence that the old ceiling had genuinely changed character.
+## What to take from it
+- Breakout quality is measured by hold and follow-through, not by the first print alone.
+- Acceptance behavior often appears through time spent above prior boundaries.
+- The risk is overreacting to first movement before acceptance is clearer.
 
-## What supported the read
-- the level was historically meaningful
-- the move was not instantly rejected
-- follow-through behavior supported acceptance rather than temporary excitement
-- the move stayed structurally alive long enough to deserve stronger confidence
+## Where this fits
+Strategies:
+- [Breakout Watcher](../strategies/breakout-watcher.md)
 
-## What PocketPilot would have emphasized
-The difference between “price crossed the line” and “the market is now behaving differently above the line.”
-
-## What a user could learn
-A breakout becomes more persuasive when the market starts living above the old boundary instead of only touching it.
+Concepts:
+- [breakout](../concepts/breakout.md)
+- [trend](../concepts/trend.md)
+- [resistance](../concepts/resistance.md)
+- [support](../concepts/support.md)

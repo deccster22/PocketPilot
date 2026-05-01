@@ -1,30 +1,37 @@
----
-title: "Range Trader Caution Example: Bitcoin’s August 2020 Failed Escape Above $12,000"
+﻿---
+title: "Example: Range Trader Caution - Bitcoin August 2020 Failed Escape"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Caution evidence node for Range Trader"
+purpose: "Caution evidence node for Range Trader during boundary pressure"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/range-trader-bitcoin-august-2020-failed-escape-caution.md"
 ---
 
-# Range Trader Caution Example: Bitcoin’s August 2020 Failed Escape Above $12,000
+# Example: Range Trader Caution - Bitcoin August 2020 Failed Escape
+
+## Context
+Bitcoin was oscillating around a long-watched upper boundary where range behavior and transition risk were both present.
+
+## Setup
+A Range Trader user could still frame the market as boundary-to-boundary behavior, but had to account for repeated pressure and a possible state shift if acceptance developed above resistance.
 
 ## What happened
-Bitcoin pushed toward and briefly above a major boundary, but failed to establish durable life beyond it.
+Price briefly escaped above the boundary, then failed to hold and moved back into prior structure. The range lens stayed usable, but transition risk was clearly elevated during the attempt.
 
-## Why this matters for Range Trader
-A Range Trader lens can stay useful while old structure still dominates, but it becomes fragile when the box starts being challenged hard enough that the market may be changing state.
+## What to take from it
+- Range logic can stay valid while transition pressure is rising, but confidence should adapt.
+- Boundary tests can carry two truths at once: range persistence and increasing breakout risk.
+- The key risk is treating a late-stage pressured range like a calm mid-range environment.
 
-## What made the fit fragile
-- repeated pressure on the boundary increased transition risk
-- excitement around the escape changed the quality of the environment
-- a range lens could still describe the structure, but only with rising caution
-- the case became as much about possible state change as about continued oscillation
+## Where this fits
+Strategies:
+- [Range Trader](../strategies/range-trader.md)
+- [Breakout Watcher](../strategies/breakout-watcher.md)
 
-## What later clarified the situation
-The failure to hold showed that the breakout had not yet matured, but it also showed how easily range logic can become uncomfortable when the market is pressing hard against transition.
-
-## What a user could learn
-Ranges are useful until they stop being comfortable. A range lens should become more cautious as escape pressure builds.
+Concepts:
+- [support](../concepts/support.md)
+- [resistance](../concepts/resistance.md)
+- [breakout](../concepts/breakout.md)
+- [volatility](../concepts/volatility.md)

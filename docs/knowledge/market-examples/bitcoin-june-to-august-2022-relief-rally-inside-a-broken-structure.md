@@ -1,5 +1,5 @@
----
-title: "Bitcoin June to August 2022: Relief Rally Inside a Broken Structure"
+﻿---
+title: "Example: Bitcoin June to August 2022 Relief Rally Inside a Broken Structure"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
@@ -9,29 +9,33 @@ related_docs: []
 canonical_path: "/docs/knowledge/market-examples/bitcoin-june-to-august-2022-relief-rally-inside-a-broken-structure.md"
 ---
 
-# Bitcoin June to August 2022: Relief Rally Inside a Broken Structure
+# Example: Bitcoin June to August 2022 Relief Rally Inside a Broken Structure
 
-## What this case shows
-This case separates exhaustion, [relief rally](../glossary/relief-rally.md), and recovery.
+## Context
+After severe downside damage in 2022, Bitcoin entered a phase where short-term rebounds could look strong while the broader structure was still under stress.
+
+## Setup
+A strategy user could see stretched downside conditions, a sharp rebound, and improving short-term tone. The key question was whether the rebound signaled durable repair or a relief phase inside a still-broken structure.
 
 ## What happened
-After a severe downside stretch in 2022, Bitcoin rebounded strongly through July and mid-August, but the structure did not yet prove durable repair and later weakness showed the move was still fragile.
+Price rebounded strongly through July and into mid-August. The move showed real energy, but later weakness showed that broader structural repair had not fully followed.
 
-## Why it mattered
-The ambiguity was real. The bounce was not fake. The damage was not repaired either.
+## What to take from it
+- A relief rally can be real behavior without being durable repair.
+- Speed and enthusiasm can improve quickly while higher-timeframe structure remains mixed.
+- This example is about separating rebound behavior from repaired structure, not judging whether someone should have acted.
 
-## How PocketPilot would read it
-PocketPilot would treat this as real rebound conditions with improvement in estimated confidence, but not yet durable structural repair.
-
-## Strategy lens comparison
-This case is strongest for:
+## Where this fits
+Strategies:
 - [Reversion Bounce](../strategies/reversion-bounce.md)
 - [Buy the Dip](../strategies/buy-the-dip.md)
+- [Momentum Pulse](../strategies/momentum-pulse.md)
 - [Range Trader](../strategies/range-trader.md)
 
-## What a user could learn
-Relief and recovery are related, but they are not interchangeable.
-
-## Related follow-ons
-- [Bounce vs Recovery vs Reversal](../interpretation/bounce-vs-recovery-vs-reversal.md)
-- [When a Bounce Is Not a Green Light](../action-risk/when-a-bounce-is-not-a-green-light.md)
+Concepts:
+- [reversion](../concepts/reversion.md)
+- [momentum](../concepts/momentum.md)
+- [trend](../concepts/trend.md)
+- [support](../concepts/support.md)
+- [resistance](../concepts/resistance.md)
+- [volatility](../concepts/volatility.md)

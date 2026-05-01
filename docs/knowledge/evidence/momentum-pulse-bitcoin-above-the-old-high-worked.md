@@ -1,29 +1,36 @@
----
-title: "Momentum Pulse Worked Example: Bitcoin Above the Old High"
+﻿---
+title: "Example: Momentum Pulse Continuation - Bitcoin Above the Old High"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Worked evidence node for Momentum Pulse"
+purpose: "Evidence node for Momentum Pulse continuation behavior"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/momentum-pulse-bitcoin-above-the-old-high-worked.md"
 ---
 
-# Momentum Pulse Worked Example: Bitcoin Above the Old High
+# Example: Momentum Pulse Continuation - Bitcoin Above the Old High
+
+## Context
+After clearing a major ceiling, Bitcoin entered a phase where upside movement was not only directional but visibly energized.
+
+## Setup
+A Momentum Pulse user could see acceleration beyond prior pace and assess whether that speed remained structurally supported.
 
 ## What happened
-Once Bitcoin moved beyond the old high, the market did not just continue. It accelerated in a way that made the move feel actively powered rather than passively drifting upward.
+The move accelerated and continued for an extended period. Momentum stayed active long enough to reflect persistent pressure, not only a brief burst.
 
-## Why this fit the strategy
-Acceleration itself became meaningful. The move gained pace, participation, and persistence strongly enough to teach the lens.
+## What to take from it
+- Momentum is more informative when speed and structural follow-through align.
+- Fast movement can stay constructive when continuation behavior keeps confirming.
+- The key risk is confusing one short spike with sustained pulse behavior.
 
-## What supported the read
-- movement speed increased visibly beyond the prior pace
-- follow-through was strong enough to keep the pulse alive
-- the move remained energized long enough to be more than a one-candle event
+## Where this fits
+Strategies:
+- [Momentum Pulse](../strategies/momentum-pulse.md)
 
-## What PocketPilot would have emphasized
-Acceleration with support, not just speed for speed’s sake.
-
-## What a user could learn
-Momentum matters most when the burst still has structure underneath it.
+Concepts:
+- [momentum](../concepts/momentum.md)
+- [trend](../concepts/trend.md)
+- [breakout](../concepts/breakout.md)
+- [volatility](../concepts/volatility.md)

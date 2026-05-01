@@ -1,30 +1,37 @@
----
-title: "Confluence Alignment Worked Example: Bitcoin’s $19k–$20k Bottoming Cluster and the Post-FTX Reclaim"
+﻿---
+title: "Example: Confluence Alignment Acceptance - Bitcoin 19k-20k Post-FTX Reclaim"
 status: "draft"
 owner: "founder"
 doc_class: "knowledge-node"
-purpose: "Worked evidence node for Confluence Alignment"
+purpose: "Evidence node for Confluence Alignment acceptance behavior"
 depends_on: []
 related_docs: []
 canonical_path: "/docs/knowledge/evidence/confluence-alignment-bitcoin-19k-20k-post-ftx-reclaim-worked.md"
 ---
 
-# Confluence Alignment Worked Example: Bitcoin’s $19k–$20k Bottoming Cluster and the Post-FTX Reclaim
+# Example: Confluence Alignment Acceptance - Bitcoin 19k-20k Post-FTX Reclaim
+
+## Context
+Bitcoin was rebuilding after major stress, with multiple independent evidence strands converging around the same zone.
+
+## Setup
+A Confluence Alignment user could track whether structure, cost-basis references, and reclaim behavior were reinforcing each other instead of repeating the same signal family.
 
 ## What happened
-After heavy stress in the post-FTX period, Bitcoin developed a bottoming area where multiple evidence strands pointed to the same broad zone, and later reclaim behavior gave that zone more significance.
+The zone remained active through repeated tests, later broke under FTX stress, then regained relevance as reclaim behavior and broader evidence alignment improved in early 2023.
 
-## Why this fit the strategy
-The zone mattered for more than one reason. It was not a one-indicator story dressed up as certainty.
+## What to take from it
+- Confluence is strongest when independent evidence families align, not when one signal is repeated.
+- Alignment quality can degrade under stress and later rebuild.
+- The key risk is treating a confluence zone as fixed certainty instead of evolving behavior.
 
-## What supported the read
-- the area had structural significance
-- the market had strong contextual reasons to be watched closely there
-- reclaim behavior strengthened the idea that the area was more than random noise
-- the evidence stack became layered rather than singular
+## Where this fits
+Strategies:
+- [Confluence Alignment](../strategies/confluence-alignment.md)
 
-## What PocketPilot would have emphasized
-Disciplined agreement across different evidence types rather than magic-level perfection.
-
-## What a user could learn
-Confluence is strongest when several different questions are being answered in the same place.
+Concepts:
+- [confluence](../concepts/confluence.md)
+- [trend](../concepts/trend.md)
+- [support](../concepts/support.md)
+- [resistance](../concepts/resistance.md)
+- [volatility](../concepts/volatility.md)
