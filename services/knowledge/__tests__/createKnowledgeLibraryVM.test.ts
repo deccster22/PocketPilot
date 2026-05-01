@@ -129,4 +129,29 @@ describe('createKnowledgeLibraryVM', () => {
       expect(copy).not.toMatch(/must read|required reading|complete to continue|unlock/i);
     });
   });
+
+  it('keeps P7-K19 first-wave evidence topics hidden from the visible library shelf sections', () => {
+    const firstWaveEvidenceTopicIds = [
+      'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+      'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+      'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+      'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+      'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+      'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+    ] as const;
+
+    const result = createKnowledgeLibraryVM({ nodes: knowledgeCatalog });
+
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected knowledge library to be available.');
+    }
+
+    const visibleTopicIds = new Set(
+      result.sections.flatMap((section) => section.items.map((item) => item.topicId)),
+    );
+
+    firstWaveEvidenceTopicIds.forEach((topicId) => {
+      expect(visibleTopicIds.has(topicId)).toBe(false);
+    });
+  });
 });

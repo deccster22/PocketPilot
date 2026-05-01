@@ -15,6 +15,13 @@ const RUNTIME_REQUIRED_REGISTER_TOPIC_IDS = Object.freeze([
   'strategy-range-trader',
   'strategy-reversion-bounce',
   'strategy-trend-follow',
+  // P7-K19 first-wave hidden follow-through evidence routes
+  'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+  'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+  'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+  'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+  'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+  'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
   // Insights and knowledge-system runtime routes
   'pp-what-event-ledger-is-for',
   'pp-what-insights-is-for',

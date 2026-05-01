@@ -80,7 +80,7 @@ Guardrails help highlight when risk increases during volatile pullbacks.
 These examples show how this strategy can appear in real market conditions.
 
 ### When it played out as expected
-- [Recovery after pullback (worked)](../evidence/buy-the-dip-bitcoin-above-the-old-high-worked.md)
+- [Dip behaviour inside supported structure](../evidence/buy-the-dip-bitcoin-above-the-old-high-worked.md)
 
 ### When conditions became less reliable
-- [Continued sell-off (caution)](../evidence/buy-the-dip-bitcoin-june-to-august-2022-caution.md)
+- [Relief bounce without full repair](../evidence/buy-the-dip-bitcoin-june-to-august-2022-caution.md)

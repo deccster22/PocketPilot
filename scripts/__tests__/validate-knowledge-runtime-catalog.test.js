@@ -107,6 +107,19 @@ describe('validateKnowledgeRuntimeCatalogSync', () => {
     );
   });
 
+  test('default runtime-required topic scope includes all P7-K19 first-wave evidence IDs', () => {
+    expect(RUNTIME_REQUIRED_REGISTER_TOPIC_IDS).toEqual(
+      expect.arrayContaining([
+        'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+        'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+        'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+        'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+        'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+        'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+      ]),
+    );
+  });
+
   test('passes when required register topics resolve in runtime catalog and legacy runtime IDs are explicitly allowlisted', () => {
     const workspace = createWorkspace();
     const result = validateKnowledgeRuntimeCatalogSync({
@@ -133,6 +146,34 @@ describe('validateKnowledgeRuntimeCatalogSync', () => {
     expect(result.isValid).toBe(false);
     expect(result.errors.join('\n')).toContain(
       'runtime catalog missing required registered topic IDs: required-b',
+    );
+  });
+
+  test('fails when one first-wave evidence required ID is missing from runtime catalog', () => {
+    const firstWave = [
+      'evidence-trend-follow-bitcoin-above-the-old-high-worked',
+      'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
+      'evidence-breakout-watcher-bitcoin-above-the-old-high-worked',
+      'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+      'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
+      'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+    ];
+    const workspace = createWorkspace({
+      registerTopicIds: [...firstWave],
+      runtimeCatalogTopicIds: firstWave.filter(
+        (topicId) =>
+          topicId !== 'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+      ),
+    });
+    const result = validateKnowledgeRuntimeCatalogSync({
+      rootDir: workspace.rootDir,
+      requiredRegisterTopicIds: [...firstWave],
+      allowedUnregisteredRuntimeTopicIds: [],
+    });
+
+    expect(result.isValid).toBe(false);
+    expect(result.errors.join('\n')).toContain(
+      'runtime catalog missing required registered topic IDs: evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
     );
   });
 
