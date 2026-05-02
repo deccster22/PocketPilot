@@ -26,3 +26,15 @@ Docs/meta support mapping for progressive learning alignment. This is not runtim
 | `docs/knowledge/concepts/candlestick-patterns.md` | `docs/knowledge/strategies/candle-signals.md` |
 | `docs/knowledge/concepts/fibonacci-levels.md` | `docs/knowledge/strategies/fibonacci-zones.md` |
 | `docs/knowledge/concepts/confluence.md` | `docs/knowledge/strategies/confluence-alignment.md` |
+
+## P7-K21 first-wave runtime follow-through note
+
+The first concept runtime follow-through wave is intentionally limited to:
+
+- `concept-trend`
+- `concept-breakout`
+- `concept-support`
+- `concept-resistance`
+- `concept-reversion`
+
+These are runtime-routable as hidden follow-through topics (`priority: NEXT`) and do not create a visible concept shelf in this phase.

@@ -120,6 +120,30 @@ describe('validateKnowledgeRuntimeCatalogSync', () => {
     );
   });
 
+  test('default runtime-required topic scope includes all P7-K21 first-wave concept IDs', () => {
+    expect(RUNTIME_REQUIRED_REGISTER_TOPIC_IDS).toEqual(
+      expect.arrayContaining([
+        'concept-trend',
+        'concept-breakout',
+        'concept-support',
+        'concept-resistance',
+        'concept-reversion',
+      ]),
+    );
+  });
+
+  test('default runtime-required topic scope keeps held concept IDs out of K21 required list', () => {
+    [
+      'concept-momentum',
+      'concept-confluence',
+      'concept-volatility',
+      'concept-fibonacci-levels',
+      'concept-candlestick-patterns',
+    ].forEach((topicId) => {
+      expect(RUNTIME_REQUIRED_REGISTER_TOPIC_IDS).not.toContain(topicId);
+    });
+  });
+
   test('passes when required register topics resolve in runtime catalog and legacy runtime IDs are explicitly allowlisted', () => {
     const workspace = createWorkspace();
     const result = validateKnowledgeRuntimeCatalogSync({
@@ -174,6 +198,32 @@ describe('validateKnowledgeRuntimeCatalogSync', () => {
     expect(result.isValid).toBe(false);
     expect(result.errors.join('\n')).toContain(
       'runtime catalog missing required registered topic IDs: evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
+    );
+  });
+
+  test('fails when one first-wave concept required ID is missing from runtime catalog', () => {
+    const firstWaveConceptIds = [
+      'concept-trend',
+      'concept-breakout',
+      'concept-support',
+      'concept-resistance',
+      'concept-reversion',
+    ];
+    const workspace = createWorkspace({
+      registerTopicIds: [...firstWaveConceptIds],
+      runtimeCatalogTopicIds: firstWaveConceptIds.filter(
+        (topicId) => topicId !== 'concept-reversion',
+      ),
+    });
+    const result = validateKnowledgeRuntimeCatalogSync({
+      rootDir: workspace.rootDir,
+      requiredRegisterTopicIds: [...firstWaveConceptIds],
+      allowedUnregisteredRuntimeTopicIds: [],
+    });
+
+    expect(result.isValid).toBe(false);
+    expect(result.errors.join('\n')).toContain(
+      'runtime catalog missing required registered topic IDs: concept-reversion',
     );
   });
 

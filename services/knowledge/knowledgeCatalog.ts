@@ -2455,7 +2455,7 @@ export const knowledgeCatalog = [
     title: 'Breakout acceptance above an old high',
     summary: 'An acceptance example where price moved above a major boundary and continued behaving in new territory.',
     content:
-      'Context\n\nThe market was pressing a major historical ceiling where acceptance above the level mattered more than a brief print.\n\nSetup\n\nA breakout watcher could track whether the break held and whether post-break behaviour stayed constructive.\n\nWhat happened\n\nPrice moved above the old high and continued behaving as accepted structure rather than quickly snapping back.\n\nWhat to take from it\n\nBreakout quality is about hold plus follow-through, not only the first break.\n\nWhere this fits\n\nStrategies: Breakout Watcher.\n\nConcepts: breakout, trend, support, resistance.',
+      'Context\n\nThe market was pressing a major historical ceiling where acceptance above the level mattered more than a brief print.\n\nSetup\n\nA breakout watcher could track whether the break held and whether post-break behaviour stayed constructive.\n\nWhat happened\n\nPrice moved above the old high and continued behaving as accepted structure rather than quickly snapping back.\n\nWhat to take from it\n\nBreakout quality is about hold plus follow-through, not only the first break.\n\nWhere this fits\n\nStrategies: Breakout Watcher.\n\nConcepts: breakout, resistance, support.',
     mediaType: 'CASE_STUDY',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2492,18 +2492,18 @@ export const knowledgeCatalog = [
         heading: 'Where this fits',
         body: [
           'Strategies: Breakout Watcher.',
-          'Concepts: breakout, trend, support, resistance.',
+          'Concepts: breakout, resistance, support.',
         ],
       },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: ['concept-breakout', 'concept-resistance', 'concept-support'],
   },
   {
     topicId: 'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
     title: 'Failed hold after a breakout attempt',
     summary: 'A caution example where a breakout print appeared, but acceptance did not follow and price returned to prior structure.',
     content:
-      'Context\n\nBitcoin pressed a major resistance area where transition risk was high.\n\nSetup\n\nA breakout watcher could monitor whether the level break became durable acceptance.\n\nWhat happened\n\nPrice briefly moved above the boundary, then failed to hold and returned to prior range behaviour.\n\nWhat to take from it\n\nA level cross is not equivalent to durable acceptance.\n\nWhere this fits\n\nStrategies: Breakout Watcher.\n\nConcepts: breakout, resistance, support, momentum.',
+      'Context\n\nBitcoin pressed a major resistance area where transition risk was high.\n\nSetup\n\nA breakout watcher could monitor whether the level break became durable acceptance.\n\nWhat happened\n\nPrice briefly moved above the boundary, then failed to hold and returned to prior range behaviour.\n\nWhat to take from it\n\nA level cross is not equivalent to durable acceptance.\n\nWhere this fits\n\nStrategies: Breakout Watcher.\n\nConcepts: breakout, resistance.',
     mediaType: 'CASE_STUDY',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2540,18 +2540,18 @@ export const knowledgeCatalog = [
         heading: 'Where this fits',
         body: [
           'Strategies: Breakout Watcher.',
-          'Concepts: breakout, resistance, support, momentum.',
+          'Concepts: breakout, resistance.',
         ],
       },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: ['concept-breakout', 'concept-resistance'],
   },
   {
     topicId: 'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
     title: 'Dip behaviour inside supported structure',
     summary: 'A continuation example where pullbacks appeared but broader structure stayed supportive.',
     content:
-      'Context\n\nThe market had already moved through a major boundary and continuation structure remained intact.\n\nSetup\n\nA buy-the-dip lens could assess whether pullback weakness looked temporary inside stronger structure.\n\nWhat happened\n\nPullbacks occurred, but continuation behaviour held and price repeatedly recovered.\n\nWhat to take from it\n\nDip context is stronger when weakness and structural support align.\n\nWhere this fits\n\nStrategies: Buy the Dip.\n\nConcepts: reversion, trend, support, momentum.',
+      'Context\n\nThe market had already moved through a major boundary and continuation structure remained intact.\n\nSetup\n\nA buy-the-dip lens could assess whether pullback weakness looked temporary inside stronger structure.\n\nWhat happened\n\nPullbacks occurred, but continuation behaviour held and price repeatedly recovered.\n\nWhat to take from it\n\nDip context is stronger when weakness and structural support align.\n\nWhere this fits\n\nStrategies: Buy the Dip.\n\nConcepts: support, trend.',
     mediaType: 'CASE_STUDY',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2588,18 +2588,18 @@ export const knowledgeCatalog = [
         heading: 'Where this fits',
         body: [
           'Strategies: Buy the Dip.',
-          'Concepts: reversion, trend, support, momentum.',
+          'Concepts: support, trend.',
         ],
       },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: ['concept-support', 'concept-trend'],
   },
   {
     topicId: 'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
     title: 'Relief bounce without full repair',
     summary: 'A caution example where rebound behaviour appeared before broader structural repair became durable.',
     content:
-      'Context\n\nBitcoin rebounded after deep stress, but higher-timeframe damage remained unresolved.\n\nSetup\n\nA buy-the-dip lens could read rebound strength as improving conditions while still checking for durable repair.\n\nWhat happened\n\nThe rebound was real, but later weakness showed structure had not fully repaired.\n\nWhat to take from it\n\nRelief and durable repair are related but not interchangeable.\n\nWhere this fits\n\nStrategies: Buy the Dip.\n\nConcepts: reversion, trend, support, volatility.',
+      'Context\n\nBitcoin rebounded after deep stress, but higher-timeframe damage remained unresolved.\n\nSetup\n\nA buy-the-dip lens could read rebound strength as improving conditions while still checking for durable repair.\n\nWhat happened\n\nThe rebound was real, but later weakness showed structure had not fully repaired.\n\nWhat to take from it\n\nRelief and durable repair are related but not interchangeable.\n\nWhere this fits\n\nStrategies: Buy the Dip.\n\nConcepts: reversion, trend, support.',
     mediaType: 'CASE_STUDY',
     difficulty: 'BEGINNER',
     strategyLinks: [],
@@ -2636,18 +2636,18 @@ export const knowledgeCatalog = [
         heading: 'Where this fits',
         body: [
           'Strategies: Buy the Dip.',
-          'Concepts: reversion, trend, support, volatility.',
+          'Concepts: reversion, trend, support.',
         ],
       },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: ['concept-reversion', 'concept-trend', 'concept-support'],
   },
   {
     topicId: 'evidence-trend-follow-bitcoin-above-the-old-high-worked',
     title: 'Trend continuation after a major breakout',
     summary: 'A continuation example where direction persisted after a major breakout and pullbacks did not break structure.',
     content:
-      'Context\n\nBitcoin had moved through a major historical ceiling and was testing continuation quality above prior resistance.\n\nSetup\n\nA trend-follow lens could track directional persistence through pullbacks.\n\nWhat happened\n\nPrice continued higher for months after the breakout while pullbacks stayed within broader trend structure.\n\nWhat to take from it\n\nTrend context is about sustained behaviour over time, not a single perfect entry.\n\nWhere this fits\n\nStrategies: Trend Follow.\n\nConcepts: trend, breakout, momentum, support.',
+      'Context\n\nBitcoin had moved through a major historical ceiling and was testing continuation quality above prior resistance.\n\nSetup\n\nA trend-follow lens could track directional persistence through pullbacks.\n\nWhat happened\n\nPrice continued higher for months after the breakout while pullbacks stayed within broader trend structure.\n\nWhat to take from it\n\nTrend context is about sustained behaviour over time, not a single perfect entry.\n\nWhere this fits\n\nStrategies: Trend Follow.\n\nConcepts: trend, breakout, support.',
     mediaType: 'CASE_STUDY',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2684,18 +2684,18 @@ export const knowledgeCatalog = [
         heading: 'Where this fits',
         body: [
           'Strategies: Trend Follow.',
-          'Concepts: trend, breakout, momentum, support.',
+          'Concepts: trend, breakout, support.',
         ],
       },
     ],
-    relatedTopicIds: [],
+    relatedTopicIds: ['concept-trend', 'concept-breakout', 'concept-support'],
   },
   {
     topicId: 'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution',
     title: 'When continuation conditions became less reliable',
     summary: 'A caution example where regime deterioration reduced continuation reliability despite earlier trend behaviour.',
     content:
-      'Context\n\nA supportive expansion backdrop shifted toward deleveraging pressure.\n\nSetup\n\nA trend-follow lens could still see continuation behavior while reassessing whether conditions remained supportive.\n\nWhat happened\n\nAs stress stacked, continuation became less reliable and prior assumptions weakened.\n\nWhat to take from it\n\nTrend-follow fit depends on environment quality, not only recent direction.\n\nWhere this fits\n\nStrategies: Trend Follow.\n\nConcepts: trend, momentum, volatility, confluence.',
+      'Context\n\nA supportive expansion backdrop shifted toward deleveraging pressure.\n\nSetup\n\nA trend-follow lens could still see continuation behavior while reassessing whether conditions remained supportive.\n\nWhat happened\n\nAs stress stacked, continuation became less reliable and prior assumptions weakened.\n\nWhat to take from it\n\nTrend-follow fit depends on environment quality, not only recent direction.\n\nWhere this fits\n\nStrategies: Trend Follow.\n\nConcepts: trend.',
     mediaType: 'CASE_STUDY',
     difficulty: 'INTERMEDIATE',
     strategyLinks: [],
@@ -2732,7 +2732,386 @@ export const knowledgeCatalog = [
         heading: 'Where this fits',
         body: [
           'Strategies: Trend Follow.',
-          'Concepts: trend, momentum, volatility, confluence.',
+          'Concepts: trend.',
+        ],
+      },
+    ],
+    relatedTopicIds: ['concept-trend'],
+  },
+  {
+    topicId: 'concept-trend',
+    title: 'Trend',
+    summary: 'Price moving consistently in one direction.',
+    content:
+      'What this means\n\nPrice moving consistently in one direction.\n\nWhy it matters\n\nIt helps you decide whether market behaviour is persisting or shifting.\n\nHow to think about it\n\nUse trend as context for interpretation, not as a promise that direction must continue.\n\nCommon misunderstanding\n\nThinking a trend guarantees future movement.\n\nLayer 2: Deeper understanding\n\nHow to recognise this\n\nA trend is visible when price keeps moving in one broad direction over time. The key sign is that price keeps accepting new areas rather than returning fully to the old range.\n\nHow it usually develops\n\nA trend often begins with a behaviour shift, then proves itself through pullbacks that hold and follow-through that remains intact.\n\nWhat it is commonly confused with\n\na single strong move that has not yet built structure.\n\nshort-term volatility moving in one direction.\n\na temporary rally or sell-off inside a larger sideways range.\n\nmomentum, which is about speed and pressure rather than structure over time.\n\nWhat makes it clearer\n\nRepeated directional structure, orderly pullbacks, and acceptance of new price areas make trend context easier to interpret.\n\nWhat makes it less reliable\n\nHeavy overlap, repeated failed continuation, and unstable volatility can make trend structure less clear.\n\nHow it appears in examples\n\nTrend appears in continuation examples where pullbacks do not break structure, and in caution examples where follow-through becomes less reliable.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['Price moving consistently in one direction.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It helps you decide whether market behaviour is persisting or shifting.'],
+      },
+      {
+        heading: 'How to think about it',
+        body: [
+          'Use trend as context for interpretation, not as a promise that direction must continue.',
+        ],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Thinking a trend guarantees future movement.'],
+      },
+      {
+        heading: 'Layer 2: Deeper understanding',
+        body: ['This layer adds deeper behaviour context beneath the beginner foundation.'],
+      },
+      {
+        heading: 'How to recognise this',
+        body: [
+          'A trend is visible when price keeps moving in one broad direction over time. The key sign is that price keeps accepting new areas rather than returning fully to the old range.',
+        ],
+      },
+      {
+        heading: 'How it usually develops',
+        body: [
+          'A trend often begins with a behaviour shift, then proves itself through pullbacks that hold and follow-through that remains intact.',
+        ],
+      },
+      {
+        heading: 'What it is commonly confused with',
+        body: [
+          'a single strong move that has not yet built structure',
+          'short-term volatility moving in one direction',
+          'a temporary rally or sell-off inside a larger sideways range',
+          'momentum, which is about speed and pressure rather than structure over time',
+        ],
+      },
+      {
+        heading: 'What makes it clearer',
+        body: [
+          'Repeated directional structure, orderly pullbacks, and acceptance of new price areas make trend context easier to interpret.',
+        ],
+      },
+      {
+        heading: 'What makes it less reliable',
+        body: [
+          'Heavy overlap, repeated failed continuation, and unstable volatility can make trend structure less clear.',
+        ],
+      },
+      {
+        heading: 'How it appears in examples',
+        body: [
+          'Trend appears in continuation examples where pullbacks do not break structure, and in caution examples where follow-through becomes less reliable.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'concept-breakout',
+    title: 'Breakout',
+    summary: 'Price moving beyond a key level.',
+    content:
+      'What this means\n\nPrice moving beyond a key level.\n\nWhy it matters\n\nIt highlights moments when market structure may be changing.\n\nHow to think about it\n\nRead breakouts with confirmation context, not as instant certainty.\n\nCommon misunderstanding\n\nAssuming every breakout continues cleanly.\n\nLayer 2: Deeper understanding\n\nHow to recognise this\n\nA breakout appears when price moves beyond a level or area that had previously contained it. The key behaviour is what price does after the break.\n\nHow it usually develops\n\nBreakouts often build after repeated testing or compression. Follow-through after the initial move helps separate durable transition from noise.\n\nWhat it is commonly confused with\n\nany fast move through a level.\n\na temporary spike beyond a boundary.\n\nnoise around support or resistance.\n\nmomentum without a meaningful boundary shift.\n\nWhat makes it clearer\n\nRepeated interaction at the level, tighter pre-break movement, and post-break hold improve breakout clarity.\n\nWhat makes it less reliable\n\nImmediate rejection, wide back-and-forth movement, and little follow-through reduce breakout reliability.\n\nHow it appears in examples\n\nBreakout appears in acceptance examples where price holds outside prior structure and in caution examples where price snaps back.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['Price moving beyond a key level.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It highlights moments when market structure may be changing.'],
+      },
+      {
+        heading: 'How to think about it',
+        body: ['Read breakouts with confirmation context, not as instant certainty.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Assuming every breakout continues cleanly.'],
+      },
+      {
+        heading: 'Layer 2: Deeper understanding',
+        body: ['This layer adds deeper behaviour context beneath the beginner foundation.'],
+      },
+      {
+        heading: 'How to recognise this',
+        body: [
+          'A breakout appears when price moves beyond a level or area that had previously contained it. The key behaviour is what price does after the break.',
+        ],
+      },
+      {
+        heading: 'How it usually develops',
+        body: [
+          'Breakouts often build after repeated testing or compression. Follow-through after the initial move helps separate durable transition from noise.',
+        ],
+      },
+      {
+        heading: 'What it is commonly confused with',
+        body: [
+          'any fast move through a level',
+          'a temporary spike beyond a boundary',
+          'noise around support or resistance',
+          'momentum without a meaningful boundary shift',
+        ],
+      },
+      {
+        heading: 'What makes it clearer',
+        body: [
+          'Repeated interaction at the level, tighter pre-break movement, and post-break hold improve breakout clarity.',
+        ],
+      },
+      {
+        heading: 'What makes it less reliable',
+        body: [
+          'Immediate rejection, wide back-and-forth movement, and little follow-through reduce breakout reliability.',
+        ],
+      },
+      {
+        heading: 'How it appears in examples',
+        body: [
+          'Breakout appears in acceptance examples where price holds outside prior structure and in caution examples where price snaps back.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'concept-support',
+    title: 'Support',
+    summary: 'A price area where buying tends to appear.',
+    content:
+      'What this means\n\nA price area where buying tends to appear.\n\nWhy it matters\n\nIt helps explain why some declines slow, pause, or bounce.\n\nHow to think about it\n\nTreat support as a zone that can strengthen or fail, not as a perfect line.\n\nCommon misunderstanding\n\nAssuming support will always hold.\n\nLayer 2: Deeper understanding\n\nHow to recognise this\n\nSupport is an area where downward movement slows, pauses, or meets repeated buying interest.\n\nHow it usually develops\n\nSupport often becomes clearer after repeated reactions in a similar area, and can weaken when repeated tests produce less response.\n\nWhat it is commonly confused with\n\na single low point.\n\nan arbitrary horizontal line.\n\na guaranteed floor.\n\nWhat makes it clearer\n\nRepeated reactions, slower downside movement, and stronger response near the zone help clarify support behaviour.\n\nWhat makes it less reliable\n\nFast breaks through the zone, repeated weak tests, and unstable volatility make support less reliable.\n\nHow it appears in examples\n\nSupport appears in examples where pullbacks stabilise around repeated areas, and in caution examples where the area fails to hold.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['A price area where buying tends to appear.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It helps explain why some declines slow, pause, or bounce.'],
+      },
+      {
+        heading: 'How to think about it',
+        body: ['Treat support as a zone that can strengthen or fail, not as a perfect line.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Assuming support will always hold.'],
+      },
+      {
+        heading: 'Layer 2: Deeper understanding',
+        body: ['This layer adds deeper behaviour context beneath the beginner foundation.'],
+      },
+      {
+        heading: 'How to recognise this',
+        body: [
+          'Support is an area where downward movement slows, pauses, or meets repeated buying interest.',
+        ],
+      },
+      {
+        heading: 'How it usually develops',
+        body: [
+          'Support often becomes clearer after repeated reactions in a similar area, and can weaken when repeated tests produce less response.',
+        ],
+      },
+      {
+        heading: 'What it is commonly confused with',
+        body: [
+          'a single low point',
+          'an arbitrary horizontal line',
+          'a guaranteed floor',
+        ],
+      },
+      {
+        heading: 'What makes it clearer',
+        body: [
+          'Repeated reactions, slower downside movement, and stronger response near the zone help clarify support behaviour.',
+        ],
+      },
+      {
+        heading: 'What makes it less reliable',
+        body: [
+          'Fast breaks through the zone, repeated weak tests, and unstable volatility make support less reliable.',
+        ],
+      },
+      {
+        heading: 'How it appears in examples',
+        body: [
+          'Support appears in examples where pullbacks stabilise around repeated areas, and in caution examples where the area fails to hold.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'concept-resistance',
+    title: 'Resistance',
+    summary: 'A price area where selling tends to appear.',
+    content:
+      'What this means\n\nA price area where selling tends to appear.\n\nWhy it matters\n\nIt helps explain why upward moves can pause, stall, or reverse.\n\nHow to think about it\n\nTreat resistance as a zone that can weaken over repeated tests.\n\nCommon misunderstanding\n\nAssuming resistance cannot be broken.\n\nLayer 2: Deeper understanding\n\nHow to recognise this\n\nResistance is an area where upward movement slows, pauses, or meets repeated selling pressure.\n\nHow it usually develops\n\nResistance often strengthens after repeated failed pushes higher, and can weaken when pressure keeps building through the area.\n\nWhat it is commonly confused with\n\na single high point.\n\nan exact ceiling.\n\na level that must always reject.\n\nWhat makes it clearer\n\nRepeated rejection, slowing movement near the area, and clear structure around the level help clarify resistance.\n\nWhat makes it less reliable\n\nInconsistent rejection, strong follow-through beyond the area, and limited prior interaction can reduce resistance reliability.\n\nHow it appears in examples\n\nResistance appears in both acceptance and failed-hold breakout examples, depending on how price behaves after testing the boundary.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['A price area where selling tends to appear.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It helps explain why upward moves can pause, stall, or reverse.'],
+      },
+      {
+        heading: 'How to think about it',
+        body: ['Treat resistance as a zone that can weaken over repeated tests.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Assuming resistance cannot be broken.'],
+      },
+      {
+        heading: 'Layer 2: Deeper understanding',
+        body: ['This layer adds deeper behaviour context beneath the beginner foundation.'],
+      },
+      {
+        heading: 'How to recognise this',
+        body: [
+          'Resistance is an area where upward movement slows, pauses, or meets repeated selling pressure.',
+        ],
+      },
+      {
+        heading: 'How it usually develops',
+        body: [
+          'Resistance often strengthens after repeated failed pushes higher, and can weaken when pressure keeps building through the area.',
+        ],
+      },
+      {
+        heading: 'What it is commonly confused with',
+        body: [
+          'a single high point',
+          'an exact ceiling',
+          'a level that must always reject',
+        ],
+      },
+      {
+        heading: 'What makes it clearer',
+        body: [
+          'Repeated rejection, slowing movement near the area, and clear structure around the level help clarify resistance.',
+        ],
+      },
+      {
+        heading: 'What makes it less reliable',
+        body: [
+          'Inconsistent rejection, strong follow-through beyond the area, and limited prior interaction can reduce resistance reliability.',
+        ],
+      },
+      {
+        heading: 'How it appears in examples',
+        body: [
+          'Resistance appears in both acceptance and failed-hold breakout examples, depending on how price behaves after testing the boundary.',
+        ],
+      },
+    ],
+    relatedTopicIds: [],
+  },
+  {
+    topicId: 'concept-reversion',
+    title: 'Reversion',
+    summary: 'Price moving back toward a typical level.',
+    content:
+      'What this means\n\nPrice moving back toward a typical level.\n\nWhy it matters\n\nIt helps explain rebounds or pullbacks after stretched moves.\n\nHow to think about it\n\nTreat reversion as a possibility to evaluate, not as an automatic rule.\n\nCommon misunderstanding\n\nAssuming every stretched move must immediately reverse.\n\nLayer 2: Deeper understanding\n\nHow to recognise this\n\nReversion appears when price stretches away from a more typical area and starts moving back toward it.\n\nHow it usually develops\n\nReversion often begins after directional pressure becomes stretched, but the return may be partial and can fail if original pressure continues.\n\nWhat it is commonly confused with\n\na full trend reversal.\n\na normal pullback inside a trend.\n\na temporary pause with no clear reference area.\n\nWhat makes it clearer\n\nClear overextension, signs of slowing pressure, and a meaningful area to revert toward improve clarity.\n\nWhat makes it less reliable\n\nContinued one-sided pressure, no clear slowing, or no obvious reference area can make reversion less reliable.\n\nHow it appears in examples\n\nReversion appears in caution examples where relief behaviour appears but durable repair does not follow.',
+    mediaType: 'ARTICLE',
+    difficulty: 'BEGINNER',
+    strategyLinks: [],
+    signalLinks: [],
+    eventTypeLinks: [],
+    family: 'core-language',
+    priority: 'NEXT',
+    sections: [
+      {
+        heading: 'What this means',
+        body: ['Price moving back toward a typical level.'],
+      },
+      {
+        heading: 'Why it matters',
+        body: ['It helps explain rebounds or pullbacks after stretched moves.'],
+      },
+      {
+        heading: 'How to think about it',
+        body: ['Treat reversion as a possibility to evaluate, not as an automatic rule.'],
+      },
+      {
+        heading: 'Common misunderstanding',
+        body: ['Assuming every stretched move must immediately reverse.'],
+      },
+      {
+        heading: 'Layer 2: Deeper understanding',
+        body: ['This layer adds deeper behaviour context beneath the beginner foundation.'],
+      },
+      {
+        heading: 'How to recognise this',
+        body: [
+          'Reversion appears when price stretches away from a more typical area and starts moving back toward it.',
+        ],
+      },
+      {
+        heading: 'How it usually develops',
+        body: [
+          'Reversion often begins after directional pressure becomes stretched, but the return may be partial and can fail if original pressure continues.',
+        ],
+      },
+      {
+        heading: 'What it is commonly confused with',
+        body: [
+          'a full trend reversal',
+          'a normal pullback inside a trend',
+          'a temporary pause with no clear reference area',
+        ],
+      },
+      {
+        heading: 'What makes it clearer',
+        body: [
+          'Clear overextension, signs of slowing pressure, and a meaningful area to revert toward improve clarity.',
+        ],
+      },
+      {
+        heading: 'What makes it less reliable',
+        body: [
+          'Continued one-sided pressure, no clear slowing, or no obvious reference area can make reversion less reliable.',
+        ],
+      },
+      {
+        heading: 'How it appears in examples',
+        body: [
+          'Reversion appears in caution examples where relief behaviour appears but durable repair does not follow.',
         ],
       },
     ],

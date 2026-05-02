@@ -154,4 +154,28 @@ describe('createKnowledgeLibraryVM', () => {
       expect(visibleTopicIds.has(topicId)).toBe(false);
     });
   });
+
+  it('keeps P7-K21 first-wave concept topics hidden from visible library shelf sections while priority is NEXT', () => {
+    const firstWaveConceptTopicIds = [
+      'concept-trend',
+      'concept-breakout',
+      'concept-support',
+      'concept-resistance',
+      'concept-reversion',
+    ] as const;
+
+    const result = createKnowledgeLibraryVM({ nodes: knowledgeCatalog });
+
+    if (result.status !== 'AVAILABLE') {
+      throw new Error('Expected knowledge library to be available.');
+    }
+
+    const visibleTopicIds = new Set(
+      result.sections.flatMap((section) => section.items.map((item) => item.topicId)),
+    );
+
+    firstWaveConceptTopicIds.forEach((topicId) => {
+      expect(visibleTopicIds.has(topicId)).toBe(false);
+    });
+  });
 });

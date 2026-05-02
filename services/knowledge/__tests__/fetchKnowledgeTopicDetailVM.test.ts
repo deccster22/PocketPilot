@@ -161,6 +161,84 @@ describe('fetchKnowledgeTopicDetailVM', () => {
     });
   });
 
+  it('resolves all five P7-K21 first-wave concept topic IDs as available hidden follow-through routes', () => {
+    const firstWaveConceptTopicIds = [
+      'concept-trend',
+      'concept-breakout',
+      'concept-support',
+      'concept-resistance',
+      'concept-reversion',
+    ] as const;
+
+    firstWaveConceptTopicIds.forEach((topicId) => {
+      const result = fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId,
+      });
+
+      expect(result.availability.status).toBe('AVAILABLE');
+
+      if (result.availability.status !== 'AVAILABLE') {
+        throw new Error(`Expected ${topicId} to resolve, received ${result.availability.reason}.`);
+      }
+
+      expect(result.availability.topic.topicId).toBe(topicId);
+    });
+  });
+
+  it('routes first-wave evidence topics to only the intended first-wave concept links', () => {
+    const expectedConceptLinksByEvidence = {
+      'evidence-trend-follow-bitcoin-above-the-old-high-worked': [
+        'concept-trend',
+        'concept-breakout',
+        'concept-support',
+      ],
+      'evidence-trend-follow-from-liquidity-tailwind-to-deleveraging-grind-caution': [
+        'concept-trend',
+      ],
+      'evidence-breakout-watcher-bitcoin-above-the-old-high-worked': [
+        'concept-breakout',
+        'concept-resistance',
+        'concept-support',
+      ],
+      'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution': [
+        'concept-breakout',
+        'concept-resistance',
+      ],
+      'evidence-buy-the-dip-bitcoin-above-the-old-high-worked': [
+        'concept-support',
+        'concept-trend',
+      ],
+      'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution': [
+        'concept-reversion',
+        'concept-trend',
+        'concept-support',
+      ],
+    } as const;
+
+    (
+      Object.entries(expectedConceptLinksByEvidence) as ReadonlyArray<
+        [string, ReadonlyArray<string>]
+      >
+    ).forEach(([evidenceTopicId, expectedConceptIds]) => {
+      const result = fetchKnowledgeTopicDetailVM({
+        surface: 'KNOWLEDGE_LIBRARY',
+        topicId: evidenceTopicId,
+      });
+
+      expect(result.availability.status).toBe('AVAILABLE');
+
+      if (result.availability.status !== 'AVAILABLE') {
+        throw new Error(`Expected ${evidenceTopicId} to resolve, received ${result.availability.reason}.`);
+      }
+
+      expect(result.availability.topic.relatedTopicIds).toEqual(expectedConceptIds);
+      expect(result.availability.topic.relatedTopicIds).not.toEqual(
+        expect.arrayContaining(['concept-momentum', 'concept-confluence', 'concept-volatility']),
+      );
+    });
+  });
+
   it('exposes exactly two first-wave evidence links from each first-wave source strategy topic', () => {
     const expectedByStrategy = {
       'strategy-trend-follow': [
@@ -225,6 +303,11 @@ describe('fetchKnowledgeTopicDetailVM', () => {
       'fibonacci-failure',
       'candle-signal-valid',
       'candle-signal-noise',
+      'concept-momentum',
+      'concept-confluence',
+      'concept-volatility',
+      'concept-fibonacci-levels',
+      'concept-candlestick-patterns',
     ] as const;
 
     nonRoutableTopicIds.forEach((topicId) => {
