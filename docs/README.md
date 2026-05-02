@@ -2,11 +2,11 @@ Title: PocketPilot Documentation Index
 Version: v3 markdown source
 Source: reconciled repo docs tree
 
-Last Updated: 2026-05-01
+Last Updated: 2026-05-02
 
 # PocketPilot Documentation Index
 
-**Last updated:** 2026-05-01
+**Last updated:** 2026-05-02
 
 **Purpose:** Canonical entry point for PocketPilot documentation in this repo.
 
@@ -94,6 +94,7 @@ Start with:
 - P7-K16 merges compact Layer 3 example-wiring bridges into canonical strategy, concept, and covered Trade Hub articles, reuses existing canonical example/evidence topics when available, and maps non-live example slugs for future integration without runtime UI behavior changes.
 - P7-K17 standardizes all current Layer 3 market-example/evidence narrative topics to one behavior-first template, sharpens the four caution upgrades, and updates docs-side integration mapping without widening runtime wiring.
 - P7-K19 surfaces a bounded first wave of six evidence examples as hidden runtime-resolvable follow-through topics from three source strategies, keeps market examples docs-side, keeps Trade Hub example links off, and preserves no-visible-Examples-shelf behavior.
+- P7-K21 adds a bounded first concept follow-through wave by merging Layer 2 readiness content into five concept docs and surfacing exactly those five concept IDs as hidden runtime-routable topics (`priority: NEXT`) for evidence-to-concept routing, without creating a visible Concept shelf or widening Trade Hub/example surfacing.
 - P9-S6 adds one service-owned fit-contrast seam inside Strategy Navigator so users can read a calm "why this, not that" comparison against nearby alternatives without ranking theatre, prediction framing, or execution prompts.
 - P9-S7 adds one service-owned nearby-alternative heuristic seam so Strategy Navigator fit-contrast compares against more context-adjacent strategies instead of weak or arbitrary alternatives.
 - P9-S8 adds one canonical service-owned strategy metadata registry so nearby-alternative selection and fit-contrast consume the same explicit metadata base instead of scattered strategy-label assumptions.

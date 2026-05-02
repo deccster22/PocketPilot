@@ -1,7 +1,7 @@
 # PocketPilot Active Backlog / State
 
 Phase anchor: `DOC-D3` (narrative cleanup continuity)  
-Last refreshed: 2026-05-01  
+Last refreshed: 2026-05-02  
 Scope: active backlog/state source with docs/admin continuity updates
 
 ## Why This Refresh Happened Now
@@ -18,6 +18,7 @@ Recent landed work closed or narrowed multiple previously-open backlog threads:
 - `P7-K16`
 - `P7-K17`
 - `P7-K19`
+- `P7-K21`
 - `P6-A7`, `P6-A8`, `P8-I12`
 - `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9`
 - `DOC-D1`
@@ -59,11 +60,12 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 - `P7` broader alias coverage beyond current seams: parked until signal review shows repeated unresolved terms.
 - `P7` Layer 3 narrative example/evidence content import for mapped future slugs: parked until a bounded narrative-content phase is approved.
 - `P7` second-wave runtime surfacing for Momentum/Confluence evidence pairs: parked until first-wave usefulness review and bounded scope approval.
+- `P7` second-wave concept runtime surfacing for Momentum/Confluence (and later Volatility where bridges are strong): parked until first-wave concept follow-through usefulness review and bounded scope approval.
 - `P7` visible Examples shelf rollout: parked until hidden follow-through runtime behavior proves useful without clutter.
+- `P7` visible Concept shelf rollout: parked until hidden concept follow-through behavior proves useful without clutter.
 - `P7` Trade Hub example-link rollout: parked until planning-language safety review explicitly approves action-adjacent linking.
 - `P7` missing clean played-out examples for Range Trader and Reversion Bounce: parked until a bounded follow-up example-authoring phase is approved.
 - `P7` missing Layer 3 evidence coverage for Candle Signals and Fibonacci Zones: parked until a bounded strategy-evidence expansion phase is approved.
-- `P7` Concept Layer 2 deepening: parked until explicit sequence is opened after Strategy Layer 2 stabilization.
 - `P7` strategy/concept evidence cleanup pass: parked until a bounded evidence cleanup scope is approved.
 - `P8` richer period/archive/journal variants: parked unless reflection-family prioritization explicitly promotes them.
 - `P9` profile-aware disclosure defaults beyond current conservative progressive disclosure: parked until explicit product need.
@@ -100,6 +102,7 @@ Path choice: `docs/meta/BACKLOG.md` was selected because `docs/meta/` is already
 | Layer 3 example wiring bridges across strategy/concept/trade-hub docs with non-live slug mapping fallback | completed baseline | `P7-K16` |
 | Layer 3 market-example/evidence narrative standardization (template consistency + behavior-first framing + KEEP/UPGRADE alignment) | completed baseline | `P7-K17` |
 | Layer 3 first-wave hidden runtime follow-through surfacing for six evidence topics (Trend Follow/Breakout Watcher/Buy the Dip) with no visible examples shelf | completed baseline | `P7-K19` |
+| Concept Layer 2 deepening for first-wave concept set plus hidden concept follow-through runtime surfacing for five concept topics (trend/breakout/support/resistance/reversion) with no visible concept shelf | completed baseline | `P7-K21` |
 | Snapshot Since Last Checked surface + clear-after-view behavior + deeper archive continuity | completed baseline | `P6-A7`, `P6-A8`, `P8-I12` |
 | Strategy Navigator fit contrast + nearby alternative heuristics + metadata normalization + mobile density refinement | completed baseline | `P9-S6`, `P9-S7`, `P9-S8`, `P9-S9` |
 | docs map/index consistency cleanup after these landings | completed | `DOC-D1` |

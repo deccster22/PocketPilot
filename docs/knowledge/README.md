@@ -55,3 +55,5 @@ Controlled live knowledge tree for in-product learning content.
 `P7-K17` standardizes the existing 6 market-example and 12 evidence docs into one behavior-first example template, sharpens the four audit-marked caution upgrades, and refreshes `docs/knowledge/_meta/LAYER3_EXAMPLE_INTEGRATION_MAP.md` without adding new broad topic docs or widening runtime/help wiring.
 
 `P7-K19` adds a bounded first-wave runtime surfacing pass for exactly six evidence topics (Trend Follow, Breakout Watcher, Buy the Dip pairs), keeps them hidden as follow-through routes (`priority: NEXT`), wires strategy related-topic follow-through links, and intentionally keeps market-example runtime routes, Trade Hub example links, and a visible Examples shelf out of scope.
+
+`P7-K21` adds the first bounded concept runtime follow-through wave by merging Layer 2 readiness content into five canonical concept docs (`trend`, `breakout`, `support`, `resistance`, `reversion`), surfacing exactly those five concept topic IDs as hidden runtime routes (`priority: NEXT`), and wiring evidence-to-concept related-topic follow-through without enabling a visible Concept shelf.

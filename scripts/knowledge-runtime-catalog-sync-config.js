@@ -22,6 +22,12 @@ const RUNTIME_REQUIRED_REGISTER_TOPIC_IDS = Object.freeze([
   'evidence-breakout-watcher-bitcoin-august-2020-failed-escape-caution',
   'evidence-buy-the-dip-bitcoin-above-the-old-high-worked',
   'evidence-buy-the-dip-bitcoin-june-to-august-2022-caution',
+  // P7-K21 first-wave hidden concept follow-through routes
+  'concept-trend',
+  'concept-breakout',
+  'concept-support',
+  'concept-resistance',
+  'concept-reversion',
   // Insights and knowledge-system runtime routes
   'pp-what-event-ledger-is-for',
   'pp-what-insights-is-for',

@@ -9,18 +9,22 @@ depends_on:
   - "P7-K17"
   - "P7-K18"
   - "P7-K19"
+  - "P7-K20"
+  - "P7-K21"
 related_docs:
   - "/docs/knowledge/_register/CONTENT_REGISTER.csv"
   - "/docs/knowledge/market-examples/"
   - "/docs/knowledge/evidence/"
+  - "/docs/knowledge/concepts/"
   - "/docs/phases/P7-K17.md"
   - "/docs/phases/P7-K19.md"
+  - "/docs/phases/P7-K21.md"
 canonical_path: "/docs/knowledge/_meta/LAYER3_EXAMPLE_INTEGRATION_MAP.md"
 ---
 
 # Layer 3 Example Integration Map
 
-This map tracks the Layer 3 example/evidence corpus after standardization (`P7-K17`) and first-wave runtime follow-through surfacing (`P7-K19`).
+This map tracks the Layer 3 example/evidence corpus after standardization (`P7-K17`), first-wave evidence runtime follow-through surfacing (`P7-K19`), and first-wave concept follow-through routing enablement (`P7-K21`).
 
 ## Current scope snapshot
 
@@ -37,6 +41,8 @@ This map tracks the Layer 3 example/evidence corpus after standardization (`P7-K
 - No visible Examples shelf is enabled.
 - Evidence topics only in first wave.
 - Market-example topics remain docs-side in this phase.
+- Five concept topics are now runtime-routable as hidden follow-through references for first-wave evidence topics.
+- No visible Concept shelf is enabled.
 - Trade Hub example links remain off in this phase.
 
 ## Canonical topic routing status
@@ -75,6 +81,23 @@ Runtime follow-through links were added from these source strategy topics only:
 - `strategy-buy-the-dip` -> 2 first-wave buy-the-dip evidence topics
 
 Concept-source linking was intentionally deferred in `P7-K19` because concept topic IDs are not currently runtime-routable, and adding them would widen this wave beyond the accepted first-wave scope.
+
+`P7-K21` follows that deferral by adding only the accepted five concept follow-through routes:
+
+- `concept-trend`
+- `concept-breakout`
+- `concept-support`
+- `concept-resistance`
+- `concept-reversion`
+
+Evidence-to-concept related-topic routing is now active only for the six first-wave evidence topics.  
+Held concept IDs remain outside the runtime-required scope in this wave:
+
+- `concept-momentum`
+- `concept-confluence`
+- `concept-volatility`
+- `concept-fibonacci-levels`
+- `concept-candlestick-patterns`
 
 ## Missing coverage gaps (still visible)
 
